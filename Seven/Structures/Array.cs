@@ -1,7 +1,7 @@
 ﻿// Seven
 // https://github.com/53V3N1X/SevenFramework
-// LISCENSE: See "LISCENSE.txt" in th root project directory.
-// SUPPORT: See "README.txt" in the root project directory.
+// LISCENSE: See "LISCENSE.md" in th root project directory.
+// SUPPORT: See "SUPPORT.md" in the root project directory.
 
 namespace Seven.Structures
 {
@@ -9,6 +9,8 @@ namespace Seven.Structures
   /// <typeparam name="Type">The type of the instances to store in this data structure.</typeparam>
   public interface Array<Type> : Structure<Type>
   {
+    #region property
+
     /// <summary>Allows indexed access of the array.</summary>
     /// <param name="index">The index of the array to get/set.</param>
     /// <returns>The value at the desired index.</returns>
@@ -16,6 +18,8 @@ namespace Seven.Structures
 
     /// <summary>The length of the array.</summary>
     int Length { get; }
+
+    #endregion
   }
 
   /// <summary>Implements a standard array that inherits InterfaceTraversable.</summary>
@@ -24,6 +28,8 @@ namespace Seven.Structures
   public class Array_Array<Type> : Array<Type>
   {
     public Type[] _array;
+
+    #region code
 
     /// <summary>FOR COMPATIBILITY ONLY. AVOID IF POSSIBLE.</summary>
     public static implicit operator Array_Array<Type>(Type[] array)
@@ -261,10 +267,16 @@ namespace Seven.Structures
       return array;
     }
 
+    #endregion
+
+    #region error
+
     /// <summary>This is used for throwing AVL Tree exceptions only to make debugging faster.</summary>
     private class Error : Structure.Error
     {
       public Error(string message) : base(message) { }
     }
+
+    #endregion
   }
 }

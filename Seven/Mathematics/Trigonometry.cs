@@ -1,7 +1,7 @@
 ﻿// Seven
 // https://github.com/53V3N1X/SevenFramework
-// LISCENSE: See "LISCENSE.txt" in th root project directory.
-// SUPPORT: See "README.txt" in the root project directory.
+// LISCENSE: See "LISCENSE.md" in th root project directory.
+// SUPPORT: See "SUPPORT.md" in the root project directory.
 
 namespace Seven.Mathematics
 {
@@ -9,7 +9,9 @@ namespace Seven.Mathematics
   /// <typeparam name="T">The type this trigonometry library can perform on.</typeparam>
   public interface Trigonometry<T>
   {
-		/// <summary>Converts degrees to radians.</summary>
+    #region property
+
+    /// <summary>Converts degrees to radians.</summary>
 		T toRadians(T angle);
 		/// <summary>Converts radians to degrees.</summary>
 		T toDegrees(T angle);
@@ -37,8 +39,11 @@ namespace Seven.Mathematics
     T arcsec(T ratio);
     /// <summary>Computes the arccot of a ratio.</summary>
     T arccot(T ratio);
+
+    #endregion
   }
 
+  /// <summary>Makes and stores implementations of trigonometry.</summary>
   public static class Trigonometry
   {
     #region Delegates
@@ -580,6 +585,474 @@ namespace Seven.Mathematics
     #endregion
 
     #region Implementations
+
+    #region Fraction128
+
+    public static Fraction128 toRadians(Fraction128 angle)
+    {
+      return (Fraction128)((double)angle * Constants.pi_double / 180d);
+    }
+
+    public static Fraction128 toDegrees(Fraction128 angle)
+    {
+      return (Fraction128)((double)angle * 180d / Constants.pi_double);
+    }
+
+    public static Fraction128 sin(Fraction128 angle)
+    {
+      return (Fraction128)System.Math.Sin((double)angle);
+
+      // THE FOLLOWING IS PERSONAL SIN FUNCTION. IT WORKS BUT IT IS NOT AS FAST AS
+      // THE SYSTEM FUNCTION IN ITS CURRENT STATE
+      #region Custom Sin Function
+      //// get the angle to be within the unit circle
+      //angle = angle % (TwoPi);
+
+      //// if the angle is negative, inverse it against the full unit circle
+      //if (angle < 0)
+      //  angle = TwoPi + angle;
+
+      //// adjust for quadrants
+      //// NOTE: if you want more accuracy, you can follow this pattern
+      //// sin(x) = x - x^3/3! + x^5/5! - x^7/7! ...
+      //// the more terms you include the more accurate it is
+      //float angleCubed;
+      //float angleToTheFifth;
+      //// quadrant 1
+      //if (angle <= HalfPi)
+      //{
+      //  angleCubed = angle * angle * angle;
+      //  angleToTheFifth = angleCubed * angle * angle;
+      //  return angle
+      //    - ((angleCubed) / 6)
+      //    + ((angleToTheFifth) / 120);
+      //}
+      //// quadrant 2
+      //else if (angle <= Pi)
+      //{
+      //  angle = HalfPi - (angle % HalfPi);
+      //  angleCubed = angle * angle * angle;
+      //  angleToTheFifth = angleCubed * angle * angle;
+      //  return angle
+      //    - ((angleCubed) / 6)
+      //    + ((angleToTheFifth) / 120);
+      //}
+      //// quadrant 3
+      //else if (angle <= ThreeHalvesPi)
+      //{
+      //  angle = angle % Pi;
+      //  angleCubed = angle * angle * angle;
+      //  angleToTheFifth = angleCubed * angle * angle;
+      //  return -(angle
+      //      - ((angleCubed) / 6)
+      //      + ((angleToTheFifth) / 120));
+      //}
+      //// quadrant 4  
+      //else
+      //{
+      //  angle = HalfPi - (angle % HalfPi);
+      //  angleCubed = angle * angle * angle;
+      //  angleToTheFifth = angleCubed * angle * angle;
+      //  return -(angle
+      //      - ((angleCubed) / 6)
+      //      + ((angleToTheFifth) / 120));
+      //}
+      #endregion
+    }
+
+    public static Fraction128 cos(Fraction128 angle)
+    {
+      return (Fraction128)System.Math.Cos((double)angle);
+
+      // THE FOLLOWING IS MY PERSONAL FUNCTION. IT WORKS BUT IT IS NOT AS FAST AS
+      // THE SYSTEM FUNCTION IN ITS CURRENT STATE
+      #region Custom Cos Function
+      //// If you wanted to be cheap, you could just use the following commented line...
+      //// return Sin(angle + (Pi / 2));
+
+      //// get the angle to be within the unit circle
+      //angle = angle % (TwoPi);
+
+      //// if the angle is negative, inverse it against the full unit circle
+      //if (angle < 0)
+      //  angle = TwoPi + angle;
+
+      //// adjust for quadrants
+      //// NOTE: if you want more accuracy, you can follow this pattern
+      //// cos(x) = 1 - x^2/2! + x^4/4! - x^6/6! ...
+      //// the terms you include the more accuracy it is
+      //float angleSquared;
+      //float angleToTheFourth;
+      //float angleToTheSixth;
+      //// quadrant 1
+      //if (angle <= HalfPi)
+      //{
+      //  angleSquared = angle * angle;
+      //  angleToTheFourth = angleSquared * angle * angle;
+      //  angleToTheSixth = angleToTheFourth * angle * angle;
+      //  return 1
+      //    - (angleSquared / 2)
+      //    + (angleToTheFourth / 24)
+      //    - (angleToTheSixth / 720);
+      //}
+      //// quadrant 2
+      //else if (angle <= Pi)
+      //{
+      //  angle = HalfPi - (angle % HalfPi);
+      //  angleSquared = angle * angle;
+      //  angleToTheFourth = angleSquared * angle * angle;
+      //  angleToTheSixth = angleToTheFourth * angle * angle;
+      //  return -(1
+      //    - (angleSquared / 2)
+      //    + (angleToTheFourth / 24)
+      //    - (angleToTheSixth / 720));
+      //}
+      //// quadrant 3
+      //else if (angle <= ThreeHalvesPi)
+      //{
+      //  angle = angle % Pi;
+      //  angleSquared = angle * angle;
+      //  angleToTheFourth = angleSquared * angle * angle;
+      //  angleToTheSixth = angleToTheFourth * angle * angle;
+      //  return -(1
+      //    - (angleSquared / 2)
+      //    + (angleToTheFourth / 24)
+      //    - (angleToTheSixth / 720));
+      //}
+      //// quadrant 4  
+      //else
+      //{
+      //  angle = HalfPi - (angle % HalfPi);
+      //  angleSquared = angle * angle;
+      //  angleToTheFourth = angleSquared * angle * angle;
+      //  angleToTheSixth = angleToTheFourth * angle * angle;
+      //  return 1
+      //    - (angleSquared / 2)
+      //    + (angleToTheFourth / 24)
+      //    - (angleToTheSixth / 720);
+      //}
+      #endregion
+    }
+
+    public static Fraction128 tan(Fraction128 angle)
+    {
+      return (Fraction128)System.Math.Tan((double)angle);
+
+      // THE FOLLOWING IS MY PERSONAL FUNCTION. IT WORKS BUT IT IS NOT AS FAST AS
+      // THE SYSTEM FUNCTION IN ITS CURRENT STATE
+      #region Custom Tan Function
+      //// "sin / cos" results in "opposite side / adjacent side", which is equal to tangent
+      //return Sin(angle) / Cos(angle);
+      #endregion
+    }
+
+    public static Fraction128 sec(Fraction128 angle)
+    {
+      return (Fraction128)(1d / System.Math.Cos((double)angle));
+
+      // THE FOLLOWING IS MY PERSONAL FUNCTION. IT WORKS BUT IT IS NOT AS FAST AS
+      // THE SYSTEM FUNCTION IN ITS CURRENT STATE
+      #region Custom Sec Function
+      //// by definition, sec is the reciprical of cos
+      //return 1 / Cos(angle);
+      #endregion
+    }
+
+    public static Fraction128 csc(Fraction128 angle)
+    {
+      return (Fraction128)(1d / System.Math.Sin((double)angle));
+
+      // THE FOLLOWING IS MY PERSONAL FUNCTION. IT WORKS BUT IT IS NOT AS FAST AS
+      // THE SYSTEM FUNCTION IN ITS CURRENT STATE
+      #region Custom Csc Function
+      //// by definition, csc is the reciprical of sin
+      //return 1 / Sin(angle);
+      #endregion
+    }
+
+    public static Fraction128 cot(Fraction128 angle)
+    {
+      return (Fraction128)(1.0d / System.Math.Tan((double)angle));
+
+      // THE FOLLOWING IS MY PERSONAL FUNCTION. IT WORKS BUT IT IS NOT AS FAST AS
+      // THE SYSTEM FUNCTION IN ITS CURRENT STATE
+      #region Custom Cot Function
+      //// by definition, cot is the reciprical of tan
+      //return 1 / Tan(angle);
+      #endregion
+    }
+
+    public static Fraction128 arcsin(Fraction128 sinRatio)
+    {
+      return (Fraction128)System.Math.Asin((double)sinRatio);
+      //I haven't made a custom ArcSin function yet...
+    }
+
+    public static Fraction128 arccos(Fraction128 cosRatio)
+    {
+      return (Fraction128)System.Math.Acos((double)cosRatio);
+      //I haven't made a custom ArcCos function yet...
+    }
+
+    public static Fraction128 arctan(Fraction128 tanRatio)
+    {
+      return (Fraction128)System.Math.Atan((double)tanRatio);
+      //I haven't made a custom ArcTan function yet...
+    }
+
+    public static Fraction128 arccsc(Fraction128 cscRatio)
+    {
+      return (Fraction128)System.Math.Asin(1.0d / (double)cscRatio);
+      //I haven't made a custom ArcCsc function yet...
+    }
+
+    public static Fraction128 arcsec(Fraction128 secRatio)
+    {
+      return (Fraction128)System.Math.Acos(1.0d / (double)secRatio);
+      //I haven't made a custom ArcSec function yet...
+    }
+
+    public static Fraction128 arccot(Fraction128 cotRatio)
+    {
+      return (Fraction128)System.Math.Atan(1.0d / (double)cotRatio);
+      //I haven't made a custom ArcCot function yet...
+    }
+
+    #endregion
+
+    #region Fraction64
+
+    public static Fraction64 toRadians(Fraction64 angle)
+    {
+      return (Fraction64)((double)angle * Constants.pi_double / 180d);
+    }
+
+    public static Fraction64 toDegrees(Fraction64 angle)
+    {
+      return (Fraction64)((double)angle * 180d / Constants.pi_double);
+    }
+
+    public static Fraction64 sin(Fraction64 angle)
+    {
+      return (Fraction64)System.Math.Sin((double)angle);
+
+      // THE FOLLOWING IS PERSONAL SIN FUNCTION. IT WORKS BUT IT IS NOT AS FAST AS
+      // THE SYSTEM FUNCTION IN ITS CURRENT STATE
+      #region Custom Sin Function
+      //// get the angle to be within the unit circle
+      //angle = angle % (TwoPi);
+
+      //// if the angle is negative, inverse it against the full unit circle
+      //if (angle < 0)
+      //  angle = TwoPi + angle;
+
+      //// adjust for quadrants
+      //// NOTE: if you want more accuracy, you can follow this pattern
+      //// sin(x) = x - x^3/3! + x^5/5! - x^7/7! ...
+      //// the more terms you include the more accurate it is
+      //float angleCubed;
+      //float angleToTheFifth;
+      //// quadrant 1
+      //if (angle <= HalfPi)
+      //{
+      //  angleCubed = angle * angle * angle;
+      //  angleToTheFifth = angleCubed * angle * angle;
+      //  return angle
+      //    - ((angleCubed) / 6)
+      //    + ((angleToTheFifth) / 120);
+      //}
+      //// quadrant 2
+      //else if (angle <= Pi)
+      //{
+      //  angle = HalfPi - (angle % HalfPi);
+      //  angleCubed = angle * angle * angle;
+      //  angleToTheFifth = angleCubed * angle * angle;
+      //  return angle
+      //    - ((angleCubed) / 6)
+      //    + ((angleToTheFifth) / 120);
+      //}
+      //// quadrant 3
+      //else if (angle <= ThreeHalvesPi)
+      //{
+      //  angle = angle % Pi;
+      //  angleCubed = angle * angle * angle;
+      //  angleToTheFifth = angleCubed * angle * angle;
+      //  return -(angle
+      //      - ((angleCubed) / 6)
+      //      + ((angleToTheFifth) / 120));
+      //}
+      //// quadrant 4  
+      //else
+      //{
+      //  angle = HalfPi - (angle % HalfPi);
+      //  angleCubed = angle * angle * angle;
+      //  angleToTheFifth = angleCubed * angle * angle;
+      //  return -(angle
+      //      - ((angleCubed) / 6)
+      //      + ((angleToTheFifth) / 120));
+      //}
+      #endregion
+    }
+
+    public static Fraction64 cos(Fraction64 angle)
+    {
+      return (Fraction64)System.Math.Cos((double)angle);
+
+      // THE FOLLOWING IS MY PERSONAL FUNCTION. IT WORKS BUT IT IS NOT AS FAST AS
+      // THE SYSTEM FUNCTION IN ITS CURRENT STATE
+      #region Custom Cos Function
+      //// If you wanted to be cheap, you could just use the following commented line...
+      //// return Sin(angle + (Pi / 2));
+
+      //// get the angle to be within the unit circle
+      //angle = angle % (TwoPi);
+
+      //// if the angle is negative, inverse it against the full unit circle
+      //if (angle < 0)
+      //  angle = TwoPi + angle;
+
+      //// adjust for quadrants
+      //// NOTE: if you want more accuracy, you can follow this pattern
+      //// cos(x) = 1 - x^2/2! + x^4/4! - x^6/6! ...
+      //// the terms you include the more accuracy it is
+      //float angleSquared;
+      //float angleToTheFourth;
+      //float angleToTheSixth;
+      //// quadrant 1
+      //if (angle <= HalfPi)
+      //{
+      //  angleSquared = angle * angle;
+      //  angleToTheFourth = angleSquared * angle * angle;
+      //  angleToTheSixth = angleToTheFourth * angle * angle;
+      //  return 1
+      //    - (angleSquared / 2)
+      //    + (angleToTheFourth / 24)
+      //    - (angleToTheSixth / 720);
+      //}
+      //// quadrant 2
+      //else if (angle <= Pi)
+      //{
+      //  angle = HalfPi - (angle % HalfPi);
+      //  angleSquared = angle * angle;
+      //  angleToTheFourth = angleSquared * angle * angle;
+      //  angleToTheSixth = angleToTheFourth * angle * angle;
+      //  return -(1
+      //    - (angleSquared / 2)
+      //    + (angleToTheFourth / 24)
+      //    - (angleToTheSixth / 720));
+      //}
+      //// quadrant 3
+      //else if (angle <= ThreeHalvesPi)
+      //{
+      //  angle = angle % Pi;
+      //  angleSquared = angle * angle;
+      //  angleToTheFourth = angleSquared * angle * angle;
+      //  angleToTheSixth = angleToTheFourth * angle * angle;
+      //  return -(1
+      //    - (angleSquared / 2)
+      //    + (angleToTheFourth / 24)
+      //    - (angleToTheSixth / 720));
+      //}
+      //// quadrant 4  
+      //else
+      //{
+      //  angle = HalfPi - (angle % HalfPi);
+      //  angleSquared = angle * angle;
+      //  angleToTheFourth = angleSquared * angle * angle;
+      //  angleToTheSixth = angleToTheFourth * angle * angle;
+      //  return 1
+      //    - (angleSquared / 2)
+      //    + (angleToTheFourth / 24)
+      //    - (angleToTheSixth / 720);
+      //}
+      #endregion
+    }
+
+    public static Fraction64 tan(Fraction64 angle)
+    {
+      return (Fraction64)System.Math.Tan((double)angle);
+
+      // THE FOLLOWING IS MY PERSONAL FUNCTION. IT WORKS BUT IT IS NOT AS FAST AS
+      // THE SYSTEM FUNCTION IN ITS CURRENT STATE
+      #region Custom Tan Function
+      //// "sin / cos" results in "opposite side / adjacent side", which is equal to tangent
+      //return Sin(angle) / Cos(angle);
+      #endregion
+    }
+
+    public static Fraction64 sec(Fraction64 angle)
+    {
+      return (Fraction64)(1d / System.Math.Cos((double)angle));
+
+      // THE FOLLOWING IS MY PERSONAL FUNCTION. IT WORKS BUT IT IS NOT AS FAST AS
+      // THE SYSTEM FUNCTION IN ITS CURRENT STATE
+      #region Custom Sec Function
+      //// by definition, sec is the reciprical of cos
+      //return 1 / Cos(angle);
+      #endregion
+    }
+
+    public static Fraction64 csc(Fraction64 angle)
+    {
+      return (Fraction64)(1d / System.Math.Sin((double)angle));
+
+      // THE FOLLOWING IS MY PERSONAL FUNCTION. IT WORKS BUT IT IS NOT AS FAST AS
+      // THE SYSTEM FUNCTION IN ITS CURRENT STATE
+      #region Custom Csc Function
+      //// by definition, csc is the reciprical of sin
+      //return 1 / Sin(angle);
+      #endregion
+    }
+
+    public static Fraction64 cot(Fraction64 angle)
+    {
+      return (Fraction64)(1.0d / System.Math.Tan((double)angle));
+
+      // THE FOLLOWING IS MY PERSONAL FUNCTION. IT WORKS BUT IT IS NOT AS FAST AS
+      // THE SYSTEM FUNCTION IN ITS CURRENT STATE
+      #region Custom Cot Function
+      //// by definition, cot is the reciprical of tan
+      //return 1 / Tan(angle);
+      #endregion
+    }
+
+    public static Fraction64 arcsin(Fraction64 sinRatio)
+    {
+      return (Fraction64)System.Math.Asin((double)sinRatio);
+      //I haven't made a custom ArcSin function yet...
+    }
+
+    public static Fraction64 arccos(Fraction64 cosRatio)
+    {
+      return (Fraction64)System.Math.Acos((double)cosRatio);
+      //I haven't made a custom ArcCos function yet...
+    }
+
+    public static Fraction64 arctan(Fraction64 tanRatio)
+    {
+      return (Fraction64)System.Math.Atan((double)tanRatio);
+      //I haven't made a custom ArcTan function yet...
+    }
+
+    public static Fraction64 arccsc(Fraction64 cscRatio)
+    {
+      return (Fraction64)System.Math.Asin(1.0d / (double)cscRatio);
+      //I haven't made a custom ArcCsc function yet...
+    }
+
+    public static Fraction64 arcsec(Fraction64 secRatio)
+    {
+      return (Fraction64)System.Math.Acos(1.0d / (double)secRatio);
+      //I haven't made a custom ArcSec function yet...
+    }
+
+    public static Fraction64 arccot(Fraction64 cotRatio)
+    {
+      return (Fraction64)System.Math.Atan(1.0d / (double)cotRatio);
+      //I haven't made a custom ArcCot function yet...
+    }
+
+    #endregion
 
     #region decimal
 
@@ -1285,10 +1758,14 @@ namespace Seven.Mathematics
 
     #endregion
 
+    #region error
+
     /// <summary>Error type for all arithmetic computations.</summary>
 		public class Error : Seven.Error
 		{
 			public Error(string message) : base(message) { }
-		}
+    }
+
+    #endregion
   }
 }

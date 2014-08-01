@@ -1,28 +1,41 @@
 ﻿// Seven
 // https://github.com/53V3N1X/SevenFramework
-// LISCENSE: See "LISCENSE.txt" in th root project directory.
-// SUPPORT: See "README.txt" in the root project directory.
+// LISCENSE: See "LISCENSE.md" in th root project directory.
+// SUPPORT: See "SUPPORT.md" in the root project directory.
 
 namespace Seven.Structures
 {
   /// <summary>Represents a link between objects.</summary>
   public interface Link : Structure<object>
   {
+    #region property
+
+    /// <summary>The number of objects in the tuple.</summary>
+    int Size { get; }
+
+    #endregion
+
+    #region method
+
     /// <summary>Gets an array with all the types contained in this link in respective order.</summary>
     /// <returns>An array of all the types in this link in respective order.</returns>
     System.Type[] Types();
 
-    /// <summary>The number of objects in the tuple.</summary>
-    int Size { get; }
+    #endregion
   }
 
   /// <summary>Represents a link between objects.</summary>
   /// <typeparam name="TypeOne">The type of the left item to be linked.</typeparam>
   [System.Serializable]
-  public class Link<TypeOne>
-    : Link
+  public class Link<TypeOne> : Link
   {
+    #region field
+
     protected object _one;
+
+    #endregion
+
+    #region property
 
     /// <summary>Gets the current memory imprint of this structure in bytes.</summary>
     /// <remarks>Returns long.MaxValue on overflow.</remarks>
@@ -34,6 +47,22 @@ namespace Seven.Structures
     /// <summary>The left item in the link.</summary>
     /// <remarks>Runtime: O(1).</remarks>
     public TypeOne One { get { return (TypeOne)this._one; } set { this._one = value; } }
+
+    #endregion
+
+    #region construct
+
+    /// <summary>Creates a link between objects.</summary>
+    /// <param name="one">The first item to be linked.</param>
+    /// <remarks>Runtime: O(1).</remarks>
+    public Link(TypeOne one)
+    {
+      this._one = one;
+    }
+
+    #endregion
+
+    #region method
 
     /// <summary>explicitly casts a System.Tuple to a Seven.Structures.Link.</summary>
     /// <param name="tuple">The System.Tuple to be casted.</param>
@@ -63,14 +92,6 @@ namespace Seven.Structures
       System.Collections.Generic.IEnumerable<object>.GetEnumerator()
     {
       yield return this._one;
-    }
-
-    /// <summary>Creates a link between objects.</summary>
-    /// <param name="one">The first item to be linked.</param>
-    /// <remarks>Runtime: O(1).</remarks>
-    public Link(TypeOne one)
-    {
-      this._one = one;
     }
 
     /// <summary>Gets an array with all the types contained in this link in respective order.</summary>
@@ -151,6 +172,8 @@ namespace Seven.Structures
         this._one
       };
     }
+
+    #endregion
   }
 
   /// <summary>Represents a link between objects.</summary>
@@ -159,8 +182,14 @@ namespace Seven.Structures
   [System.Serializable]
   public class Link<TypeOne, TypeTwo> : Link
   {
+    #region property
+
     protected object _one;
     protected object _two;
+
+    #endregion
+
+    #region field
 
     /// <summary>Gets the current memory imprint of this structure in bytes.</summary>
     /// <remarks>Returns long.MaxValue on overflow.</remarks>
@@ -175,6 +204,24 @@ namespace Seven.Structures
     /// <summary>The right item in the link.</summary>
     /// <remarks>Runtime: O(1).</remarks>
     public TypeTwo Two { get { return (TypeTwo)this._two; } set { this._two = value; } }
+
+    #endregion
+
+    #region construct
+
+    /// <summary>Creates a link between objects.</summary>
+    /// <param name="one">The first item to be linked.</param>
+    /// <param name="two">The second item to be linked.</param>
+    /// <remarks>Runtime: O(1).</remarks>
+    public Link(TypeOne one, TypeTwo two)
+    {
+      this._one = one;
+      this._two = two;
+    }
+
+    #endregion
+
+    #region method
 
     /// <summary>FOR COMPATIBILITY ONLY. AVOID IF POSSIBLE.</summary>
     public static explicit operator Link<TypeOne, TypeTwo>(System.Tuple<TypeOne, TypeTwo> tuple)
@@ -202,16 +249,6 @@ namespace Seven.Structures
     {
       yield return this._one;
       yield return this._two;
-    }
-
-    /// <summary>Creates a link between objects.</summary>
-    /// <param name="one">The first item to be linked.</param>
-    /// <param name="two">The second item to be linked.</param>
-    /// <remarks>Runtime: O(1).</remarks>
-    public Link(TypeOne one, TypeTwo two)
-    {
-      this._one = one;
-      this._two = two;
     }
 
     /// <summary>Gets an array with all the types contained in this link in respective order.</summary>
@@ -306,6 +343,8 @@ namespace Seven.Structures
         this._two
       };
     }
+
+    #endregion
   }
 
   /// <summary>Represents a link between objects.</summary>
@@ -315,9 +354,15 @@ namespace Seven.Structures
   [System.Serializable]
   public class Link<TypeOne, TypeTwo, TypeThree> : Link
   {
+    #region field
+
     protected object _one;
     protected object _two;
     protected object _three;
+
+    #endregion
+
+    #region property
 
     /// <summary>Gets the current memory imprint of this structure in bytes.</summary>
     /// <remarks>Returns long.MaxValue on overflow.</remarks>
@@ -335,6 +380,26 @@ namespace Seven.Structures
     /// <summary>The third item in the link.</summary>
     /// <remarks>Runtime: O(1).</remarks>
     public TypeThree Three { get { return (TypeThree)this._three; } set { this._three = value; } }
+
+    #endregion
+
+    #region construct
+
+    /// <summary>Creates a link between objects.</summary>
+    /// <param name="one">The first item to be linked.</param>
+    /// <param name="two">The second item to be linked.</param>
+    /// <param name="three">The third item to be linked.</param>
+    /// <remarks>Runtime: O(1).</remarks>
+    public Link(TypeOne one, TypeTwo two, TypeThree three)
+    {
+      this._one = one;
+      this._two = two;
+      this._three = three;
+    }
+
+    #endregion
+
+    #region method
 
     /// <summary>explicitly casts a System.Tuple to a Seven.Structures.Link.</summary>
     /// <param name="tuple">The System.Tuple to be casted.</param>
@@ -368,18 +433,6 @@ namespace Seven.Structures
       yield return this._one;
       yield return this._two;
       yield return this._three;
-    }
-
-    /// <summary>Creates a link between objects.</summary>
-    /// <param name="one">The first item to be linked.</param>
-    /// <param name="two">The second item to be linked.</param>
-    /// <param name="three">The third item to be linked.</param>
-    /// <remarks>Runtime: O(1).</remarks>
-    public Link(TypeOne one, TypeTwo two, TypeThree three)
-    {
-      this._one = one;
-      this._two = two;
-      this._three = three;
     }
 
     /// <summary>Gets an array with all the types contained in this link in respective order.</summary>
@@ -487,6 +540,8 @@ namespace Seven.Structures
         this._three
       };
     }
+
+    #endregion
   }
 
   /// <summary>Represents a link between objects.</summary>
@@ -495,13 +550,18 @@ namespace Seven.Structures
   /// <typeparam name="TypeThree">The type of the third item to be linked.</typeparam>
   /// <typeparam name="TypeFour">The type of the fourth item to be linked.</typeparam>
   [System.Serializable]
-  public class Link<TypeOne, TypeTwo, TypeThree, TypeFour>
-    : Link
+  public class Link<TypeOne, TypeTwo, TypeThree, TypeFour> : Link
   {
+    #region field
+
     protected object _one;
     protected object _two;
     protected object _three;
     protected object _four;
+
+    #endregion
+
+    #region property
 
     /// <summary>Gets the current memory imprint of this structure in bytes.</summary>
     /// <remarks>Returns long.MaxValue on overflow.</remarks>
@@ -522,6 +582,28 @@ namespace Seven.Structures
     /// <summary>The fourth item in the link.</summary>
     /// <remarks>Runtime: O(1).</remarks>
     public TypeFour Four { get { return (TypeFour)this._four; } set { this._four = value; } }
+
+    #endregion
+
+    #region construct
+
+    /// <summary>Creates a link between objects.</summary>
+    /// <param name="one">The left item to be linked.</param>
+    /// <param name="two">The second item to be linked.</param>
+    /// <param name="three">The third item to be linked.</param>
+    /// <param name="four">The fourth item to be linked.</param>
+    /// <remarks>Runtime: O(1).</remarks>
+    public Link(TypeOne one, TypeTwo two, TypeThree three, TypeFour four)
+    {
+      this._one = one;
+      this._two = two;
+      this._three = three;
+      this._four = four;
+    }
+
+    #endregion
+
+    #region method
 
     /// <summary>explicitly casts a System.Tuple to a Seven.Structures.Link.</summary>
     /// <param name="tuple">The System.Tuple to be casted.</param>
@@ -561,20 +643,6 @@ namespace Seven.Structures
       yield return this._two;
       yield return this._three;
       yield return this._four;
-    }
-
-    /// <summary>Creates a link between objects.</summary>
-    /// <param name="one">The left item to be linked.</param>
-    /// <param name="two">The second item to be linked.</param>
-    /// <param name="three">The third item to be linked.</param>
-    /// <param name="four">The fourth item to be linked.</param>
-    /// <remarks>Runtime: O(1).</remarks>
-    public Link(TypeOne one, TypeTwo two, TypeThree three, TypeFour four)
-    {
-      this._one = one;
-      this._two = two;
-      this._three = three;
-      this._four = four;
     }
 
     /// <summary>Gets an array with all the types contained in this link in respective order.</summary>
@@ -696,6 +764,8 @@ namespace Seven.Structures
         this._four
       };
     }
+
+    #endregion
   }
 
   /// <summary>Represents a link between objects.</summary>
@@ -705,14 +775,19 @@ namespace Seven.Structures
   /// <typeparam name="TypeFour">The type of the fourth item to be linked.</typeparam>
   /// <typeparam name="TypeFive">The type of the fifth item to be linked.</typeparam>
   [System.Serializable]
-  public class Link<TypeOne, TypeTwo, TypeThree, TypeFour, TypeFive>
-    : Link
+  public class Link<TypeOne, TypeTwo, TypeThree, TypeFour, TypeFive> : Link
   {
+    #region field
+
     protected object _one;
     protected object _two;
     protected object _three;
     protected object _four;
     protected object _five;
+
+    #endregion
+
+    #region property
 
     /// <summary>Gets the current memory imprint of this structure in bytes.</summary>
     /// <remarks>Returns long.MaxValue on overflow.</remarks>
@@ -736,6 +811,30 @@ namespace Seven.Structures
     /// <summary>The fifth item in the link.</summary>
     /// <remarks>Runtime: O(1).</remarks>
     public TypeFive Five { get { return (TypeFive)this._five; } set { this._five = value; } }
+
+    #endregion
+
+    #region construct
+
+    /// <summary>Creates a link between objects.</summary>
+    /// <param name="one">The first item to be linked.</param>
+    /// <param name="two">The second item to be linked.</param>
+    /// <param name="three">The third item to be linked.</param>
+    /// <param name="four">The fourth item to be linked.</param>
+    /// <param name="five">The fourth item to be linked.</param>
+    /// <remarks>Runtime: O(1).</remarks>
+    public Link(TypeOne one, TypeTwo two, TypeThree three, TypeFour four, TypeFive five)
+    {
+      this._one = one;
+      this._two = two;
+      this._three = three;
+      this._four = four;
+      this._five = five;
+    }
+
+    #endregion
+
+    #region method
 
     /// <summary>explicitly casts a System.Tuple to a Seven.Structures.Link.</summary>
     /// <param name="tuple">The System.Tuple to be casted.</param>
@@ -777,22 +876,6 @@ namespace Seven.Structures
       yield return this._three;
       yield return this._four;
       yield return this._five;
-    }
-
-    /// <summary>Creates a link between objects.</summary>
-    /// <param name="one">The first item to be linked.</param>
-    /// <param name="two">The second item to be linked.</param>
-    /// <param name="three">The third item to be linked.</param>
-    /// <param name="four">The fourth item to be linked.</param>
-    /// <param name="five">The fourth item to be linked.</param>
-    /// <remarks>Runtime: O(1).</remarks>
-    public Link(TypeOne one, TypeTwo two, TypeThree three, TypeFour four, TypeFive five)
-    {
-      this._one = one;
-      this._two = two;
-      this._three = three;
-      this._four = four;
-      this._five = five;
     }
 
     /// <summary>Gets an array with all the types contained in this link in respective order.</summary>
@@ -926,6 +1009,8 @@ namespace Seven.Structures
         this._five
       };
     }
+
+    #endregion
   }
 
   /// <summary>Represents a link between objects.</summary>
@@ -936,15 +1021,20 @@ namespace Seven.Structures
   /// <typeparam name="TypeFive">The type of the fifth item to be linked.</typeparam>
   /// <typeparam name="TypeSix">The type of the sixth item to be linked.</typeparam>
   [System.Serializable]
-  public class Link<TypeOne, TypeTwo, TypeThree, TypeFour, TypeFive, TypeSix>
-    : Link
+  public class Link<TypeOne, TypeTwo, TypeThree, TypeFour, TypeFive, TypeSix> : Link
   {
+    #region field
+
     protected object _one;
     protected object _two;
     protected object _three;
     protected object _four;
     protected object _five;
     protected object _six;
+
+    #endregion
+
+    #region property
 
     /// <summary>Gets the current memory imprint of this structure in bytes.</summary>
     /// <remarks>Returns long.MaxValue on overflow.</remarks>
@@ -971,6 +1061,32 @@ namespace Seven.Structures
     /// <summary>The sixth item in the link.</summary>
     /// <remarks>Runtime: O(1).</remarks>
     public TypeSix Six { get { return (TypeSix)this._six; } set { this._six = value; } }
+
+    #endregion
+
+    #region construct
+
+    /// <summary>Creates a link between objects.</summary>
+    /// <param name="one">The first item to be linked.</param>
+    /// <param name="two">The second item to be linked.</param>
+    /// <param name="three">The third item to be linked.</param>
+    /// <param name="four">The fourth item to be linked.</param>
+    /// <param name="five">The fourth item to be linked.</param>
+    /// <param name="six">The fourth item to be linked.</param>
+    /// <remarks>Runtime: O(1).</remarks>
+    public Link(TypeOne one, TypeTwo two, TypeThree three, TypeFour four, TypeFive five, TypeSix six)
+    {
+      this._one = one;
+      this._two = two;
+      this._three = three;
+      this._four = four;
+      this._five = five;
+      this._six = six;
+    }
+
+    #endregion
+
+    #region method
 
     /// <summary>explicitly casts a System.Tuple to a Seven.Structures.Link.</summary>
     /// <param name="tuple">The System.Tuple to be casted.</param>
@@ -1017,25 +1133,7 @@ namespace Seven.Structures
       yield return this._five;
       yield return this._six;
     }
-
-    /// <summary>Creates a link between objects.</summary>
-    /// <param name="one">The first item to be linked.</param>
-    /// <param name="two">The second item to be linked.</param>
-    /// <param name="three">The third item to be linked.</param>
-    /// <param name="four">The fourth item to be linked.</param>
-    /// <param name="five">The fourth item to be linked.</param>
-    /// <param name="six">The fourth item to be linked.</param>
-    /// <remarks>Runtime: O(1).</remarks>
-    public Link(TypeOne one, TypeTwo two, TypeThree three, TypeFour four, TypeFive five, TypeSix six)
-    {
-      this._one = one;
-      this._two = two;
-      this._three = three;
-      this._four = four;
-      this._five = five;
-      this._six = six;
-    }
-
+    
     /// <summary>Gets an array with all the types contained in this link in respective order.</summary>
     /// <returns>An array of all the types in this link in respective order.</returns>
     public System.Type[] Types()
@@ -1179,6 +1277,8 @@ namespace Seven.Structures
         this._six
       };
     }
+
+    #endregion
   }
 
   /// <summary>Represents a link between objects.</summary>
@@ -1189,9 +1289,10 @@ namespace Seven.Structures
   /// <typeparam name="TypeFive">The type of the fifth item to be linked.</typeparam>
   /// <typeparam name="TypeSix">The type of the sixth item to be linked.</typeparam>
   [System.Serializable]
-  public class Link<TypeOne, TypeTwo, TypeThree, TypeFour, TypeFive, TypeSix, TypeSeven>
-    : Link
+  public class Link<TypeOne, TypeTwo, TypeThree, TypeFour, TypeFive, TypeSix, TypeSeven> : Link
   {
+    #region field
+
     protected object _one;
     protected object _two;
     protected object _three;
@@ -1199,6 +1300,10 @@ namespace Seven.Structures
     protected object _five;
     protected object _six;
     protected object _seven;
+
+    #endregion
+
+    #region property
 
     /// <summary>Gets the current memory imprint of this structure in bytes.</summary>
     /// <remarks>Returns long.MaxValue on overflow.</remarks>
@@ -1228,6 +1333,33 @@ namespace Seven.Structures
     /// <summary>The sixth item in the link.</summary>
     /// <remarks>Runtime: O(1).</remarks>
     public TypeSeven Seven { get { return (TypeSeven)this._seven; } set { this._seven = value; } }
+
+    #endregion
+
+    #region construct
+
+    /// <summary>Creates a link between objects.</summary>
+    /// <param name="one">The first item to be linked.</param>
+    /// <param name="two">The second item to be linked.</param>
+    /// <param name="three">The third item to be linked.</param>
+    /// <param name="four">The fourth item to be linked.</param>
+    /// <param name="five">The fourth item to be linked.</param>
+    /// <param name="six">The fourth item to be linked.</param>
+    /// <remarks>Runtime: O(1).</remarks>
+    public Link(TypeOne one, TypeTwo two, TypeThree three, TypeFour four, TypeFive five, TypeSix six, TypeSeven seven)
+    {
+      this._one = one;
+      this._two = two;
+      this._three = three;
+      this._four = four;
+      this._five = five;
+      this._six = six;
+      this._seven = seven;
+    }
+
+    #endregion
+
+    #region method
 
     /// <summary>explicitly casts a System.Tuple to a Seven.Structures.Link.</summary>
     /// <param name="tuple">The System.Tuple to be casted.</param>
@@ -1275,25 +1407,6 @@ namespace Seven.Structures
       yield return this._five;
       yield return this._six;
       yield return this._seven;
-    }
-
-    /// <summary>Creates a link between objects.</summary>
-    /// <param name="one">The first item to be linked.</param>
-    /// <param name="two">The second item to be linked.</param>
-    /// <param name="three">The third item to be linked.</param>
-    /// <param name="four">The fourth item to be linked.</param>
-    /// <param name="five">The fourth item to be linked.</param>
-    /// <param name="six">The fourth item to be linked.</param>
-    /// <remarks>Runtime: O(1).</remarks>
-    public Link(TypeOne one, TypeTwo two, TypeThree three, TypeFour four, TypeFive five, TypeSix six, TypeSeven seven)
-    {
-      this._one = one;
-      this._two = two;
-      this._three = three;
-      this._four = four;
-      this._five = five;
-      this._six = six;
-      this._seven = seven;
     }
 
     /// <summary>Gets an array with all the types contained in this link in respective order.</summary>
@@ -1450,5 +1563,7 @@ namespace Seven.Structures
         this._seven
       };
     }
+
+    #endregion
   }
 }

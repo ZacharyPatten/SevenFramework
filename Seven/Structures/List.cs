@@ -1,7 +1,7 @@
 ﻿// Seven
 // https://github.com/53V3N1X/SevenFramework
-// LISCENSE: See "LISCENSE.txt" in th root project directory.
-// SUPPORT: See "README.txt" in the root project directory.
+// LISCENSE: See "LISCENSE.md" in th root project directory.
+// SUPPORT: See "SUPPORT.md" in the root project directory.
 
 namespace Seven.Structures
 {
@@ -9,6 +9,18 @@ namespace Seven.Structures
   /// <typeparam name="T">The type of items to store in the list.</typeparam>
   public interface List<T> : Structure<T>
   {
+    #region property
+
+    /// <summary>Returns the number of items in the list.</summary>
+    int Count { get; }
+
+    /// <summary>Returns true if the structure is empty.</summary>
+    bool IsEmpty { get; }
+
+    #endregion
+
+    #region method
+
     /// <summary>Adds an item to the end of this list.</summary>
     /// <param name="addition">The item to add to the list.</param>
     void Add(T addition);
@@ -28,15 +40,11 @@ namespace Seven.Structures
     /// <param name="removal">The item to genocide (hell yeah that is a verb...).</param>
     /// <param name="compare">The function to determine equality.</param>
     void RemoveAll(T removal, Compare<T> compare);
-    
-    /// <summary>Returns the number of items in the list.</summary>
-    int Count { get; }
-
-    /// <summary>Returns true if the structure is empty.</summary>
-    bool IsEmpty { get; }
 
     /// <summary>Resets the list to an empty state. WARNING could cause excessive garbage collection.</summary>
     void Clear();
+
+    #endregion
   }
 
   /// <summary>Implements a growing, singularly-linked list data structure that inherits InterfaceTraversable.</summary>
@@ -45,6 +53,8 @@ namespace Seven.Structures
   [System.Serializable]
   public class List_Linked<Type> : List<Type>
   {
+    #region class
+
     /// <summary>This class just holds the data for each individual node of the list.</summary>
     protected class Node
     {
@@ -57,10 +67,18 @@ namespace Seven.Structures
       internal Node(Type data) { _value = data; }
     }
 
+    #endregion
+
+    #region field
+
     protected Node _head;
     protected Node _tail;
     protected int _count;
-    
+
+    #endregion
+
+    #region propterty
+
     /// <summary>Gets the current memory imprint of this structure in bytes.</summary>
     /// <remarks>Returns long.MaxValue on overflow.</remarks>
     public int SizeOf { get { return _count; } }
@@ -72,6 +90,22 @@ namespace Seven.Structures
     /// <summary>Returns true if the structure is empty.</summary>
     /// <remarks>Runtime: O(1).</remarks>
     public bool IsEmpty { get { return _count == 0; } }
+
+    #endregion
+
+    #region construct
+
+    /// <summary>Creates an instance of a stalistck.</summary>
+    /// <remarks>Runtime: O(1).</remarks>
+    public List_Linked()
+    {
+      _head = _tail = null;
+      _count = 0;
+    }
+
+    #endregion
+
+    #region method
 
     /// <summary>FOR COMPATIBILITY ONLY. AVOID IF POSSIBLE.</summary>
     System.Collections.IEnumerator
@@ -87,14 +121,6 @@ namespace Seven.Structures
     {
       for (Node looper = this._head; looper != null; looper = looper.Next)
         yield return looper.Value;
-    }
-
-    /// <summary>Creates an instance of a stalistck.</summary>
-    /// <remarks>Runtime: O(1).</remarks>
-    public List_Linked()
-    {
-      _head = _tail = null;
-      _count = 0;
     }
 
     /// <summary>Checks to see if an object reference exists.</summary>
@@ -396,18 +422,33 @@ namespace Seven.Structures
       return array;
     }
 
+    #endregion
+
+    #region error
+
     /// <summary>This is used for throwing AVL Tree exceptions only to make debugging faster.</summary>
-    private class Exception : Error { public Exception(string message) : base(message) { } }
+    private class Exception : Error
+    {
+      public Exception(string message) : base(message) { }
+    }
+
+    #endregion
   }
 
   /// <summary>Implements a growing, singularly-linked list data structure that inherits InterfaceTraversable.</summary>
-  /// <typeparam name="InterfaceStringId">The type of objects to be placed in the list.</typeparam>
+  /// <typeparam name="Type">The type of objects to be placed in the list.</typeparam>
   /// <remarks>The runtimes of each public member are included in the "remarks" xml tags.</remarks>
   [System.Serializable]
   public class List_Linked_ThreadSafe<Type> : List_Linked<Type>
   {
+    #region field
+
     Seven.Parallels.ReaderWriterLock _readerWriterLock;
-    
+
+    #endregion
+
+    #region construct
+
     /// <summary>Creates an instance of a stalistck.</summary>
     /// <remarks>Runtime: O(1).</remarks>
     public List_Linked_ThreadSafe() : base()
@@ -416,8 +457,17 @@ namespace Seven.Structures
       throw new Error("the thread safe version wrappers are not yet finished. sorry.");
     }
 
+    #endregion
+
+    #region error
+
     /// <summary>This is used for throwing AVL Tree exceptions only to make debugging faster.</summary>
-    private class Exception : Error { public Exception(string message) : base(message) { } }
+    private class Error : Structure.Error
+    {
+      public Error(string message) : base(message) { }
+    }
+
+    #endregion
   }
 
   /// <summary>Implements a growing list as an array (with expansions/contractions) 
@@ -427,9 +477,15 @@ namespace Seven.Structures
   [System.Serializable]
   public class List_Array<Type> : List<Type>
   {
+    #region field
+
     protected Type[] _list;
     protected int _count;
     protected int _minimumCapacity;
+
+    #endregion
+
+    #region property
 
     /// <summary>Gets the number of items in the list.</summary>
     /// <remarks>Runtime: O(1).</remarks>
@@ -505,6 +561,10 @@ namespace Seven.Structures
       }
     }
 
+    #endregion
+
+    #region construct
+
     /// <summary>Creates an instance of a ListArray, and sets it's minimum capacity.</summary>
     /// <remarks>Runtime: O(1).</remarks>
     public List_Array()
@@ -523,6 +583,10 @@ namespace Seven.Structures
       _count = 0;
       _minimumCapacity = minimumCapacity;
     }
+
+    #endregion
+
+    #region method
 
     /// <summary>Determines if an object reference exists in the array.</summary>
     /// <param name="reference">The reference to the object.</param>
@@ -774,21 +838,33 @@ namespace Seven.Structures
       for (int i = 0; i < _count; i++) array[i] = _list[i];
       return array;
     }
-    
+
+    #endregion
+
+    #region error
+
     /// <summary>This is used for throwing AVL Tree exceptions only to make debugging faster.</summary>
     private class Error : Structure.Error
     {
       public Error(string message) : base(message) { }
     }
+
+    #endregion
   }
 
   /// <summary>Implements a growing, singularly-linked list data structure that inherits InterfaceTraversable.</summary>
-  /// <typeparam name="InterfaceStringId">The type of objects to be placed in the list.</typeparam>
+  /// <typeparam name="Type">The type of objects to be placed in the list.</typeparam>
   /// <remarks>The runtimes of each public member are included in the "remarks" xml tags.</remarks>
   [System.Serializable]
   public class List_Array_ThreadSafe<Type> : List_Array<Type>
   {
+    #region field
+
     Seven.Parallels.ReaderWriterLock _readerWriterLock;
+
+    #endregion
+
+    #region construct
 
     /// <summary>Creates an instance of a stalistck.</summary>
     /// <remarks>Runtime: O(1).</remarks>
@@ -800,12 +876,21 @@ namespace Seven.Structures
       throw new Error("thread safe wrappers are not yet complete. sorry.");
     }
 
+    #endregion
+
+    #region error
+
     /// <summary>This is used for throwing AVL Tree exceptions only to make debugging faster.</summary>
     private class Exception : Structure.Error
     {
       public Exception(string message) : base(message) { }
     }
+
+    #endregion
   }
+
+  // WARNING: THIS IMPLEMENTATION IS INTENDED FOR EDUCATIONAL PURPOSES ONLY
+  #region public class List_Delegate<T> : List<T>
 
   ///// <summary>WARNING: THIS IMPLEMENTATION IS INTENDED FOR EDUCATIONAL PURPOSES VS USAGE.</summary>
   ///// <typeparam name="Type">The type of objects to be placed in the list.</typeparam>
@@ -994,4 +1079,6 @@ namespace Seven.Structures
   //  /// <summary>This is used for throwing AVL Tree exceptions only to make debugging faster.</summary>
   //  protected class Exception : Error { public Exception(string message) : base(message) { } }
   //}
+
+  #endregion
 }

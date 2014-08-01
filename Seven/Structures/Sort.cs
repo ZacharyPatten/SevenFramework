@@ -1,18 +1,15 @@
 ﻿// Seven
 // https://github.com/53V3N1X/SevenFramework
-// LISCENSE: See "LISCENSE.txt" in th root project directory.
-// SUPPORT: See "README.txt" in the root project directory.
-
-// DEVELOPMENT NOTE
-// Test start/end functions and make full sorts call them
-
-using System;
+// LISCENSE: See "LISCENSE.md" in th root project directory.
+// SUPPORT: See "SUPPORT.md" in the root project directory.
 
 namespace Seven.Structures
 {
   /// <summary>Contains static sorting algorithms.</summary>
   public static class Sort
   {
+    #region Bubble
+
     /// <summary>Sorts an entire array in non-decreasing order using the bubble sort algorithm.</summary>
     /// <typeparam name="T">The type of objects stored within the array.</typeparam>
     /// <param name="compare">The compare function (returns a positive value if left is greater than right).</param>
@@ -48,6 +45,10 @@ namespace Seven.Structures
             array[j] = temp;
           }
     }
+
+    #endregion
+
+    #region Selection
 
     /// <summary>Sorts an entire array in non-decreasing order using the selection sort algoritm.</summary>
     /// <typeparam name="T">The type of objects stored within the array.</typeparam>
@@ -93,6 +94,10 @@ namespace Seven.Structures
       }
     }
 
+    #endregion
+
+    #region Insertion
+
     /// <summary>Sorts an entire array in non-decreasing order using the insertion sort algorithm.</summary>
     /// <typeparam name="T">The type of objects stored within the array.</typeparam>
     /// <param name="compare">Returns positive if left greater than right.</param>
@@ -128,6 +133,10 @@ namespace Seven.Structures
         array[j] = temp;
       }
     }
+
+    #endregion
+
+    #region Quick
 
     /// <summary>Sorts an entire array in non-decreasing order using the quick sort algorithm.</summary>
     /// <typeparam name="T">The type of objects stored within the array.</typeparam>
@@ -181,6 +190,10 @@ namespace Seven.Structures
       }
     }
 
+    #endregion
+
+    #region Merge
+
     /// <summary>Sorts up to an array in non-decreasing order using the merge sort algorithm.</summary>
     /// <typeparam name="T">The type of objects stored within the array.</typeparam>
     /// <param name="compare">Returns zero or negative if the left is less than or equal to the right.</param>
@@ -229,6 +242,10 @@ namespace Seven.Structures
           array[start + h] = sorted[0 + h];
       }
     }
+
+    #endregion
+
+    #region Heap
 
     /// <summary>Sorts an entire array in non-decreasing order using the heap sort algorithm.</summary>
     /// <typeparam name="T">The type of objects stored within the array.</typeparam>
@@ -292,6 +309,10 @@ namespace Seven.Structures
       }
     }
 
+    #endregion
+
+    #region OddEven
+
     /// <summary>Sorts an entire array in non-decreasing order using the odd-even sort algorithm.</summary>
     /// <typeparam name="T">The type of objects stored within the array.</typeparam>
     /// <param name="compare">The method of compare for the sort.</param>
@@ -326,6 +347,10 @@ namespace Seven.Structures
         }
       }
     }
+
+    #endregion
+
+    #region Counting
 
     /// <summary>Method specifically for computing object keys in the Counting Sort algorithm.</summary>
     /// <typeparam name="T">The type of instances in the array to be sorted.</typeparam>
@@ -367,13 +392,17 @@ namespace Seven.Structures
       }
     }
 
+    #endregion
+
+    #region Shuffle
+
     /// <summary>Sorts an entire array in a randomized order.</summary>
     /// <typeparam name="T">The type of objects stored within the array.</typeparam>
     /// <param name="array">The aray to shuffle.</param>
     /// <remarks>Runtime: O(n). Memory: in place. Stable: N/A (not a comparative sort).</remarks>
     public static void Shuffle<T>(T[] array)
     {
-      Random random = new Random();
+      System.Random random = new System.Random();
       for (int i = 0; i < array.Length; i++)
       {
         int randomIndex = random.Next(0, array.Length);
@@ -382,6 +411,10 @@ namespace Seven.Structures
         array[randomIndex] = temp;
       }
     }
+
+    #endregion
+
+    #region Bogo
 
     /// <summary>Sorts an entire array in non-decreasing order using the slow sort algorithm.</summary>
     /// <typeparam name="T">The type of objects stored within the array.</typeparam>
@@ -401,6 +434,10 @@ namespace Seven.Structures
           return false;
       return true;
     }
+
+    #endregion
+
+    #region Slow
 
     /// <summary>Sorts an entire array of in non-decreasing order using the slow sort algorithm.</summary>
     /// <typeparam name="T">The type of objects stored within the array.</typeparam>
@@ -427,5 +464,7 @@ namespace Seven.Structures
       }
       Sort.Slow(compare, array, i, j - 1);
     }
+
+    #endregion
   }
 }

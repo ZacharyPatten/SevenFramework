@@ -1,7 +1,7 @@
 ﻿// Seven
 // https://github.com/53V3N1X/SevenFramework
-// LISCENSE: See "LISCENSE.txt" in th root project directory.
-// SUPPORT: See "README.txt" in the root project directory.
+// LISCENSE: See "LISCENSE.md" in th root project directory.
+// SUPPORT: See "SUPPORT.md" in the root project directory.
 
 namespace Seven.Structures
 {
@@ -13,13 +13,7 @@ namespace Seven.Structures
 
   public class Set_Linked<T> : Set<T>
   {
-    /// <summary>A set of allowable table sizes, all of which are prime.</summary>
-    private static readonly int[] _tableSizes = new int[]
-    {
-        1, 2, 5, 11, 23, 47, 97, 197, 397, 797, 1597, 3203, 6421, 12853, 25717, 51437,
-        102877, 205759, 411527, 823117, 1646237, 3292489, 6584983, 13169977, 26339969,
-        52679969, 105359939, 210719881, 421439783, 842879579, 1685759167
-    };
+    #region class
 
     private class Node
     {
@@ -36,6 +30,18 @@ namespace Seven.Structures
       }
     }
 
+    #endregion
+
+    #region field
+
+    /// <summary>A set of allowable table sizes, all of which are prime.</summary>
+    private static readonly int[] _tableSizes = new int[]
+    {
+        1, 2, 5, 11, 23, 47, 97, 197, 397, 797, 1597, 3203, 6421, 12853, 25717, 51437,
+        102877, 205759, 411527, 823117, 1646237, 3292489, 6584983, 13169977, 26339969,
+        52679969, 105359939, 210719881, 421439783, 842879579, 1685759167
+    };
+
     private const double _maxLoadFactor = 1.0d;
 
     private Equate<T> _equate;
@@ -43,6 +49,10 @@ namespace Seven.Structures
     private Node[] _table;
     private int _count;
     private int _sizeIndex;
+
+    #endregion
+
+    #region property
 
     /// <summary>The function for calculating hash codes for this table.</summary>
     public Map.Hash<T> Hash { get { return _hash; } }
@@ -63,6 +73,10 @@ namespace Seven.Structures
     /// <remarks>Runtime: O(1).</remarks>
     public int TableSize { get { return _table.Length; } }
 
+    #endregion
+
+    #region construct
+
     /// <summary>Constructs a new hash table instance.</summary>
     /// <remarks>Runtime: O(1).</remarks>
     public Set_Linked(Equate<T> equate, Map.Hash<T> hash)
@@ -73,6 +87,10 @@ namespace Seven.Structures
       _count = 0;
       _sizeIndex = 0;
     }
+
+    #endregion
+
+    #region method
 
     public bool Contains(T key)
     {
@@ -279,10 +297,16 @@ namespace Seven.Structures
       throw new System.NotImplementedException();
     }
 
+    #endregion
+
+    #region error
+
     /// <summary>This is used for throwing hash table exceptions only to make debugging faster.</summary>
     private class Error : Structure.Error
     {
       public Error(string message) : base(message) { }
     }
+
+    #endregion
   }
 }

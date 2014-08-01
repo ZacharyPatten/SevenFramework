@@ -1,7 +1,7 @@
 ﻿// Seven
 // https://github.com/53V3N1X/SevenFramework
-// LISCENSE: See "LISCENSE.txt" in th root project directory.
-// SUPPORT: See "README.txt" in the root project directory.
+// LISCENSE: See "LISCENSE.md" in th root project directory.
+// SUPPORT: See "SUPPORT.md" in the root project directory.
 
 // THIS FILE CONTAINS EXTERNAL CITATIONS
 
@@ -13,12 +13,20 @@ namespace Seven.Structures
   /// <typeparam name="Type"></typeparam>
   public interface AvlTree<Type> : Structure<Type>
   {
+    #region property
+
+    int Count { get; }
+    bool IsEmpty { get; }
+
+    #endregion
+
+    #region method
+
     void Add(Type addition);
     //bool TryAdd(Type addition);
     //void Remove(Type removal);
     //bool TryRemove(Type removal);
-    int Count { get; }
-    bool IsEmpty { get; }
+    
     void Clear();
 
     bool Contains<Key>(Key key, Compare<Type, Key> comparison);
@@ -49,6 +57,8 @@ namespace Seven.Structures
     /// <param name="maximum"></param>
     /// <returns></returns>
     ForeachStatus Foreach(ForeachRefBreak<Type> function, Type minimum, Type maximum);
+
+    #endregion
   }
 
   /// <summary>Contains extensions for generic AvlTrees.</summary>
@@ -67,6 +77,8 @@ namespace Seven.Structures
   [System.Serializable]
   public class AvlTree_Linked<Type> : AvlTree<Type>
   {
+    #region class
+
     /// <summary>This class just holds the data for each individual node of the tree.</summary>
     protected class Node
     {
@@ -89,10 +101,18 @@ namespace Seven.Structures
       }
     }
 
+    #endregion
+
+    #region field
+
     protected Node _avlTree;
     protected int _count;
 
     protected Compare<Type> _compare;
+
+    #endregion
+
+    #region property
 
     public int SizeOf { get { return _count; } }
 
@@ -103,6 +123,10 @@ namespace Seven.Structures
     /// <remarks>Runtime: O(1).</remarks>
     public bool IsEmpty { get { return _avlTree == null; } }
 
+    #endregion
+
+    #region construct
+
     /// <summary>Constructs an AVL Tree.</summary>
     /// <param name="compare">The comparison function for sorting the items.</param>
     /// <remarks>Runtime: O(1).</remarks>
@@ -112,6 +136,10 @@ namespace Seven.Structures
       _count = 0;
       _compare = compare;
     }
+
+    #endregion
+
+    #region method
 
     #region Recursive Versions
 
@@ -1135,8 +1163,17 @@ namespace Seven.Structures
       return clone;
     }
 
+    #endregion
+
+    #region error
+
     /// <summary>This is used for throwing AVL Tree exceptions only to make debugging faster.</summary>
-    protected class Exception : Error { public Exception(string message) : base(message) { } }
+    protected class Exception : Error
+    {
+      public Exception(string message) : base(message) { }
+    }
+
+    #endregion
   }
 
   /// <summary>Implements an AVL Tree where the items are sorted by string id values.</summary>
@@ -1144,7 +1181,13 @@ namespace Seven.Structures
   [System.Serializable]
   public class AvlTreeLinkedThreadSafe<Type> : AvlTree_Linked<Type>
   {
+    #region field
+
     ReaderWriterLock _readerWriterLock;
+
+    #endregion
+
+    #region construct
 
     /// <summary>Constructs an AVL Tree.</summary>
     /// <param name="compare">The comparison function for sorting the items.</param>
@@ -1153,6 +1196,10 @@ namespace Seven.Structures
     {
       this._readerWriterLock = new ReaderWriterLock();
     }
+
+    #endregion
+
+    #region method
 
     /// <summary></summary>
     /// <typeparam name="Key"></typeparam>
@@ -1589,6 +1636,8 @@ namespace Seven.Structures
         this._readerWriterLock.ReaderUnlock();
       }
     }
+
+    #endregion
   }
 
   /// <summary>Implements an AVL Tree where the items are sorted by string id values.</summary>
@@ -1596,16 +1645,26 @@ namespace Seven.Structures
   [System.Serializable]
   public class AvlTree_Array<Type>// : AvlTree<Type>
   {
+    #region class
+
     public struct Node
     {
       public bool _occupied;
       public Type _value;
     }
 
+    #endregion
+
+    #region field
+
     internal Link<bool, Type>[] _avlTree;
     protected int _count;
 
     protected Compare<Type> _compare;
+
+    #endregion
+
+    #region property
 
     /// <summary>Gets the number of elements in the collection.</summary>
     /// <remarks>Runtime: O(1).</remarks>
@@ -1613,6 +1672,10 @@ namespace Seven.Structures
     /// <summary>Gets whether the binary search tree is empty.</summary>
     /// <remarks>Runtime: O(1).</remarks>
     public bool IsEmpty { get { return _avlTree == null; } }
+
+    #endregion
+
+    #region construct
 
     /// <summary>Constructs an AVL Tree.</summary>
     /// <param name="compare">The comparison function for sorting the items.</param>
@@ -1625,6 +1688,10 @@ namespace Seven.Structures
       _count = 0;
       _compare = compare;
     }
+
+    #endregion
+
+    #region methods
 
     private int Height(int index)
     {
@@ -2350,9 +2417,15 @@ namespace Seven.Structures
     //  }
     //}
 
+    #endregion
+
+    #region error
+
     public class Exception : Error
     {
       public Exception(string message) : base(message) { }
     }
+
+    #endregion
   }
 }

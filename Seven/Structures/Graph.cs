@@ -1,7 +1,7 @@
 ﻿// Seven
 // https://github.com/53V3N1X/SevenFramework
-// LISCENSE: See "LISCENSE.txt" in th root project directory.
-// SUPPORT: See "README.txt" in the root project directory.
+// LISCENSE: See "LISCENSE.md" in th root project directory.
+// SUPPORT: See "SUPPORT.md" in the root project directory.
 
 using System;
 using System.Collections.Generic;
@@ -17,6 +17,8 @@ namespace Seven.Structures
 
   public class Graph_Array<T> : Graph<T>
   {
+    #region class
+
     private class Node
     {
       private T _value;
@@ -31,17 +33,33 @@ namespace Seven.Structures
       }
     }
 
+    #endregion
+
+    #region field
+
     private Equate<T> _equate;
     private Node[] _nodes;
     private int _edgeCount;
 
+    #endregion
+
+    #region property
+
     public int NodeCount { get { return this._nodes.Length; } }
     public int EdgeCount { get { return this._edgeCount; } }
+
+    #endregion
+
+    #region construct
 
     public Graph_Array(Equate<T> equate)
     {
       _equate = equate;
     }
+
+    #endregion
+
+    #region method
 
     /// <summary>Adds a node to the graph.</summary>
     /// <param name="node">The node to be added.</param>
@@ -211,5 +229,7 @@ namespace Seven.Structures
     {
       throw new NotImplementedException();
     }
+
+    #endregion
   }
 }

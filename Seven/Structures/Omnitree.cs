@@ -1,23 +1,29 @@
 ﻿// Seven
 // https://github.com/53V3N1X/SevenFramework
-// LISCENSE: See "LISCENSE.txt" in th root project directory.
-// SUPPORT: See "README.txt" in the root project directory.
+// LISCENSE: See "LISCENSE.md" in th root project directory.
+// SUPPORT: See "SUPPORT.md" in the root project directory.
 
 namespace Seven.Structures
 {
-	/// <summary>Sorts items along N dimensions. The one data structure to rule them all. Made by Zachary Patten.</summary>
+  /// <summary>Sorts items along N dimensions. The one data structure to rule them all. Made by Zachary Patten.</summary>
   /// <typeparam name="T">The generice type of items to be stored in this omnitree.</typeparam>
   /// <typeparam name="M">The type of the axis dimensions to sort the "T" values upon.</typeparam>
   public interface Omnitree<T, M> : Structure<T>
   {
-		/// <summary>
+    #region events
+
+    /// <summary>
     /// Event for handling items that go outside the bounds of the Omnitree. Asigning this event
     /// will trigger the delegate instead of throwing an exception.
     /// </summary>
-		event Foreach<T> HandleOutOfBounds;
+    event Foreach<T> HandleOutOfBounds;
 
-		/// <summary>Gets the dimensions of the center point of the Omnitree.</summary>
-		M[] Origin { get; }
+    #endregion
+
+    #region properties
+
+    /// <summary>Gets the dimensions of the center point of the Omnitree.</summary>
+    M[] Origin { get; }
 
     /// <summary>The minimum dimensions of the Omnitree.</summary>
     M[] Min { get; }
@@ -42,6 +48,10 @@ namespace Seven.Structures
 
     /// <summary>True (if Count == 0).</summary>
     bool IsEmpty { get; }
+
+    #endregion
+
+    #region methods
 
     /// <summary>Adds an item to the tree.</summary>
     /// <param name="addition">The item to be added.</param>
@@ -92,11 +102,15 @@ namespace Seven.Structures
 
     /// <summary>Returns the tree to an empty state.</summary>
     void Clear();
+
+    #endregion
   }
 
   /// <summary>Extension class for the Omnitree interface.</summary>
   public static class Omnitree
   {
+    #region delegates
+
     /// <summary>Locates an item along the given dimensions.</summary>
     /// <typeparam name="T">The type of the item to locate.</typeparam>
     /// <typeparam name="M">The type of axis type of the Omnitree.</typeparam>
@@ -118,21 +132,29 @@ namespace Seven.Structures
     /// <returns>The computed average between the two items.</returns>
     public delegate M Average<M>(M left, M right);
 
-		/// <summary>Polymorphism base for Omnitree exceptions.</summary>
-		public class Error : Structure.Error
-		{
-			/// <summary>Constructs an Omnitree exception.</summary>
-			/// <param name="message">The message of the exception.</param>
-			public Error(string message) : base(message) { }
-		}
+    #endregion
+
+    #region error
+
+    /// <summary>Polymorphism base for Omnitree exceptions.</summary>
+    public class Error : Structure.Error
+    {
+      /// <summary>Constructs an Omnitree exception.</summary>
+      /// <param name="message">The message of the exception.</param>
+      public Error(string message) : base(message) { }
+    }
+
+    #endregion
   }
 
-	/// <summary>Sorts items along N dimensions. The one data structure to rule them all. Made by Zachary Patten.</summary>
+  /// <summary>Sorts items along N dimensions. The one data structure to rule them all. Made by Zachary Patten.</summary>
   /// <typeparam name="T">The generice type of items to be stored in this octree.</typeparam>
   /// <typeparam name="M">The type of the axis dimensions to sort the "T" values upon.</typeparam>
   [System.Serializable]
   public class Omnitree_Linked<T, M> : Omnitree<T, M>
   {
+    #region class
+
     /// <summary>Can be a leaf or a branch.</summary>
     private abstract class Node
     {
@@ -225,6 +247,10 @@ namespace Seven.Structures
         : base(min, max, parent) { }
     }
 
+    #endregion
+
+    #region field
+
     // Constants
     private const int _defaultLoad = 7;
 
@@ -248,6 +274,10 @@ namespace Seven.Structures
 
     /// <summary>Event for handling items that go outside the bounds of the Omnitree.</summary>
     public event Foreach<T> HandleOutOfBounds;
+
+    #endregion
+
+    #region property
 
     /// <summary>Gets the dimensions of the center point of the Omnitree.</summary>
     public M[] Origin { get { return (M[])this._origin.Clone(); } }
@@ -281,6 +311,10 @@ namespace Seven.Structures
 
     /// <summary>The average function the Omnitree is using.</summary>
     public Omnitree.Average<M> Average { get { return this._average; } }
+
+    #endregion
+
+    #region construct
 
     /// <summary>Constructor for an Omnitree_Linked.</summary>
     /// <param name="min">The minimum values of the tree.</param>
@@ -400,6 +434,10 @@ namespace Seven.Structures
       this._count = 0;
       this._top = new Leaf(min, max, null, _load);
     }
+
+    #endregion
+
+    #region methods
 
     /// <summary>Adds an item to the tree.</summary>
     /// <param name="addition">The item to be added.</param>
@@ -1063,11 +1101,19 @@ namespace Seven.Structures
       this._loadSquared = this._load * this._load;
     }
 
+    #endregion
+
+    #region error
+
     /// <summary>Omnitree_Linked Exception.</summary>
     private class Error : Omnitree.Error
     {
       public Error(string message) : base(message) { }
     }
+
+    #endregion
+
+    #region development version
 
     ///// <summary>Can be a leaf or a branch.</summary>
     //private abstract class Node
@@ -2425,35 +2471,39 @@ namespace Seven.Structures
     //{
     //  public Error(string message) : base(message) { }
     //}
+
+    #endregion
   }
 
-	/// <summary>Sorts items along N dimensions. The one data structure to rule them all. Made by Zachary Patten.</summary>
+  /// <summary>Sorts items along N dimensions. The one data structure to rule them all. Made by Zachary Patten.</summary>
   /// <typeparam name="T">The generice type of items to be stored in this octree.</typeparam>
   /// <typeparam name="M">The type of the axis dimensions to sort the "T" values upon.</typeparam>
   [System.Serializable]
   public class Omnitree_Array<T, M> : Omnitree<T, M>
   {
+    #region class
+
     /// <summary>Can be a leaf or a branch.</summary>
     private abstract class Node
     {
       private M[] _min;
       private M[] _max;
       private Branch _parent;
-			private int _index;
-			private int _count;
+      private int _index;
+      private int _count;
 
       internal M[] Min { get { return this._min; } }
       internal M[] Max { get { return this._max; } }
       internal Branch Parent { get { return this._parent; } }
-			internal int Index { get { return this._index; } }
-			internal int Count { get { return this._count; } set { this._count = value; } }
+      internal int Index { get { return this._index; } }
+      internal int Count { get { return this._count; } set { this._count = value; } }
 
       internal Node(M[] min, M[] max, Branch parent, int index)
       {
         this._min = min;
         this._max = max;
         this._parent = parent;
-				this._index = index;
+        this._index = index;
       }
     }
 
@@ -2488,33 +2538,41 @@ namespace Seven.Structures
       }
     }
 
-		private const int _defaultLoad = 2;
+    #endregion
+
+    #region field
+
+    private const int _defaultLoad = 2;
 
     private Omnitree.Locate<T, M> _locate;
     private Omnitree.Average<M> _average;
     private Compare<M> _compare;
     private int _dimensions;
     private int _children;
-		private M[] _origin;
+    private M[] _origin;
 
     private Node _top;
     private int _count;
     /// <summary>count ^ (1 / dimensions)</summary>
     private int _load;
-		/// <summary>load ^ dimensions</summary>
-		private int _loadPowered;
+    /// <summary>load ^ dimensions</summary>
+    private int _loadPowered;
     /// <summary>(load + 1) ^ dimensions</summary>
     private int _loadPlusOnePowered;
-		/// <summary>leaf depth of previous addition (sequencial addition optimization)</summary>
+    /// <summary>leaf depth of previous addition (sequencial addition optimization)</summary>
     private Node _previousAddition;
-		/// <summary>tree depth of previous addition (sequencial addition optimization)</summary>
+    /// <summary>tree depth of previous addition (sequencial addition optimization)</summary>
     private int _previousAdditionDepth;
 
-		/// <summary>Event for handling items that go outside the bounds of the Omnitree.</summary>
-		public event Foreach<T> HandleOutOfBounds;
+    /// <summary>Event for handling items that go outside the bounds of the Omnitree.</summary>
+    public event Foreach<T> HandleOutOfBounds;
 
-		/// <summary>Gets the dimensions of the center point of the Omnitree.</summary>
-		public M[] Origin { get { return (M[])this._origin.Clone(); } }
+    #endregion
+
+    #region property
+
+    /// <summary>Gets the dimensions of the center point of the Omnitree.</summary>
+    public M[] Origin { get { return (M[])this._origin.Clone(); } }
 
     /// <summary>The minimum dimensions of the Omnitree.</summary>
     public M[] Min { get { return (M[])this._top.Min.Clone(); } }
@@ -2543,6 +2601,10 @@ namespace Seven.Structures
     /// <summary>The average function the Omnitree is using.</summary>
     public Omnitree.Average<M> Average { get { return this._average; } }
 
+    #endregion
+
+    #region construct
+
     /// <summary>Constructor for an Omnitree_Linked.</summary>
     /// <param name="min">The minimum values of the tree.</param>
     /// <param name="max">The maximum values of the tree.</param>
@@ -2555,34 +2617,34 @@ namespace Seven.Structures
       Compare<M> compare,
       Omnitree.Average<M> average)
     {
-			// check the locate and compare delegates
-			if (locate == null)
-				throw new Error("null reference on location delegate during Omnitree construction");
-			if (compare == null)
-				throw new Error("null reference on compare delegate during Omnitree construction");
+      // check the locate and compare delegates
+      if (locate == null)
+        throw new Error("null reference on location delegate during Omnitree construction");
+      if (compare == null)
+        throw new Error("null reference on compare delegate during Omnitree construction");
 
-			// Check the min/max values
-			if (min == null)
-				throw new Error("null reference on min dimensions during Omnitree construction");
-			if (max == null)
-				throw new Error("null reference on max dimensions during Omnitree construction");
+      // Check the min/max values
+      if (min == null)
+        throw new Error("null reference on min dimensions during Omnitree construction");
+      if (max == null)
+        throw new Error("null reference on max dimensions during Omnitree construction");
       if (min.Length != max.Length)
         throw new Error("min/max values for omnitree mismatch dimensions");
-			for (int i = 0; i < min.Length; i++)
-				if (compare(min[i], max[i]) != Comparison.Less)
-					throw new Error("invalid min/max values. not all min values are less than the max values");
+      for (int i = 0; i < min.Length; i++)
+        if (compare(min[i], max[i]) != Comparison.Less)
+          throw new Error("invalid min/max values. not all min values are less than the max values");
 
-			// Check the average delegate
-			if (average == null)
-				throw new Error("null reference on average delegate during Omnitree construction");
-			M[] origin = new M[min.Length];
-			for (int i = 0; i < min.Length; i++)
-				origin[i] = average(min[i], max[i]);
-			for (int i = 0; i < min.Length; i++)
-				if (compare(min[i], origin[i]) != Comparison.Less || compare(origin[i], max[i]) != Comparison.Less)
-					throw new Error("invalid average function. not all average values were computed to be between the min/max values.");
-			
-		  this._locate = locate;
+      // Check the average delegate
+      if (average == null)
+        throw new Error("null reference on average delegate during Omnitree construction");
+      M[] origin = new M[min.Length];
+      for (int i = 0; i < min.Length; i++)
+        origin[i] = average(min[i], max[i]);
+      for (int i = 0; i < min.Length; i++)
+        if (compare(min[i], origin[i]) != Comparison.Less || compare(origin[i], max[i]) != Comparison.Less)
+          throw new Error("invalid average function. not all average values were computed to be between the min/max values.");
+
+      this._locate = locate;
       this._average = average;
       this._compare = compare;
       this._dimensions = min.Length;
@@ -2592,15 +2654,15 @@ namespace Seven.Structures
       this._top = new Leaf(min, max, null, -1);
 
       this._load = _defaultLoad;
-      this._loadPlusOnePowered = 
-				Omnitree_Array<T, M>.Int_Power(this._load + 1, this._dimensions);
-			this._loadPowered = 
-				Omnitree_Array<T, M>.Int_Power(_load, _dimensions);
+      this._loadPlusOnePowered =
+        Omnitree_Array<T, M>.Int_Power(this._load + 1, this._dimensions);
+      this._loadPowered =
+        Omnitree_Array<T, M>.Int_Power(_load, _dimensions);
 
-			this._origin = origin;
+      this._origin = origin;
 
-			this._previousAddition = this._top;
-			this._previousAdditionDepth = 0;
+      this._previousAddition = this._top;
+      this._previousAdditionDepth = 0;
     }
 
     /// <summary>Constructor for an Omnitree_Linked.</summary>
@@ -2611,19 +2673,23 @@ namespace Seven.Structures
     /// <param name="average">A function for computing the average between two items of the axis types.</param>
     public Omnitree_Array(M[] min, M[] max, Omnitree.Locate_NonOut<T, M> locate, Compare<M> compare, Omnitree.Average<M> average)
       : this(min, max,
-      // this is just an adapter - JIT should optimize
+        // this is just an adapter - JIT should optimize
       (T item, out M[] ms) => { ms = locate(item); },
       compare, average)
     {
 
     }
 
+    #endregion
+
+    #region methods
+
     /// <summary>Adds an item to the tree.</summary>
     /// <param name="addition">The item to be added.</param>
     public void Add(T addition)
     {
-			if (this._count == int.MaxValue)
-				throw new Error("(Count == int.MaxValue) max Omnitree size reached (change ints to longs if you need to).");
+      if (this._count == int.MaxValue)
+        throw new Error("(Count == int.MaxValue) max Omnitree size reached (change ints to longs if you need to).");
 
       // dynamic tree sizes
       if (this._loadPlusOnePowered < this._count)
@@ -2638,15 +2704,15 @@ namespace Seven.Structures
       M[] ms;
       this._locate(addition, out ms);
 
-			if (ms == null || ms.Length != this._dimensions)
-				throw new Error("the location function for omnitree is invalid.");
+      if (ms == null || ms.Length != this._dimensions)
+        throw new Error("the location function for omnitree is invalid.");
 
-			if (!EncapsulationCheck(this._top.Min, this._top.Max, ms))
-				throw new Error("out of bounds during addition");
+      if (!EncapsulationCheck(this._top.Min, this._top.Max, ms))
+        throw new Error("out of bounds during addition");
 
       if (this._top is Leaf && (this._top as Leaf).Count >= this._load)
       {
-				Leaf leaf = this._top as Leaf;
+        Leaf leaf = this._top as Leaf;
         this._top = new Branch(this._top.Min, this._top.Max, null, -1, _defaultLoad);
 
         for (int i = 0; i < leaf.Count; i++)
@@ -2654,26 +2720,26 @@ namespace Seven.Structures
           M[] child_ms;
           this._locate(leaf.Contents[i], out child_ms);
 
-					if (child_ms == null || child_ms.Length != this._dimensions)
-						throw new Error("the location function for omnitree is invalid.");
+          if (child_ms == null || child_ms.Length != this._dimensions)
+            throw new Error("the location function for omnitree is invalid.");
 
-					if (!EncapsulationCheck(this._top.Min, this._top.Max, child_ms))
-					{
-						this._count--;
-						if (HandleOutOfBounds == null)
-							throw new Error("a node was updated to be out of bounds (found in an addition)");
-						else
-							this.HandleOutOfBounds(leaf.Contents[i]);
-					}
-					else
-						Add(leaf.Contents[i], this._top, child_ms, 0);
+          if (!EncapsulationCheck(this._top.Min, this._top.Max, child_ms))
+          {
+            this._count--;
+            if (HandleOutOfBounds == null)
+              throw new Error("a node was updated to be out of bounds (found in an addition)");
+            else
+              this.HandleOutOfBounds(leaf.Contents[i]);
+          }
+          else
+            Add(leaf.Contents[i], this._top, child_ms, 0);
         }
       }
 
-			if (this.EncapsulationCheck(this._previousAddition.Min, this._previousAddition.Max, ms))
-				this.Add(addition, this._previousAddition, ms, this._previousAdditionDepth);
-			else
-				this.Add(addition, _top, ms, 0);
+      if (this.EncapsulationCheck(this._previousAddition.Min, this._previousAddition.Max, ms))
+        this.Add(addition, this._previousAddition, ms, this._previousAdditionDepth);
+      else
+        this.Add(addition, _top, ms, 0);
       this._count++;
     }
 
@@ -2691,8 +2757,8 @@ namespace Seven.Structures
         {
           Omnitree_Array<T, M>.Leaf_Add(leaf, addition);
 
-					this._previousAddition = leaf;
-					this._previousAdditionDepth = depth;
+          this._previousAddition = leaf;
+          this._previousAdditionDepth = depth;
 
           return;
         }
@@ -2704,25 +2770,25 @@ namespace Seven.Structures
           for (int i = 0; i < leaf.Count; i++)
           {
             M[] child_ms;
-						this._locate(leaf.Contents[i], out child_ms);
+            this._locate(leaf.Contents[i], out child_ms);
 
             if (child_ms == null || child_ms.Length != this._dimensions)
               throw new Error("the location function for omnitree is invalid.");
 
             if (EncapsulationCheck(growth.Min, growth.Max, child_ms))
-							Add(leaf.Contents[i], growth, child_ms, depth);
+              Add(leaf.Contents[i], growth, child_ms, depth);
             else
             {
-							if (EncapsulationCheck(this._top.Min, this._top.Max, child_ms))
-							{
-								this._count--;
-								if (HandleOutOfBounds == null)
-									throw new Error("a node was updated to be out of bounds (found in an addition)");
-								else
-									this.HandleOutOfBounds(leaf.Contents[i]);
-							}
-							else
-								Add(leaf.Contents[i], this._top, child_ms, depth);
+              if (EncapsulationCheck(this._top.Min, this._top.Max, child_ms))
+              {
+                this._count--;
+                if (HandleOutOfBounds == null)
+                  throw new Error("a node was updated to be out of bounds (found in an addition)");
+                else
+                  this.HandleOutOfBounds(leaf.Contents[i]);
+              }
+              else
+                Add(leaf.Contents[i], this._top, child_ms, depth);
             }
           }
 
@@ -2736,21 +2802,21 @@ namespace Seven.Structures
         int child = this.DetermineChild(branch, ms);
         Node child_node = this.Branch_GetChild(branch, child);
 
-				// null children in branches are just empty leaves
+        // null children in branches are just empty leaves
         if (child_node == null)
         {
           Leaf leaf = GrowLeaf(branch, child);
           Omnitree_Array<T, M>.Leaf_Add(leaf, addition);
 
-					this._previousAddition = leaf;
-					this._previousAdditionDepth = depth + 1;
+          this._previousAddition = leaf;
+          this._previousAdditionDepth = depth + 1;
 
-					branch.Count++;
+          branch.Count++;
           return;
         }
 
         Add(addition, child_node, ms, depth + 1);
-				branch.Count++;
+        branch.Count++;
         return;
       }
     }
@@ -2780,9 +2846,9 @@ namespace Seven.Structures
       if (branch.Children.Length == this._children)
         return branch.Children[index];
       // partially allocated branch - use fake indeces
-			for (int i = 0; i < branch.ChildCount; i++)
-				if (branch.Children[i].Index == index)
-					return branch.Children[i];
+      for (int i = 0; i < branch.ChildCount; i++)
+        if (branch.Children[i].Index == index)
+          return branch.Children[i];
       return null;
     }
 
@@ -2797,7 +2863,7 @@ namespace Seven.Structures
       {
         // if the branch is fully allocated, treat the index as the
         // actual index we want to set
-				if (branch.Children.Length == this._children)
+        if (branch.Children.Length == this._children)
           branch.Children[index] = value;
         // if the branch is not yet fully allocated - the index must
         // first be found in the partial allocation
@@ -2807,18 +2873,18 @@ namespace Seven.Structures
           if (branch.ChildCount == branch.Children.Length)
           {
             Node[] newAllocation =
-							new Node[branch.Children.Length * 2 > this._children ? 
-								branch.Children.Length * 2 : this._children];
+              new Node[branch.Children.Length * 2 > this._children ?
+                branch.Children.Length * 2 : this._children];
 
             // if the growth will result in a fully allocated branch -
             // make the indeces true indeces
-						if (newAllocation.Length == this._children)
+            if (newAllocation.Length == this._children)
             {
               foreach (Node node in branch.Children)
                 newAllocation[node.Index] = node;
               newAllocation[index] = value;
               branch.Children = newAllocation;
-							branch.ChildCount++;
+              branch.ChildCount++;
             }
             // if the branch will not yet be fully allocated - just
             // keep using fake indeces
@@ -2839,11 +2905,11 @@ namespace Seven.Structures
       {
         // value is a branch; we need to overwrite a leaf
         for (int i = 0; i < branch.Children.Length; i++)
-					if (branch.Children[i].Index == index)
-					{
-						branch.Children[i] = value;
-						break;
-					}
+          if (branch.Children[i].Index == index)
+          {
+            branch.Children[i] = value;
+            break;
+          }
       }
       return value;
     }
@@ -2865,207 +2931,207 @@ namespace Seven.Structures
       return result;
     }
 
-		/// <summary>Removes all the items qualified by the delegate.</summary>
-		/// <param name="where">The predicate to qualify removals.</param>
-		public void Remove(Predicate<T> where)
-		{
-			this._count -= this.Remove(this._top, where);
+    /// <summary>Removes all the items qualified by the delegate.</summary>
+    /// <param name="where">The predicate to qualify removals.</param>
+    public void Remove(Predicate<T> where)
+    {
+      this._count -= this.Remove(this._top, where);
 
-			// dynamic tree sizes
-			while (this._loadPowered > this._count && this._load > _defaultLoad)
-			{
-				this._load--;
-				this._loadPlusOnePowered =
-					Omnitree_Array<T, M>.Int_Power(_load + 1, _dimensions);
-				this._loadPowered =
-					Omnitree_Array<T, M>.Int_Power(_load, _dimensions);
-			}
+      // dynamic tree sizes
+      while (this._loadPowered > this._count && this._load > _defaultLoad)
+      {
+        this._load--;
+        this._loadPlusOnePowered =
+          Omnitree_Array<T, M>.Int_Power(_load + 1, _dimensions);
+        this._loadPowered =
+          Omnitree_Array<T, M>.Int_Power(_load, _dimensions);
+      }
 
-			this._previousAddition = this._top;
-			this._previousAdditionDepth = 0;
-		}
+      this._previousAddition = this._top;
+      this._previousAdditionDepth = 0;
+    }
 
-		/// <summary>Recursive version of the remove method.</summary>
-		/// <param name="node">The current node of traversal.</param>
-		/// <param name="where">The predicate to qualify removals.</param>
-		private int Remove(Node node, Predicate<T> where)
-		{
-			int removals = 0;
-			if (node is Leaf)
-			{
-				Leaf leaf = node as Leaf;
-				for (int i = 0; i < leaf.Count; i++)
-				{
-					if (where(leaf.Contents[i]))
-						removals++;
-					else
-						leaf.Contents[i - removals] = leaf.Contents[i];
-				}
-				leaf.Count -= removals;
-				this._count -= removals;
+    /// <summary>Recursive version of the remove method.</summary>
+    /// <param name="node">The current node of traversal.</param>
+    /// <param name="where">The predicate to qualify removals.</param>
+    private int Remove(Node node, Predicate<T> where)
+    {
+      int removals = 0;
+      if (node is Leaf)
+      {
+        Leaf leaf = node as Leaf;
+        for (int i = 0; i < leaf.Count; i++)
+        {
+          if (where(leaf.Contents[i]))
+            removals++;
+          else
+            leaf.Contents[i - removals] = leaf.Contents[i];
+        }
+        leaf.Count -= removals;
+        this._count -= removals;
 
-				return removals;
-			}
-			else
-			{
-				Branch branch = node as Branch;
-				if (branch.Children.Length == this._children)
-				{
-					for (int i = 0; i < branch.ChildCount; i++)
-						if (branch.Children[i] != null)
-						{
-							removals += this.Remove(branch.Children[i], where);
-							if (branch.Children[i].Count == 0)
-								ChopChild(branch, branch.Children[i--].Index);
-						}
-				}
-				else
-				{
-					for (int i = 0; i < branch.ChildCount; i++)
-					{
-						removals += this.Remove(branch.Children[i], where);
-						if (branch.Children[i].Count == 0)
-							this.ChopChild(branch, branch.Children[i--].Index);
-					}
-				}
-				branch.Count -= removals;
+        return removals;
+      }
+      else
+      {
+        Branch branch = node as Branch;
+        if (branch.Children.Length == this._children)
+        {
+          for (int i = 0; i < branch.ChildCount; i++)
+            if (branch.Children[i] != null)
+            {
+              removals += this.Remove(branch.Children[i], where);
+              if (branch.Children[i].Count == 0)
+                ChopChild(branch, branch.Children[i--].Index);
+            }
+        }
+        else
+        {
+          for (int i = 0; i < branch.ChildCount; i++)
+          {
+            removals += this.Remove(branch.Children[i], where);
+            if (branch.Children[i].Count == 0)
+              this.ChopChild(branch, branch.Children[i--].Index);
+          }
+        }
+        branch.Count -= removals;
 
-				if (branch.Count < this._load && branch.Count != 0)
-					ShrinkChild(branch.Parent, branch.Index);
+        if (branch.Count < this._load && branch.Count != 0)
+          ShrinkChild(branch.Parent, branch.Index);
 
-				return removals;
-			}
-		}
+        return removals;
+      }
+    }
 
     /// <summary>Removes all the items in a given space.</summary>
     /// <param name="min">The minimum values of the space.</param>
     /// <param name="max">The maximum values of the space.</param>
-		/// <returns>The number of items that were removed.</returns>
+    /// <returns>The number of items that were removed.</returns>
     public void Remove(M[] min, M[] max)
     {
-			this._count -= this.Remove(this._top, min, max);
+      this._count -= this.Remove(this._top, min, max);
 
-			// dynamic tree sizes
-			while (this._loadPowered > this._count && this._load > _defaultLoad)
-			{
-				this._load--;
-				this._loadPlusOnePowered =
-					Omnitree_Array<T, M>.Int_Power(_load + 1, _dimensions);
-				this._loadPowered =
-					Omnitree_Array<T, M>.Int_Power(_load, _dimensions);
-			}
+      // dynamic tree sizes
+      while (this._loadPowered > this._count && this._load > _defaultLoad)
+      {
+        this._load--;
+        this._loadPlusOnePowered =
+          Omnitree_Array<T, M>.Int_Power(_load + 1, _dimensions);
+        this._loadPowered =
+          Omnitree_Array<T, M>.Int_Power(_load, _dimensions);
+      }
 
-			this._previousAddition = this._top;
-			this._previousAdditionDepth = 0;
+      this._previousAddition = this._top;
+      this._previousAdditionDepth = 0;
     }
 
-		/// <summary>Recursive version of the remove method.</summary>
-		/// <param name="node">The current node of traversal.</param>
-		/// <param name="min">The min dimensions of the removal space.</param>
-		/// <param name="max">The max dimensions of the removal space.</param>
-		private int Remove(Node node, M[] min, M[] max)
-		{
-			int removals = 0;
-			if (node is Leaf)
-			{
-				Leaf leaf = node as Leaf;
-				for (int i = 0; i < leaf.Count; i++)
-				{
-					M[] ms;
-					this._locate(leaf.Contents[i], out ms);
+    /// <summary>Recursive version of the remove method.</summary>
+    /// <param name="node">The current node of traversal.</param>
+    /// <param name="min">The min dimensions of the removal space.</param>
+    /// <param name="max">The max dimensions of the removal space.</param>
+    private int Remove(Node node, M[] min, M[] max)
+    {
+      int removals = 0;
+      if (node is Leaf)
+      {
+        Leaf leaf = node as Leaf;
+        for (int i = 0; i < leaf.Count; i++)
+        {
+          M[] ms;
+          this._locate(leaf.Contents[i], out ms);
 
-					if (ms == null || ms.Length != this._dimensions)
-						throw new Error("the location function for omnitree is invalid.");
+          if (ms == null || ms.Length != this._dimensions)
+            throw new Error("the location function for omnitree is invalid.");
 
-					if (this.EncapsulationCheck(min, max, ms))
-						removals++;
-					else
-						leaf.Contents[i - removals] = leaf.Contents[i];
-			  }
-				leaf.Count -= removals;
-				this._count -= removals;
+          if (this.EncapsulationCheck(min, max, ms))
+            removals++;
+          else
+            leaf.Contents[i - removals] = leaf.Contents[i];
+        }
+        leaf.Count -= removals;
+        this._count -= removals;
 
-			  return removals;
-			}
-			else
-			{
-				Branch branch = node as Branch;
-				if (branch.Children.Length == this._children)
-				{
-					for (int i = 0; i < branch.ChildCount; i++)
-						if (branch.Children[i] != null && InclusionCheck(branch.Children[i].Min, branch.Children[i].Max, min, max))
-						{
-							if (this.EncapsulationCheck(min, max, node.Min, node.Max))
-							{
-								removals += node.Count;
-								ChopChild(branch, branch.Children[i--].Index);
-							}
-							else
-							{
-								removals += this.Remove(branch.Children[i], min, max);
-								if (branch.Children[i].Count == 0)
-									ChopChild(branch, branch.Children[i--].Index);
-							}
-						}
-				}
-				else
-				{
-					for (int i = 0; i < branch.ChildCount; i++)
-						if (InclusionCheck(branch.Children[i].Min, branch.Children[i].Max, min, max))
-						{
-							if (this.EncapsulationCheck(min, max, node.Min, node.Max))
-							{
-								removals += node.Count;
-								this.ChopChild(branch, branch.Children[i--].Index);
-							}
-							else
-							{
-								removals += this.Remove(branch.Children[i], min, max);
-								if (branch.Children[i].Count == 0)
-									this.ChopChild(branch, branch.Children[i--].Index);
-							}
-						}
-				}
-				branch.Count -= removals;
+        return removals;
+      }
+      else
+      {
+        Branch branch = node as Branch;
+        if (branch.Children.Length == this._children)
+        {
+          for (int i = 0; i < branch.ChildCount; i++)
+            if (branch.Children[i] != null && InclusionCheck(branch.Children[i].Min, branch.Children[i].Max, min, max))
+            {
+              if (this.EncapsulationCheck(min, max, node.Min, node.Max))
+              {
+                removals += node.Count;
+                ChopChild(branch, branch.Children[i--].Index);
+              }
+              else
+              {
+                removals += this.Remove(branch.Children[i], min, max);
+                if (branch.Children[i].Count == 0)
+                  ChopChild(branch, branch.Children[i--].Index);
+              }
+            }
+        }
+        else
+        {
+          for (int i = 0; i < branch.ChildCount; i++)
+            if (InclusionCheck(branch.Children[i].Min, branch.Children[i].Max, min, max))
+            {
+              if (this.EncapsulationCheck(min, max, node.Min, node.Max))
+              {
+                removals += node.Count;
+                this.ChopChild(branch, branch.Children[i--].Index);
+              }
+              else
+              {
+                removals += this.Remove(branch.Children[i], min, max);
+                if (branch.Children[i].Count == 0)
+                  this.ChopChild(branch, branch.Children[i--].Index);
+              }
+            }
+        }
+        branch.Count -= removals;
 
-				if (branch.Count < this._load && branch.Count != 0)
-					ShrinkChild(branch.Parent, branch.Index);
+        if (branch.Count < this._load && branch.Count != 0)
+          ShrinkChild(branch.Parent, branch.Index);
 
-				return removals;
-			}
-		}
+        return removals;
+      }
+    }
 
-		/// <summary>Converts a branch back into a leaf when the count is reduced.</summary>
-		/// <param name="parent">The parent to shrink a child of.</param>
-		/// <param name="child">The index of the child to shrink.</param>
-		private void ShrinkChild(Branch parent, int child)
-		{
-			if (parent == null)
-			{
-				Node oldChild = this._top;
-				this._top = new Leaf(oldChild.Min, oldChild.Max, parent, oldChild.Index);
-				this.Foreach((T i) => { this.Add(i); }, oldChild);
-			}
-			else if (parent.Children.Length == this._children)
-			{
-				Node oldChild = parent.Children[child];
-				parent.Children[child] = new Leaf(oldChild.Min, oldChild.Max, parent, oldChild.Index);
-				this.Foreach((T i) => { this.Add(i); }, oldChild);
-			}
-			else
-			{
-				for (int i = 0; i < parent.ChildCount; i++)
-				{
-					if (parent.Children[i].Index == child)
-					{
-						Node oldChild = parent.Children[i];
-						parent.Children[i] = new Leaf(oldChild.Min, oldChild.Max, parent, oldChild.Index);
-						this.Foreach((T j) => { this.Add(j); }, oldChild);
-						break;
-					}
-				}
-			}
-		}
+    /// <summary>Converts a branch back into a leaf when the count is reduced.</summary>
+    /// <param name="parent">The parent to shrink a child of.</param>
+    /// <param name="child">The index of the child to shrink.</param>
+    private void ShrinkChild(Branch parent, int child)
+    {
+      if (parent == null)
+      {
+        Node oldChild = this._top;
+        this._top = new Leaf(oldChild.Min, oldChild.Max, parent, oldChild.Index);
+        this.Foreach((T i) => { this.Add(i); }, oldChild);
+      }
+      else if (parent.Children.Length == this._children)
+      {
+        Node oldChild = parent.Children[child];
+        parent.Children[child] = new Leaf(oldChild.Min, oldChild.Max, parent, oldChild.Index);
+        this.Foreach((T i) => { this.Add(i); }, oldChild);
+      }
+      else
+      {
+        for (int i = 0; i < parent.ChildCount; i++)
+        {
+          if (parent.Children[i].Index == child)
+          {
+            Node oldChild = parent.Children[i];
+            parent.Children[i] = new Leaf(oldChild.Min, oldChild.Max, parent, oldChild.Index);
+            this.Foreach((T j) => { this.Add(j); }, oldChild);
+            break;
+          }
+        }
+      }
+    }
 
     /// <summary>Removes all the items in a given space validated by a predicate.</summary>
     /// <param name="min">The minimum values of the space.</param>
@@ -3073,81 +3139,81 @@ namespace Seven.Structures
     /// <param name="where">The equality constraint of the removal.</param>
     public void Remove(M[] min, M[] max, Predicate<T> where)
     {
-			this._count -= this.Remove(this._top, min, max, where);
+      this._count -= this.Remove(this._top, min, max, where);
 
-			// dynamic tree sizes
-			while (this._loadPowered > this._count && this._load > _defaultLoad)
-			{
-				this._load--;
-				this._loadPlusOnePowered =
-					Omnitree_Array<T, M>.Int_Power(_load + 1, _dimensions);
-				this._loadPowered =
-					Omnitree_Array<T, M>.Int_Power(_load, _dimensions);
-			}
+      // dynamic tree sizes
+      while (this._loadPowered > this._count && this._load > _defaultLoad)
+      {
+        this._load--;
+        this._loadPlusOnePowered =
+          Omnitree_Array<T, M>.Int_Power(_load + 1, _dimensions);
+        this._loadPowered =
+          Omnitree_Array<T, M>.Int_Power(_load, _dimensions);
+      }
 
-			this._previousAddition = this._top;
-			this._previousAdditionDepth = 0;
+      this._previousAddition = this._top;
+      this._previousAdditionDepth = 0;
     }
 
-		/// <summary>Recursive version of the remove method.</summary>
-		/// <param name="node">The current node of traversal.</param>
-		/// <param name="min">The min dimensions of the removal space.</param>
-		/// <param name="max">The max dimensions of the removal space.</param>
-		/// <param name="where">The equality constraint of the removal.</param>
-		private int Remove(Node node, M[] min, M[] max, Predicate<T> where)
-		{
-			int removals = 0;
-			if (node is Leaf)
-			{
-				Leaf leaf = node as Leaf;
-				for (int i = 0; i < leaf.Count; i++)
-				{
-					M[] ms;
-					this._locate(leaf.Contents[i], out ms);
+    /// <summary>Recursive version of the remove method.</summary>
+    /// <param name="node">The current node of traversal.</param>
+    /// <param name="min">The min dimensions of the removal space.</param>
+    /// <param name="max">The max dimensions of the removal space.</param>
+    /// <param name="where">The equality constraint of the removal.</param>
+    private int Remove(Node node, M[] min, M[] max, Predicate<T> where)
+    {
+      int removals = 0;
+      if (node is Leaf)
+      {
+        Leaf leaf = node as Leaf;
+        for (int i = 0; i < leaf.Count; i++)
+        {
+          M[] ms;
+          this._locate(leaf.Contents[i], out ms);
 
-					if (ms == null || ms.Length != this._dimensions)
-						throw new Error("the location function for omnitree is invalid.");
+          if (ms == null || ms.Length != this._dimensions)
+            throw new Error("the location function for omnitree is invalid.");
 
-					if (this.EncapsulationCheck(min, max, ms) && where(leaf.Contents[i]))
-						removals++;
-					else
-						leaf.Contents[i - removals] = leaf.Contents[i];
-				}
-				leaf.Count -= removals;
-				this._count -= removals;
+          if (this.EncapsulationCheck(min, max, ms) && where(leaf.Contents[i]))
+            removals++;
+          else
+            leaf.Contents[i - removals] = leaf.Contents[i];
+        }
+        leaf.Count -= removals;
+        this._count -= removals;
 
-				return removals;
-			}
-			else
-			{
-				Branch branch = node as Branch;
-				if (branch.Children.Length == this._children)
-				{
-					for (int i = 0; i < branch.ChildCount; i++)
-						if (branch.Children[i] != null)
-						{
-							removals += this.Remove(branch.Children[i], min, max, where);
-							if (branch.Children[i].Count == 0)
-								ChopChild(branch, branch.Children[i--].Index);
-						}
-				}
-				else
-				{
-					for (int i = 0; i < branch.ChildCount; i++)
-					{
-						removals += this.Remove(branch.Children[i], min, max, where);
-						if (branch.Children[i].Count == 0)
-							this.ChopChild(branch, branch.Children[i--].Index);
-					}
-				}
-				branch.Count -= removals;
+        return removals;
+      }
+      else
+      {
+        Branch branch = node as Branch;
+        if (branch.Children.Length == this._children)
+        {
+          for (int i = 0; i < branch.ChildCount; i++)
+            if (branch.Children[i] != null)
+            {
+              removals += this.Remove(branch.Children[i], min, max, where);
+              if (branch.Children[i].Count == 0)
+                ChopChild(branch, branch.Children[i--].Index);
+            }
+        }
+        else
+        {
+          for (int i = 0; i < branch.ChildCount; i++)
+          {
+            removals += this.Remove(branch.Children[i], min, max, where);
+            if (branch.Children[i].Count == 0)
+              this.ChopChild(branch, branch.Children[i--].Index);
+          }
+        }
+        branch.Count -= removals;
 
-				if (branch.Count < this._load && branch.Count != 0)
-					ShrinkChild(branch.Parent, branch.Index);
+        if (branch.Count < this._load && branch.Count != 0)
+          ShrinkChild(branch.Parent, branch.Index);
 
-				return removals;
-			}
-		}
+        return removals;
+      }
+    }
 
     /// <summary>Grows a branch on the tree at the desired location</summary>
     /// <param name="branch">The branch to grow a branch on.</param>
@@ -3157,8 +3223,8 @@ namespace Seven.Structures
     /// <returns>The newly constructed branch.</returns>
     private Branch GrowBranch(Branch branch, M[] min, M[] max, int child)
     {
-      return this.Branch_SetChild(branch, child, 
-				new Branch(min, max, branch, child, _defaultLoad)) as Branch;
+      return this.Branch_SetChild(branch, child,
+        new Branch(min, max, branch, child, _defaultLoad)) as Branch;
     }
 
     /// <summary>Grows a leaf on the tree at the desired location.</summary>
@@ -3169,8 +3235,8 @@ namespace Seven.Structures
     {
       M[] min, max;
       this.DetermineChildBounds(branch, child, out min, out max);
-      return this.Branch_SetChild(branch, child, 
-				new Leaf(min, max, branch, child)) as Leaf;
+      return this.Branch_SetChild(branch, child,
+        new Leaf(min, max, branch, child)) as Leaf;
     }
 
     /// <summary>Computes the child index that contains the desired dimensions.</summary>
@@ -3212,30 +3278,30 @@ namespace Seven.Structures
       }
     }
 
-		/// <summary>Checks a node for inclusion (overlap) between two spaces.</summary>
-		/// <param name="left_min">The minimum values of the left space.</param>
-		/// <param name="left_max">The maximum values of the left space.</param>
-		/// <param name="right_min">The minimum values of the right space.</param>
-		/// <param name="right_max">The maximum values of the right space.</param>
-		/// <returns>True if the spaces overlap; False if not.</returns>
-		private bool InclusionCheck(M[] left_min, M[] left_max, M[] right_min, M[] right_max)
-		{
-			// if the right space is not outside the left space, they must overlap
-			for (int j = 0; j < this._dimensions; j++)
-				if (this._compare(left_max[j], right_min[j]) == Comparison.Less ||
-					this._compare(left_min[j], right_max[j]) == Comparison.Greater)
-					return false;
-			return true;
-		}
+    /// <summary>Checks a node for inclusion (overlap) between two spaces.</summary>
+    /// <param name="left_min">The minimum values of the left space.</param>
+    /// <param name="left_max">The maximum values of the left space.</param>
+    /// <param name="right_min">The minimum values of the right space.</param>
+    /// <param name="right_max">The maximum values of the right space.</param>
+    /// <returns>True if the spaces overlap; False if not.</returns>
+    private bool InclusionCheck(M[] left_min, M[] left_max, M[] right_min, M[] right_max)
+    {
+      // if the right space is not outside the left space, they must overlap
+      for (int j = 0; j < this._dimensions; j++)
+        if (this._compare(left_max[j], right_min[j]) == Comparison.Less ||
+          this._compare(left_min[j], right_max[j]) == Comparison.Greater)
+          return false;
+      return true;
+    }
 
-		/// <summary>Checks if a space encapsulates a point.</summary>
-		/// <param name="min">The minimum values of the space.</param>
-		/// <param name="max">The maximum values of the space.</param>
-		/// <param name="ms">The point.</param>
-		/// <returns>True if the space encapsulates the point; False if not.</returns>
+    /// <summary>Checks if a space encapsulates a point.</summary>
+    /// <param name="min">The minimum values of the space.</param>
+    /// <param name="max">The maximum values of the space.</param>
+    /// <param name="ms">The point.</param>
+    /// <returns>True if the space encapsulates the point; False if not.</returns>
     private bool EncapsulationCheck(M[] min, M[] max, M[] ms)
     {
-			// if the space is not outside the bounds, it must be inside
+      // if the space is not outside the bounds, it must be inside
       for (int j = 0; j < this._dimensions; j++)
         if (this._compare(ms[j], min[j]) == Comparison.Less ||
           this._compare(ms[j], max[j]) == Comparison.Greater)
@@ -3243,200 +3309,200 @@ namespace Seven.Structures
       return true;
     }
 
-		/// <summary>Checks if a space (left) encapsulates another space (right).</summary>
-		/// <param name="left_min">The minimum values of the left space.</param>
-		/// <param name="left_max">The maximum values of the left space.</param>
-		/// <param name="right_min">The minimum values of the right space.</param>
-		/// <param name="right_max">The maximum values of the right space.</param>
-		/// <returns>True if the left space encapsulates the right; False if not.</returns>
-		private bool EncapsulationCheck(M[] left_min, M[] left_max, M[] right_min, M[] right_max)
-		{
-			// if all the dimensions of the left space are 
-			// beyond that of the right, the right is encapsulated
-			for (int j = 0; j < this._dimensions; j++)
-				if (this._compare(left_min[j], right_min[j]) != Comparison.Less ||
-					this._compare(left_max[j], right_max[j]) != Comparison.Greater)
-					return false;
-			return true;
-		}
+    /// <summary>Checks if a space (left) encapsulates another space (right).</summary>
+    /// <param name="left_min">The minimum values of the left space.</param>
+    /// <param name="left_max">The maximum values of the left space.</param>
+    /// <param name="right_min">The minimum values of the right space.</param>
+    /// <param name="right_max">The maximum values of the right space.</param>
+    /// <returns>True if the left space encapsulates the right; False if not.</returns>
+    private bool EncapsulationCheck(M[] left_min, M[] left_max, M[] right_min, M[] right_max)
+    {
+      // if all the dimensions of the left space are 
+      // beyond that of the right, the right is encapsulated
+      for (int j = 0; j < this._dimensions; j++)
+        if (this._compare(left_min[j], right_min[j]) != Comparison.Less ||
+          this._compare(left_max[j], right_max[j]) != Comparison.Greater)
+          return false;
+      return true;
+    }
 
     /// <summary>Chops (removes) a child from a branch.</summary>
     /// <param name="branch">The parent of the child to chop.</param>
     /// <param name="child">The index of the child to chop.</param>
     private void ChopChild(Branch branch, int child)
     {
-			if (branch.Children.Length == this._children)
-				branch.Children[child] = null;
-			else
-			{
-				for (int i = 0; i < branch.ChildCount; i++)
-					if (branch.Children[i].Index == child)
-					{
-						branch.Children[i] = branch.Children[branch.ChildCount - 1];
-						branch.ChildCount--;
-						break;
-					}
-			}
+      if (branch.Children.Length == this._children)
+        branch.Children[child] = null;
+      else
+      {
+        for (int i = 0; i < branch.ChildCount; i++)
+          if (branch.Children[i].Index == child)
+          {
+            branch.Children[i] = branch.Children[branch.ChildCount - 1];
+            branch.ChildCount--;
+            break;
+          }
+      }
     }
 
     /// <summary>Iterates through the entire tree and ensures each item is in the proper leaf.</summary>
     public void Update()
     {
-			this.Update(this._top, 0);
+      this.Update(this._top, 0);
 
-			this._previousAddition = this._top;
-			this._previousAdditionDepth = 0;
+      this._previousAddition = this._top;
+      this._previousAdditionDepth = 0;
     }
 
-		/// <summary>Recursive version of the Update method.</summary>
-		/// <param name="node">The current node of iteration.</param>
-		/// <param name="depth">The current depth of iteration.</param>
-		private void Update(Node node, int depth)
-		{
-			if (node is Leaf)
-			{
-				Leaf leaf = node as Leaf;
-				for (int i = 0; i < leaf.Count; i++)
-				{
-					M[] ms;
+    /// <summary>Recursive version of the Update method.</summary>
+    /// <param name="node">The current node of iteration.</param>
+    /// <param name="depth">The current depth of iteration.</param>
+    private void Update(Node node, int depth)
+    {
+      if (node is Leaf)
+      {
+        Leaf leaf = node as Leaf;
+        for (int i = 0; i < leaf.Count; i++)
+        {
+          M[] ms;
           this._locate(leaf.Contents[i], out ms);
 
           if (ms == null || ms.Length != this._dimensions)
             throw new Error("the location function for omnitree is invalid.");
 
-					if (!EncapsulationCheck(leaf.Min, leaf.Max, ms))
-					{
-						T item = leaf.Contents[i];
-						leaf.Contents[i] = leaf.Contents[--leaf.Count];
-						Node temp = leaf.Parent;
-						while (temp != null)
-						{
-							if (EncapsulationCheck(temp.Min, temp.Max, ms))
-								break;
-							temp.Count--;
-							temp = temp.Parent;
-						}
+          if (!EncapsulationCheck(leaf.Min, leaf.Max, ms))
+          {
+            T item = leaf.Contents[i];
+            leaf.Contents[i] = leaf.Contents[--leaf.Count];
+            Node temp = leaf.Parent;
+            while (temp != null)
+            {
+              if (EncapsulationCheck(temp.Min, temp.Max, ms))
+                break;
+              temp.Count--;
+              temp = temp.Parent;
+            }
 
-						if (temp == null)
-						{
-							this._count--;
-							if (HandleOutOfBounds == null)
-								throw new Error("a node was updated to be out of bounds (found in an update)");
-							else
-								this.HandleOutOfBounds(leaf.Contents[i]);
-						}
-						else
-							this.Add(item, temp, ms, depth);
-					}
-				}
-			}
-			else
-			{
-				Branch branch = node as Branch;
-				if (branch.Children.Length == this._children)
-				{
-					for (int i = 0; i < branch.ChildCount; i++)
-						if (branch.Children[i] != null)
-						{
-							this.Update(branch.Children[i], depth + 1);
-							if (branch.Children[i].Count == 0)
-								ChopChild(branch, branch.Children[i].Index);
-						}
-				}
-				else
-					for (int i = 0; i < branch.ChildCount; i++)
-					{
-						this.Update(branch.Children[i], depth + 1);
-						if (branch.Children[i].Count == 0)
-							ChopChild(branch, branch.Children[i].Index);
-					}
+            if (temp == null)
+            {
+              this._count--;
+              if (HandleOutOfBounds == null)
+                throw new Error("a node was updated to be out of bounds (found in an update)");
+              else
+                this.HandleOutOfBounds(leaf.Contents[i]);
+            }
+            else
+              this.Add(item, temp, ms, depth);
+          }
+        }
+      }
+      else
+      {
+        Branch branch = node as Branch;
+        if (branch.Children.Length == this._children)
+        {
+          for (int i = 0; i < branch.ChildCount; i++)
+            if (branch.Children[i] != null)
+            {
+              this.Update(branch.Children[i], depth + 1);
+              if (branch.Children[i].Count == 0)
+                ChopChild(branch, branch.Children[i].Index);
+            }
+        }
+        else
+          for (int i = 0; i < branch.ChildCount; i++)
+          {
+            this.Update(branch.Children[i], depth + 1);
+            if (branch.Children[i].Count == 0)
+              ChopChild(branch, branch.Children[i].Index);
+          }
 
-				if (branch.Count < this._load && branch.Count != 0)
-					ShrinkChild(branch.Parent, branch.Index);
-			}
-		}
+        if (branch.Count < this._load && branch.Count != 0)
+          ShrinkChild(branch.Parent, branch.Index);
+      }
+    }
 
     /// <summary>Iterates through the provided dimensions and ensures each item is in the proper leaf.</summary>
     /// <param name="min">The minimum dimensions of the space to update.</param>
     /// <param name="max">The maximum dimensions of the space to update.</param>
     public void Update(M[] min, M[] max)
     {
-			this.Update(min, max, this._top, 0);
+      this.Update(min, max, this._top, 0);
 
-			this._previousAddition = this._top;
-			this._previousAdditionDepth = 0;
+      this._previousAddition = this._top;
+      this._previousAdditionDepth = 0;
     }
 
-		/// <summary>Recursive version of the Update method.</summary>
-		/// <param name="min">The minimum dimensions of the space to update.</param>
-		/// <param name="max">The maximum dimensions of the space to update.</param>
-		/// <param name="node">The current node of iteration.</param>
-		/// <param name="depth">The current depth in the tree.</param>
-		private void Update(M[] min, M[] max, Node node, int depth)
-		{
-			if (node is Leaf)
-			{
-				Leaf leaf = node as Leaf;
-				for (int i = 0; i < leaf.Count; i++)
-				{
-					M[] ms;
-					this._locate(leaf.Contents[i], out ms);
+    /// <summary>Recursive version of the Update method.</summary>
+    /// <param name="min">The minimum dimensions of the space to update.</param>
+    /// <param name="max">The maximum dimensions of the space to update.</param>
+    /// <param name="node">The current node of iteration.</param>
+    /// <param name="depth">The current depth in the tree.</param>
+    private void Update(M[] min, M[] max, Node node, int depth)
+    {
+      if (node is Leaf)
+      {
+        Leaf leaf = node as Leaf;
+        for (int i = 0; i < leaf.Count; i++)
+        {
+          M[] ms;
+          this._locate(leaf.Contents[i], out ms);
 
-					if (ms == null || ms.Length != this._dimensions)
-						throw new Error("the location function for omnitree is invalid.");
+          if (ms == null || ms.Length != this._dimensions)
+            throw new Error("the location function for omnitree is invalid.");
 
 
-					if (!EncapsulationCheck(leaf.Min, leaf.Max, ms))
-					{
-						T item = leaf.Contents[i];
-						leaf.Contents[i] = leaf.Contents[--leaf.Count];
-						Node temp = leaf.Parent;
-						while (temp != null)
-						{
-							if (EncapsulationCheck(temp.Min, temp.Max, ms))
-								break;
-							temp.Count--;
-							temp = temp.Parent;
-						}
+          if (!EncapsulationCheck(leaf.Min, leaf.Max, ms))
+          {
+            T item = leaf.Contents[i];
+            leaf.Contents[i] = leaf.Contents[--leaf.Count];
+            Node temp = leaf.Parent;
+            while (temp != null)
+            {
+              if (EncapsulationCheck(temp.Min, temp.Max, ms))
+                break;
+              temp.Count--;
+              temp = temp.Parent;
+            }
 
-						if (temp == null)
-						{
-							this._count--;
-							if (HandleOutOfBounds == null)
-								throw new Error("a node was updated to be out of bounds (found in an update)");
-							else
-								this.HandleOutOfBounds(leaf.Contents[i]);
-						}
-						else
-							this.Add(item, temp, ms, depth);
-					}
-				}
-			}
-			else
-			{
-				Branch branch = node as Branch;
-				if (branch.Children.Length == this._children)
-				{
-					for (int i = 0; i < branch.ChildCount; i++)
-						if (branch.Children[i] != null)
-						{
-							this.Update(branch.Children[i], depth + 1);
-							if (branch.Children[i].Count == 0)
-								ChopChild(branch, branch.Children[i].Index);
-						}
-				}
-				else
-					for (int i = 0; i < branch.ChildCount; i++)
-					{
-						this.Update(branch.Children[i], depth + 1);
-						if (branch.Children[i].Count == 0)
-							ChopChild(branch, branch.Children[i].Index);
-					}
+            if (temp == null)
+            {
+              this._count--;
+              if (HandleOutOfBounds == null)
+                throw new Error("a node was updated to be out of bounds (found in an update)");
+              else
+                this.HandleOutOfBounds(leaf.Contents[i]);
+            }
+            else
+              this.Add(item, temp, ms, depth);
+          }
+        }
+      }
+      else
+      {
+        Branch branch = node as Branch;
+        if (branch.Children.Length == this._children)
+        {
+          for (int i = 0; i < branch.ChildCount; i++)
+            if (branch.Children[i] != null)
+            {
+              this.Update(branch.Children[i], depth + 1);
+              if (branch.Children[i].Count == 0)
+                ChopChild(branch, branch.Children[i].Index);
+            }
+        }
+        else
+          for (int i = 0; i < branch.ChildCount; i++)
+          {
+            this.Update(branch.Children[i], depth + 1);
+            if (branch.Children[i].Count == 0)
+              ChopChild(branch, branch.Children[i].Index);
+          }
 
-				if (branch.Count < this._load && branch.Count != 0)
-					ShrinkChild(branch.Parent, branch.Index);
-			}
-		}
+        if (branch.Count < this._load && branch.Count != 0)
+          ShrinkChild(branch.Parent, branch.Index);
+      }
+    }
 
     /// <summary>Traverses every item in the tree and performs the delegate in them.</summary>
     /// <param name="function">The delegate to perform on every item in the tree.</param>
@@ -3448,14 +3514,14 @@ namespace Seven.Structures
     {
       if (node is Leaf)
       {
-				Leaf leaf = node as Leaf;
+        Leaf leaf = node as Leaf;
         for (int i = 0; i < leaf.Count; i++)
           function(leaf.Contents[i]);
       }
       else
       {
-				Branch branch = node as Branch;
-				if (branch.Children.Length == this._children)
+        Branch branch = node as Branch;
+        if (branch.Children.Length == this._children)
         {
           foreach (Node child in branch.Children)
             if (child != null)
@@ -3477,22 +3543,22 @@ namespace Seven.Structures
     {
       if (node is Leaf)
       {
-				Leaf leaf = node as Leaf;
+        Leaf leaf = node as Leaf;
         for (int i = 0; i < leaf.Count; i++)
           function(ref leaf.Contents[i]);
       }
       else
       {
-				Branch branch = node as Branch;
-				if (branch.Children.Length == this._children)
+        Branch branch = node as Branch;
+        if (branch.Children.Length == this._children)
         {
-					foreach (Node child in branch.Children)
+          foreach (Node child in branch.Children)
             if (child != null)
               this.Foreach(function, child);
         }
         else
-					for (int i = 0; i < branch.ChildCount; i++)
-						this.Foreach(function, branch.Children[i]);
+          for (int i = 0; i < branch.ChildCount; i++)
+            this.Foreach(function, branch.Children[i]);
       }
     }
 
@@ -3506,14 +3572,14 @@ namespace Seven.Structures
     {
       if (node is Leaf)
       {
-				Leaf leaf = node as Leaf;
-				for (int i = 0; i < leaf.Count; i++)
-					if (function(leaf.Contents[i]) == ForeachStatus.Break)
+        Leaf leaf = node as Leaf;
+        for (int i = 0; i < leaf.Count; i++)
+          if (function(leaf.Contents[i]) == ForeachStatus.Break)
             return ForeachStatus.Break;
       }
       else
       {
-				Branch branch = node as Branch;
+        Branch branch = node as Branch;
         if (branch.ChildCount == this._children)
         {
           foreach (Node child in branch.Children)
@@ -3539,15 +3605,15 @@ namespace Seven.Structures
     {
       if (node is Leaf)
       {
-				Leaf leaf = node as Leaf;
+        Leaf leaf = node as Leaf;
         for (int i = 0; i < leaf.Count; i++)
           if (function(ref leaf.Contents[i]) == ForeachStatus.Break)
             return ForeachStatus.Break;
       }
       else
       {
-				Branch branch = node as Branch;
-				if (branch.Children.Length == this._children)
+        Branch branch = node as Branch;
+        if (branch.Children.Length == this._children)
         {
           foreach (Node child in branch.Children)
             if (child != null)
@@ -3574,10 +3640,10 @@ namespace Seven.Structures
     {
       if (node is Leaf)
       {
-				Leaf leaf = node as Leaf;
+        Leaf leaf = node as Leaf;
         for (int i = 0; i < leaf.Count; i++)
         {
-					M[] ms;
+          M[] ms;
           this._locate(leaf.Contents[i], out ms);
 
           if (ms == null || ms.Length != this._dimensions)
@@ -3589,18 +3655,18 @@ namespace Seven.Structures
       }
       else
       {
-				Branch branch = node as Branch;
-				if (branch.Children.Length == this._children)
+        Branch branch = node as Branch;
+        if (branch.Children.Length == this._children)
         {
-					for (int i = 0; i < branch.ChildCount; i++)
-						if (branch.Children[i] != null && InclusionCheck(branch.Children[i].Min, branch.Children[i].Max, min, max))
-							this.Foreach(function, branch.Children[i], min, max);
+          for (int i = 0; i < branch.ChildCount; i++)
+            if (branch.Children[i] != null && InclusionCheck(branch.Children[i].Min, branch.Children[i].Max, min, max))
+              this.Foreach(function, branch.Children[i], min, max);
         }
         else
         {
-					for (int i = 0; i < branch.ChildCount; i++)
-						if (InclusionCheck(branch.Children[i].Min, branch.Children[i].Max, min, max))
-							this.Foreach(function, branch.Children[i], min, max);
+          for (int i = 0; i < branch.ChildCount; i++)
+            if (InclusionCheck(branch.Children[i].Min, branch.Children[i].Max, min, max))
+              this.Foreach(function, branch.Children[i], min, max);
         }
       }
     }
@@ -3617,10 +3683,10 @@ namespace Seven.Structures
     {
       if (node is Leaf)
       {
-				Leaf leaf = node as Leaf;
+        Leaf leaf = node as Leaf;
         for (int i = 0; i < leaf.Count; i++)
         {
-					M[] ms;
+          M[] ms;
           this._locate(leaf.Contents[i], out ms);
 
           if (ms == null || ms.Length != this._dimensions)
@@ -3632,18 +3698,18 @@ namespace Seven.Structures
       }
       else
       {
-				Branch branch = node as Branch;
-				if (branch.Children.Length == this._children)
+        Branch branch = node as Branch;
+        if (branch.Children.Length == this._children)
         {
-					for (int i = 0; i < this._children; i++)
-						if (branch.Children[i] != null && InclusionCheck(branch.Children[i].Min, branch.Children[i].Max, min, max))
-							this.Foreach(function, branch.Children[i], min, max);
+          for (int i = 0; i < this._children; i++)
+            if (branch.Children[i] != null && InclusionCheck(branch.Children[i].Min, branch.Children[i].Max, min, max))
+              this.Foreach(function, branch.Children[i], min, max);
         }
         else
         {
-					for (int i = 0; i < branch.ChildCount; i++)
-						if (InclusionCheck(branch.Children[i].Min, branch.Children[i].Max, min, max))
-							this.Foreach(function, branch.Children[i], min, max);
+          for (int i = 0; i < branch.ChildCount; i++)
+            if (InclusionCheck(branch.Children[i].Min, branch.Children[i].Max, min, max))
+              this.Foreach(function, branch.Children[i], min, max);
         }
       }
     }
@@ -3660,10 +3726,10 @@ namespace Seven.Structures
     {
       if (node is Leaf)
       {
-				Leaf leaf = node as Leaf;
+        Leaf leaf = node as Leaf;
         for (int i = 0; i < leaf.Count; i++)
         {
-					M[] ms;
+          M[] ms;
           this._locate(leaf.Contents[i], out ms);
 
           if (ms == null || ms.Length != this._dimensions)
@@ -3676,19 +3742,19 @@ namespace Seven.Structures
       }
       else
       {
-				Branch branch = node as Branch;
-				if (branch.Children.Length == this._children)
+        Branch branch = node as Branch;
+        if (branch.Children.Length == this._children)
         {
-					for (int i = 0; i < this._children; i++)
-						if (branch.Children[i] != null && InclusionCheck(branch.Children[i].Min, branch.Children[i].Max, min, max))
-							if (this.Foreach(function, branch.Children[i], min, max) == ForeachStatus.Break)
+          for (int i = 0; i < this._children; i++)
+            if (branch.Children[i] != null && InclusionCheck(branch.Children[i].Min, branch.Children[i].Max, min, max))
+              if (this.Foreach(function, branch.Children[i], min, max) == ForeachStatus.Break)
                 return ForeachStatus.Break;
         }
         else
         {
-					for (int i = 0; i < branch.ChildCount; i++)
-						if (InclusionCheck(branch.Children[i].Min, branch.Children[i].Max, min, max))
-							if (this.Foreach(function, branch.Children[i], min, max) == ForeachStatus.Break)
+          for (int i = 0; i < branch.ChildCount; i++)
+            if (InclusionCheck(branch.Children[i].Min, branch.Children[i].Max, min, max))
+              if (this.Foreach(function, branch.Children[i], min, max) == ForeachStatus.Break)
                 return ForeachStatus.Break;
         }
       }
@@ -3707,10 +3773,10 @@ namespace Seven.Structures
     {
       if (node is Leaf)
       {
-				Leaf leaf = node as Leaf;
+        Leaf leaf = node as Leaf;
         for (int i = 0; i < leaf.Count; i++)
         {
-					M[] ms;
+          M[] ms;
           this._locate(leaf.Contents[i], out ms);
 
           if (ms == null || ms.Length != this._dimensions)
@@ -3723,19 +3789,19 @@ namespace Seven.Structures
       }
       else
       {
-				Branch branch = node as Branch;
-				if (branch.Children.Length == this._children)
+        Branch branch = node as Branch;
+        if (branch.Children.Length == this._children)
         {
-					for (int i = 0; i < this._children; i++)
-						if (branch.Children[i] != null && InclusionCheck(branch.Children[i].Min, branch.Children[i].Max, min, max))
-							if (this.Foreach(function, branch.Children[i], min, max) == ForeachStatus.Break)
+          for (int i = 0; i < this._children; i++)
+            if (branch.Children[i] != null && InclusionCheck(branch.Children[i].Min, branch.Children[i].Max, min, max))
+              if (this.Foreach(function, branch.Children[i], min, max) == ForeachStatus.Break)
                 return ForeachStatus.Break;
         }
         else
         {
-					for (int i = 0; i < branch.ChildCount; i++)
-						if (InclusionCheck(branch.Children[i].Min, branch.Children[i].Max, min, max))
-							if (this.Foreach(function, branch.Children[i], min, max) == ForeachStatus.Break)
+          for (int i = 0; i < branch.ChildCount; i++)
+            if (InclusionCheck(branch.Children[i].Min, branch.Children[i].Max, min, max))
+              if (this.Foreach(function, branch.Children[i], min, max) == ForeachStatus.Break)
                 return ForeachStatus.Break;
         }
       }
@@ -3755,7 +3821,7 @@ namespace Seven.Structures
       System.Collections.Generic.IEnumerable<T>.GetEnumerator()
     {
       T[] array = this.ToArray();
-			return ((System.Collections.Generic.IEnumerable<T>)array).GetEnumerator();
+      return ((System.Collections.Generic.IEnumerable<T>)array).GetEnumerator();
     }
 
     /// <summary>Puts all the items on this tree into an array.</summary>
@@ -3788,17 +3854,23 @@ namespace Seven.Structures
       this._top = new Leaf(this._top.Min, this._top.Max, null, -1);
       this._count = 0;
 
-			this._load = _defaultLoad;
-			this._loadPlusOnePowered =
-				Omnitree_Array<T, M>.Int_Power(this._load + 1, this._dimensions);
-			this._loadPowered =
-				Omnitree_Array<T, M>.Int_Power(_load, _dimensions);
+      this._load = _defaultLoad;
+      this._loadPlusOnePowered =
+        Omnitree_Array<T, M>.Int_Power(this._load + 1, this._dimensions);
+      this._loadPowered =
+        Omnitree_Array<T, M>.Int_Power(_load, _dimensions);
     }
+
+    #endregion
+
+    #region error
 
     /// <summary>Omnitree_Array Exception.</summary>
     private class Error : Omnitree.Error
     {
       public Error(string message) : base(message) { }
     }
+
+    #endregion
   }
 }

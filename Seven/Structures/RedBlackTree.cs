@@ -1,7 +1,7 @@
 ﻿// Seven
 // https://github.com/53V3N1X/SevenFramework
-// LISCENSE: See "LISCENSE.txt" in th root project directory.
-// SUPPORT: See "README.txt" in the root project directory.
+// LISCENSE: See "LISCENSE.md" in th root project directory.
+// SUPPORT: See "SUPPORT.md" in the root project directory.
 
 // THIS FILE CONTAINS ETERNAL CITATIONS
 
@@ -11,12 +11,19 @@ namespace Seven.Structures
 {
   public interface RedBlackTree<T> : Structure<T>
   {
+    #region property
+
+    int Count { get; }
+    bool IsEmpty { get; }
+
+    #endregion
+
+    #region method
+
     void Add(T addition);
     //bool TryAdd(Type addition);
     void Remove(T removal);
     //bool TryRemove(Type removal);
-    int Count { get; }
-    bool IsEmpty { get; }
     void Clear();
 
     //bool Contains<Key>(Key key, Func<Type, Key, int> comparison);
@@ -24,6 +31,8 @@ namespace Seven.Structures
     //bool TryGet<Key>(Key get, Func<Type, Key, int> comparison, out Type item);
     //void Remove<Key>(Key removal, Func<Type, Key, int> comparison);
     //bool TryRemove<Key>(Key removal, Func<Type, Key, int> comparison);
+
+    #endregion
   }
 
   /// <summary></summary>
@@ -38,8 +47,7 @@ namespace Seven.Structures
   [Serializable]
   public class RedBlackTree_Linked<T> : RedBlackTree<T>
   {
-    protected const bool Red = true;
-    protected const bool Black = false;
+    #region class
 
     protected class Node
     {
@@ -61,15 +69,30 @@ namespace Seven.Structures
       }
     }
 
+    #endregion
+
+    #region field
+
+    protected const bool Red = true;
+    protected const bool Black = false;
+
     protected Compare<T> _compare;
 
     protected int _count;
     protected Node _redBlackTree;
     protected static Node _sentinelNode;
 
+    #endregion
+
+    #region property
+
     public int Count { get { return _count; } }
 
     public bool IsEmpty { get { return _redBlackTree == null; } }
+
+    #endregion
+
+    #region construct
 
     public RedBlackTree_Linked(Compare<T> valueComparisonFunction)
     {
@@ -78,6 +101,10 @@ namespace Seven.Structures
       _redBlackTree = _sentinelNode;
       _compare = valueComparisonFunction;
     }
+
+    #endregion
+
+    #region method
 
     public T Get<Key>(Key key, Func<T, Key, int> comparison)
     {
@@ -93,7 +120,7 @@ namespace Seven.Structures
         else
           treeNode = treeNode.RightChild;
       }
-      throw new RedBlackLinkedException("attempting to get a non-existing value.");
+      throw new Error("attempting to get a non-existing value.");
     }
 
     public bool TryGet<Key>(Key key, Func<T, Key, int> comparison, out T returnValue)
@@ -153,7 +180,7 @@ namespace Seven.Structures
     public void Add(T data)
     {
       if (data == null)
-        throw (new RedBlackLinkedException("RedBlackNode key and data must not be null"));
+        throw (new Error("RedBlackNode key and data must not be null"));
       Node addition = new Node();
       Node temp = _redBlackTree;
       while (temp != _sentinelNode)
@@ -161,7 +188,7 @@ namespace Seven.Structures
         addition.Parent = temp;
         Comparison result = _compare(data, temp.Value);
         if (result == Comparison.Equal)
-          throw (new RedBlackLinkedException("A Node with the same key already exists"));
+          throw (new Error("A Node with the same key already exists"));
         else if (result == Comparison.Greater)
           temp = temp.RightChild;
         else // (result == Comparison.Less)
@@ -285,7 +312,7 @@ namespace Seven.Structures
     {
       Node treeNode = _redBlackTree;
       if (treeNode == null || treeNode == _sentinelNode)
-        throw new RedBlackLinkedException("attempting to get the minimum value from an empty tree.");
+        throw new Error("attempting to get the minimum value from an empty tree.");
       while (treeNode.LeftChild != _sentinelNode)
         treeNode = treeNode.LeftChild;
       T returnValue = treeNode.Value;
@@ -297,7 +324,7 @@ namespace Seven.Structures
       Node treeNode = _redBlackTree;
       if (treeNode == null || treeNode == _sentinelNode)
       {
-        throw (new RedBlackLinkedException("attempting to get the maximum value from an empty tree."));
+        throw (new Error("attempting to get the maximum value from an empty tree."));
       }
       while (treeNode.RightChild != _sentinelNode)
         treeNode = treeNode.RightChild;
@@ -309,7 +336,7 @@ namespace Seven.Structures
     {
       if (value is object)
         if (((object)value) == null)
-          throw new RedBlackLinkedException("Attempting to remove a null value from the tree.");
+          throw new Error("Attempting to remove a null value from the tree.");
       //int result;
       Node node;
       node = _redBlackTree;
@@ -721,11 +748,17 @@ namespace Seven.Structures
       throw new NotImplementedException();
     }
 
+    #endregion
+
+    #region error
+
     /// <summary>This is used for throwing RedBlackTree exceptions only to make debugging faster.</summary>
-    protected class RedBlackLinkedException : Error
+    protected class Error : Structure.Error
     {
-      public RedBlackLinkedException(string message) : base(message) { }
+      public Error(string message) : base(message) { }
     }
+
+    #endregion
   }
 
   #region RedBlackTreeLinkedThreadSafe<Type>

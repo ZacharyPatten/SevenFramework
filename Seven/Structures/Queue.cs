@@ -1,7 +1,7 @@
 ﻿// Seven
 // https://github.com/53V3N1X/SevenFramework
-// LISCENSE: See "LISCENSE.txt" in th root project directory.
-// SUPPORT: See "README.txt" in the root project directory.
+// LISCENSE: See "LISCENSE.md" in th root project directory.
+// SUPPORT: See "SUPPORT.md" in the root project directory.
 
 using System;
 using System.Collections;
@@ -9,14 +9,25 @@ using System.Collections.Generic;
 
 namespace Seven.Structures
 {
+  /// <summary>Implements First-In-First-Out queue data structure.</summary>
+  /// <typeparam name="Type">The type of items to store in this structure.</typeparam>
   public interface Queue<Type> : Structure<Type>
   {
+    #region property
+
+    int Count { get; }
+    bool IsEmpty { get; }
+
+    #endregion
+
+    #region method
+
     void Enqueue(Type push);
     Type Peek();
     Type Dequeue();
-    int Count { get; }
-    bool IsEmpty { get; }
     void Clear();
+
+    #endregion
   }
 
   /// <summary>Implements First-In-First-Out queue data structure.</summary>
@@ -24,6 +35,8 @@ namespace Seven.Structures
   [Serializable]
   public class Queue_Linked<Type> : Queue<Type>
   {
+    #region class
+
     /// <summary>This class just holds the data for each individual node of the list.</summary>
     private class Node
     {
@@ -36,9 +49,17 @@ namespace Seven.Structures
       internal Node(Type data) { _value = data; }
     }
 
+    #endregion
+
+    #region field
+
     private Node _head;
     private Node _tail;
     private int _count;
+
+    #endregion
+
+    #region property
 
     /// <summary>Returns the number of items in the queue.</summary>
     /// <remarks>Runtime: O(1).</remarks>
@@ -47,6 +68,10 @@ namespace Seven.Structures
     /// <summary>Returns true if this structure is in an empty state.</summary>
     public bool IsEmpty { get { return _head == null; } }
 
+    #endregion
+
+    #region construct
+
     /// <summary>Creates an instance of a queue.</summary>
     /// <remarks>Runtime: O(1).</remarks>
     public Queue_Linked()
@@ -54,6 +79,10 @@ namespace Seven.Structures
       _head = _tail = null;
       _count = 0;
     }
+
+    #endregion
+
+    #region method
 
     /// <summary>Adds an item to the back of the queue.</summary>
     /// <param name="enqueue">The item to add to the queue.</param>
@@ -246,11 +275,17 @@ namespace Seven.Structures
       throw new NotImplementedException();
     }
 
+    #endregion
+
+    #region error
+
     /// <summary>This is used for throwing AVL Tree exceptions only to make debugging faster.</summary>
     private class Exception : Error
     {
       public Exception(string message) : base(message) { }
     }
+
+    #endregion
   }
 
   /// <summary>Implements a growing list as an array (with expansions/contractions) 
@@ -260,10 +295,16 @@ namespace Seven.Structures
   [Serializable]
   public class Queue_Array<Type> : Queue<Type>
   {
+    #region fields
+
     private Type[] _queue;
     private int _start;
     private int _count;
     private int _minimumCapacity;
+
+    #endregion
+
+    #region property
 
     /// <summary>Gets the number of items in the list.</summary>
     /// <remarks>Runtime: O(1).</remarks>
@@ -315,6 +356,10 @@ namespace Seven.Structures
       }
     }
 
+    #endregion
+
+    #region construct
+
     /// <summary>Creates an instance of a ListArray, and sets it's minimum capacity.</summary>
     /// <param name="minimumCapacity">The initial and smallest array size allowed by this list.</param>
     /// <remarks>Runtime: O(1).</remarks>
@@ -324,6 +369,10 @@ namespace Seven.Structures
       _count = 0;
       _minimumCapacity = minimumCapacity;
     }
+
+    #endregion
+
+    #region method
 
     /// <summary>Adds an item to the end of the list.</summary>
     /// <param name="addition">The item to be added.</param>
@@ -542,10 +591,16 @@ namespace Seven.Structures
 
     #endregion
 
+    #endregion
+
+    #region error
+
     /// <summary>This is used for throwing AVL Tree exceptions only to make debugging faster.</summary>
-    private class ListArrayException : Error
+    private class ListArrayException : Structure.Error
     {
       public ListArrayException(string message) : base(message) { }
     }
+
+    #endregion
   }
 }

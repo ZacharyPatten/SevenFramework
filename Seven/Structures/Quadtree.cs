@@ -1,7 +1,7 @@
 ﻿ // Seven
  // https://github.com/53V3N1X/SevenFramework
- // LISCENSE: See "LISCENSE.txt" in th root project directory.
- // SUPPORT: See "README.txt" in the root project directory.
+ // LISCENSE: See "LISCENSE.md" in th root project directory.
+ // SUPPORT: See "SUPPORT.md" in the root project directory.
 
 namespace Seven.Structures
 {
@@ -102,7 +102,6 @@ namespace Seven.Structures
     /// <param name="x">The x axis location.</param>
     /// <param name="y">The y axis location.</param>
     public delegate void Locate<T>(T item, out M x, out M y);
-
 
     public delegate T Average<T>(T first, T second);
 

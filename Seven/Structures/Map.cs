@@ -1,7 +1,7 @@
 ﻿// Seven
 // https://github.com/53V3N1X/SevenFramework
-// LISCENSE: See "LISCENSE.txt" in th root project directory.
-// SUPPORT: See "README.txt" in the root project directory.
+// LISCENSE: See "LISCENSE.md" in th root project directory.
+// SUPPORT: See "SUPPORT.md" in the root project directory.
 
 using System;
 using System.Threading;
@@ -14,35 +14,42 @@ namespace Seven.Structures
 {
   public interface Map<V, K> : Structure<V>
   {
+    #region property
+
     V this[K key] { get; set; }
+    int Count { get; }
+    bool IsEmpty { get; }
+    Map.Hash<K> Hash { get; }
+    Equate<K> Equate { get; }
+
+    #endregion
+
+    #region method
+
     V Get(K get);
     bool TryGet(K get, out V returnValue);
     bool Contains(K containsCheck);
     void Add(K key, V value);
     void Remove(K removalKey);
-    int Count { get; }
-    bool IsEmpty { get; }
     void Clear();
-    Map.Hash<K> Hash { get; }
-    Equate<K> Equate { get; }
+
+    #endregion
   }
 
   /// <summary>Contains extensions for the Map interface.</summary>
   public class Map
   {
+    #region delegate
+
     public delegate int Hash<K>(K key);
+
+    #endregion
   }
 
   [Serializable]
   public class Map_Linked<T, K> : Map<T, K>
   {
-    /// <summary>A set of allowable table sizes, all of which are prime.</summary>
-    private static readonly int[] _tableSizes = new int[]
-    {
-        1, 2, 5, 11, 23, 47, 97, 197, 397, 797, 1597, 3203, 6421, 12853, 25717, 51437,
-        102877, 205759, 411527, 823117, 1646237, 3292489, 6584983, 13169977, 26339969,
-        52679969, 105359939, 210719881, 421439783, 842879579, 1685759167
-    };
+    #region class
 
     private class Node
     {
@@ -62,6 +69,18 @@ namespace Seven.Structures
       }
     }
 
+    #endregion
+
+    #region field
+
+    /// <summary>A set of allowable table sizes, all of which are prime.</summary>
+    private static readonly int[] _tableSizes = new int[]
+    {
+        1, 2, 5, 11, 23, 47, 97, 197, 397, 797, 1597, 3203, 6421, 12853, 25717, 51437,
+        102877, 205759, 411527, 823117, 1646237, 3292489, 6584983, 13169977, 26339969,
+        52679969, 105359939, 210719881, 421439783, 842879579, 1685759167
+    };
+
     private const double _maxLoadFactor = 1.0d;
 
     private Equate<K> _equate;
@@ -69,6 +88,10 @@ namespace Seven.Structures
     private Node[] _table;
     private int _count;
     private int _sizeIndex;
+
+    #endregion
+
+    #region property
 
     /// <summary>The function for calculating hash codes for this table.</summary>
     public Map.Hash<K> Hash { get { return _hash; } }
@@ -113,6 +136,10 @@ namespace Seven.Structures
       }
     }
 
+    #endregion
+
+    #region construct
+
     /// <summary>Constructs a new hash table instance.</summary>
     /// <remarks>Runtime: O(1).</remarks>
     public Map_Linked(Equate<K> equate, Map.Hash<K> hash)
@@ -123,6 +150,10 @@ namespace Seven.Structures
       _count = 0;
       _sizeIndex = 0;
     }
+
+    #endregion
+
+    #region method
 
     public bool Contains(K key)
     {
@@ -359,10 +390,16 @@ namespace Seven.Structures
       throw new NotImplementedException();
     }
 
+    #endregion
+
+    #region error
+
     /// <summary>This is used for throwing hash table exceptions only to make debugging faster.</summary>
     private class Error : Structure.Error
     {
       public Error(string message) : base(message) { }
     }
+
+    #endregion
   }
 }

@@ -1,7 +1,7 @@
 ﻿// Seven
 // https://github.com/53V3N1X/SevenFramework
-// LISCENSE: See "LISCENSE.txt" in th root project directory.
-// SUPPORT: See "README.txt" in the root project directory.
+// LISCENSE: See "LISCENSE.md" in th root project directory.
+// SUPPORT: See "SUPPORT.md" in the root project directory.
 
 using Seven;
 
@@ -11,6 +11,18 @@ namespace Seven.Structures
   /// <typeparam name="Type">The generic type to be stored within the heap.</typeparam>
   public interface Heap<Type> : Structure<Type>
   {
+    #region property
+
+    /// <summary>The number of items in the queue.</summary>
+    int Count { get; }
+
+    /// <summary>True if count == 0; false if count > 0.</summary>
+    bool IsEmpty { get; }
+
+    #endregion
+
+    #region methods
+
     /// <summary>Enqueues an item into the heap.</summary>
     /// <param name="addition"></param>
     void Enqueue(Type addition);
@@ -23,14 +35,10 @@ namespace Seven.Structures
     /// <returns>The highest priority item in the queue.</returns>
     Type Peek();
 
-    /// <summary>The number of items in the queue.</summary>
-    int Count { get; }
-
-    /// <summary>True if count == 0; false if count > 0.</summary>
-    bool IsEmpty { get; }
-
     /// <summary>Returns the heap to an empty state.</summary>
     void Clear();
+
+    #endregion
   }
   
   /// <summary>Implements a priority heap with static priorities using an array.</summary>
@@ -44,10 +52,16 @@ namespace Seven.Structures
   [System.Serializable]
   public class Heap_Array<Type> : Heap<Type>
   {
+    #region field
+
     private Compare<Type> _compare;
     private Type[] _heap;
     private int _minimumCapacity;
     private int _count;
+
+    #endregion
+
+    #region property
 
     /// <summary>The maximum items the queue can hold.</summary>
     /// <remarks>Runtime: O(1).</remarks>
@@ -63,6 +77,10 @@ namespace Seven.Structures
     /// <summary>Returns true if the structure is empty.</summary>
     /// <remarks>Runtime: O(1).</remarks>
     public bool IsEmpty { get { return this._count == 0; } }
+
+    #endregion
+
+    #region construct
 
     /// <summary>Generates a priority queue with a capacity of the parameter. Runtime O(1).</summary>
     /// <param name="minimumCapacity">The capacity you want this priority queue to have.</param>
@@ -86,6 +104,10 @@ namespace Seven.Structures
       this._minimumCapacity = minimumCapacity;
       this._count = 0;
     }
+
+    #endregion
+
+    #region method
 
     /// <summary>The root index of the heap.</summary>
     private const int _root = 1;
@@ -389,11 +411,17 @@ namespace Seven.Structures
       return clone;
     }
 
+    #endregion
+
+    #region error
+
     /// <summary>This is used for throwing imutable priority queue exceptions only to make debugging faster.</summary>
     private class Error : Structure.Error
     {
       public Error(string message) : base(message) { }
     }
+
+    #endregion
   }
 
   #region HeapLinkedStatic

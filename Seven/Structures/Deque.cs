@@ -1,7 +1,7 @@
 ﻿// Seven
 // https://github.com/53V3N1X/SevenFramework
-// LISCENSE: See "LISCENSE.txt" in th root project directory.
-// SUPPORT: See "README.txt" in the root project directory.
+// LISCENSE: See "LISCENSE.md" in th root project directory.
+// SUPPORT: See "SUPPORT.md" in the root project directory.
 
 namespace Seven.Structures
 {
@@ -15,6 +15,8 @@ namespace Seven.Structures
   [System.Serializable]
   public class Deque_Linked<Type> : Deque<Type>
   {
+    #region class
+
     /// <summary>This class just holds the data for each individual node of the list.</summary>
     private class Node
     {
@@ -27,9 +29,17 @@ namespace Seven.Structures
       internal Node(Type data) { _value = data; }
     }
 
+    #endregion
+
+    #region field
+
     private Node _head;
     private Node _tail;
     private int _count;
+
+    #endregion
+
+    #region property
 
     /// <summary>Returns the number of items in the queue.</summary>
     /// <remarks>Runtime: O(1).</remarks>
@@ -38,6 +48,10 @@ namespace Seven.Structures
     /// <summary>Returns true if this structure is in an empty state.</summary>
     public bool IsEmpty { get { return _head == null; } }
 
+    #endregion
+
+    #region construct
+
     /// <summary>Creates an instance of a queue.</summary>
     /// <remarks>Runtime: O(1).</remarks>
     public Deque_Linked()
@@ -45,6 +59,10 @@ namespace Seven.Structures
       _head = _tail = null;
       _count = 0;
     }
+
+    #endregion
+
+    #region methods
 
     /// <summary>Adds an item to the back of the queue.</summary>
     /// <param name="enqueue">The item to add to the queue.</param>
@@ -217,11 +235,17 @@ namespace Seven.Structures
       throw new System.NotImplementedException();
     }
 
+    #endregion
+
+    #region error
+
     /// <summary>This is used for throwing AVL Tree exceptions only to make debugging faster.</summary>
     private class Exception : Error
     {
       public Exception(string message) : base(message) { }
     }
+
+    #endregion
   }
 
 }

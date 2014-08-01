@@ -1,9 +1,7 @@
 ﻿// Seven
 // https://github.com/53V3N1X/SevenFramework
-// LISCENSE: See "LISCENSE.txt" in th root project directory.
-// SUPPORT: See "README.txt" in the root project directory.
-
-// THIS FILE CONTAINS EXTERNAL CITATIONS
+// LISCENSE: See "LISCENSE.md" in th root project directory.
+// SUPPORT: See "SUPPORT.md" in the root project directory.
 
 namespace Seven
 {
@@ -24,8 +22,38 @@ namespace Seven
   /// </citation>
   public struct Fraction64
   {
+    #region field
+
     private int _numerator;
     private int _denominator;
+
+    #endregion
+
+    #region property
+
+    /// <summary>The denominator of the fraction.</summary>
+    public int Denominator
+    {
+      get { return _denominator; }
+      set
+      {
+        if (value != 0)
+          _denominator = value;
+        else
+          throw new Error("Denominator cannot be assigned a ZERO Value");
+      }
+    }
+
+    /// <summary>The numerator of the fraction.</summary>
+    public int Numerator
+    {
+      get { return _numerator; }
+      set { _numerator = value; }
+    }
+
+    #endregion
+
+    #region construct
 
     /// <summary>Constructs a fraction from an int.</summary>
     /// <param name="integer">The int to represent as a fraction.</param>
@@ -39,15 +67,15 @@ namespace Seven
     /// <param name="rational">The double to represent as a fraction.</param>
     public Fraction64(double rational)
     {
+    Rounded:
+
       if (rational > int.MaxValue)
+        throw new Error("Fraction64 construction invalid (rational > int.MaxValue)");
+      else if (rational % 1 == 0)
       {
-        this._numerator = int.MaxValue;
+        this._numerator = (int)rational;
         this._denominator = 1;
-      }
-      else if (rational < int.MinValue)
-      {
-        this._numerator = int.MinValue;
-        this._denominator = 1;
+        return;
       }
       else
       {
@@ -55,51 +83,41 @@ namespace Seven
         {
           checked
           {
-            if (rational % 1 == 0)
+            double temp_rational = rational;
+            int multiple = 1;
+            string temp_string = rational.ToString();
+            while (temp_string.IndexOf("E") > 0)
             {
-              this._numerator = (int)rational;
-              this._denominator = 1;
-              Fraction64.Reduce(this);
+              temp_rational *= 10;
+              multiple *= 10;
+              temp_string = temp_rational.ToString();
             }
-            else
+            int i = 0;
+            while (temp_string[i] != '.')
+              i++;
+            int digitsAfterDecimal = temp_string.Length - i - 1;
+            while (digitsAfterDecimal > 0)
             {
-              double temp_rational = rational;
-              int multiple = 1;
-              string temp_string = rational.ToString();
-              while (temp_string.IndexOf("E") > 0)
-              {
-                temp_rational *= 10;
-                multiple *= 10;
-                temp_string = temp_rational.ToString();
-              }
-              int i = 0;
-              while (temp_string[i] != '.')
-                i++;
-              int digitsAfterDecimal = temp_string.Length - i - 1;
-              while (digitsAfterDecimal > 0)
-              {
-                temp_rational *= 10;
-                multiple *= 10;
-                digitsAfterDecimal--;
-              }
-              _numerator = (int)System.Math.Round(temp_rational);
-              _denominator = multiple;
-              Reduce(this);
+              temp_rational *= 10;
+              multiple *= 10;
+              digitsAfterDecimal--;
             }
-
+            _numerator = (int)System.Math.Round(temp_rational);
+            _denominator = multiple;
+            Reduce(this);
           }
         }
-        catch (System.OverflowException)
+        catch
         {
-          throw new Error("Conversion not possible due to overflow");
-        }
-        catch (System.Exception)
-        {
-          throw new Error("Conversion not possible");
+          rational = System.Math.Round(rational, 5);
+          goto Rounded;
         }
       }
     }
 
+    /// <summary>Makes a fraction given an integer and a denominator.</summary>
+    /// <param name="numerator">The nmerator of the fraction.</param>
+    /// <param name="deniminator">The denominator fo the fraction.</param>
     public Fraction64(int numerator, int deniminator)
     {
       _numerator = numerator;
@@ -107,6 +125,8 @@ namespace Seven
       Reduce(this);
     }
 
+    /// <summary>Creates a fraction by parsing a string.</summary>
+    /// <param name="literal">The literal representation fo the fraction.</param>
     public Fraction64(string literal)
     {
       int i;
@@ -189,24 +209,11 @@ namespace Seven
       }
     }
 
-    public int Denominator
-    {
-      get { return _denominator; }
-      set
-      {
-        if (value != 0)
-          _denominator = value;
-        else
-          throw new Error("Denominator cannot be assigned a ZERO Value");
-      }
-    }
+    #endregion
 
-    public int Numerator
-    {
-      get { return _numerator; }
-      set { _numerator = value; }
-    }
+    #region operator
 
+    public static Fraction64 operator ++(Fraction64 fraction) { return fraction + 1; }
     /// <summary>Negates a fraction.</summary>
     /// <param name="fraction">The fraction to negate.</param>
     /// <returns>The result of the negation.</returns>
@@ -281,15 +288,47 @@ namespace Seven
     /// <param name="fraction">The integer to convert into a fraction.</param>
     /// <returns>The resulting fraction representation.</returns>
     public static explicit operator double(Fraction64 fraction) { return fraction.ToDouble(); }
+    public static Fraction64 operator %(Fraction64 left, Fraction64 right)
+    {
+      while (left > right)
+        left = left - right;
+      return left;
+    }
 
+    #endregion
+
+    #region method
+
+    public int CompareTo(Fraction64 right)
+    {
+      if (this < right)
+        return -1;
+      else if (this > right)
+        return 1;
+      else return 0;
+    }
+
+    public static int CompareTo(Fraction64 left, Fraction64 right)
+    {
+      if (left < right)
+       return -1;
+      else if (left > right)
+        return 1;
+      else return 0;
+    }
+
+    /// <summary>Check for equality by value.</summary>
+    /// <param name="left">The left operand of the equality check.</param>
+    /// <param name="right">The right operand of the equality check.</param>
+    /// <returns>True if equal; false if not.</returns>
     private static bool Equals(Fraction64 left, Fraction64 right)
     {
       return (left._numerator == right._numerator && left._denominator == right._denominator);
     }
 
-    /// <summary>
-    /// checks whether two fraction64s are equal
-    /// </summary>
+    /// <summary>Checks for equality by value.</summary>
+    /// <param name="obj">The right operand of the equality check.</param>
+    /// <returns>True if equal; false if not.</returns>
     public override bool Equals(object obj)
     {
       if (obj is Fraction64)
@@ -297,17 +336,15 @@ namespace Seven
       return false;
     }
 
-    /// <summary>
-    /// returns a hash code for this fraction64
-    /// </summary>
+    /// <summary>Computes a hash code for this fraction.</summary>
     public override int GetHashCode()
     {
       return (int)((Numerator ^ Denominator) & 0xFFFFFFFF);
     }
 
-    /// <summary>
-    /// internal function for negation
-    /// </summary>
+    /// <summary>Negates a fraction.</summary>
+    /// <param name="frac1">The fraction to negate.</param>
+    /// <returns>The result of the negation.</returns>
     private static Fraction64 Negate(Fraction64 frac1)
     {
       int iNumerator = -frac1.Numerator;
@@ -315,6 +352,10 @@ namespace Seven
       return (new Fraction64(iNumerator, iDenominator));
     }
 
+    /// <summary>Compute the addition of two fracitons.</summary>
+    /// <param name="frac1">The left operand of the addition.</param>
+    /// <param name="frac2">The right operand of the addition.</param>
+    /// <returns>The result of the addition.</returns>
     private static Fraction64 Add(Fraction64 frac1, Fraction64 frac2)
     {
       try
@@ -333,6 +374,10 @@ namespace Seven
       }
     }
 
+    /// <summary>Computes the multiplication of two fractions.</summary>
+    /// <param name="frac1">The left operand of the multiplication.</param>
+    /// <param name="frac2">The right operand of the multiplication.</param>
+    /// <returns>The result of the multiplication.</returns>
     private static Fraction64 Multiply(Fraction64 frac1, Fraction64 frac2)
     {
       try
@@ -374,6 +419,8 @@ namespace Seven
       return this.Numerator / (double)this.Denominator;
     }
 
+    /// <summary>Converts this fraction into a string "num/den".</summary>
+    /// <returns>A string representation fo this fraction.</returns>
     public override string ToString()
     {
       string str;
@@ -445,10 +492,16 @@ namespace Seven
       }
     }
 
+    #endregion
+
+    #region error
+
     public class Error : Seven.Error
     {
       public Error(string Message) : base(Message) { }
     }
+
+    #endregion
   }
 
   /// <summary>A fraction represented as two ints (numerator / denomnator).</summary>
@@ -468,8 +521,36 @@ namespace Seven
   /// </citation>
   public struct Fraction128
   {
+    #region field
+
     private long _numerator;
     private long _denominator;
+
+    #endregion
+
+    #region property
+
+    public long Denominator
+    {
+      get { return _denominator; }
+      set
+      {
+        if (value != 0)
+          _denominator = value;
+        else
+          throw new Error("Denominator cannot be assigned a ZERO Value");
+      }
+    }
+
+    public long Numerator
+    {
+      get { return _numerator; }
+      set { _numerator = value; }
+    }
+
+    #endregion
+
+    #region construct
 
     public Fraction128(long longeger)
     {
@@ -479,15 +560,17 @@ namespace Seven
 
     public Fraction128(double rational)
     {
+    Rounded:
+
       if (rational > long.MaxValue)
-      {
-        this._numerator = long.MaxValue;
-        this._denominator = 1;
-      }
+        throw new Error("Fraction128 construction invalid (rational > long.MaxValue)");
       else if (rational < long.MinValue)
+        throw new Error("Fraction128 construction invalid (rational < long.MinValue)");
+      else if (rational % 1 == 0)	// if whole number
       {
-        this._numerator = long.MinValue;
+        this._numerator = (long)rational;
         this._denominator = 1;
+        Fraction128.Reduce(this);
       }
       else
       {
@@ -495,47 +578,34 @@ namespace Seven
         {
           checked
           {
-            if (rational % 1 == 0)	// if whole number
+            double temp_rational = rational;
+            long multiple = 1;
+            string temp_string = rational.ToString();
+            while (temp_string.IndexOf("E") > 0)	// if in the form like 12E-9
             {
-              this._numerator = (long)rational;
-              this._denominator = 1;
-              Fraction128.Reduce(this);
+              temp_rational *= 10;
+              multiple *= 10;
+              temp_string = temp_rational.ToString();
             }
-            else
+            int i = 0;
+            while (temp_string[i] != '.')
+              i++;
+            long digitsAfterDecimal = temp_string.Length - i - 1;
+            while (digitsAfterDecimal > 0)
             {
-              double temp_rational = rational;
-              long multiple = 1;
-              string temp_string = rational.ToString();
-              while (temp_string.IndexOf("E") > 0)	// if in the form like 12E-9
-              {
-                temp_rational *= 10;
-                multiple *= 10;
-                temp_string = temp_rational.ToString();
-              }
-              int i = 0;
-              while (temp_string[i] != '.')
-                i++;
-              long digitsAfterDecimal = temp_string.Length - i - 1;
-              while (digitsAfterDecimal > 0)
-              {
-                temp_rational *= 10;
-                multiple *= 10;
-                digitsAfterDecimal--;
-              }
-              _numerator = (long)System.Math.Round(temp_rational);
-              _denominator = multiple;
-              Reduce(this);
+              temp_rational *= 10;
+              multiple *= 10;
+              digitsAfterDecimal--;
             }
-
+            _numerator = (long)System.Math.Round(temp_rational);
+            _denominator = multiple;
+            Reduce(this);
           }
         }
         catch (System.OverflowException)
         {
-          throw new Error("Conversion not possible due to overflow");
-        }
-        catch (System.Exception)
-        {
-          throw new Error("Conversion not possible");
+          rational = System.Math.Round(rational, 10);
+          goto Rounded;
         }
       }
     }
@@ -615,24 +685,11 @@ namespace Seven
       }
     }
 
-    public long Denominator
-    {
-      get { return _denominator; }
-      set
-      {
-        if (value != 0)
-          _denominator = value;
-        else
-          throw new Error("Denominator cannot be assigned a ZERO Value");
-      }
-    }
+    #endregion
 
-    public long Numerator
-    {
-      get { return _numerator; }
-      set { _numerator = value; }
-    }
+    #region operator
 
+    public static Fraction128 operator ++(Fraction128 fraction) { return fraction + 1; }
     /// <summary>Negates a fraction.</summary>
     /// <param name="fraction">The fraction to negate.</param>
     /// <returns>The result of the negation.</returns>
@@ -707,6 +764,34 @@ namespace Seven
     /// <param name="fraction">The longeger to convert longo a fraction.</param>
     /// <returns>The resulting fraction representation.</returns>
     public static explicit operator double(Fraction128 fraction) { return fraction.ToDouble(); }
+    public static Fraction128 operator %(Fraction128 left, Fraction128 right)
+    {
+      while (left > right)
+        left = left - right;
+      return left;
+    }
+
+    #endregion
+
+    #region method
+
+    public int CompareTo(Fraction128 right)
+    {
+      if (this < right)
+        return -1;
+      else if (this > right)
+        return 1;
+      else return 0;
+    }
+
+    public static int CompareTo(Fraction128 left, Fraction128 right)
+    {
+      if (left < right)
+        return -1;
+      else if (left > right)
+        return 1;
+      else return 0;
+    }
 
     private static bool Equals(Fraction128 left, Fraction128 right)
     {
@@ -869,9 +954,15 @@ namespace Seven
       }
     }
 
+    #endregion
+
+    #region error
+
     public class Error : Seven.Error
     {
       public Error(string Message) : base(Message) { }
     }
+
+    #endregion
   }
 }

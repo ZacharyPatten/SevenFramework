@@ -1,7 +1,7 @@
 ﻿// Seven
 // https://github.com/53V3N1X/SevenFramework
-// LISCENSE: See "LISCENSE.txt" in th root project directory.
-// SUPPORT: See "README.txt" in the root project directory.
+// LISCENSE: See "LISCENSE.md" in th root project directory.
+// SUPPORT: See "SUPPORT.md" in the root project directory.
 
 namespace Seven.Mathematics
 {
@@ -96,35 +96,35 @@ namespace Seven.Mathematics
     #region quaternion
 
     /// <summary>Computes the length of quaternion.</summary>
-    LinearAlgebra.delegates._Quaternion_Magnitude<T> Quaternion_Magnitude { get; }
+    LinearAlgebra.delegates.Quaternion_Magnitude<T> Quaternion_Magnitude { get; }
     /// <summary>Computes the length of a quaternion, but doesn't square root it.</summary>
-    LinearAlgebra.delegates._Quaternion_MagnitudeSquared<T> _Quaternion_MagnitudeSquared { get; }
+    LinearAlgebra.delegates.Quaternion_MagnitudeSquared<T> _Quaternion_MagnitudeSquared { get; }
     /// <summary>Gets the conjugate of the quaternion.</summary>
-    LinearAlgebra.delegates._Quaternion_Conjugate<T> Quaternion_Conjugate { get; }
+    LinearAlgebra.delegates.Quaternion_Conjugate<T> Quaternion_Conjugate { get; }
     /// <summary>Adds two quaternions together.</summary>
-    LinearAlgebra.delegates._Quaternion_Add<T> Quaternion_Add { get; }
+    LinearAlgebra.delegates.Quaternion_Add<T> Quaternion_Add { get; }
     /// <summary>Subtracts two quaternions.</summary>
-    LinearAlgebra.delegates._Quaternion_Subtract<T> Quaternion_Subtract { get; }
+    LinearAlgebra.delegates.Quaternion_Subtract<T> Quaternion_Subtract { get; }
     /// <summary>Multiplies two quaternions together.</summary>
-    LinearAlgebra.delegates._Quaternion_Multiply<T> Quaternion_Multiply { get; }
+    LinearAlgebra.delegates.Quaternion_Multiply<T> Quaternion_Multiply { get; }
     /// <summary>Multiplies all the values of the quaternion by a scalar value.</summary>
-    LinearAlgebra.delegates._Quaternion_Multiply_scalar<T> Quaternion_Multiply_scalar { get; }
+    LinearAlgebra.delegates.Quaternion_Multiply_scalar<T> Quaternion_Multiply_scalar { get; }
     /// <summary>Pre-multiplies a 3-component vector by a quaternion.</summary>
-    LinearAlgebra.delegates._Multiply_Vector<T> Multiply_Vector { get; }
+    LinearAlgebra.delegates.Quaternion_Multiply_Vector<T> Multiply_Vector { get; }
     /// <summary>Normalizes the quaternion.</summary>
-    LinearAlgebra.delegates._Quaternion_Normalize<T> Quaternion_Normalize { get; }
+    LinearAlgebra.delegates.Quaternion_Normalize<T> Quaternion_Normalize { get; }
     /// <summary>Inverts a quaternion.</summary>
-    LinearAlgebra.delegates._Quaternion_Invert<T> Quaternion_Invert { get; }
+    LinearAlgebra.delegates.Quaternion_Invert<T> Quaternion_Invert { get; }
     /// <summary>Lenearly interpolates between two quaternions.</summary>
-    LinearAlgebra.delegates._Quaternion_Lerp<T> Quaternion_Lerp { get; }
+    LinearAlgebra.delegates.Quaternion_Lerp<T> Quaternion_Lerp { get; }
     /// <summary>Sphereically interpolates between two quaternions.</summary>
-    LinearAlgebra.delegates._Quaternion_Slerp<T> Quaternion_Slerp { get; }
+    LinearAlgebra.delegates.Quaternion_Slerp<T> Quaternion_Slerp { get; }
     /// <summary>Rotates a vector by a quaternion [v' = qvq'].</summary>
-    LinearAlgebra.delegates._Quaternion_Rotate<T> Quaternion_Rotate { get; }
+    LinearAlgebra.delegates.Quaternion_Rotate<T> Quaternion_Rotate { get; }
     /// <summary>Does a value equality check.</summary>
-    LinearAlgebra.delegates._Quaternion_EqualsValue<T> Quaternion_EqualsValue { get; }
+    LinearAlgebra.delegates.Quaternion_EqualsValue<T> Quaternion_EqualsValue { get; }
     /// <summary>Does a value equality check with leniency.</summary>
-    LinearAlgebra.delegates._Quaternion_EqualsValue_leniency<T> Quaternion_EqualsValue_leniency { get; }
+    LinearAlgebra.delegates.Quaternion_EqualsValue_leniency<T> Quaternion_EqualsValue_leniency { get; }
 
     #endregion
   }
@@ -132,7 +132,7 @@ namespace Seven.Mathematics
   /// <summary>Makes and stores implementations of linear algebra.</summary>
 	public static class LinearAlgebra
   {
-    #region delegates
+    #region delegate
 
     /// <summary>Stores the delegates used for linear algebra.</summary>
     public static class delegates
@@ -141,57 +141,69 @@ namespace Seven.Mathematics
       #region vector
 
       /// <summary>Adds two vectors together.</summary>
+      /// <typeparam name="T">The numeric type of the operation.</typeparam>
       /// <param name="left">The first vector of the addition.</param>
       /// <param name="right">The second vector of the addiiton.</param>
       /// <returns>The result of the addiion.</returns>
       public delegate T[] Vector_Add<T>(T[] left, T[] right);
       /// <summary>Negates all the values in a vector.</summary>
+      /// <typeparam name="T">The numeric type of the operation.</typeparam>
       /// <param name="vector">The vector to have its values negated.</param>
       /// <returns>The result of the negations.</returns>
       public delegate T[] Vector_Negate<T>(T[] vector);
       /// <summary>Subtracts two vectors.</summary>
+      /// <typeparam name="T">The numeric type of the operation.</typeparam>
       /// <param name="left">The left vector of the subtraction.</param>
       /// <param name="right">The right vector of the subtraction.</param>
       /// <returns>The result of the vector subtracton.</returns>
       public delegate T[] Vector_Subtract<T>(T[] left, T[] right);
       /// <summary>Multiplies all the components of a vecotr by a scalar.</summary>
+      /// <typeparam name="T">The numeric type of the operation.</typeparam>
       /// <param name="left">The vector to have the components multiplied by.</param>
       /// <param name="right">The scalars to multiply the vector components by.</param>
       /// <returns>The result of the multiplications.</returns>
       public delegate T[] Vector_Multiply<T>(T[] left, T right);
       /// <summary>Divides all the components of a vector by a scalar.</summary>
+      /// <typeparam name="T">The numeric type of the operation.</typeparam>
       /// <param name="left">The vector to have the components divided by.</param>
       /// <param name="right">The scalar to divide the vector components by.</param>
       /// <returns>The resulting vector after teh divisions.</returns>
       public delegate T[] Vector_Divide<T>(T[] vector, T right);
       /// <summary>Computes the dot product between two vectors.</summary>
+      /// <typeparam name="T">The numeric type of the operation.</typeparam>
       /// <param name="left">The first vector of the dot product operation.</param>
       /// <param name="right">The second vector of the dot product operation.</param>
       /// <returns>The result of the dot product operation.</returns>
       public delegate T Vector_DotProduct<T>(T[] left, T[] right);
       /// <summary>Computes teh cross product of two vectors.</summary>
+      /// <typeparam name="T">The numeric type of the operation.</typeparam>
       /// <param name="left">The first vector of the cross product operation.</param>
       /// <param name="right">The second vector of the cross product operation.</param>
       /// <returns>The result of the cross product operation.</returns>
       public delegate T[] Vector_CrossProduct<T>(T[] left, T[] right);
       /// <summary>Normalizes a vector.</summary>
+      /// <typeparam name="T">The numeric type of the operation.</typeparam>
       /// <param name="vector">The vector to normalize.</param>
       /// <returns>The result of the normalization.</returns>
       public delegate T[] Vector_Normalize<T>(T[] vector);
       /// <summary>Computes the length of a vector.</summary>
+      /// <typeparam name="T">The numeric type of the operation.</typeparam>
       /// <param name="vector">The vector to calculate the length of.</param>
       /// <returns>The computed length of the vector.</returns>
       public delegate T Vector_Magnitude<T>(T[] vector);
       /// <summary>Computes the length of a vector but doesn't square root it for efficiency (length remains squared).</summary>
+      /// <typeparam name="T">The numeric type of the operation.</typeparam>
       /// <param name="vector">The vector to compute the length squared of.</param>
       /// <returns>The computed length squared of the vector.</returns>
       public delegate T Vector_MagnitudeSquared<T>(T[] vector);
       /// <summary>Computes the angle between two vectors.</summary>
+      /// <typeparam name="T">The numeric type of the operation.</typeparam>
       /// <param name="first">The first vector to determine the angle between.</param>
       /// <param name="second">The second vector to determine the angle between.</param>
       /// <returns>The angle between the two vectors in radians.</returns>
       public delegate T Vector_Angle<T>(T[] first, T[] second);
       /// <summary>Rotates a vector by the specified axis and rotation values.</summary>
+      /// <typeparam name="T">The numeric type of the operation.</typeparam>
       /// <param name="vector">The vector to rotate.</param>
       /// <param name="angle">The angle of the rotation.</param>
       /// <param name="x">The x component of the axis vector to rotate about.</param>
@@ -200,18 +212,21 @@ namespace Seven.Mathematics
       /// <returns>The result of the rotation.</returns>
       public delegate T[] Vector_RotateBy<T>(T[] vector, T angle, T x, T y, T z);
       /// <summary>Computes the linear interpolation between two vectors.</summary>
+      /// <typeparam name="T">The numeric type of the operation.</typeparam>
       /// <param name="left">The starting vector of the interpolation.</param>
       /// <param name="right">The ending vector of the interpolation.</param>
       /// <param name="blend">The ratio 0.0 to 1.0 of the interpolation between the start and end.</param>
       /// <returns>The result of the interpolation.</returns>
       public delegate T[] Vector_Lerp<T>(T[] left, T[] right, T blend);
       /// <summary>Sphereically interpolates between two vectors.</summary>
+      /// <typeparam name="T">The numeric type of the operation.</typeparam>
       /// <param name="left">The starting vector of the interpolation.</param>
       /// <param name="right">The ending vector of the interpolation.</param>
       /// <param name="blend">The ratio 0.0 to 1.0 defining the interpolation distance between the two vectors.</param>
       /// <returns>The result of the slerp operation.</returns>
       public delegate T[] Vector_Slerp<T>(T[] left, T[] right, T blend);
       /// <summary>Interpolates between three vectors using barycentric coordinates.</summary>
+      /// <typeparam name="T">The numeric type of the operation.</typeparam>
       /// <param name="a">The first vector of the interpolation.</param>
       /// <param name="b">The second vector of the interpolation.</param>
       /// <param name="c">The thrid vector of the interpolation.</param>
@@ -220,17 +235,20 @@ namespace Seven.Mathematics
       /// <returns>The resulting vector of the barycentric interpolation.</returns>
       public delegate T[] Vector_Blerp<T>(T[] a, T[] b, T[] c, T u, T v);
       /// <summary>Does a value equality check.</summary>
+      /// <typeparam name="T">The numeric type of the operation.</typeparam>
       /// <param name="left">The first vector to check for equality.</param>
       /// <param name="right">The second vector  to check for equality.</param>
       /// <returns>True if values are equal, false if not.</returns>
       public delegate bool Vector_EqualsValue<T>(T[] left, T[] right);
       /// <summary>Does a value equality check with leniency.</summary>
+      /// <typeparam name="T">The numeric type of the operation.</typeparam>
       /// <param name="left">The first vector to check for equality.</param>
       /// <param name="right">The second vector to check for equality.</param>
       /// <param name="leniency">How much the values can vary but still be considered equal.</param>
       /// <returns>True if values are equal, false if not.</returns>
       public delegate bool Vector_EqualsValue_leniency<T>(T[] left, T[] right, T leniency);
       /// <summary>Rotates a vector by a quaternion.</summary>
+      /// <typeparam name="T">The numeric type of the operation.</typeparam>
       /// <param name="vector">The vector to rotate.</param>
       /// <param name="rotation">The quaternion to rotate the 3-component vector by.</param>
       /// <returns>The result of the rotation.</returns>
@@ -240,46 +258,60 @@ namespace Seven.Mathematics
 
       #region matrix
 
+      /// <summary>Determines if a matrix is symetric.</summary>
+      /// <typeparam name="T">The numeric type of the operation.</typeparam>
+      /// <param name="matrix">The matrix to determine symetry on.</param>
+      /// <returns>True if the matrix is symetric; false if not.</returns>
+      public delegate bool Matrix_IsSymetric<T>(T[,] matrix);
       /// <summary>Negates all the values in a matrix.</summary>
+      /// <typeparam name="T">The numeric type of the operation.</typeparam>
       /// <param name="matrix">The matrix to have its values negated.</param>
       /// <returns>The resulting matrix after the negations.</returns>
       public delegate T[,] Matrix_Negate<T>(T[,] matrix);
       /// <summary>Does standard addition of two matrices.</summary>
+      /// <typeparam name="T">The numeric type of the operation.</typeparam>
       /// <param name="left">The left matrix of the addition.</param>
       /// <param name="right">The right matrix of the addition.</param>
       /// <returns>The resulting matrix after the addition.</returns>
       public delegate T[,] Matrix_Add<T>(T[,] left, T[,] right);
       /// <summary>Subtracts a scalar from all the values in a matrix.</summary>
+      /// <typeparam name="T">The numeric type of the operation.</typeparam>
       /// <param name="left">The matrix to have the values subtracted from.</param>
       /// <param name="right">The scalar to subtract from all the matrix values.</param>
       /// <returns>The resulting matrix after the subtractions.</returns>
       public delegate T[,] Matrix_Subtract<T>(T[,] left, T[,] right);
       /// <summary>Does a standard (triple for looped) multiplication between matrices.</summary>
+      /// <typeparam name="T">The numeric type of the operation.</typeparam>
       /// <param name="left">The left matrix of the multiplication.</param>
       /// <param name="right">The right matrix of the multiplication.</param>
       /// <returns>The resulting matrix of the multiplication.</returns>
       public delegate T[,] Matrix_Multiply<T>(T[,] left, T[,] right);
       /// <summary>Does a standard (triple for looped) multiplication between matrices.</summary>
+      /// <typeparam name="T">The numeric type of the operation.</typeparam>
       /// <param name="matrix">The left matrix of the multiplication.</param>
       /// <param name="right">The right matrix of the multiplication.</param>
       /// <returns>The resulting matrix of the multiplication.</returns>
       public delegate T[] Matrix_Multiply_vector<T>(T[,] matrix, T[] right);
       /// <summary>Multiplies all the values in a matrix by a scalar.</summary>
+      /// <typeparam name="T">The numeric type of the operation.</typeparam>
       /// <param name="matrix">The matrix to have the values multiplied.</param>
       /// <param name="right">The scalar to multiply the values by.</param>
       /// <returns>The resulting matrix after the multiplications.</returns>
       public delegate T[,] Matrix_Multiply_scalar<T>(T[,] matrix, T right);
       /// <summary>Divides all the values in the matrix by a scalar.</summary>
+      /// <typeparam name="T">The numeric type of the operation.</typeparam>
       /// <param name="left">The matrix to divide the values of.</param>
       /// <param name="right">The scalar to divide all the matrix values by.</param>
       /// <returns>The resulting matrix with the divided values.</returns>
       public delegate T[,] Matrix_Divide<T>(T[,] left, T right);
       /// <summary>Applies a power to a square matrix.</summary>
+      /// <typeparam name="T">The numeric type of the operation.</typeparam>
       /// <param name="matrix">The matrix to be powered by.</param>
       /// <param name="power">The power to apply to the matrix.</param>
       /// <returns>The resulting matrix of the power operation.</returns>
       public delegate T[,] Matrix_Power<T>(T[,] matrix, int power);
       /// <summary>Gets the minor of a matrix.</summary>
+      /// <typeparam name="T">The numeric type of the operation.</typeparam>
       /// <param name="matrix">The matrix to get the minor of.</param>
       /// <param name="row">The restricted row to form the minor.</param>
       /// <param name="column">The restricted column to form the minor.</param>
@@ -287,45 +319,55 @@ namespace Seven.Mathematics
       public delegate T[,] Matrix_Minor<T>(T[,] matrix, int row, int column);
       /// <summary>Combines two matrices from left to right 
       /// (result.Rows = left.Rows && result.Columns = left.Columns + right.Columns).</summary>
+      /// <typeparam name="T">The numeric type of the operation.</typeparam>
       /// <param name="left">The left matrix of the concatenation.</param>
       /// <param name="right">The right matrix of the concatenation.</param>
       /// <returns>The resulting matrix of the concatenation.</returns>
       public delegate T[,] Matrix_ConcatenateRowWise<T>(T[,] left, T[,] right);
       /// <summary>Calculates the determinent of a square matrix.</summary>
+      /// <typeparam name="T">The numeric type of the operation.</typeparam>
       /// <param name="matrix">The matrix to calculate the determinent of.</param>
       /// <returns>The determinent of the matrix.</returns>
       public delegate T Matrix_Determinent<T>(T[,] matrix);
       /// <summary>Calculates the echelon of a matrix (aka REF).</summary>
+      /// <typeparam name="T">The numeric type of the operation.</typeparam>
       /// <param name="matrix">The matrix to calculate the echelon of (aka REF).</param>
       /// <returns>The echelon of the matrix (aka REF).</returns>
       public delegate T[,] Matrix_Echelon<T>(T[,] matrix);
       /// <summary>Calculates the echelon of a matrix and reduces it (aka RREF).</summary>
+      /// <typeparam name="T">The numeric type of the operation.</typeparam>
       /// <param name="matrix">The matrix matrix to calculate the reduced echelon of (aka RREF).</param>
       /// <returns>The reduced echelon of the matrix (aka RREF).</returns>
       public delegate T[,] Matrix_ReducedEchelon<T>(T[,] matrix);
       /// <summary>Calculates the inverse of a matrix.</summary>
+      /// <typeparam name="T">The numeric type of the operation.</typeparam>
       /// <param name="matrix">The matrix to calculate the inverse of.</param>
       /// <returns>The inverse of the matrix.</returns>
       public delegate T[,] Matrix_Inverse<T>(T[,] matrix);
       /// <summary>Calculates the adjoint of a matrix.</summary>
+      /// <typeparam name="T">The numeric type of the operation.</typeparam>
       /// <param name="matrix">The matrix to calculate the adjoint of.</param>
       /// <returns>The adjoint of the matrix.</returns>
       public delegate T[,] Matrix_Adjoint<T>(T[,] matrix);
       /// <summary>Returns the transpose of a matrix.</summary>
+      /// <typeparam name="T">The numeric type of the operation.</typeparam>
       /// <param name="matrix">The matrix to transpose.</param>
       /// <returns>The transpose of the matrix.</returns>
       public delegate T[,] Matrix_Transpose<T>(T[,] matrix);
       /// <summary>Decomposes a matrix into lower-upper reptresentation.</summary>
+      /// <typeparam name="T">The numeric type of the operation.</typeparam>
       /// <param name="matrix">The matrix to decompose.</param>
       /// <param name="lower">The computed lower triangular matrix.</param>
       /// <param name="upper">The computed upper triangular matrix.</param>
       public delegate void Matrix_DecomposeLU<T>(T[,] matrix, out T[,] lower, out T[,] upper);
       /// <summary>Does a value equality check.</summary>
+      /// <typeparam name="T">The numeric type of the operation.</typeparam>
       /// <param name="left">The first matrix to check for equality.</param>
       /// <param name="right">The second matrix to check for equality.</param>
       /// <returns>True if values are equal, false if not.</returns>
       public delegate bool Matrix_EqualsByValue<T>(T[,] left, T[,] right);
       /// <summary>Does a value equality check with leniency.</summary>
+      /// <typeparam name="T">The numeric type of the operation.</typeparam>
       /// <param name="left">The first matrix to check for equality.</param>
       /// <param name="right">The second matrix to check for equality.</param>
       /// <param name="leniency">How much the values can vary but still be considered equal.</param>
@@ -337,78 +379,93 @@ namespace Seven.Mathematics
       #region quaternion
 
       /// <summary>Computes the length of quaternion.</summary>
+      /// <typeparam name="T">The numeric type of the operation.</typeparam>
       /// <param name="quaternion">The quaternion to compute the length of.</param>
       /// <returns>The length of the given quaternion.</returns>
-      public delegate T _Quaternion_Magnitude<T>(Quaternion<T> quaternion);
+      public delegate T Quaternion_Magnitude<T>(Quaternion<T> quaternion);
       /// <summary>Computes the length of a quaternion, but doesn't square root it.</summary>
+      /// <typeparam name="T">The numeric type of the operation.</typeparam>
       /// <param name="quaternion">The quaternion to compute the length squared of.</param>
       /// <returns>The squared length of the given quaternion.</returns>
-      public delegate T _Quaternion_MagnitudeSquared<T>(Quaternion<T> quaternion);
+      public delegate T Quaternion_MagnitudeSquared<T>(Quaternion<T> quaternion);
       /// <summary>Gets the conjugate of the quaternion.</summary>
+      /// <typeparam name="T">The numeric type of the operation.</typeparam>
       /// <param name="quaternion">The quaternion to conjugate.</param>
       /// <returns>The conjugate of teh given quaternion.</returns>
-      public delegate Quaternion<T> _Quaternion_Conjugate<T>(Quaternion<T> quaternion);
+      public delegate Quaternion<T> Quaternion_Conjugate<T>(Quaternion<T> quaternion);
       /// <summary>Adds two quaternions together.</summary>
+      /// <typeparam name="T">The numeric type of the operation.</typeparam>
       /// <param name="left">The first quaternion of the addition.</param>
       /// <param name="right">The second quaternion of the addition.</param>
       /// <returns>The result of the addition.</returns>
-      public delegate Quaternion<T> _Quaternion_Add<T>(Quaternion<T> left, Quaternion<T> right);
+      public delegate Quaternion<T> Quaternion_Add<T>(Quaternion<T> left, Quaternion<T> right);
       /// <summary>Subtracts two quaternions.</summary>
+      /// <typeparam name="T">The numeric type of the operation.</typeparam>
       /// <param name="left">The left quaternion of the subtraction.</param>
       /// <param name="right">The right quaternion of the subtraction.</param>
       /// <returns>The resulting quaternion after the subtraction.</returns>
-      public delegate Quaternion<T> _Quaternion_Subtract<T>(Quaternion<T> left, Quaternion<T> right);
+      public delegate Quaternion<T> Quaternion_Subtract<T>(Quaternion<T> left, Quaternion<T> right);
       /// <summary>Multiplies two quaternions together.</summary>
+      /// <typeparam name="T">The numeric type of the operation.</typeparam>
       /// <param name="left">The first quaternion of the multiplication.</param>
       /// <param name="right">The second quaternion of the multiplication.</param>
       /// <returns>The resulting quaternion after the multiplication.</returns>
-      public delegate Quaternion<T> _Quaternion_Multiply<T>(Quaternion<T> left, Quaternion<T> right);
+      public delegate Quaternion<T> Quaternion_Multiply<T>(Quaternion<T> left, Quaternion<T> right);
       /// <summary>Multiplies all the values of the quaternion by a scalar value.</summary>
+      /// <typeparam name="T">The numeric type of the operation.</typeparam>
       /// <param name="left">The quaternion of the multiplication.</param>
       /// <param name="right">The scalar of the multiplication.</param>
       /// <returns>The result of multiplying all the values in the quaternion by the scalar.</returns>
-      public delegate Quaternion<T> _Quaternion_Multiply_scalar<T>(Quaternion<T> left, T right);
+      public delegate Quaternion<T> Quaternion_Multiply_scalar<T>(Quaternion<T> left, T right);
       /// <summary>Pre-multiplies a 3-component vector by a quaternion.</summary>
+      /// <typeparam name="T">The numeric type of the operation.</typeparam>
       /// <param name="left">The quaternion to pre-multiply the vector by.</param>
       /// <param name="right">The vector to be multiplied.</param>
       /// <returns>The resulting quaternion of the multiplication.</returns>
-      public delegate Quaternion<T> _Multiply_Vector<T>(Quaternion<T> left, Vector<T> right);
+      public delegate Quaternion<T> Quaternion_Multiply_Vector<T>(Quaternion<T> left, Vector<T> right);
       /// <summary>Normalizes the quaternion.</summary>
+      /// <typeparam name="T">The numeric type of the operation.</typeparam>
       /// <param name="quaternion">The quaternion to normalize.</param>
       /// <returns>The normalization of the given quaternion.</returns>
-      public delegate Quaternion<T> _Quaternion_Normalize<T>(Quaternion<T> quaternion);
+      public delegate Quaternion<T> Quaternion_Normalize<T>(Quaternion<T> quaternion);
       /// <summary>Inverts a quaternion.</summary>
+      /// <typeparam name="T">The numeric type of the operation.</typeparam>
       /// <param name="quaternion">The quaternion to find the inverse of.</param>
       /// <returns>The inverse of the given quaternion.</returns>
-      public delegate Quaternion<T> _Quaternion_Invert<T>(Quaternion<T> quaternion);
+      public delegate Quaternion<T> Quaternion_Invert<T>(Quaternion<T> quaternion);
       /// <summary>Lenearly interpolates between two quaternions.</summary>
+      /// <typeparam name="T">The numeric type of the operation.</typeparam>
       /// <param name="left">The starting point of the interpolation.</param>
       /// <param name="right">The ending point of the interpolation.</param>
       /// <param name="blend">The ratio 0.0-1.0 of how far to interpolate between the left and right quaternions.</param>
       /// <returns>The result of the interpolation.</returns>
-      public delegate Quaternion<T> _Quaternion_Lerp<T>(Quaternion<T> left, Quaternion<T> right, T blend);
+      public delegate Quaternion<T> Quaternion_Lerp<T>(Quaternion<T> left, Quaternion<T> right, T blend);
       /// <summary>Sphereically interpolates between two quaternions.</summary>
+      /// <typeparam name="T">The numeric type of the operation.</typeparam>
       /// <param name="left">The starting point of the interpolation.</param>
       /// <param name="right">The ending point of the interpolation.</param>
       /// <param name="blend">The ratio of how far to interpolate between the left and right quaternions.</param>
       /// <returns>The result of the interpolation.</returns>
-      public delegate Quaternion<T> _Quaternion_Slerp<T>(Quaternion<T> left, Quaternion<T> right, T blend);
+      public delegate Quaternion<T> Quaternion_Slerp<T>(Quaternion<T> left, Quaternion<T> right, T blend);
       /// <summary>Rotates a vector by a quaternion [v' = qvq'].</summary>
+      /// <typeparam name="T">The numeric type of the operation.</typeparam>
       /// <param name="rotation">The quaternion to rotate the vector by.</param>
       /// <param name="vector">The vector to be rotated by.</param>
       /// <returns>The result of the rotation.</returns>
-      public delegate Vector<T> _Quaternion_Rotate<T>(Quaternion<T> rotation, Vector<T> vector);
+      public delegate Vector<T> Quaternion_Rotate<T>(Quaternion<T> rotation, Vector<T> vector);
       /// <summary>Does a value equality check.</summary>
+      /// <typeparam name="T">The numeric type of the operation.</typeparam>
       /// <param name="left">The first quaternion to check for equality.</param>
       /// <param name="right">The second quaternion  to check for equality.</param>
       /// <returns>True if values are equal, false if not.</returns>
-      public delegate bool _Quaternion_EqualsValue<T>(Quaternion<T> left, Quaternion<T> right);
+      public delegate bool Quaternion_EqualsValue<T>(Quaternion<T> left, Quaternion<T> right);
       /// <summary>Does a value equality check with leniency.</summary>
+      /// <typeparam name="T">The numeric type of the operation.</typeparam>
       /// <param name="left">The first quaternion to check for equality.</param>
       /// <param name="right">The second quaternion to check for equality.</param>
       /// <param name="leniency">How much the values can vary but still be considered equal.</param>
       /// <returns>True if values are equal, false if not.</returns>
-      public delegate bool _Quaternion_EqualsValue_leniency<T>(Quaternion<T> left, Quaternion<T> right, T leniency);
+      public delegate bool Quaternion_EqualsValue_leniency<T>(Quaternion<T> left, Quaternion<T> right, T leniency);
 
       #endregion
 
@@ -428,7 +485,9 @@ namespace Seven.Mathematics
 					{ typeof(double), LinearAlgebra.LinearAlgebra_double.Get },
 					{ typeof(float), LinearAlgebra.LinearAlgebra_float.Get },
 					{ typeof(decimal), LinearAlgebra.LinearAlgebra_decimal.Get },
-					{ typeof(long), LinearAlgebra.LinearAlgebra_long.Get }
+					{ typeof(long), LinearAlgebra.LinearAlgebra_long.Get },
+          { typeof(Fraction64), LinearAlgebra.LinearAlgebra_Fraction64.Get },
+          { typeof(Fraction128), LinearAlgebra.LinearAlgebra_Fraction128.Get },
 				};
 
     /// <summary>Checks to see if a linear algebra implementaton exists for the given type.</summary>
@@ -455,13 +514,299 @@ namespace Seven.Mathematics
       if (_linearAlgebras.Contains(typeof(T)))
         return (LinearAlgebra<T>)_linearAlgebras[typeof(T)];
       else
-        return LinearAlgebra_unsupported<T>.Get;
+        return new LinearAlgebra_unsupported<T>();
 		}
 
     #region provided
 
+    private class LinearAlgebra_Fraction128 : LinearAlgebra<Fraction128>
+    {
+      #region construct-simpleton
+
+      private LinearAlgebra_Fraction128() { _instance = this; }
+      private static LinearAlgebra_Fraction128 _instance;
+      private static LinearAlgebra_Fraction128 Instance
+      {
+        get
+        {
+          if (_instance == null)
+            return _instance = new LinearAlgebra_Fraction128();
+          else
+            return _instance;
+        }
+      }
+
+      /// <summary>Gets Arithmetic for "byte" types.</summary>
+      public static LinearAlgebra_Fraction128 Get { get { return Instance; } }
+
+      #endregion
+
+      #region vector
+
+      /// <summary>Adds two vectors together.</summary>
+      public LinearAlgebra.delegates.Vector_Add<Fraction128> Vector_Add { get { return LinearAlgebra.Add; } }
+      /// <summary>Negates all the values in a vector.</summary>
+      public LinearAlgebra.delegates.Vector_Negate<Fraction128> Vector_Negate { get { return LinearAlgebra.Negate; } }
+      /// <summary>Subtracts two vectors.</summary>
+      public LinearAlgebra.delegates.Vector_Subtract<Fraction128> Vector_Subtract { get { return LinearAlgebra.Subtract; } }
+      /// <summary>Multiplies all the components of a vecotr by a scalar.</summary>
+      public LinearAlgebra.delegates.Vector_Multiply<Fraction128> Vector_Multiply { get { return LinearAlgebra.Multiply; } }
+      /// <summary>Divides all the components of a vector by a scalar.</summary>
+      public LinearAlgebra.delegates.Vector_Divide<Fraction128> Vector_Divide { get { return LinearAlgebra.Divide; } }
+      /// <summary>Computes the dot product between two vectors.</summary>
+      public LinearAlgebra.delegates.Vector_DotProduct<Fraction128> Vector_DotProduct { get { return LinearAlgebra.DotProduct; } }
+      /// <summary>Computes teh cross product of two vectors.</summary>
+      public LinearAlgebra.delegates.Vector_CrossProduct<Fraction128> Vector_CrossProduct { get { return LinearAlgebra.CrossProduct; } }
+      /// <summary>Normalizes a vector.</summary>
+      public LinearAlgebra.delegates.Vector_Normalize<Fraction128> Vector_Normalize { get { return LinearAlgebra.Normalize; } }
+      /// <summary>Computes the length of a vector.</summary>
+      public LinearAlgebra.delegates.Vector_Magnitude<Fraction128> Vector_Magnitude { get { return LinearAlgebra.Magnitude; } }
+      /// <summary>Computes the length of a vector but doesn't square root it for efficiency (length remains squared).</summary>
+      public LinearAlgebra.delegates.Vector_MagnitudeSquared<Fraction128> Vector_MagnitudeSquared { get { return LinearAlgebra.MagnitudeSquared; } }
+      /// <summary>Computes the angle between two vectors.</summary>
+      public LinearAlgebra.delegates.Vector_Angle<Fraction128> Vector_Angle { get { return LinearAlgebra.Angle; } }
+      /// <summary>Rotates a vector by the specified axis and rotation values.</summary>
+      public LinearAlgebra.delegates.Vector_RotateBy<Fraction128> Vector_RotateBy { get { return LinearAlgebra.RotateBy; } }
+      /// <summary>Computes the linear interpolation between two vectors.</summary>
+      public LinearAlgebra.delegates.Vector_Lerp<Fraction128> Vector_Lerp { get { return LinearAlgebra.Lerp; } }
+      /// <summary>Sphereically interpolates between two vectors.</summary>
+      public LinearAlgebra.delegates.Vector_Slerp<Fraction128> Vector_Slerp { get { return LinearAlgebra.Slerp; } }
+      /// <summary>Interpolates between three vectors using barycentric coordinates.</summary>
+      public LinearAlgebra.delegates.Vector_Blerp<Fraction128> Vector_Blerp { get { return LinearAlgebra.Blerp; } }
+      /// <summary>Checks for equality by value.</summary>
+      public LinearAlgebra.delegates.Vector_EqualsValue<Fraction128> Vector_EqualsValue { get { return LinearAlgebra.EqualsValue; } }
+      /// <summary>Checks for equality by value with leniency.</summary>
+      public LinearAlgebra.delegates.Vector_EqualsValue_leniency<Fraction128> Vector_EqualsValue_leniency { get { return LinearAlgebra.EqualsValue; } }
+      /// <summary>Rotates a vector by a quaternion.</summary>
+      public LinearAlgebra.delegates.Vector_RotateBy_quaternion<Fraction128> Vector_RotateBy_quaternion { get { return LinearAlgebra.RotateBy; } }
+
+      #endregion
+
+      #region matix
+
+      /// <summary>Negates all the values in this matrix.</summary>
+      public LinearAlgebra.delegates.Matrix_Negate<Fraction128> Matrix_Negate { get { return LinearAlgebra.Negate; } }
+      /// <summary>Does a standard matrix addition.</summary>
+      public LinearAlgebra.delegates.Matrix_Add<Fraction128> Matrix_Add { get { return LinearAlgebra.Add; } }
+      /// <summary>Does a standard matrix subtraction.</summary>
+      public LinearAlgebra.delegates.Matrix_Subtract<Fraction128> Matrix_Subtract { get { return LinearAlgebra.Subtract; } }
+      /// <summary>Does a standard matrix multiplication (triple for loop).</summary>
+      public LinearAlgebra.delegates.Matrix_Multiply<Fraction128> Matrix_Multiply { get { return LinearAlgebra.Multiply; } }
+      /// <summary>Multiplies all the values in this matrix by a scalar.</summary>
+      public LinearAlgebra.delegates.Matrix_Multiply_scalar<Fraction128> Matrix_Multiply_scalar { get { return LinearAlgebra.Multiply; } }
+      /// <summary>Premultiplies a vector by a matrix.</summary>
+      public LinearAlgebra.delegates.Matrix_Multiply_vector<Fraction128> Matrix_Multiply_vector { get { return LinearAlgebra.Multiply; } }
+      /// <summary>Divides all the values in this matrix by a scalar.</summary>
+      public LinearAlgebra.delegates.Matrix_Divide<Fraction128> Matrix_Divide { get { return LinearAlgebra.Divide; } }
+      /// <summary>Takes the matrix to the given int power.</summary>
+      public LinearAlgebra.delegates.Matrix_Power<Fraction128> Matrix_Power { get { return LinearAlgebra.Power; } }
+      /// <summary>Gets the minor of a matrix.</summary>
+      public LinearAlgebra.delegates.Matrix_Minor<Fraction128> Matrix_Minor { get { return LinearAlgebra.Minor; } }
+      /// <summary>Combines two matrices from left to right (result.Rows = left.Rows && result.Columns = left.Columns + right.Columns).</summary>
+      public LinearAlgebra.delegates.Matrix_ConcatenateRowWise<Fraction128> Matrix_ConcatenateRowWise { get { return LinearAlgebra.ConcatenateRowWise; } }
+      /// <summary>Computes the determinent if this matrix is square.</summary>
+      public LinearAlgebra.delegates.Matrix_Determinent<Fraction128> Matrix_Determinent { get { return LinearAlgebra.Determinent; } }
+      /// <summary>Computes the echelon form of this matrix (aka REF).</summary>
+      public LinearAlgebra.delegates.Matrix_Echelon<Fraction128> Matrix_Echelon { get { return LinearAlgebra.Echelon; } }
+      /// <summary>Computes the reduced echelon form of this matrix (aka RREF).</summary>
+      public LinearAlgebra.delegates.Matrix_ReducedEchelon<Fraction128> Matrix_ReducedEchelon { get { return LinearAlgebra.ReducedEchelon; } }
+      /// <summary>Computes the inverse of this matrix.</summary>
+      public LinearAlgebra.delegates.Matrix_Inverse<Fraction128> Matrix_Inverse { get { return LinearAlgebra.Inverse; } }
+      /// <summary>Gets the adjoint of this matrix.</summary>
+      public LinearAlgebra.delegates.Matrix_Adjoint<Fraction128> Matrix_Adjoint { get { return LinearAlgebra.Adjoint; } }
+      /// <summary>Transposes this matrix.</summary>
+      public LinearAlgebra.delegates.Matrix_Transpose<Fraction128> Matrix_Transpose { get { return LinearAlgebra.Transpose; } }
+      /// <summary>Decomposes a matrix to lower/upper components.</summary>
+      public LinearAlgebra.delegates.Matrix_DecomposeLU<Fraction128> Matrix_DecomposeLU { get { return LinearAlgebra.DecomposeLU; } }
+      /// <summary>Dtermines equality but value.</summary>
+      public LinearAlgebra.delegates.Matrix_EqualsByValue<Fraction128> Matrix_EqualsByValue { get { return LinearAlgebra.EqualsValue; } }
+      /// <summary>Determines equality by value with leniency.</summary>
+      public LinearAlgebra.delegates.Matrix_EqualsByValue_leniency<Fraction128> Matrix_EqualsByValue_leniency { get { return LinearAlgebra.EqualsValue; } }
+
+      #endregion
+
+      #region quaterion
+
+      /// <summary>Computes the length of quaternion.</summary>
+      public LinearAlgebra.delegates.Quaternion_Magnitude<Fraction128> Quaternion_Magnitude { get { return LinearAlgebra.Magnitude; } }
+      /// <summary>Computes the length of a quaternion, but doesn't square root it.</summary>
+      public LinearAlgebra.delegates.Quaternion_MagnitudeSquared<Fraction128> _Quaternion_MagnitudeSquared { get { return LinearAlgebra.MagnitudeSquared; } }
+      /// <summary>Gets the conjugate of the quaternion.</summary>
+      public LinearAlgebra.delegates.Quaternion_Conjugate<Fraction128> Quaternion_Conjugate { get { return LinearAlgebra.Conjugate; } }
+      /// <summary>Adds two quaternions together.</summary>
+      public LinearAlgebra.delegates.Quaternion_Add<Fraction128> Quaternion_Add { get { return LinearAlgebra.Add; } }
+      /// <summary>Subtracts two quaternions.</summary>
+      public LinearAlgebra.delegates.Quaternion_Subtract<Fraction128> Quaternion_Subtract { get { return LinearAlgebra.Subtract; } }
+      /// <summary>Multiplies two quaternions together.</summary>
+      public LinearAlgebra.delegates.Quaternion_Multiply<Fraction128> Quaternion_Multiply { get { return LinearAlgebra.Multiply; } }
+      /// <summary>Multiplies all the values of the quaternion by a scalar value.</summary>
+      public LinearAlgebra.delegates.Quaternion_Multiply_scalar<Fraction128> Quaternion_Multiply_scalar { get { return LinearAlgebra.Multiply; } }
+      /// <summary>Pre-multiplies a 3-component vector by a quaternion.</summary>
+      public LinearAlgebra.delegates.Quaternion_Multiply_Vector<Fraction128> Multiply_Vector { get { return LinearAlgebra.Multiply; } }
+      /// <summary>Normalizes the quaternion.</summary>
+      public LinearAlgebra.delegates.Quaternion_Normalize<Fraction128> Quaternion_Normalize { get { return LinearAlgebra.Normalize; } }
+      /// <summary>Inverts a quaternion.</summary>
+      public LinearAlgebra.delegates.Quaternion_Invert<Fraction128> Quaternion_Invert { get { return LinearAlgebra.Invert; } }
+      /// <summary>Lenearly interpolates between two quaternions.</summary>
+      public LinearAlgebra.delegates.Quaternion_Lerp<Fraction128> Quaternion_Lerp { get { return LinearAlgebra.Lerp; } }
+      /// <summary>Sphereically interpolates between two quaternions.</summary>
+      public LinearAlgebra.delegates.Quaternion_Slerp<Fraction128> Quaternion_Slerp { get { return LinearAlgebra.Slerp; } }
+      /// <summary>Rotates a vector by a quaternion [v' = qvq'].</summary>
+      public LinearAlgebra.delegates.Quaternion_Rotate<Fraction128> Quaternion_Rotate { get { return LinearAlgebra.Rotate; } }
+      /// <summary>Does a value equality check.</summary>
+      public LinearAlgebra.delegates.Quaternion_EqualsValue<Fraction128> Quaternion_EqualsValue { get { return LinearAlgebra.EqualsValue; } }
+      /// <summary>Does a value equality check with leniency.</summary>
+      public LinearAlgebra.delegates.Quaternion_EqualsValue_leniency<Fraction128> Quaternion_EqualsValue_leniency { get { return LinearAlgebra.EqualsValue; } }
+
+      #endregion
+    }
+
+    private class LinearAlgebra_Fraction64 : LinearAlgebra<Fraction64>
+    {
+      #region construct-simpleton
+
+      private LinearAlgebra_Fraction64() { _instance = this; }
+      private static LinearAlgebra_Fraction64 _instance;
+      private static LinearAlgebra_Fraction64 Instance
+      {
+        get
+        {
+          if (_instance == null)
+            return _instance = new LinearAlgebra_Fraction64();
+          else
+            return _instance;
+        }
+      }
+
+      /// <summary>Gets Arithmetic for "byte" types.</summary>
+      public static LinearAlgebra_Fraction64 Get { get { return Instance; } }
+
+      #endregion
+
+      #region vector
+
+      /// <summary>Adds two vectors together.</summary>
+      public LinearAlgebra.delegates.Vector_Add<Fraction64> Vector_Add { get { return LinearAlgebra.Add; } }
+      /// <summary>Negates all the values in a vector.</summary>
+      public LinearAlgebra.delegates.Vector_Negate<Fraction64> Vector_Negate { get { return LinearAlgebra.Negate; } }
+      /// <summary>Subtracts two vectors.</summary>
+      public LinearAlgebra.delegates.Vector_Subtract<Fraction64> Vector_Subtract { get { return LinearAlgebra.Subtract; } }
+      /// <summary>Multiplies all the components of a vecotr by a scalar.</summary>
+      public LinearAlgebra.delegates.Vector_Multiply<Fraction64> Vector_Multiply { get { return LinearAlgebra.Multiply; } }
+      /// <summary>Divides all the components of a vector by a scalar.</summary>
+      public LinearAlgebra.delegates.Vector_Divide<Fraction64> Vector_Divide { get { return LinearAlgebra.Divide; } }
+      /// <summary>Computes the dot product between two vectors.</summary>
+      public LinearAlgebra.delegates.Vector_DotProduct<Fraction64> Vector_DotProduct { get { return LinearAlgebra.DotProduct; } }
+      /// <summary>Computes teh cross product of two vectors.</summary>
+      public LinearAlgebra.delegates.Vector_CrossProduct<Fraction64> Vector_CrossProduct { get { return LinearAlgebra.CrossProduct; } }
+      /// <summary>Normalizes a vector.</summary>
+      public LinearAlgebra.delegates.Vector_Normalize<Fraction64> Vector_Normalize { get { return LinearAlgebra.Normalize; } }
+      /// <summary>Computes the length of a vector.</summary>
+      public LinearAlgebra.delegates.Vector_Magnitude<Fraction64> Vector_Magnitude { get { return LinearAlgebra.Magnitude; } }
+      /// <summary>Computes the length of a vector but doesn't square root it for efficiency (length remains squared).</summary>
+      public LinearAlgebra.delegates.Vector_MagnitudeSquared<Fraction64> Vector_MagnitudeSquared { get { return LinearAlgebra.MagnitudeSquared; } }
+      /// <summary>Computes the angle between two vectors.</summary>
+      public LinearAlgebra.delegates.Vector_Angle<Fraction64> Vector_Angle { get { return LinearAlgebra.Angle; } }
+      /// <summary>Rotates a vector by the specified axis and rotation values.</summary>
+      public LinearAlgebra.delegates.Vector_RotateBy<Fraction64> Vector_RotateBy { get { return LinearAlgebra.RotateBy; } }
+      /// <summary>Computes the linear interpolation between two vectors.</summary>
+      public LinearAlgebra.delegates.Vector_Lerp<Fraction64> Vector_Lerp { get { return LinearAlgebra.Lerp; } }
+      /// <summary>Sphereically interpolates between two vectors.</summary>
+      public LinearAlgebra.delegates.Vector_Slerp<Fraction64> Vector_Slerp { get { return LinearAlgebra.Slerp; } }
+      /// <summary>Interpolates between three vectors using barycentric coordinates.</summary>
+      public LinearAlgebra.delegates.Vector_Blerp<Fraction64> Vector_Blerp { get { return LinearAlgebra.Blerp; } }
+      /// <summary>Checks for equality by value.</summary>
+      public LinearAlgebra.delegates.Vector_EqualsValue<Fraction64> Vector_EqualsValue { get { return LinearAlgebra.EqualsValue; } }
+      /// <summary>Checks for equality by value with leniency.</summary>
+      public LinearAlgebra.delegates.Vector_EqualsValue_leniency<Fraction64> Vector_EqualsValue_leniency { get { return LinearAlgebra.EqualsValue; } }
+      /// <summary>Rotates a vector by a quaternion.</summary>
+      public LinearAlgebra.delegates.Vector_RotateBy_quaternion<Fraction64> Vector_RotateBy_quaternion { get { return LinearAlgebra.RotateBy; } }
+
+      #endregion
+
+      #region matix
+
+      /// <summary>Negates all the values in this matrix.</summary>
+      public LinearAlgebra.delegates.Matrix_Negate<Fraction64> Matrix_Negate { get { return LinearAlgebra.Negate; } }
+      /// <summary>Does a standard matrix addition.</summary>
+      public LinearAlgebra.delegates.Matrix_Add<Fraction64> Matrix_Add { get { return LinearAlgebra.Add; } }
+      /// <summary>Does a standard matrix subtraction.</summary>
+      public LinearAlgebra.delegates.Matrix_Subtract<Fraction64> Matrix_Subtract { get { return LinearAlgebra.Subtract; } }
+      /// <summary>Does a standard matrix multiplication (triple for loop).</summary>
+      public LinearAlgebra.delegates.Matrix_Multiply<Fraction64> Matrix_Multiply { get { return LinearAlgebra.Multiply; } }
+      /// <summary>Multiplies all the values in this matrix by a scalar.</summary>
+      public LinearAlgebra.delegates.Matrix_Multiply_scalar<Fraction64> Matrix_Multiply_scalar { get { return LinearAlgebra.Multiply; } }
+      /// <summary>Premultiplies a vector by a matrix.</summary>
+      public LinearAlgebra.delegates.Matrix_Multiply_vector<Fraction64> Matrix_Multiply_vector { get { return LinearAlgebra.Multiply; } }
+      /// <summary>Divides all the values in this matrix by a scalar.</summary>
+      public LinearAlgebra.delegates.Matrix_Divide<Fraction64> Matrix_Divide { get { return LinearAlgebra.Divide; } }
+      /// <summary>Takes the matrix to the given int power.</summary>
+      public LinearAlgebra.delegates.Matrix_Power<Fraction64> Matrix_Power { get { return LinearAlgebra.Power; } }
+      /// <summary>Gets the minor of a matrix.</summary>
+      public LinearAlgebra.delegates.Matrix_Minor<Fraction64> Matrix_Minor { get { return LinearAlgebra.Minor; } }
+      /// <summary>Combines two matrices from left to right (result.Rows = left.Rows && result.Columns = left.Columns + right.Columns).</summary>
+      public LinearAlgebra.delegates.Matrix_ConcatenateRowWise<Fraction64> Matrix_ConcatenateRowWise { get { return LinearAlgebra.ConcatenateRowWise; } }
+      /// <summary>Computes the determinent if this matrix is square.</summary>
+      public LinearAlgebra.delegates.Matrix_Determinent<Fraction64> Matrix_Determinent { get { return LinearAlgebra.Determinent; } }
+      /// <summary>Computes the echelon form of this matrix (aka REF).</summary>
+      public LinearAlgebra.delegates.Matrix_Echelon<Fraction64> Matrix_Echelon { get { return LinearAlgebra.Echelon; } }
+      /// <summary>Computes the reduced echelon form of this matrix (aka RREF).</summary>
+      public LinearAlgebra.delegates.Matrix_ReducedEchelon<Fraction64> Matrix_ReducedEchelon { get { return LinearAlgebra.ReducedEchelon; } }
+      /// <summary>Computes the inverse of this matrix.</summary>
+      public LinearAlgebra.delegates.Matrix_Inverse<Fraction64> Matrix_Inverse { get { return LinearAlgebra.Inverse; } }
+      /// <summary>Gets the adjoint of this matrix.</summary>
+      public LinearAlgebra.delegates.Matrix_Adjoint<Fraction64> Matrix_Adjoint { get { return LinearAlgebra.Adjoint; } }
+      /// <summary>Transposes this matrix.</summary>
+      public LinearAlgebra.delegates.Matrix_Transpose<Fraction64> Matrix_Transpose { get { return LinearAlgebra.Transpose; } }
+      /// <summary>Decomposes a matrix to lower/upper components.</summary>
+      public LinearAlgebra.delegates.Matrix_DecomposeLU<Fraction64> Matrix_DecomposeLU { get { return LinearAlgebra.DecomposeLU; } }
+      /// <summary>Dtermines equality but value.</summary>
+      public LinearAlgebra.delegates.Matrix_EqualsByValue<Fraction64> Matrix_EqualsByValue { get { return LinearAlgebra.EqualsValue; } }
+      /// <summary>Determines equality by value with leniency.</summary>
+      public LinearAlgebra.delegates.Matrix_EqualsByValue_leniency<Fraction64> Matrix_EqualsByValue_leniency { get { return LinearAlgebra.EqualsValue; } }
+
+      #endregion
+
+      #region quaterion
+
+      /// <summary>Computes the length of quaternion.</summary>
+      public LinearAlgebra.delegates.Quaternion_Magnitude<Fraction64> Quaternion_Magnitude { get { return LinearAlgebra.Magnitude; } }
+      /// <summary>Computes the length of a quaternion, but doesn't square root it.</summary>
+      public LinearAlgebra.delegates.Quaternion_MagnitudeSquared<Fraction64> _Quaternion_MagnitudeSquared { get { return LinearAlgebra.MagnitudeSquared; } }
+      /// <summary>Gets the conjugate of the quaternion.</summary>
+      public LinearAlgebra.delegates.Quaternion_Conjugate<Fraction64> Quaternion_Conjugate { get { return LinearAlgebra.Conjugate; } }
+      /// <summary>Adds two quaternions together.</summary>
+      public LinearAlgebra.delegates.Quaternion_Add<Fraction64> Quaternion_Add { get { return LinearAlgebra.Add; } }
+      /// <summary>Subtracts two quaternions.</summary>
+      public LinearAlgebra.delegates.Quaternion_Subtract<Fraction64> Quaternion_Subtract { get { return LinearAlgebra.Subtract; } }
+      /// <summary>Multiplies two quaternions together.</summary>
+      public LinearAlgebra.delegates.Quaternion_Multiply<Fraction64> Quaternion_Multiply { get { return LinearAlgebra.Multiply; } }
+      /// <summary>Multiplies all the values of the quaternion by a scalar value.</summary>
+      public LinearAlgebra.delegates.Quaternion_Multiply_scalar<Fraction64> Quaternion_Multiply_scalar { get { return LinearAlgebra.Multiply; } }
+      /// <summary>Pre-multiplies a 3-component vector by a quaternion.</summary>
+      public LinearAlgebra.delegates.Quaternion_Multiply_Vector<Fraction64> Multiply_Vector { get { return LinearAlgebra.Multiply; } }
+      /// <summary>Normalizes the quaternion.</summary>
+      public LinearAlgebra.delegates.Quaternion_Normalize<Fraction64> Quaternion_Normalize { get { return LinearAlgebra.Normalize; } }
+      /// <summary>Inverts a quaternion.</summary>
+      public LinearAlgebra.delegates.Quaternion_Invert<Fraction64> Quaternion_Invert { get { return LinearAlgebra.Invert; } }
+      /// <summary>Lenearly interpolates between two quaternions.</summary>
+      public LinearAlgebra.delegates.Quaternion_Lerp<Fraction64> Quaternion_Lerp { get { return LinearAlgebra.Lerp; } }
+      /// <summary>Sphereically interpolates between two quaternions.</summary>
+      public LinearAlgebra.delegates.Quaternion_Slerp<Fraction64> Quaternion_Slerp { get { return LinearAlgebra.Slerp; } }
+      /// <summary>Rotates a vector by a quaternion [v' = qvq'].</summary>
+      public LinearAlgebra.delegates.Quaternion_Rotate<Fraction64> Quaternion_Rotate { get { return LinearAlgebra.Rotate; } }
+      /// <summary>Does a value equality check.</summary>
+      public LinearAlgebra.delegates.Quaternion_EqualsValue<Fraction64> Quaternion_EqualsValue { get { return LinearAlgebra.EqualsValue; } }
+      /// <summary>Does a value equality check with leniency.</summary>
+      public LinearAlgebra.delegates.Quaternion_EqualsValue_leniency<Fraction64> Quaternion_EqualsValue_leniency { get { return LinearAlgebra.EqualsValue; } }
+
+      #endregion
+    }
+
     private class LinearAlgebra_decimal : LinearAlgebra<decimal>
     {
+      #region construct-simpleton
+
       private LinearAlgebra_decimal() { _instance = this; }
       private static LinearAlgebra_decimal _instance;
       private static LinearAlgebra_decimal Instance
@@ -477,6 +822,8 @@ namespace Seven.Mathematics
 
       /// <summary>Gets Arithmetic for "byte" types.</summary>
       public static LinearAlgebra_decimal Get { get { return Instance; } }
+
+      #endregion
 
       #region vector
 
@@ -565,41 +912,43 @@ namespace Seven.Mathematics
       #region quaterion
 
       /// <summary>Computes the length of quaternion.</summary>
-      public LinearAlgebra.delegates._Quaternion_Magnitude<decimal> Quaternion_Magnitude { get { return LinearAlgebra.Magnitude; } }
+      public LinearAlgebra.delegates.Quaternion_Magnitude<decimal> Quaternion_Magnitude { get { return LinearAlgebra.Magnitude; } }
       /// <summary>Computes the length of a quaternion, but doesn't square root it.</summary>
-      public LinearAlgebra.delegates._Quaternion_MagnitudeSquared<decimal> _Quaternion_MagnitudeSquared { get { return LinearAlgebra.MagnitudeSquared; } }
+      public LinearAlgebra.delegates.Quaternion_MagnitudeSquared<decimal> _Quaternion_MagnitudeSquared { get { return LinearAlgebra.MagnitudeSquared; } }
       /// <summary>Gets the conjugate of the quaternion.</summary>
-      public LinearAlgebra.delegates._Quaternion_Conjugate<decimal> Quaternion_Conjugate { get { return LinearAlgebra.Conjugate; } }
+      public LinearAlgebra.delegates.Quaternion_Conjugate<decimal> Quaternion_Conjugate { get { return LinearAlgebra.Conjugate; } }
       /// <summary>Adds two quaternions together.</summary>
-      public LinearAlgebra.delegates._Quaternion_Add<decimal> Quaternion_Add { get { return LinearAlgebra.Add; } }
+      public LinearAlgebra.delegates.Quaternion_Add<decimal> Quaternion_Add { get { return LinearAlgebra.Add; } }
       /// <summary>Subtracts two quaternions.</summary>
-      public LinearAlgebra.delegates._Quaternion_Subtract<decimal> Quaternion_Subtract { get { return LinearAlgebra.Subtract; } }
+      public LinearAlgebra.delegates.Quaternion_Subtract<decimal> Quaternion_Subtract { get { return LinearAlgebra.Subtract; } }
       /// <summary>Multiplies two quaternions together.</summary>
-      public LinearAlgebra.delegates._Quaternion_Multiply<decimal> Quaternion_Multiply { get { return LinearAlgebra.Multiply; } }
+      public LinearAlgebra.delegates.Quaternion_Multiply<decimal> Quaternion_Multiply { get { return LinearAlgebra.Multiply; } }
       /// <summary>Multiplies all the values of the quaternion by a scalar value.</summary>
-      public LinearAlgebra.delegates._Quaternion_Multiply_scalar<decimal> Quaternion_Multiply_scalar { get { return LinearAlgebra.Multiply; } }
+      public LinearAlgebra.delegates.Quaternion_Multiply_scalar<decimal> Quaternion_Multiply_scalar { get { return LinearAlgebra.Multiply; } }
       /// <summary>Pre-multiplies a 3-component vector by a quaternion.</summary>
-      public LinearAlgebra.delegates._Multiply_Vector<decimal> Multiply_Vector { get { return LinearAlgebra.Multiply; } }
+      public LinearAlgebra.delegates.Quaternion_Multiply_Vector<decimal> Multiply_Vector { get { return LinearAlgebra.Multiply; } }
       /// <summary>Normalizes the quaternion.</summary>
-      public LinearAlgebra.delegates._Quaternion_Normalize<decimal> Quaternion_Normalize { get { return LinearAlgebra.Normalize; } }
+      public LinearAlgebra.delegates.Quaternion_Normalize<decimal> Quaternion_Normalize { get { return LinearAlgebra.Normalize; } }
       /// <summary>Inverts a quaternion.</summary>
-      public LinearAlgebra.delegates._Quaternion_Invert<decimal> Quaternion_Invert { get { return LinearAlgebra.Invert; } }
+      public LinearAlgebra.delegates.Quaternion_Invert<decimal> Quaternion_Invert { get { return LinearAlgebra.Invert; } }
       /// <summary>Lenearly interpolates between two quaternions.</summary>
-      public LinearAlgebra.delegates._Quaternion_Lerp<decimal> Quaternion_Lerp { get { return LinearAlgebra.Lerp; } }
+      public LinearAlgebra.delegates.Quaternion_Lerp<decimal> Quaternion_Lerp { get { return LinearAlgebra.Lerp; } }
       /// <summary>Sphereically interpolates between two quaternions.</summary>
-      public LinearAlgebra.delegates._Quaternion_Slerp<decimal> Quaternion_Slerp { get { return LinearAlgebra.Slerp; } }
+      public LinearAlgebra.delegates.Quaternion_Slerp<decimal> Quaternion_Slerp { get { return LinearAlgebra.Slerp; } }
       /// <summary>Rotates a vector by a quaternion [v' = qvq'].</summary>
-      public LinearAlgebra.delegates._Quaternion_Rotate<decimal> Quaternion_Rotate { get { return LinearAlgebra.Rotate; } }
+      public LinearAlgebra.delegates.Quaternion_Rotate<decimal> Quaternion_Rotate { get { return LinearAlgebra.Rotate; } }
       /// <summary>Does a value equality check.</summary>
-      public LinearAlgebra.delegates._Quaternion_EqualsValue<decimal> Quaternion_EqualsValue { get { return LinearAlgebra.EqualsValue; } }
+      public LinearAlgebra.delegates.Quaternion_EqualsValue<decimal> Quaternion_EqualsValue { get { return LinearAlgebra.EqualsValue; } }
       /// <summary>Does a value equality check with leniency.</summary>
-      public LinearAlgebra.delegates._Quaternion_EqualsValue_leniency<decimal> Quaternion_EqualsValue_leniency { get { return LinearAlgebra.EqualsValue; } }
+      public LinearAlgebra.delegates.Quaternion_EqualsValue_leniency<decimal> Quaternion_EqualsValue_leniency { get { return LinearAlgebra.EqualsValue; } }
 
       #endregion
     }
 
     private class LinearAlgebra_double : LinearAlgebra<double>
     {
+      #region construct-simpleton
+
       private LinearAlgebra_double() { _instance = this; }
       private static LinearAlgebra_double _instance;
       private static LinearAlgebra_double Instance
@@ -615,6 +964,8 @@ namespace Seven.Mathematics
 
       /// <summary>Gets Arithmetic for "byte" types.</summary>
       public static LinearAlgebra_double Get { get { return Instance; } }
+
+      #endregion
 
       #region vector
 
@@ -703,41 +1054,43 @@ namespace Seven.Mathematics
       #region quaterion
 
       /// <summary>Computes the length of quaternion.</summary>
-      public LinearAlgebra.delegates._Quaternion_Magnitude<double> Quaternion_Magnitude { get { return LinearAlgebra.Magnitude; } }
+      public LinearAlgebra.delegates.Quaternion_Magnitude<double> Quaternion_Magnitude { get { return LinearAlgebra.Magnitude; } }
       /// <summary>Computes the length of a quaternion, but doesn't square root it.</summary>
-      public LinearAlgebra.delegates._Quaternion_MagnitudeSquared<double> _Quaternion_MagnitudeSquared { get { return LinearAlgebra.MagnitudeSquared; } }
+      public LinearAlgebra.delegates.Quaternion_MagnitudeSquared<double> _Quaternion_MagnitudeSquared { get { return LinearAlgebra.MagnitudeSquared; } }
       /// <summary>Gets the conjugate of the quaternion.</summary>
-      public LinearAlgebra.delegates._Quaternion_Conjugate<double> Quaternion_Conjugate { get { return LinearAlgebra.Conjugate; } }
+      public LinearAlgebra.delegates.Quaternion_Conjugate<double> Quaternion_Conjugate { get { return LinearAlgebra.Conjugate; } }
       /// <summary>Adds two quaternions together.</summary>
-      public LinearAlgebra.delegates._Quaternion_Add<double> Quaternion_Add { get { return LinearAlgebra.Add; } }
+      public LinearAlgebra.delegates.Quaternion_Add<double> Quaternion_Add { get { return LinearAlgebra.Add; } }
       /// <summary>Subtracts two quaternions.</summary>
-      public LinearAlgebra.delegates._Quaternion_Subtract<double> Quaternion_Subtract { get { return LinearAlgebra.Subtract; } }
+      public LinearAlgebra.delegates.Quaternion_Subtract<double> Quaternion_Subtract { get { return LinearAlgebra.Subtract; } }
       /// <summary>Multiplies two quaternions together.</summary>
-      public LinearAlgebra.delegates._Quaternion_Multiply<double> Quaternion_Multiply { get { return LinearAlgebra.Multiply; } }
+      public LinearAlgebra.delegates.Quaternion_Multiply<double> Quaternion_Multiply { get { return LinearAlgebra.Multiply; } }
       /// <summary>Multiplies all the values of the quaternion by a scalar value.</summary>
-      public LinearAlgebra.delegates._Quaternion_Multiply_scalar<double> Quaternion_Multiply_scalar { get { return LinearAlgebra.Multiply; } }
+      public LinearAlgebra.delegates.Quaternion_Multiply_scalar<double> Quaternion_Multiply_scalar { get { return LinearAlgebra.Multiply; } }
       /// <summary>Pre-multiplies a 3-component vector by a quaternion.</summary>
-      public LinearAlgebra.delegates._Multiply_Vector<double> Multiply_Vector { get { return LinearAlgebra.Multiply; } }
+      public LinearAlgebra.delegates.Quaternion_Multiply_Vector<double> Multiply_Vector { get { return LinearAlgebra.Multiply; } }
       /// <summary>Normalizes the quaternion.</summary>
-      public LinearAlgebra.delegates._Quaternion_Normalize<double> Quaternion_Normalize { get { return LinearAlgebra.Normalize; } }
+      public LinearAlgebra.delegates.Quaternion_Normalize<double> Quaternion_Normalize { get { return LinearAlgebra.Normalize; } }
       /// <summary>Inverts a quaternion.</summary>
-      public LinearAlgebra.delegates._Quaternion_Invert<double> Quaternion_Invert { get { return LinearAlgebra.Invert; } }
+      public LinearAlgebra.delegates.Quaternion_Invert<double> Quaternion_Invert { get { return LinearAlgebra.Invert; } }
       /// <summary>Lenearly interpolates between two quaternions.</summary>
-      public LinearAlgebra.delegates._Quaternion_Lerp<double> Quaternion_Lerp { get { return LinearAlgebra.Lerp; } }
+      public LinearAlgebra.delegates.Quaternion_Lerp<double> Quaternion_Lerp { get { return LinearAlgebra.Lerp; } }
       /// <summary>Sphereically interpolates between two quaternions.</summary>
-      public LinearAlgebra.delegates._Quaternion_Slerp<double> Quaternion_Slerp { get { return LinearAlgebra.Slerp; } }
+      public LinearAlgebra.delegates.Quaternion_Slerp<double> Quaternion_Slerp { get { return LinearAlgebra.Slerp; } }
       /// <summary>Rotates a vector by a quaternion [v' = qvq'].</summary>
-      public LinearAlgebra.delegates._Quaternion_Rotate<double> Quaternion_Rotate { get { return LinearAlgebra.Rotate; } }
+      public LinearAlgebra.delegates.Quaternion_Rotate<double> Quaternion_Rotate { get { return LinearAlgebra.Rotate; } }
       /// <summary>Does a value equality check.</summary>
-      public LinearAlgebra.delegates._Quaternion_EqualsValue<double> Quaternion_EqualsValue { get { return LinearAlgebra.EqualsValue; } }
+      public LinearAlgebra.delegates.Quaternion_EqualsValue<double> Quaternion_EqualsValue { get { return LinearAlgebra.EqualsValue; } }
       /// <summary>Does a value equality check with leniency.</summary>
-      public LinearAlgebra.delegates._Quaternion_EqualsValue_leniency<double> Quaternion_EqualsValue_leniency { get { return LinearAlgebra.EqualsValue; } }
+      public LinearAlgebra.delegates.Quaternion_EqualsValue_leniency<double> Quaternion_EqualsValue_leniency { get { return LinearAlgebra.EqualsValue; } }
 
       #endregion
     }
 
     private class LinearAlgebra_float : LinearAlgebra<float>
     {
+      #region construct-simpleton
+
       private LinearAlgebra_float() { _instance = this; }
       private static LinearAlgebra_float _instance;
       private static LinearAlgebra_float Instance
@@ -753,6 +1106,8 @@ namespace Seven.Mathematics
 
       /// <summary>Gets Arithmetic for "byte" types.</summary>
       public static LinearAlgebra_float Get { get { return Instance; } }
+
+      #endregion
 
       #region vector
 
@@ -841,41 +1196,43 @@ namespace Seven.Mathematics
       #region quaterion
 
       /// <summary>Computes the length of quaternion.</summary>
-      public LinearAlgebra.delegates._Quaternion_Magnitude<float> Quaternion_Magnitude { get { return LinearAlgebra.Magnitude; } }
+      public LinearAlgebra.delegates.Quaternion_Magnitude<float> Quaternion_Magnitude { get { return LinearAlgebra.Magnitude; } }
       /// <summary>Computes the length of a quaternion, but doesn't square root it.</summary>
-      public LinearAlgebra.delegates._Quaternion_MagnitudeSquared<float> _Quaternion_MagnitudeSquared { get { return LinearAlgebra.MagnitudeSquared; } }
+      public LinearAlgebra.delegates.Quaternion_MagnitudeSquared<float> _Quaternion_MagnitudeSquared { get { return LinearAlgebra.MagnitudeSquared; } }
       /// <summary>Gets the conjugate of the quaternion.</summary>
-      public LinearAlgebra.delegates._Quaternion_Conjugate<float> Quaternion_Conjugate { get { return LinearAlgebra.Conjugate; } }
+      public LinearAlgebra.delegates.Quaternion_Conjugate<float> Quaternion_Conjugate { get { return LinearAlgebra.Conjugate; } }
       /// <summary>Adds two quaternions together.</summary>
-      public LinearAlgebra.delegates._Quaternion_Add<float> Quaternion_Add { get { return LinearAlgebra.Add; } }
+      public LinearAlgebra.delegates.Quaternion_Add<float> Quaternion_Add { get { return LinearAlgebra.Add; } }
       /// <summary>Subtracts two quaternions.</summary>
-      public LinearAlgebra.delegates._Quaternion_Subtract<float> Quaternion_Subtract { get { return LinearAlgebra.Subtract; } }
+      public LinearAlgebra.delegates.Quaternion_Subtract<float> Quaternion_Subtract { get { return LinearAlgebra.Subtract; } }
       /// <summary>Multiplies two quaternions together.</summary>
-      public LinearAlgebra.delegates._Quaternion_Multiply<float> Quaternion_Multiply { get { return LinearAlgebra.Multiply; } }
+      public LinearAlgebra.delegates.Quaternion_Multiply<float> Quaternion_Multiply { get { return LinearAlgebra.Multiply; } }
       /// <summary>Multiplies all the values of the quaternion by a scalar value.</summary>
-      public LinearAlgebra.delegates._Quaternion_Multiply_scalar<float> Quaternion_Multiply_scalar { get { return LinearAlgebra.Multiply; } }
+      public LinearAlgebra.delegates.Quaternion_Multiply_scalar<float> Quaternion_Multiply_scalar { get { return LinearAlgebra.Multiply; } }
       /// <summary>Pre-multiplies a 3-component vector by a quaternion.</summary>
-      public LinearAlgebra.delegates._Multiply_Vector<float> Multiply_Vector { get { return LinearAlgebra.Multiply; } }
+      public LinearAlgebra.delegates.Quaternion_Multiply_Vector<float> Multiply_Vector { get { return LinearAlgebra.Multiply; } }
       /// <summary>Normalizes the quaternion.</summary>
-      public LinearAlgebra.delegates._Quaternion_Normalize<float> Quaternion_Normalize { get { return LinearAlgebra.Normalize; } }
+      public LinearAlgebra.delegates.Quaternion_Normalize<float> Quaternion_Normalize { get { return LinearAlgebra.Normalize; } }
       /// <summary>Inverts a quaternion.</summary>
-      public LinearAlgebra.delegates._Quaternion_Invert<float> Quaternion_Invert { get { return LinearAlgebra.Invert; } }
+      public LinearAlgebra.delegates.Quaternion_Invert<float> Quaternion_Invert { get { return LinearAlgebra.Invert; } }
       /// <summary>Lenearly interpolates between two quaternions.</summary>
-      public LinearAlgebra.delegates._Quaternion_Lerp<float> Quaternion_Lerp { get { return LinearAlgebra.Lerp; } }
+      public LinearAlgebra.delegates.Quaternion_Lerp<float> Quaternion_Lerp { get { return LinearAlgebra.Lerp; } }
       /// <summary>Sphereically interpolates between two quaternions.</summary>
-      public LinearAlgebra.delegates._Quaternion_Slerp<float> Quaternion_Slerp { get { return LinearAlgebra.Slerp; } }
+      public LinearAlgebra.delegates.Quaternion_Slerp<float> Quaternion_Slerp { get { return LinearAlgebra.Slerp; } }
       /// <summary>Rotates a vector by a quaternion [v' = qvq'].</summary>
-      public LinearAlgebra.delegates._Quaternion_Rotate<float> Quaternion_Rotate { get { return LinearAlgebra.Rotate; } }
+      public LinearAlgebra.delegates.Quaternion_Rotate<float> Quaternion_Rotate { get { return LinearAlgebra.Rotate; } }
       /// <summary>Does a value equality check.</summary>
-      public LinearAlgebra.delegates._Quaternion_EqualsValue<float> Quaternion_EqualsValue { get { return LinearAlgebra.EqualsValue; } }
+      public LinearAlgebra.delegates.Quaternion_EqualsValue<float> Quaternion_EqualsValue { get { return LinearAlgebra.EqualsValue; } }
       /// <summary>Does a value equality check with leniency.</summary>
-      public LinearAlgebra.delegates._Quaternion_EqualsValue_leniency<float> Quaternion_EqualsValue_leniency { get { return LinearAlgebra.EqualsValue; } }
+      public LinearAlgebra.delegates.Quaternion_EqualsValue_leniency<float> Quaternion_EqualsValue_leniency { get { return LinearAlgebra.EqualsValue; } }
 
       #endregion
     }
 
     private class LinearAlgebra_long : LinearAlgebra<long>
     {
+      #region construct-simpleton
+
       private LinearAlgebra_long() { _instance = this; }
       private static LinearAlgebra_long _instance;
       private static LinearAlgebra_long Instance
@@ -891,6 +1248,8 @@ namespace Seven.Mathematics
 
       /// <summary>Gets Arithmetic for "byte" types.</summary>
       public static LinearAlgebra_long Get { get { return Instance; } }
+
+      #endregion
 
       #region vector
 
@@ -979,41 +1338,43 @@ namespace Seven.Mathematics
       #region quaterion
 
       /// <summary>Computes the length of quaternion.</summary>
-      public LinearAlgebra.delegates._Quaternion_Magnitude<long> Quaternion_Magnitude { get { return LinearAlgebra.Magnitude; } }
+      public LinearAlgebra.delegates.Quaternion_Magnitude<long> Quaternion_Magnitude { get { return LinearAlgebra.Magnitude; } }
       /// <summary>Computes the length of a quaternion, but doesn't square root it.</summary>
-      public LinearAlgebra.delegates._Quaternion_MagnitudeSquared<long> _Quaternion_MagnitudeSquared { get { return LinearAlgebra.MagnitudeSquared; } }
+      public LinearAlgebra.delegates.Quaternion_MagnitudeSquared<long> _Quaternion_MagnitudeSquared { get { return LinearAlgebra.MagnitudeSquared; } }
       /// <summary>Gets the conjugate of the quaternion.</summary>
-      public LinearAlgebra.delegates._Quaternion_Conjugate<long> Quaternion_Conjugate { get { return LinearAlgebra.Conjugate; } }
+      public LinearAlgebra.delegates.Quaternion_Conjugate<long> Quaternion_Conjugate { get { return LinearAlgebra.Conjugate; } }
       /// <summary>Adds two quaternions together.</summary>
-      public LinearAlgebra.delegates._Quaternion_Add<long> Quaternion_Add { get { return LinearAlgebra.Add; } }
+      public LinearAlgebra.delegates.Quaternion_Add<long> Quaternion_Add { get { return LinearAlgebra.Add; } }
       /// <summary>Subtracts two quaternions.</summary>
-      public LinearAlgebra.delegates._Quaternion_Subtract<long> Quaternion_Subtract { get { return LinearAlgebra.Subtract; } }
+      public LinearAlgebra.delegates.Quaternion_Subtract<long> Quaternion_Subtract { get { return LinearAlgebra.Subtract; } }
       /// <summary>Multiplies two quaternions together.</summary>
-      public LinearAlgebra.delegates._Quaternion_Multiply<long> Quaternion_Multiply { get { return LinearAlgebra.Multiply; } }
+      public LinearAlgebra.delegates.Quaternion_Multiply<long> Quaternion_Multiply { get { return LinearAlgebra.Multiply; } }
       /// <summary>Multiplies all the values of the quaternion by a scalar value.</summary>
-      public LinearAlgebra.delegates._Quaternion_Multiply_scalar<long> Quaternion_Multiply_scalar { get { return LinearAlgebra.Multiply; } }
+      public LinearAlgebra.delegates.Quaternion_Multiply_scalar<long> Quaternion_Multiply_scalar { get { return LinearAlgebra.Multiply; } }
       /// <summary>Pre-multiplies a 3-component vector by a quaternion.</summary>
-      public LinearAlgebra.delegates._Multiply_Vector<long> Multiply_Vector { get { return LinearAlgebra.Multiply; } }
+      public LinearAlgebra.delegates.Quaternion_Multiply_Vector<long> Multiply_Vector { get { return LinearAlgebra.Multiply; } }
       /// <summary>Normalizes the quaternion.</summary>
-      public LinearAlgebra.delegates._Quaternion_Normalize<long> Quaternion_Normalize { get { return LinearAlgebra.Normalize; } }
+      public LinearAlgebra.delegates.Quaternion_Normalize<long> Quaternion_Normalize { get { return LinearAlgebra.Normalize; } }
       /// <summary>Inverts a quaternion.</summary>
-      public LinearAlgebra.delegates._Quaternion_Invert<long> Quaternion_Invert { get { return LinearAlgebra.Invert; } }
+      public LinearAlgebra.delegates.Quaternion_Invert<long> Quaternion_Invert { get { return LinearAlgebra.Invert; } }
       /// <summary>Lenearly interpolates between two quaternions.</summary>
-      public LinearAlgebra.delegates._Quaternion_Lerp<long> Quaternion_Lerp { get { return LinearAlgebra.Lerp; } }
+      public LinearAlgebra.delegates.Quaternion_Lerp<long> Quaternion_Lerp { get { return LinearAlgebra.Lerp; } }
       /// <summary>Sphereically interpolates between two quaternions.</summary>
-      public LinearAlgebra.delegates._Quaternion_Slerp<long> Quaternion_Slerp { get { return LinearAlgebra.Slerp; } }
+      public LinearAlgebra.delegates.Quaternion_Slerp<long> Quaternion_Slerp { get { return LinearAlgebra.Slerp; } }
       /// <summary>Rotates a vector by a quaternion [v' = qvq'].</summary>
-      public LinearAlgebra.delegates._Quaternion_Rotate<long> Quaternion_Rotate { get { return LinearAlgebra.Rotate; } }
+      public LinearAlgebra.delegates.Quaternion_Rotate<long> Quaternion_Rotate { get { return LinearAlgebra.Rotate; } }
       /// <summary>Does a value equality check.</summary>
-      public LinearAlgebra.delegates._Quaternion_EqualsValue<long> Quaternion_EqualsValue { get { return LinearAlgebra.EqualsValue; } }
+      public LinearAlgebra.delegates.Quaternion_EqualsValue<long> Quaternion_EqualsValue { get { return LinearAlgebra.EqualsValue; } }
       /// <summary>Does a value equality check with leniency.</summary>
-      public LinearAlgebra.delegates._Quaternion_EqualsValue_leniency<long> Quaternion_EqualsValue_leniency { get { return LinearAlgebra.EqualsValue; } }
+      public LinearAlgebra.delegates.Quaternion_EqualsValue_leniency<long> Quaternion_EqualsValue_leniency { get { return LinearAlgebra.EqualsValue; } }
 
       #endregion
     }
 
     private class LinearAlgebra_int : LinearAlgebra<int>
     {
+      #region construct-simpleton
+
       private LinearAlgebra_int() { _instance = this; }
       private static LinearAlgebra_int _instance;
       private static LinearAlgebra_int Instance
@@ -1029,6 +1390,8 @@ namespace Seven.Mathematics
 
       /// <summary>Gets Arithmetic for "byte" types.</summary>
       public static LinearAlgebra_int Get { get { return Instance; } }
+
+      #endregion
 
       #region vector
 
@@ -1117,35 +1480,35 @@ namespace Seven.Mathematics
       #region quaterion
 
       /// <summary>Computes the length of quaternion.</summary>
-      public LinearAlgebra.delegates._Quaternion_Magnitude<int> Quaternion_Magnitude { get { return LinearAlgebra.Magnitude; } }
+      public LinearAlgebra.delegates.Quaternion_Magnitude<int> Quaternion_Magnitude { get { return LinearAlgebra.Magnitude; } }
       /// <summary>Computes the length of a quaternion, but doesn't square root it.</summary>
-      public LinearAlgebra.delegates._Quaternion_MagnitudeSquared<int> _Quaternion_MagnitudeSquared { get { return LinearAlgebra.MagnitudeSquared; } }
+      public LinearAlgebra.delegates.Quaternion_MagnitudeSquared<int> _Quaternion_MagnitudeSquared { get { return LinearAlgebra.MagnitudeSquared; } }
       /// <summary>Gets the conjugate of the quaternion.</summary>
-      public LinearAlgebra.delegates._Quaternion_Conjugate<int> Quaternion_Conjugate { get { return LinearAlgebra.Conjugate; } }
+      public LinearAlgebra.delegates.Quaternion_Conjugate<int> Quaternion_Conjugate { get { return LinearAlgebra.Conjugate; } }
       /// <summary>Adds two quaternions together.</summary>
-      public LinearAlgebra.delegates._Quaternion_Add<int> Quaternion_Add { get { return LinearAlgebra.Add; } }
+      public LinearAlgebra.delegates.Quaternion_Add<int> Quaternion_Add { get { return LinearAlgebra.Add; } }
       /// <summary>Subtracts two quaternions.</summary>
-      public LinearAlgebra.delegates._Quaternion_Subtract<int> Quaternion_Subtract { get { return LinearAlgebra.Subtract; } }
+      public LinearAlgebra.delegates.Quaternion_Subtract<int> Quaternion_Subtract { get { return LinearAlgebra.Subtract; } }
       /// <summary>Multiplies two quaternions together.</summary>
-      public LinearAlgebra.delegates._Quaternion_Multiply<int> Quaternion_Multiply { get { return LinearAlgebra.Multiply; } }
+      public LinearAlgebra.delegates.Quaternion_Multiply<int> Quaternion_Multiply { get { return LinearAlgebra.Multiply; } }
       /// <summary>Multiplies all the values of the quaternion by a scalar value.</summary>
-      public LinearAlgebra.delegates._Quaternion_Multiply_scalar<int> Quaternion_Multiply_scalar { get { return LinearAlgebra.Multiply; } }
+      public LinearAlgebra.delegates.Quaternion_Multiply_scalar<int> Quaternion_Multiply_scalar { get { return LinearAlgebra.Multiply; } }
       /// <summary>Pre-multiplies a 3-component vector by a quaternion.</summary>
-      public LinearAlgebra.delegates._Multiply_Vector<int> Multiply_Vector { get { return LinearAlgebra.Multiply; } }
+      public LinearAlgebra.delegates.Quaternion_Multiply_Vector<int> Multiply_Vector { get { return LinearAlgebra.Multiply; } }
       /// <summary>Normalizes the quaternion.</summary>
-      public LinearAlgebra.delegates._Quaternion_Normalize<int> Quaternion_Normalize { get { return LinearAlgebra.Normalize; } }
+      public LinearAlgebra.delegates.Quaternion_Normalize<int> Quaternion_Normalize { get { return LinearAlgebra.Normalize; } }
       /// <summary>Inverts a quaternion.</summary>
-      public LinearAlgebra.delegates._Quaternion_Invert<int> Quaternion_Invert { get { return LinearAlgebra.Invert; } }
+      public LinearAlgebra.delegates.Quaternion_Invert<int> Quaternion_Invert { get { return LinearAlgebra.Invert; } }
       /// <summary>Lenearly interpolates between two quaternions.</summary>
-      public LinearAlgebra.delegates._Quaternion_Lerp<int> Quaternion_Lerp { get { return LinearAlgebra.Lerp; } }
+      public LinearAlgebra.delegates.Quaternion_Lerp<int> Quaternion_Lerp { get { return LinearAlgebra.Lerp; } }
       /// <summary>Sphereically interpolates between two quaternions.</summary>
-      public LinearAlgebra.delegates._Quaternion_Slerp<int> Quaternion_Slerp { get { return LinearAlgebra.Slerp; } }
+      public LinearAlgebra.delegates.Quaternion_Slerp<int> Quaternion_Slerp { get { return LinearAlgebra.Slerp; } }
       /// <summary>Rotates a vector by a quaternion [v' = qvq'].</summary>
-      public LinearAlgebra.delegates._Quaternion_Rotate<int> Quaternion_Rotate { get { return LinearAlgebra.Rotate; } }
+      public LinearAlgebra.delegates.Quaternion_Rotate<int> Quaternion_Rotate { get { return LinearAlgebra.Rotate; } }
       /// <summary>Does a value equality check.</summary>
-      public LinearAlgebra.delegates._Quaternion_EqualsValue<int> Quaternion_EqualsValue { get { return LinearAlgebra.EqualsValue; } }
+      public LinearAlgebra.delegates.Quaternion_EqualsValue<int> Quaternion_EqualsValue { get { return LinearAlgebra.EqualsValue; } }
       /// <summary>Does a value equality check with leniency.</summary>
-      public LinearAlgebra.delegates._Quaternion_EqualsValue_leniency<int> Quaternion_EqualsValue_leniency { get { return LinearAlgebra.EqualsValue; } }
+      public LinearAlgebra.delegates.Quaternion_EqualsValue_leniency<int> Quaternion_EqualsValue_leniency { get { return LinearAlgebra.EqualsValue; } }
 
       #endregion
     }
@@ -1154,20 +1517,52 @@ namespace Seven.Mathematics
     /// <typeparam name="T">The type to create a linear algebra library for.</typeparam>
     public class LinearAlgebra_generic<T> : LinearAlgebra<T>
     {
+      #region field
+
+      // Constants
+      private T _zero;
+      private T _one;
+      private T _two;
+
+      // Logic
+      private Logic.delegates.abs<T> _abs;
+      private Equate<T> _equate;
+      private Compare<T> _compare;
+
+      // Arithmetic
+      private Arithmetic.delegates.Negate<T> _negate;
+      private Arithmetic.delegates.Add<T> _add;
+      private Arithmetic.delegates.Subtract<T> _subtract;
+      private Arithmetic.delegates.Multiply<T> _multiply;
+      private Arithmetic.delegates.Divide<T> _divide;
+
+      // Algebra
+      private Algebra.delegates.sqrt<T> _sqrt;
+      private Algebra.delegates.invert<T> _Invert_Multiplicative;
+
+      // Trigonometry
+      private Trigonometry._sin<T> _sin;
+      private Trigonometry._cos<T> _cos;
+      private Trigonometry._arccos<T> _acos;
+
+      #endregion
+
+      #region construct
+
       private LinearAlgebra_generic(
         T zero,
         T one,
         T two,
-        Logic._Abs<T> abs,
+        Logic.delegates.abs<T> abs,
         Equate<T> equate,
         Compare<T> compare,
-        Arithmetic._Negate<T> negate,
-        Arithmetic._Add<T> add,
-        Arithmetic._Subtract<T> subtract,
-        Arithmetic._Multiply<T> multiply,
-        Arithmetic._Divide<T> divide,
-        Algebra._sqrt<T> sqrt,
-        Algebra._invert_mult<T> invert_mult,
+        Arithmetic.delegates.Negate<T> negate,
+        Arithmetic.delegates.Add<T> add,
+        Arithmetic.delegates.Subtract<T> subtract,
+        Arithmetic.delegates.Multiply<T> multiply,
+        Arithmetic.delegates.Divide<T> divide,
+        Algebra.delegates.sqrt<T> sqrt,
+        Algebra.delegates.invert<T> invert_mult,
         Trigonometry._sin<T> sin,
         Trigonometry._cos<T> cos,
         Trigonometry._arccos<T> arccos)
@@ -1190,31 +1585,7 @@ namespace Seven.Mathematics
         _acos = arccos;
       }
 
-      // Constants
-      private T _zero;
-      private T _one;
-      private T _two;
-
-      // Logic
-      private Logic._Abs<T> _abs;
-      private Equate<T> _equate;
-      private Compare<T> _compare;
-
-      // Arithmetic
-      private Arithmetic._Negate<T> _negate;
-      private Arithmetic._Add<T> _add;
-      private Arithmetic._Subtract<T> _subtract;
-      private Arithmetic._Multiply<T> _multiply;
-      private Arithmetic._Divide<T> _divide;
-
-      // Algebra
-      private Algebra._sqrt<T> _sqrt;
-      private Algebra._invert_mult<T> _Invert_Multiplicative;
-
-      // Trigonometry
-      private Trigonometry._sin<T> _sin;
-      private Trigonometry._cos<T> _cos;
-      private Trigonometry._arccos<T> _acos;
+      #endregion
 
       #region vector
 
@@ -2085,7 +2456,7 @@ namespace Seven.Mathematics
       #region quaternion
 
       /// <summary>Computes the length of quaternion.</summary>
-      public LinearAlgebra.delegates._Quaternion_Magnitude<T> Quaternion_Magnitude
+      public LinearAlgebra.delegates.Quaternion_Magnitude<T> Quaternion_Magnitude
       { 
         get 
         {
@@ -2103,7 +2474,7 @@ namespace Seven.Mathematics
       }
 
       /// <summary>Computes the length of a quaternion, but doesn't square root it.</summary>
-      public LinearAlgebra.delegates._Quaternion_MagnitudeSquared<T> _Quaternion_MagnitudeSquared
+      public LinearAlgebra.delegates.Quaternion_MagnitudeSquared<T> _Quaternion_MagnitudeSquared
       {
         get
         {
@@ -2121,7 +2492,7 @@ namespace Seven.Mathematics
       }
 
       /// <summary>Gets the conjugate of the quaternion.</summary>
-      public LinearAlgebra.delegates._Quaternion_Conjugate<T> Quaternion_Conjugate
+      public LinearAlgebra.delegates.Quaternion_Conjugate<T> Quaternion_Conjugate
       {
         get
         {
@@ -2138,7 +2509,7 @@ namespace Seven.Mathematics
       }
 
       /// <summary>Adds two quaternions together.</summary>
-      public LinearAlgebra.delegates._Quaternion_Add<T> Quaternion_Add
+      public LinearAlgebra.delegates.Quaternion_Add<T> Quaternion_Add
       {
         get
         {
@@ -2155,7 +2526,7 @@ namespace Seven.Mathematics
       }
 
       /// <summary>Subtracts two quaternions.</summary>
-      public LinearAlgebra.delegates._Quaternion_Subtract<T> Quaternion_Subtract
+      public LinearAlgebra.delegates.Quaternion_Subtract<T> Quaternion_Subtract
       {
         get
         {
@@ -2172,7 +2543,7 @@ namespace Seven.Mathematics
       }
 
       /// <summary>Multiplies two quaternions together.</summary>
-      public LinearAlgebra.delegates._Quaternion_Multiply<T> Quaternion_Multiply
+      public LinearAlgebra.delegates.Quaternion_Multiply<T> Quaternion_Multiply
       {
         get
         {
@@ -2189,7 +2560,7 @@ namespace Seven.Mathematics
       }
 
       /// <summary>Multiplies all the values of the quaternion by a scalar value.</summary>
-      public LinearAlgebra.delegates._Quaternion_Multiply_scalar<T> Quaternion_Multiply_scalar
+      public LinearAlgebra.delegates.Quaternion_Multiply_scalar<T> Quaternion_Multiply_scalar
       {
         get
         {
@@ -2206,7 +2577,7 @@ namespace Seven.Mathematics
       }
 
       /// <summary>Pre-multiplies a 3-component vector by a quaternion.</summary>
-      public LinearAlgebra.delegates._Multiply_Vector<T> Multiply_Vector
+      public LinearAlgebra.delegates.Quaternion_Multiply_Vector<T> Multiply_Vector
       {
         get
         {
@@ -2228,7 +2599,7 @@ namespace Seven.Mathematics
       }
 
       /// <summary>Normalizes the quaternion.</summary>
-      public LinearAlgebra.delegates._Quaternion_Normalize<T> Quaternion_Normalize
+      public LinearAlgebra.delegates.Quaternion_Normalize<T> Quaternion_Normalize
       {
         get
         {
@@ -2245,7 +2616,7 @@ namespace Seven.Mathematics
       }
 
       /// <summary>Inverts a quaternion.</summary>
-      public LinearAlgebra.delegates._Quaternion_Invert<T> Quaternion_Invert
+      public LinearAlgebra.delegates.Quaternion_Invert<T> Quaternion_Invert
       {
         get
         {
@@ -2267,7 +2638,7 @@ namespace Seven.Mathematics
       }
 
       /// <summary>Lenearly interpolates between two quaternions.</summary>
-      public LinearAlgebra.delegates._Quaternion_Lerp<T> Quaternion_Lerp
+      public LinearAlgebra.delegates.Quaternion_Lerp<T> Quaternion_Lerp
       {
         get
         {
@@ -2299,7 +2670,7 @@ namespace Seven.Mathematics
       }
 
       /// <summary>Sphereically interpolates between two quaternions.</summary>
-      public LinearAlgebra.delegates._Quaternion_Slerp<T> Quaternion_Slerp
+      public LinearAlgebra.delegates.Quaternion_Slerp<T> Quaternion_Slerp
       {
         get
         {
@@ -2344,7 +2715,7 @@ namespace Seven.Mathematics
       }
 
       /// <summary>Rotates a vector by a quaternion [v' = qvq'].</summary>
-      public LinearAlgebra.delegates._Quaternion_Rotate<T> Quaternion_Rotate
+      public LinearAlgebra.delegates.Quaternion_Rotate<T> Quaternion_Rotate
       {
         get
         {
@@ -2360,7 +2731,7 @@ namespace Seven.Mathematics
       }
 
       /// <summary>Does a value equality check.</summary>
-      public LinearAlgebra.delegates._Quaternion_EqualsValue<T> Quaternion_EqualsValue
+      public LinearAlgebra.delegates.Quaternion_EqualsValue<T> Quaternion_EqualsValue
       {
         get
         {
@@ -2377,7 +2748,7 @@ namespace Seven.Mathematics
       }
 
       /// <summary>Does a value equality check with leniency.</summary>
-      public LinearAlgebra.delegates._Quaternion_EqualsValue_leniency<T> Quaternion_EqualsValue_leniency
+      public LinearAlgebra.delegates.Quaternion_EqualsValue_leniency<T> Quaternion_EqualsValue_leniency
       {
         get
         {
@@ -2398,68 +2769,68 @@ namespace Seven.Mathematics
 
     private class LinearAlgebra_unsupported<T> : LinearAlgebra<T>
     {
-      private LinearAlgebra_unsupported() { _instance = this; }
-      private static LinearAlgebra_unsupported<T> _instance;
-      private static LinearAlgebra_unsupported<T> Instance
-      { get { return _instance ?? new LinearAlgebra_unsupported<T>(); } }
-      internal static LinearAlgebra_unsupported<T> Get { get { return Instance; } }
+      #region construct
+
+      public LinearAlgebra_unsupported() { }
+
+      #endregion
 
       #region vector
 
       /// <summary>Adds two vectors together.</summary>
       public LinearAlgebra.delegates.Vector_Add<T> Vector_Add
-      { get { throw new Error("a linear algebra for " + typeof(T) + " could not be found or created"); } }
+      { get { return (T[] left, T[] right) => { throw new Error("a linear algebra for " + typeof(T) + " could not be found or created"); }; } }
       /// <summary>Negates all the values in a vector.</summary>
       public LinearAlgebra.delegates.Vector_Negate<T> Vector_Negate
-      { get { throw new Error("a linear algebra for " + typeof(T) + " could not be found or created"); } }
+      { get { return (T[] left) => { throw new Error("a linear algebra for " + typeof(T) + " could not be found or created"); }; } }
       /// <summary>Subtracts two vectors.</summary>
       public LinearAlgebra.delegates.Vector_Subtract<T> Vector_Subtract
-      { get { throw new Error("a linear algebra for " + typeof(T) + " could not be found or created"); } }
+      { get { return (T[] left, T[] right) => { throw new Error("a linear algebra for " + typeof(T) + " could not be found or created"); }; } }
       /// <summary>Multiplies all the components of a vecotr by a scalar.</summary>
       public LinearAlgebra.delegates.Vector_Multiply<T> Vector_Multiply
-      { get { throw new Error("a linear algebra for " + typeof(T) + " could not be found or created"); } }
+      { get { return (T[] left, T right) => { throw new Error("a linear algebra for " + typeof(T) + " could not be found or created"); }; } }
       /// <summary>Divides all the components of a vector by a scalar.</summary>
       public LinearAlgebra.delegates.Vector_Divide<T> Vector_Divide
-      { get { throw new Error("a linear algebra for " + typeof(T) + " could not be found or created"); } }
+      { get { return (T[] left, T right) => { throw new Error("a linear algebra for " + typeof(T) + " could not be found or created"); }; } }
       /// <summary>Computes the dot product between two vectors.</summary>
       public LinearAlgebra.delegates.Vector_DotProduct<T> Vector_DotProduct
-      { get { throw new Error("a linear algebra for " + typeof(T) + " could not be found or created"); } }
+      { get { return (T[] left, T[] right) => { throw new Error("a linear algebra for " + typeof(T) + " could not be found or created"); }; } }
       /// <summary>Computes teh cross product of two vectors.</summary>
       public LinearAlgebra.delegates.Vector_CrossProduct<T> Vector_CrossProduct
-      { get { throw new Error("a linear algebra for " + typeof(T) + " could not be found or created"); } }
+      { get { return (T[] left, T[] right) => { throw new Error("a linear algebra for " + typeof(T) + " could not be found or created"); }; } }
       /// <summary>Normalizes a vector.</summary>
       public LinearAlgebra.delegates.Vector_Normalize<T> Vector_Normalize
-      { get { throw new Error("a linear algebra for " + typeof(T) + " could not be found or created"); } }
+      { get { return (T[] left) => { throw new Error("a linear algebra for " + typeof(T) + " could not be found or created"); }; } }
       /// <summary>Computes the length of a vector.</summary>
       public LinearAlgebra.delegates.Vector_Magnitude<T> Vector_Magnitude
-      { get { throw new Error("a linear algebra for " + typeof(T) + " could not be found or created"); } }
+      { get { return (T[] left) => { throw new Error("a linear algebra for " + typeof(T) + " could not be found or created"); }; } }
       /// <summary>Computes the length of a vector but doesn't square root it for efficiency (length remains squared).</summary>
       public LinearAlgebra.delegates.Vector_MagnitudeSquared<T> Vector_MagnitudeSquared
-      { get { throw new Error("a linear algebra for " + typeof(T) + " could not be found or created"); } }
+      { get { return (T[] left) => { throw new Error("a linear algebra for " + typeof(T) + " could not be found or created"); }; } }
       /// <summary>Computes the angle between two vectors.</summary>
       public LinearAlgebra.delegates.Vector_Angle<T> Vector_Angle
-      { get { throw new Error("a linear algebra for " + typeof(T) + " could not be found or created"); } }
+      { get { return (T[] left, T[] right) => { throw new Error("a linear algebra for " + typeof(T) + " could not be found or created"); }; } }
       /// <summary>Rotates a vector by the specified axis and rotation values.</summary>
       public LinearAlgebra.delegates.Vector_RotateBy<T> Vector_RotateBy
-      { get { throw new Error("a linear algebra for " + typeof(T) + " could not be found or created"); } }
+      { get { return (T[] left, T angle, T x, T y, T z) => { throw new Error("a linear algebra for " + typeof(T) + " could not be found or created"); }; } }
       /// <summary>Computes the linear Terpolation between two vectors.</summary>
       public LinearAlgebra.delegates.Vector_Lerp<T> Vector_Lerp
-      { get { throw new Error("a linear algebra for " + typeof(T) + " could not be found or created"); } }
+      { get { return (T[] left, T[] right, T blend) => { throw new Error("a linear algebra for " + typeof(T) + " could not be found or created"); }; } }
       /// <summary>Sphereically Terpolates between two vectors.</summary>
       public LinearAlgebra.delegates.Vector_Slerp<T> Vector_Slerp
-      { get { throw new Error("a linear algebra for " + typeof(T) + " could not be found or created"); } }
+      { get { return (T[] left, T[] right, T blend) => { throw new Error("a linear algebra for " + typeof(T) + " could not be found or created"); }; } }
       /// <summary>Interpolates between three vectors using barycentric coordinates.</summary>
       public LinearAlgebra.delegates.Vector_Blerp<T> Vector_Blerp
-      { get { throw new Error("a linear algebra for " + typeof(T) + " could not be found or created"); } }
+      { get { return (T[] a, T[] b, T[] c, T u, T v) => { throw new Error("a linear algebra for " + typeof(T) + " could not be found or created"); }; } }
       /// <summary>Checks for equality by value.</summary>
       public LinearAlgebra.delegates.Vector_EqualsValue<T> Vector_EqualsValue
-      { get { throw new Error("a linear algebra for " + typeof(T) + " could not be found or created"); } }
+      { get { return (T[] left, T[] right) => { throw new Error("a linear algebra for " + typeof(T) + " could not be found or created"); }; } }
       /// <summary>Checks for equality by value with leniency.</summary>
       public LinearAlgebra.delegates.Vector_EqualsValue_leniency<T> Vector_EqualsValue_leniency
-      { get { throw new Error("a linear algebra for " + typeof(T) + " could not be found or created"); } }
+      { get { return (T[] left, T[] right, T leniency) => { throw new Error("a linear algebra for " + typeof(T) + " could not be found or created"); }; } }
       /// <summary>Rotates a vector by a quaternion.</summary>
       public LinearAlgebra.delegates.Vector_RotateBy_quaternion<T> Vector_RotateBy_quaternion
-      { get { throw new Error("a linear algebra for " + typeof(T) + " could not be found or created"); } }
+      { get { return (T[] left, Quaternion<T> right) => { throw new Error("a linear algebra for " + typeof(T) + " could not be found or created"); }; } }
 
       #endregion
 
@@ -2467,111 +2838,111 @@ namespace Seven.Mathematics
 
       /// <summary>Negates all the values in this matrix.</summary>
       public LinearAlgebra.delegates.Matrix_Negate<T> Matrix_Negate
-      { get { throw new Error("a linear algebra for " + typeof(T) + " could not be found or created"); } }
+      { get { return (T[,] left) => { throw new Error("a linear algebra for " + typeof(T) + " could not be found or created"); }; } }
       /// <summary>Does a standard matrix addition.</summary>
       public LinearAlgebra.delegates.Matrix_Add<T> Matrix_Add
-      { get { throw new Error("a linear algebra for " + typeof(T) + " could not be found or created"); } }
+      { get { return (T[,] left, T[,] right) => { throw new Error("a linear algebra for " + typeof(T) + " could not be found or created"); }; } }
       /// <summary>Does a standard matrix subtraction.</summary>
       public LinearAlgebra.delegates.Matrix_Subtract<T> Matrix_Subtract
-      { get { throw new Error("a linear algebra for " + typeof(T) + " could not be found or created"); } }
+      { get { return (T[,] left, T[,] right) => { throw new Error("a linear algebra for " + typeof(T) + " could not be found or created"); }; } }
       /// <summary>Does a standard matrix multiplication (triple for loop).</summary>
       public LinearAlgebra.delegates.Matrix_Multiply<T> Matrix_Multiply
-      { get { throw new Error("a linear algebra for " + typeof(T) + " could not be found or created"); } }
+      { get { return (T[,] left, T[,] right) => { throw new Error("a linear algebra for " + typeof(T) + " could not be found or created"); }; } }
       /// <summary>Multiplies all the values in this matrix by a scalar.</summary>
       public LinearAlgebra.delegates.Matrix_Multiply_scalar<T> Matrix_Multiply_scalar
-      { get { throw new Error("a linear algebra for " + typeof(T) + " could not be found or created"); } }
+      { get { return (T[,] left, T right) => { throw new Error("a linear algebra for " + typeof(T) + " could not be found or created"); }; } }
       /// <summary>Multiplies all the values in this matrix by a scalar.</summary>
       public LinearAlgebra.delegates.Matrix_Multiply_vector<T> Matrix_Multiply_vector
-      { get { throw new Error("a linear algebra for " + typeof(T) + " could not be found or created"); } }
+      { get { return (T[,] left, T[] right) => { throw new Error("a linear algebra for " + typeof(T) + " could not be found or created"); }; } }
       /// <summary>Divides all the values in this matrix by a scalar.</summary>
       public LinearAlgebra.delegates.Matrix_Divide<T> Matrix_Divide
-      { get { throw new Error("a linear algebra for " + typeof(T) + " could not be found or created"); } }
+      { get { return (T[,] left, T right) => { throw new Error("a linear algebra for " + typeof(T) + " could not be found or created"); }; } }
       /// <summary>Divides all the values in this matrix by a scalar.</summary>
       public LinearAlgebra.delegates.Matrix_Power<T> Matrix_Power
-      { get { throw new Error("a linear algebra for " + typeof(T) + " could not be found or created"); } }
+      { get { return (T[,] left, int right) => { throw new Error("a linear algebra for " + typeof(T) + " could not be found or created"); }; } }
       /// <summary>Gets the minor of a matrix.</summary>
       public LinearAlgebra.delegates.Matrix_Minor<T> Matrix_Minor
-      { get { throw new Error("a linear algebra for " + typeof(T) + " could not be found or created"); } }
+      { get { return (T[,] left, int row, int column) => { throw new Error("a linear algebra for " + typeof(T) + " could not be found or created"); }; } }
       /// <summary>Combines two matrices from left to right (result.Rows = left.Rows && result.Columns = left.Columns + right.Columns).</summary>
       public LinearAlgebra.delegates.Matrix_ConcatenateRowWise<T> Matrix_ConcatenateRowWise
-      { get { throw new Error("a linear algebra for " + typeof(T) + " could not be found or created"); } }
+      { get { return (T[,] left, T[,] right) => { throw new Error("a linear algebra for " + typeof(T) + " could not be found or created"); }; } }
       /// <summary>Computes the determinent if this matrix is square.</summary>
       public LinearAlgebra.delegates.Matrix_Determinent<T> Matrix_Determinent
-      { get { throw new Error("a linear algebra for " + typeof(T) + " could not be found or created"); } }
+      { get { return (T[,] left) => { throw new Error("a linear algebra for " + typeof(T) + " could not be found or created"); }; } }
       /// <summary>Computes the echelon form of this matrix (aka REF).</summary>
       public LinearAlgebra.delegates.Matrix_Echelon<T> Matrix_Echelon
-      { get { throw new Error("a linear algebra for " + typeof(T) + " could not be found or created"); } }
+      { get { return (T[,] left) => { throw new Error("a linear algebra for " + typeof(T) + " could not be found or created"); }; } }
       /// <summary>Computes the reduced echelon form of this matrix (aka RREF).</summary>
       public LinearAlgebra.delegates.Matrix_ReducedEchelon<T> Matrix_ReducedEchelon
-      { get { throw new Error("a linear algebra for " + typeof(T) + " could not be found or created"); } }
+      { get { return (T[,] left) => { throw new Error("a linear algebra for " + typeof(T) + " could not be found or created"); }; } }
       /// <summary>Computes the inverse of this matrix.</summary>
       public LinearAlgebra.delegates.Matrix_Inverse<T> Matrix_Inverse
-      { get { throw new Error("a linear algebra for " + typeof(T) + " could not be found or created"); } }
+      { get { return (T[,] left) => { throw new Error("a linear algebra for " + typeof(T) + " could not be found or created"); }; } }
       /// <summary>Gets the adjoT of this matrix.</summary>
       public LinearAlgebra.delegates.Matrix_Adjoint<T> Matrix_Adjoint
-      { get { throw new Error("a linear algebra for " + typeof(T) + " could not be found or created"); } }
+      { get { return (T[,] left) => { throw new Error("a linear algebra for " + typeof(T) + " could not be found or created"); }; } }
       /// <summary>Transposes this matrix.</summary>
       public LinearAlgebra.delegates.Matrix_Transpose<T> Matrix_Transpose
-      { get { throw new Error("a linear algebra for " + typeof(T) + " could not be found or created"); } }
+      { get { return (T[,] left) => { throw new Error("a linear algebra for " + typeof(T) + " could not be found or created"); }; } }
       /// <summary>Decomposes a matrix to lower/upper components.</summary>
       public LinearAlgebra.delegates.Matrix_DecomposeLU<T> Matrix_DecomposeLU
-      { get { throw new Error("a linear algebra for " + typeof(T) + " could not be found or created"); } }
+      { get { return (T[,] m, out T[,] l, out T[,] u) => { throw new Error("a linear algebra for " + typeof(T) + " could not be found or created"); }; } }
       /// <summary>Dtermines equality but value.</summary>
       public LinearAlgebra.delegates.Matrix_EqualsByValue<T> Matrix_EqualsByValue
-      { get { throw new Error("a linear algebra for " + typeof(T) + " could not be found or created"); } }
+      { get { return (T[,] left, T[,] right) => { throw new Error("a linear algebra for " + typeof(T) + " could not be found or created"); }; } }
       /// <summary>Determines equality by value with leniency.</summary>
       public LinearAlgebra.delegates.Matrix_EqualsByValue_leniency<T> Matrix_EqualsByValue_leniency
-      { get { throw new Error("a linear algebra for " + typeof(T) + " could not be found or created"); } }
+      { get { return (T[,] left, T[,] right, T leniency) => { throw new Error("a linear algebra for " + typeof(T) + " could not be found or created"); }; } }
 
       #endregion
 
       #region quaterion
 
       /// <summary>Computes the length of quaternion.</summary>
-      public LinearAlgebra.delegates._Quaternion_Magnitude<T> Quaternion_Magnitude
-      { get { throw new Error("a linear algebra for " + typeof(T) + " could not be found or created"); } }
+      public LinearAlgebra.delegates.Quaternion_Magnitude<T> Quaternion_Magnitude
+      { get { return (Quaternion<T> a) => { throw new Error("a linear algebra for " + typeof(T) + " could not be found or created"); }; } }
       /// <summary>Computes the length of a quaternion, but doesn't square root it.</summary>
-      public LinearAlgebra.delegates._Quaternion_MagnitudeSquared<T> _Quaternion_MagnitudeSquared
-      { get { throw new Error("a linear algebra for " + typeof(T) + " could not be found or created"); } }
+      public LinearAlgebra.delegates.Quaternion_MagnitudeSquared<T> _Quaternion_MagnitudeSquared
+      { get { return (Quaternion<T> a) => { throw new Error("a linear algebra for " + typeof(T) + " could not be found or created"); }; } }
       /// <summary>Gets the conjugate of the quaternion.</summary>
-      public LinearAlgebra.delegates._Quaternion_Conjugate<T> Quaternion_Conjugate
-      { get { throw new Error("a linear algebra for " + typeof(T) + " could not be found or created"); } }
+      public LinearAlgebra.delegates.Quaternion_Conjugate<T> Quaternion_Conjugate
+      { get { return (Quaternion<T> a) => { throw new Error("a linear algebra for " + typeof(T) + " could not be found or created"); }; } }
       /// <summary>Adds two quaternions together.</summary>
-      public LinearAlgebra.delegates._Quaternion_Add<T> Quaternion_Add
-      { get { throw new Error("a linear algebra for " + typeof(T) + " could not be found or created"); } }
+      public LinearAlgebra.delegates.Quaternion_Add<T> Quaternion_Add
+      { get { return (Quaternion<T> a, Quaternion<T> b) => { throw new Error("a linear algebra for " + typeof(T) + " could not be found or created"); }; } }
       /// <summary>Subtracts two quaternions.</summary>
-      public LinearAlgebra.delegates._Quaternion_Subtract<T> Quaternion_Subtract
-      { get { throw new Error("a linear algebra for " + typeof(T) + " could not be found or created"); } }
+      public LinearAlgebra.delegates.Quaternion_Subtract<T> Quaternion_Subtract
+      { get { return (Quaternion<T> a, Quaternion<T> b) => { throw new Error("a linear algebra for " + typeof(T) + " could not be found or created"); }; } }
       /// <summary>Multiplies two quaternions together.</summary>
-      public LinearAlgebra.delegates._Quaternion_Multiply<T> Quaternion_Multiply
-      { get { throw new Error("a linear algebra for " + typeof(T) + " could not be found or created"); } }
+      public LinearAlgebra.delegates.Quaternion_Multiply<T> Quaternion_Multiply
+      { get { return (Quaternion<T> a, Quaternion<T> b) => { throw new Error("a linear algebra for " + typeof(T) + " could not be found or created"); }; } }
       /// <summary>Multiplies all the values of the quaternion by a scalar value.</summary>
-      public LinearAlgebra.delegates._Quaternion_Multiply_scalar<T> Quaternion_Multiply_scalar
-      { get { throw new Error("a linear algebra for " + typeof(T) + " could not be found or created"); } }
+      public LinearAlgebra.delegates.Quaternion_Multiply_scalar<T> Quaternion_Multiply_scalar
+      { get { return (Quaternion<T> a, T b) => { throw new Error("a linear algebra for " + typeof(T) + " could not be found or created"); }; } }
       /// <summary>Pre-multiplies a 3-component vector by a quaternion.</summary>
-      public LinearAlgebra.delegates._Multiply_Vector<T> Multiply_Vector
-      { get { throw new Error("a linear algebra for " + typeof(T) + " could not be found or created"); } }
+      public LinearAlgebra.delegates.Quaternion_Multiply_Vector<T> Multiply_Vector
+      { get { return (Quaternion<T> a, Vector<T> b) => { throw new Error("a linear algebra for " + typeof(T) + " could not be found or created"); }; } }
       /// <summary>Normalizes the quaternion.</summary>
-      public LinearAlgebra.delegates._Quaternion_Normalize<T> Quaternion_Normalize
-      { get { throw new Error("a linear algebra for " + typeof(T) + " could not be found or created"); } }
+      public LinearAlgebra.delegates.Quaternion_Normalize<T> Quaternion_Normalize
+      { get { return (Quaternion<T> a) => { throw new Error("a linear algebra for " + typeof(T) + " could not be found or created"); }; } }
       /// <summary>Inverts a quaternion.</summary>
-      public LinearAlgebra.delegates._Quaternion_Invert<T> Quaternion_Invert
-      { get { throw new Error("a linear algebra for " + typeof(T) + " could not be found or created"); } }
+      public LinearAlgebra.delegates.Quaternion_Invert<T> Quaternion_Invert
+      { get { return (Quaternion<T> a) => { throw new Error("a linear algebra for " + typeof(T) + " could not be found or created"); }; } }
       /// <summary>Lenearly interpolates between two quaternions.</summary>
-      public LinearAlgebra.delegates._Quaternion_Lerp<T> Quaternion_Lerp
-      { get { throw new Error("a linear algebra for " + typeof(T) + " could not be found or created"); } }
+      public LinearAlgebra.delegates.Quaternion_Lerp<T> Quaternion_Lerp
+      { get { return (Quaternion<T> a, Quaternion<T> b, T blend) => { throw new Error("a linear algebra for " + typeof(T) + " could not be found or created"); }; } }
       /// <summary>Sphereically interpolates between two quaternions.</summary>
-      public LinearAlgebra.delegates._Quaternion_Slerp<T> Quaternion_Slerp
-      { get { throw new Error("a linear algebra for " + typeof(T) + " could not be found or created"); } }
+      public LinearAlgebra.delegates.Quaternion_Slerp<T> Quaternion_Slerp
+      { get { return (Quaternion<T> a, Quaternion<T> b, T blend) => { throw new Error("a linear algebra for " + typeof(T) + " could not be found or created"); }; } }
       /// <summary>Rotates a vector by a quaternion [v' = qvq'].</summary>
-      public LinearAlgebra.delegates._Quaternion_Rotate<T> Quaternion_Rotate
-      { get { throw new Error("a linear algebra for " + typeof(T) + " could not be found or created"); } }
+      public LinearAlgebra.delegates.Quaternion_Rotate<T> Quaternion_Rotate
+      { get { return (Quaternion<T> a, Vector<T> b) => { throw new Error("a linear algebra for " + typeof(T) + " could not be found or created"); }; } }
       /// <summary>Does a value equality check.</summary>
-      public LinearAlgebra.delegates._Quaternion_EqualsValue<T> Quaternion_EqualsValue
-      { get { throw new Error("a linear algebra for " + typeof(T) + " could not be found or created"); } }
+      public LinearAlgebra.delegates.Quaternion_EqualsValue<T> Quaternion_EqualsValue
+      { get { return (Quaternion<T> a, Quaternion<T> b) => { throw new Error("a linear algebra for " + typeof(T) + " could not be found or created"); }; } }
       /// <summary>Does a value equality check with leniency.</summary>
-      public LinearAlgebra.delegates._Quaternion_EqualsValue_leniency<T> Quaternion_EqualsValue_leniency
-      { get { throw new Error("a linear algebra for " + typeof(T) + " could not be found or created"); } }
+      public LinearAlgebra.delegates.Quaternion_EqualsValue_leniency<T> Quaternion_EqualsValue_leniency
+      { get { return (Quaternion<T> a, Quaternion<T> b, T leniency) => { throw new Error("a linear algebra for " + typeof(T) + " could not be found or created"); }; } }
 
       #endregion
     }
@@ -2581,6 +2952,1986 @@ namespace Seven.Mathematics
     #endregion
 
     #region implementations
+
+    #region Fraction128
+
+    #region vector
+
+    /// <summary>Adds two vectors together.</summary>
+    /// <param name="left">The first vector of the addition.</param>
+    /// <param name="right">The second vector of the addiiton.</param>
+    /// <returns>The result of the addiion.</returns>
+    public static Fraction128[] Add(Fraction128[] left, Fraction128[] right)
+    {
+      if (left.Length != right.Length)
+        throw new Error("invalid dimensions on vector addition.");
+      Fraction128[] result = new Fraction128[left.Length];
+      for (int i = 0; i < left.Length; i++)
+        result[i] = left[i] + right[i];
+      return result;
+    }
+
+    /// <summary>Negates all the values in a vector.</summary>
+    /// <param name="vector">The vector to have its values negated.</param>
+    /// <returns>The result of the negations.</returns>
+    public static Fraction128[] Negate(Fraction128[] vector)
+    {
+      Fraction128[] result = new Fraction128[vector.Length];
+      for (int i = 0; i < vector.Length; i++)
+        result[i] = -vector[i];
+      return result;
+    }
+
+    /// <summary>Subtracts two vectors.</summary>
+    /// <param name="left">The left vector of the subtraction.</param>
+    /// <param name="right">The right vector of the subtraction.</param>
+    /// <returns>The result of the vector subtracton.</returns>
+    public static Fraction128[] Subtract(Fraction128[] left, Fraction128[] right)
+    {
+      if (left.Length != right.Length)
+        throw new Error("invalid dimensions on vector subtraction.");
+      Fraction128[] result = new Fraction128[left.Length];
+      for (int i = 0; i < left.Length; i++)
+        result[i] = left[i] - right[i];
+      return result;
+    }
+
+    /// <summary>Multiplies all the components of a vecotr by a scalar.</summary>
+    /// <param name="left">The vector to have the components multiplied by.</param>
+    /// <param name="right">The scalars to multiply the vector components by.</param>
+    /// <returns>The result of the multiplications.</returns>
+    public static Fraction128[] Multiply(Fraction128[] left, Fraction128 right)
+    {
+      Fraction128[] result = new Fraction128[left.Length];
+      for (int i = 0; i < left.Length; i++)
+        result[i] = left[i] * right;
+      return result;
+    }
+
+    /// <summary>Divides all the components of a vector by a scalar.</summary>
+    /// <param name="vector">The vector to have the components divided by.</param>
+    /// <param name="right">The scalar to divide the vector components by.</param>
+    /// <returns>The resulting vector after teh divisions.</returns>
+    public static Fraction128[] Divide(Fraction128[] vector, Fraction128 right)
+    {
+      Fraction128[] result = new Fraction128[vector.Length];
+      int arrayLength = vector.Length;
+      for (int i = 0; i < arrayLength; i++)
+        result[i] = vector[i] / right;
+      return result;
+    }
+
+    /// <summary>Computes the dot product between two vectors.</summary>
+    /// <param name="left">The first vector of the dot product operation.</param>
+    /// <param name="right">The second vector of the dot product operation.</param>
+    /// <returns>The result of the dot product operation.</returns>
+    public static Fraction128 DotProduct(Fraction128[] left, Fraction128[] right)
+    {
+      if (left.Length != right.Length)
+        throw new Error("invalid dimensions on vector dot product.");
+      Fraction128 result = 0;
+      for (int i = 0; i < left.Length; i++)
+        result += (left[i] * right[i]);
+      return result;
+    }
+
+    /// <summary>Computes teh cross product of two vectors.</summary>
+    /// <param name="left">The first vector of the cross product operation.</param>
+    /// <param name="right">The second vector of the cross product operation.</param>
+    /// <returns>The result of the cross product operation.</returns>
+    public static Fraction128[] CrossProduct(Fraction128[] left, Fraction128[] right)
+    {
+      if (left.Length != right.Length)
+        throw new Error("invalid cross product !(left.Dimensions == right.Dimensions)");
+      if (left.Length == 3 || left.Length == 4)
+      {
+        return new Fraction128[] {
+          left[1] * right[2] - left[2] * right[1],
+          left[2] * right[0] - left[0] * right[2],
+          left[0] * right[1] - left[1] * right[0] };
+      }
+      throw new Error("my cross product function is only defined for 3-component vectors.");
+    }
+
+    /// <summary>Normalizes a vector.</summary>
+    /// <param name="vector">The vector to normalize.</param>
+    /// <returns>The result of the normalization.</returns>
+    public static Fraction128[] Normalize(Fraction128[] vector)
+    {
+      Fraction128 length = LinearAlgebra.Magnitude(vector);
+      if (length != 0)
+      {
+        Fraction128[] result = new Fraction128[vector.Length];
+        for (int i = 0; i < vector.Length; i++)
+          result[i] = vector[i] / length;
+        return result;
+      }
+      else
+        return new Fraction128[vector.Length];
+    }
+
+    /// <summary>Computes the length of a vector.</summary>
+    /// <param name="vector">The vector to calculate the length of.</param>
+    /// <returns>The computed length of the vector.</returns>
+    public static Fraction128 Magnitude(Fraction128[] vector)
+    {
+      Fraction128 result = 0;
+      int arrayLength = vector.Length;
+      for (int i = 0; i < arrayLength; i++)
+        result += (vector[i] * vector[i]);
+      return (Fraction128)System.Math.Sqrt((double)result);
+    }
+
+    /// <summary>Computes the length of a vector but doesn't square root it for efficiency (length remains squared).</summary>
+    /// <param name="vector">The vector to compute the length squared of.</param>
+    /// <returns>The computed length squared of the vector.</returns>
+    public static Fraction128 MagnitudeSquared(Fraction128[] vector)
+    {
+      Fraction128 result = 0;
+      for (int i = 0; i < vector.Length; i++)
+        result += (vector[i] * vector[i]);
+      return result;
+    }
+
+    /// <summary>Computes the angle between two vectors.</summary>
+    /// <param name="first">The first vector to determine the angle between.</param>
+    /// <param name="second">The second vector to determine the angle between.</param>
+    /// <returns>The angle between the two vectors in radians.</returns>
+    public static Fraction128 Angle(Fraction128[] first, Fraction128[] second)
+    {
+      return (Fraction128)System.Math.Acos((double)(LinearAlgebra.DotProduct(first, second) / (LinearAlgebra.Magnitude(first) * LinearAlgebra.Magnitude(second))));
+    }
+
+    /// <summary>Rotates a vector by the specified axis and rotation values.</summary>
+    /// <param name="vector">The vector to rotate.</param>
+    /// <param name="angle">The angle of the rotation.</param>
+    /// <param name="x">The x component of the axis vector to rotate about.</param>
+    /// <param name="y">The y component of the axis vector to rotate about.</param>
+    /// <param name="z">The z component of the axis vector to rotate about.</param>
+    /// <returns>The result of the rotation.</returns>
+    public static Fraction128[] RotateBy(Fraction128[] vector, Fraction128 angle, Fraction128 x, Fraction128 y, Fraction128 z)
+    {
+      if (vector.Length == 3)
+      {
+        // Note: the angle is in radians
+        Fraction128 sinHalfAngle = (Fraction128)System.Math.Sin((double)angle / 2d);
+        Fraction128 cosHalfAngle = (Fraction128)System.Math.Cos((double)angle / 2d);
+        x *= sinHalfAngle;
+        y *= sinHalfAngle;
+        z *= sinHalfAngle;
+        Fraction128 x2 = cosHalfAngle * vector[0] + y * vector[2] - z * vector[1];
+        Fraction128 y2 = cosHalfAngle * vector[1] + z * vector[0] - x * vector[2];
+        Fraction128 z2 = cosHalfAngle * vector[2] + x * vector[1] - y * vector[0];
+        Fraction128 w2 = -x * vector[0] - y * vector[1] - z * vector[2];
+        return new Fraction128[] {
+          x * w2 + cosHalfAngle * x2 + y * z2 - z * y2,
+          y * w2 + cosHalfAngle * y2 + z * x2 - x * z2,
+          z * w2 + cosHalfAngle * z2 + x * y2 - y * x2 };
+      }
+      throw new Error("my RotateBy() function is only defined for 3-component vectors.");
+    }
+
+    /// <summary>Rotates a vector by a quaternion rotation.</summary>
+    /// <param name="vector">The vector to be rotated.</param>
+    /// <param name="quaternion">The rotation to be applied.</param>
+    /// <returns>The vector after the rotation.</returns>
+    public static Fraction128[] RotateBy(Fraction128[] vector, Quaternion<Fraction128> quaternion)
+    {
+      return Rotate(quaternion, vector);
+    }
+
+    /// <summary>Computes the linear interpolation between two vectors.</summary>
+    /// <param name="left">The starting vector of the interpolation.</param>
+    /// <param name="right">The ending vector of the interpolation.</param>
+    /// <param name="blend">The ratio 0.0 to 1.0 of the interpolation between the start and end.</param>
+    /// <returns>The result of the interpolation.</returns>
+    public static Fraction128[] Lerp(Fraction128[] left, Fraction128[] right, Fraction128 blend)
+    {
+      if (blend < 0 || blend > 1)
+        throw new Error("invalid lerp blend value: (blend < 0.0f || blend > 1.0f).");
+      if (left.Length != right.Length)
+        throw new Error("invalid lerp matrix length: (left.Dimensions != right.Dimensions)");
+      Fraction128[] result = new Fraction128[left.Length];
+      for (int i = 0; i < left.Length; i++)
+        result[i] = left[i] + blend * (right[i] - left[i]);
+      return result;
+    }
+
+    /// <summary>Sphereically interpolates between two vectors.</summary>
+    /// <param name="left">The starting vector of the interpolation.</param>
+    /// <param name="right">The ending vector of the interpolation.</param>
+    /// <param name="blend">The ratio 0.0 to 1.0 defining the interpolation distance between the two vectors.</param>
+    /// <returns>The result of the slerp operation.</returns>
+    public static Fraction128[] Slerp(Fraction128[] left, Fraction128[] right, Fraction128 blend)
+    {
+      if (blend < 0 || blend > 1)
+        throw new Error("invalid slerp blend value: (blend < 0.0f || blend > 1.0f).");
+      Fraction128 dot = LinearAlgebra.DotProduct(left, right);
+      dot = dot < -1 ? -1 : dot;
+      dot = dot > 1 ? 1 : dot;
+      Fraction128 theta = (Fraction128)System.Math.Acos((double)dot) * blend;
+      return LinearAlgebra.Multiply(LinearAlgebra.Add(LinearAlgebra.Multiply(left, (Fraction128)System.Math.Cos((double)theta)),
+        LinearAlgebra.Normalize(LinearAlgebra.Subtract(right, LinearAlgebra.Multiply(left, dot)))), (Fraction128)System.Math.Sin((double)theta));
+    }
+
+    /// <summary>Interpolates between three vectors using barycentric coordinates.</summary>
+    /// <param name="a">The first vector of the interpolation.</param>
+    /// <param name="b">The second vector of the interpolation.</param>
+    /// <param name="c">The thrid vector of the interpolation.</param>
+    /// <param name="u">The "U" value of the barycentric interpolation equation.</param>
+    /// <param name="v">The "V" value of the barycentric interpolation equation.</param>
+    /// <returns>The resulting vector of the barycentric interpolation.</returns>
+    public static Fraction128[] Blerp(Fraction128[] a, Fraction128[] b, Fraction128[] c, Fraction128 u, Fraction128 v)
+    {
+      return LinearAlgebra.Add(LinearAlgebra.Add(LinearAlgebra.Multiply(LinearAlgebra.Subtract(b, a), u),
+        LinearAlgebra.Multiply(LinearAlgebra.Subtract(c, a), v)), a);
+    }
+
+    /// <summary>Does a value equality check.</summary>
+    /// <param name="left">The first matrix to check for equality.</param>
+    /// <param name="right">The second matrix to check for equality.</param>
+    /// <returns>True if values are equal, false if not.</returns>
+    public static bool EqualsValue(Fraction128[] left, Fraction128[] right)
+    {
+      if (left.GetLength(0) != right.GetLength(0))
+        return false;
+      for (int i = 0; i < left.GetLength(0); i++)
+        if (left[i] != right[i])
+          return false;
+      return true;
+    }
+
+    /// <summary>Does a value equality check with leniency.</summary>
+    /// <param name="left">The first matrix to check for equality.</param>
+    /// <param name="right">The second matrix to check for equality.</param>
+    /// <param name="leniency">How much the values can vary but still be considered equal.</param>
+    /// <returns>True if values are equal, false if not.</returns>
+    public static bool EqualsValue(Fraction128[] left, Fraction128[] right, Fraction128 leniency)
+    {
+      if (left.GetLength(0) != right.GetLength(0) || left.GetLength(1) != right.GetLength(1))
+        return false;
+      for (int i = 0; i < left.GetLength(0); i++)
+        if (Logic.Abs(left[i] - right[i]) > leniency)
+          return false;
+      return true;
+    }
+
+    #endregion
+
+    #region matrix
+
+    /// <summary>Constructs a new identity-matrix of the given dimensions.</summary>
+    /// <param name="rows">The number of rows of the matrix.</param>
+    /// <param name="columns">The number of columns of the matrix.</param>
+    /// <returns>The newly constructed identity-matrix.</returns>
+    public static Fraction128[,] MatrixFactoryIdentity_Fraction128(int rows, int columns)
+    {
+      Fraction128[,] matrix;
+      try { matrix = new Fraction128[rows, columns]; }
+      catch { throw new Error("invalid dimensions."); }
+      if (rows <= columns)
+        for (int i = 0; i < rows; i++)
+          matrix[i, i] = 1;
+      else
+        for (int i = 0; i < columns; i++)
+          matrix[i, i] = 1;
+      return matrix;
+    }
+
+    /// <summary>Determines if a matrix is symetric or not.</summary>
+    /// <param name="matrix">The matrix to determine symetry of.</param>
+    /// <returns>True if symetric; false if not.</returns>
+    public static bool IsSymmetric(Fraction128[,] matrix)
+    {
+      int rows = matrix.GetLength(0);
+      int cols = matrix.GetLength(1);
+
+      if (rows != cols)
+        return false;
+
+      for (var row = 0; row < rows; row++)
+        for (var column = row + 1; column < cols; column++)
+          if (matrix[row, column] != matrix[column, row])
+            return false;
+
+      return true;
+    }
+
+    /// <summary>Negates all the values in a matrix.</summary>
+    /// <param name="matrix">The matrix to have its values negated.</param>
+    /// <returns>The resulting matrix after the negations.</returns>
+    public static Fraction128[,] Negate(Fraction128[,] matrix)
+    {
+      Fraction128[,] result = new Fraction128[matrix.GetLength(0), matrix.GetLength(1)];
+      for (int i = 0; i < matrix.GetLength(0); i++)
+        for (int j = 0; j < matrix.GetLength(1); j++)
+          result[i, j] = -matrix[i, j];
+      return result;
+    }
+
+    /// <summary>Does standard addition of two matrices.</summary>
+    /// <param name="left">The left matrix of the addition.</param>
+    /// <param name="right">The right matrix of the addition.</param>
+    /// <returns>The resulting matrix after the addition.</returns>
+    public static Fraction128[,] Add(Fraction128[,] left, Fraction128[,] right)
+    {
+      if (left.GetLength(0) != right.GetLength(0) || left.GetLength(1) != right.GetLength(1))
+        throw new Error("invalid addition (size miss-match).");
+      Fraction128[,] result = new Fraction128[left.GetLength(0), left.GetLength(1)];
+      for (int i = 0; i < result.GetLength(0); i++)
+        for (int j = 0; j < result.GetLength(1); j++)
+          result[i, j] = left[i, j] + right[i, j];
+      return result;
+    }
+
+    /// <summary>Subtracts a scalar from all the values in a matrix.</summary>
+    /// <param name="left">The matrix to have the values subtracted from.</param>
+    /// <param name="right">The scalar to subtract from all the matrix values.</param>
+    /// <returns>The resulting matrix after the subtractions.</returns>
+    public static Fraction128[,] Subtract(Fraction128[,] left, Fraction128[,] right)
+    {
+      if (left.GetLength(0) != right.GetLength(0) || left.GetLength(1) != right.GetLength(1))
+        throw new Error("invalid subtraction (size miss-match).");
+      Fraction128[,] result = new Fraction128[left.GetLength(0), left.GetLength(1)];
+      for (int i = 0; i < result.GetLength(0); i++)
+        for (int j = 0; j < result.GetLength(1); j++)
+          result[i, j] = left[i, j] - right[i, j];
+      return result;
+    }
+
+    /// <summary>Performs multiplication on two matrices.</summary>
+    /// <param name="left">The left matrix of the multiplication.</param>
+    /// <param name="right">The right matrix of the multiplication.</param>
+    /// <returns>The resulting matrix of the multiplication.</returns>
+    public static Fraction128[,] Multiply(Fraction128[,] left, Fraction128[,] right)
+    {
+      if (left.GetLength(1) != right.GetLength(0))
+        throw new LinearAlgebra.Error("invalid multiplication (size miss-match).");
+      Fraction128[,] result = new Fraction128[left.GetLength(0), right.GetLength(1)];
+      for (int i = 0; i < result.GetLength(0); i++)
+        for (int j = 0; j < result.GetLength(1); j++)
+          for (int k = 0; k < left.GetLength(1); k++)
+            result[i, j] += left[i, k] * right[k, j];
+      return result;
+    }
+
+    /// <summary>Does a standard (triple for looped) multiplication between matrices.</summary>
+    /// <param name="left">The left matrix of the multiplication.</param>
+    /// <param name="right">The right matrix of the multiplication.</param>
+    /// <returns>The resulting matrix of the multiplication.</returns>
+    public static Fraction128[] Multiply(Fraction128[,] left, Fraction128[] right)
+    {
+      if (left.GetLength(1) != right.GetLength(0))
+        throw new Error("invalid multiplication (size miss-match).");
+      Fraction128[] result = new Fraction128[left.GetLength(1)];
+      for (int i = 0; i < left.GetLength(0); i++)
+        for (int j = 0; j < right.GetLength(1); j++)
+          result[i] = result[i] + left[i, j] * right[j];
+      return result;
+    }
+
+    /// <summary>Multiplies all the values in a matrix by a scalar.</summary>
+    /// <param name="left">The matrix to have the values multiplied.</param>
+    /// <param name="right">The scalar to multiply the values by.</param>
+    /// <returns>The resulting matrix after the multiplications.</returns>
+    public static Fraction128[,] Multiply(Fraction128[,] left, Fraction128 right)
+    {
+      Fraction128[,] result = new Fraction128[left.GetLength(0), left.GetLength(1)];
+      for (int i = 0; i < left.GetLength(0); i++)
+        for (int j = 0; j < left.GetLength(1); j++)
+          result[i, j] = left[i, j] * right;
+      return result;
+    }
+
+    /// <summary>Applies a power to a square matrix.</summary>
+    /// <param name="matrix">The matrix to be powered by.</param>
+    /// <param name="power">The power to apply to the matrix.</param>
+    /// <returns>The resulting matrix of the power operation.</returns>
+    public static Fraction128[,] Power(Fraction128[,] matrix, int power)
+    {
+      if (!(matrix.GetLength(0) == matrix.GetLength(1)))
+        throw new Error("invalid power (!matrix.IsSquare).");
+      if (!(power >= 0))
+        throw new Error("invalid power !(power > -1)");
+      if (power == 0)
+        return LinearAlgebra.MatrixFactoryIdentity_Fraction128(matrix.GetLength(0), matrix.GetLength(1));
+      Fraction128[,] result = matrix.Clone() as Fraction128[,];
+      for (int i = 0; i < power; i++)
+        result = LinearAlgebra.Multiply(result, result);
+      return result;
+    }
+
+    /// <summary>Divides all the values in the matrix by a scalar.</summary>
+    /// <param name="matrix">The matrix to divide the values of.</param>
+    /// <param name="right">The scalar to divide all the matrix values by.</param>
+    /// <returns>The resulting matrix with the divided values.</returns>
+    public static Fraction128[,] Divide(Fraction128[,] matrix, Fraction128 right)
+    {
+      Fraction128[,] result = new Fraction128[matrix.GetLength(0), matrix.GetLength(1)];
+      for (int i = 0; i < matrix.GetLength(0); i++)
+        for (int j = 0; j < matrix.GetLength(1); j++)
+          result[i, j] = matrix[i, j] / right;
+      return result;
+    }
+
+    /// <summary>Gets the minor of a matrix.</summary>
+    /// <param name="matrix">The matrix to get the minor of.</param>
+    /// <param name="row">The restricted row to form the minor.</param>
+    /// <param name="column">The restricted column to form the minor.</param>
+    /// <returns>The minor of the matrix.</returns>
+    public static Fraction128[,] Minor(Fraction128[,] matrix, int row, int column)
+    {
+      Fraction128[,] minor = new Fraction128[matrix.GetLength(0) - 1, matrix.GetLength(1) - 1];
+      int m = 0, n = 0;
+      for (int i = 0; i < matrix.GetLength(0); i++)
+      {
+        if (i == row) continue;
+        n = 0;
+        for (int j = 0; j < matrix.GetLength(1); j++)
+        {
+          if (j == column) continue;
+          minor[m, n] = matrix[i, j];
+          n++;
+        }
+        m++;
+      }
+      return minor;
+    }
+
+    /// <summary>Combines two matrices from left to right 
+    /// (result.Rows = left.Rows && result.Columns = left.Columns + right.Columns).</summary>
+    /// <param name="left">The left matrix of the concatenation.</param>
+    /// <param name="right">The right matrix of the concatenation.</param>
+    /// <returns>The resulting matrix of the concatenation.</returns>
+    public static Fraction128[,] ConcatenateRowWise(Fraction128[,] left, Fraction128[,] right)
+    {
+      if (left.GetLength(0) != right.GetLength(0))
+        throw new Error("invalid row-wise concatenation !(left.Rows == right.Rows).");
+      Fraction128[,] result = new Fraction128[left.GetLength(0), left.GetLength(1) + right.GetLength(1)];
+      for (int i = 0; i < result.GetLength(0); i++)
+        for (int j = 0; j < result.GetLength(1); j++)
+        {
+          if (j < left.GetLength(1)) result[i, j] = left[i, j];
+          else result[i, j] = right[i, j - left.GetLength(1)];
+        }
+      return result;
+    }
+
+    /// <summary>Calculates the echelon of a matrix (aka REF).</summary>
+    /// <param name="matrix">The matrix to calculate the echelon of (aka REF).</param>
+    /// <returns>The echelon of the matrix (aka REF).</returns>
+    public static Fraction128[,] Echelon(Fraction128[,] matrix)
+    {
+      try
+      {
+        Fraction128[,] result = matrix.Clone() as Fraction128[,];
+        for (int i = 0; i < matrix.GetLength(0); i++)
+        {
+          if (result[i, i] == 0)
+            for (int j = i + 1; j < result.GetLength(0); j++)
+              if (result[j, i] != 0)
+                LinearAlgebra.SwapRows(result, i, j);
+          if (result[i, i] == 0)
+            continue;
+          if (result[i, i] != 1)
+            for (int j = i + 1; j < result.GetLength(0); j++)
+              if (result[j, i] == 1)
+                LinearAlgebra.SwapRows(result, i, j);
+          LinearAlgebra.RowMultiplication(result, i, 1 / result[i, i]);
+          for (int j = i + 1; j < result.GetLength(0); j++)
+            LinearAlgebra.RowAddition(result, j, i, -result[j, i]);
+        }
+        return result;
+      }
+      catch { throw new Error("echelon computation failed."); }
+    }
+
+    /// <summary>Calculates the echelon of a matrix and reduces it (aka RREF).</summary>
+    /// <param name="matrix">The matrix matrix to calculate the reduced echelon of (aka RREF).</param>
+    /// <returns>The reduced echelon of the matrix (aka RREF).</returns>
+    public static Fraction128[,] ReducedEchelon(Fraction128[,] matrix)
+    {
+      try
+      {
+        Fraction128[,] result = matrix.Clone() as Fraction128[,];
+        for (int i = 0; i < matrix.GetLength(0); i++)
+        {
+          if (result[i, i] == 0)
+            for (int j = i + 1; j < result.GetLength(0); j++)
+              if (result[j, i] != 0)
+                LinearAlgebra.SwapRows(result, i, j);
+          if (result[i, i] == 0) continue;
+          if (result[i, i] != 1)
+            for (int j = i + 1; j < result.GetLength(0); j++)
+              if (result[j, i] == 1)
+                LinearAlgebra.SwapRows(result, i, j);
+          LinearAlgebra.RowMultiplication(result, i, 1 / result[i, i]);
+          for (int j = i + 1; j < result.GetLength(0); j++)
+            LinearAlgebra.RowAddition(result, j, i, -result[j, i]);
+          for (int j = i - 1; j >= 0; j--)
+            LinearAlgebra.RowAddition(result, j, i, -result[j, i]);
+        }
+        return result;
+      }
+      catch { throw new Error("reduced echelon calculation failed."); }
+    }
+
+    /// <summary>Calculates the determinent of a square matrix.</summary>
+    /// <param name="matrix">The matrix to calculate the determinent of.</param>
+    /// <returns>The determinent of the matrix.</returns>
+    public static Fraction128 Determinent(Fraction128[,] matrix)
+    {
+      if (!(matrix.GetLength(0) == matrix.GetLength(1)))
+        throw new Error("invalid determinent !(matrix.IsSquare).");
+      try
+      {
+        Fraction128 det = 1;
+        Fraction128[,] rref = matrix.Clone() as Fraction128[,];
+        for (int i = 0; i < matrix.GetLength(0); i++)
+        {
+          if (rref[i, i] == 0)
+            for (int j = i + 1; j < rref.GetLength(0); j++)
+              if (rref[j, i] != 0)
+              {
+                LinearAlgebra.SwapRows(rref, i, j);
+                det *= -1;
+              }
+          det *= rref[i, i];
+          LinearAlgebra.RowMultiplication(rref, i, 1 / rref[i, i]);
+          for (int j = i + 1; j < rref.GetLength(0); j++)
+            LinearAlgebra.RowAddition(rref, j, i, -rref[j, i]);
+          for (int j = i - 1; j >= 0; j--)
+            LinearAlgebra.RowAddition(rref, j, i, -rref[j, i]);
+        }
+        return det;
+      }
+      catch { throw new Error("determinent computation failed."); }
+    }
+
+    /// <summary>Calculates the inverse of a matrix.</summary>
+    /// <param name="matrix">The matrix to calculate the inverse of.</param>
+    /// <returns>The inverse of the matrix.</returns>
+    public static Fraction128[,] Inverse(Fraction128[,] matrix)
+    {
+      if (LinearAlgebra.Determinent(matrix) == 0)
+        throw new Error("inverse calculation failed.");
+      try
+      {
+        Fraction128[,] identity = LinearAlgebra.MatrixFactoryIdentity_Fraction128(matrix.GetLength(0), matrix.GetLength(1));
+        Fraction128[,] rref = matrix.Clone() as Fraction128[,];
+        for (int i = 0; i < matrix.GetLength(0); i++)
+        {
+          if (rref[i, i] == 0)
+            for (int j = i + 1; j < rref.GetLength(0); j++)
+              if (rref[j, i] != 0)
+              {
+                LinearAlgebra.SwapRows(rref, i, j);
+                LinearAlgebra.SwapRows(identity, i, j);
+              }
+          LinearAlgebra.RowMultiplication(identity, i, 1 / rref[i, i]);
+          LinearAlgebra.RowMultiplication(rref, i, 1 / rref[i, i]);
+          for (int j = i + 1; j < rref.GetLength(0); j++)
+          {
+            LinearAlgebra.RowAddition(identity, j, i, -rref[j, i]);
+            LinearAlgebra.RowAddition(rref, j, i, -rref[j, i]);
+          }
+          for (int j = i - 1; j >= 0; j--)
+          {
+            LinearAlgebra.RowAddition(identity, j, i, -rref[j, i]);
+            LinearAlgebra.RowAddition(rref, j, i, -rref[j, i]);
+          }
+        }
+        return identity;
+      }
+      catch { throw new Error("inverse calculation failed."); }
+    }
+
+    /// <summary>Calculates the adjoint of a matrix.</summary>
+    /// <param name="matrix">The matrix to calculate the adjoint of.</param>
+    /// <returns>The adjoint of the matrix.</returns>
+    public static Fraction128[,] Adjoint(Fraction128[,] matrix)
+    {
+      if (!(matrix.GetLength(0) == matrix.GetLength(1)))
+        throw new Error("Adjoint of a non-square matrix does not exists");
+      Fraction128[,] AdjointMatrix = new Fraction128[matrix.GetLength(0), matrix.GetLength(1)];
+      for (int i = 0; i < matrix.GetLength(0); i++)
+        for (int j = 0; j < matrix.GetLength(1); j++)
+          if ((i + j) % 2 == 0)
+            AdjointMatrix[i, j] = LinearAlgebra.Determinent(LinearAlgebra.Minor(matrix, i, j));
+          else
+            AdjointMatrix[i, j] = -LinearAlgebra.Determinent(LinearAlgebra.Minor(matrix, i, j));
+      return LinearAlgebra.Transpose(AdjointMatrix);
+    }
+
+    /// <summary>Returns the transpose of a matrix.</summary>
+    /// <param name="matrix">The matrix to transpose.</param>
+    /// <returns>The transpose of the matrix.</returns>
+    public static Fraction128[,] Transpose(Fraction128[,] matrix)
+    {
+      Fraction128[,] transpose = new Fraction128[matrix.GetLength(1), matrix.GetLength(0)];
+      for (int i = 0; i < transpose.GetLength(0); i++)
+        for (int j = 0; j < transpose.GetLength(1); j++)
+          transpose[i, j] = matrix[j, i];
+      return transpose;
+    }
+
+    /// <summary>Decomposes a matrix into lower-upper reptresentation.</summary>
+    /// <param name="matrix">The matrix to decompose.</param>
+    /// <param name="Lower">The computed lower triangular matrix.</param>
+    /// <param name="Upper">The computed upper triangular matrix.</param>
+    public static void DecomposeLU(Fraction128[,] matrix, out Fraction128[,] Lower, out Fraction128[,] Upper)
+    {
+      if (!(matrix.GetLength(0) == matrix.GetLength(1)))
+        throw new Error("The matrix is not square!");
+      Lower = LinearAlgebra.MatrixFactoryIdentity_Fraction128(matrix.GetLength(0), matrix.GetLength(1));
+      Upper = matrix.Clone() as Fraction128[,];
+      int[] permutation = new int[matrix.GetLength(0)];
+      for (int i = 0; i < matrix.GetLength(0); i++) permutation[i] = i;
+      Fraction128 p = 0, pom2, detOfP = 1;
+      int k0 = 0, pom1 = 0;
+      for (int k = 0; k < matrix.GetLength(1) - 1; k++)
+      {
+        p = 0;
+        for (int i = k; i < matrix.GetLength(0); i++)
+          if ((Upper[i, k] > 0 ? Upper[i, k] : -Upper[i, k]) > p)
+          {
+            p = Upper[i, k] > 0 ? Upper[i, k] : -Upper[i, k];
+            k0 = i;
+          }
+        if (p == 0)
+          throw new Error("The matrix is singular!");
+        pom1 = permutation[k];
+        permutation[k] = permutation[k0];
+        permutation[k0] = pom1;
+        for (int i = 0; i < k; i++)
+        {
+          pom2 = Lower[k, i];
+          Lower[k, i] = Lower[k0, i];
+          Lower[k0, i] = pom2;
+        }
+        if (k != k0)
+          detOfP *= -1;
+        for (int i = 0; i < matrix.GetLength(1); i++)
+        {
+          pom2 = Upper[k, i];
+          Upper[k, i] = Upper[k0, i];
+          Upper[k0, i] = pom2;
+        }
+        for (int i = k + 1; i < matrix.GetLength(0); i++)
+        {
+          Lower[i, k] = Upper[i, k] / Upper[k, k];
+          for (int j = k; j < matrix.GetLength(1); j++)
+            Upper[i, j] = Upper[i, j] - Lower[i, k] * Upper[k, j];
+        }
+      }
+    }
+
+    /// <summary>Creates a copy of a matrix.</summary>
+    /// <param name="matrix">The matrix to copy.</param>
+    /// <returns>A copy of the matrix.</returns>
+    public static Fraction128[,] Clone(Fraction128[,] matrix)
+    {
+      Fraction128[,] result = new Fraction128[matrix.GetLength(0), matrix.GetLength(1)];
+      for (int i = 0; i < matrix.GetLength(0); i++)
+        for (int j = 0; j < matrix.GetLength(1); j++)
+          result[i, j] = matrix[i, j];
+      return result;
+    }
+
+    private static void RowMultiplication(Fraction128[,] matrix, int row, Fraction128 scalar)
+    {
+      for (int j = 0; j < matrix.GetLength(1); j++)
+        matrix[row, j] *= scalar;
+    }
+
+    private static void RowAddition(Fraction128[,] matrix, int target, int second, Fraction128 scalar)
+    {
+      for (int j = 0; j < matrix.GetLength(1); j++)
+        matrix[target, j] += (matrix[second, j] * scalar);
+    }
+
+    private static void SwapRows(Fraction128[,] matrix, int row1, int row2)
+    {
+      for (int j = 0; j < matrix.GetLength(1); j++)
+      {
+        Fraction128 temp = matrix[row1, j];
+        matrix[row1, j] = matrix[row2, j];
+        matrix[row2, j] = temp;
+      }
+    }
+
+    /// <summary>Does a value equality check.</summary>
+    /// <param name="left">The first matrix to check for equality.</param>
+    /// <param name="right">The second matrix to check for equality.</param>
+    /// <returns>True if values are equal, false if not.</returns>
+    public static bool EqualsValue(Fraction128[,] left, Fraction128[,] right)
+    {
+      if (left.GetLength(0) != right.GetLength(0) || left.GetLength(1) != right.GetLength(1))
+        return false;
+      for (int i = 0; i < left.GetLength(0); i++)
+        for (int j = 0; j < left.GetLength(1); j++)
+          if (left[i, j] != right[i, j])
+            return false;
+      return true;
+    }
+
+    /// <summary>Does a value equality check with leniency.</summary>
+    /// <param name="left">The first matrix to check for equality.</param>
+    /// <param name="right">The second matrix to check for equality.</param>
+    /// <param name="leniency">How much the values can vary but still be considered equal.</param>
+    /// <returns>True if values are equal, false if not.</returns>
+    public static bool EqualsValue(Fraction128[,] left, Fraction128[,] right, Fraction128 leniency)
+    {
+      if (left.GetLength(0) != right.GetLength(0) || left.GetLength(1) != right.GetLength(1))
+        return false;
+      for (int i = 0; i < left.GetLength(0); i++)
+        for (int j = 0; j < left.GetLength(1); j++)
+          if (Logic.Abs(left[i, j] - right[i, j]) > leniency)
+            return false;
+      return true;
+    }
+
+    #endregion
+
+    #region quaterion
+
+    /// <summary>Computes the length of quaternion.</summary>
+    /// <param name="quaternion">The quaternion to compute the length of.</param>
+    /// <returns>The length of the given quaternion.</returns>
+    public static Fraction128 Magnitude(Quaternion<Fraction128> quaternion)
+    {
+      return Algebra.sqrt(
+          (quaternion.X * quaternion.X +
+          quaternion.Y * quaternion.Y +
+          quaternion.Z * quaternion.Z +
+          quaternion.W * quaternion.W));
+    }
+
+    /// <summary>Computes the length of a quaternion, but doesn't square root it
+    /// for optimization possibilities.</summary>
+    /// <param name="quaternion">The quaternion to compute the length squared of.</param>
+    /// <returns>The squared length of the given quaternion.</returns>
+    public static Fraction128 MagnitudeSquared(Quaternion<Fraction128> quaternion)
+    {
+      return
+        quaternion.X * quaternion.X +
+        quaternion.Y * quaternion.Y +
+        quaternion.Z * quaternion.Z +
+        quaternion.W * quaternion.W;
+    }
+
+    /// <summary>Gets the conjugate of the quaternion.</summary>
+    /// <param name="quaternion">The quaternion to conjugate.</param>
+    /// <returns>The conjugate of teh given quaternion.</returns>
+    public static Quaternion<Fraction128> Conjugate(Quaternion<Fraction128> quaternion)
+    {
+      return new Quaternion<Fraction128>(
+        -quaternion.X,
+        -quaternion.Y,
+        -quaternion.Z,
+        quaternion.W);
+    }
+
+    /// <summary>Adds two quaternions together.</summary>
+    /// <param name="left">The first quaternion of the addition.</param>
+    /// <param name="right">The second quaternion of the addition.</param>
+    /// <returns>The result of the addition.</returns>
+    public static Quaternion<Fraction128> Add(Quaternion<Fraction128> left, Quaternion<Fraction128> right)
+    {
+      return new Quaternion<Fraction128>(
+        left.X + right.X,
+        left.Y + right.Y,
+        left.Z + right.Z,
+        left.W + right.W);
+    }
+
+    /// <summary>Subtracts two quaternions.</summary>
+    /// <param name="left">The left quaternion of the subtraction.</param>
+    /// <param name="right">The right quaternion of the subtraction.</param>
+    /// <returns>The resulting quaternion after the subtraction.</returns>
+    public static Quaternion<Fraction128> Subtract(Quaternion<Fraction128> left, Quaternion<Fraction128> right)
+    {
+      return new Quaternion<Fraction128>(
+        left.X - right.X,
+        left.Y - right.Y,
+        left.Z - right.Z,
+        left.W - right.W);
+    }
+
+    /// <summary>Multiplies two quaternions together.</summary>
+    /// <param name="left">The first quaternion of the multiplication.</param>
+    /// <param name="right">The second quaternion of the multiplication.</param>
+    /// <returns>The resulting quaternion after the multiplication.</returns>
+    public static Quaternion<Fraction128> Multiply(Quaternion<Fraction128> left, Quaternion<Fraction128> right)
+    {
+      return new Quaternion<Fraction128>(
+        left.X * right.W + left.W * right.X + left.Y * right.Z - left.Z * right.Y,
+        left.Y * right.W + left.W * right.Y + left.Z * right.X - left.X * right.Z,
+        left.Z * right.W + left.W * right.Z + left.X * right.Y - left.Y * right.X,
+        left.W * right.W - left.X * right.X - left.Y * right.Y - left.Z * right.Z);
+    }
+
+    /// <summary>Multiplies all the values of the quaternion by a scalar value.</summary>
+    /// <param name="left">The quaternion of the multiplication.</param>
+    /// <param name="right">The scalar of the multiplication.</param>
+    /// <returns>The result of multiplying all the values in the quaternion by the scalar.</returns>
+    public static Quaternion<Fraction128> Multiply(Quaternion<Fraction128> left, Fraction128 right)
+    {
+      return new Quaternion<Fraction128>(
+        left.X * right,
+        left.Y * right,
+        left.Z * right,
+        left.W * right);
+    }
+
+    /// <summary>Pre-multiplies a 3-component vector by a quaternion.</summary>
+    /// <param name="left">The quaternion to pre-multiply the vector by.</param>
+    /// <param name="right">The vector to be multiplied.</param>
+    /// <returns>The resulting quaternion of the multiplication.</returns>
+    public static Quaternion<Fraction128> Multiply(Quaternion<Fraction128> left, Vector<Fraction128> right)
+    {
+      if (right.Dimensions == 3)
+      {
+        return new Quaternion<Fraction128>(
+          left.W * right.X + left.Y * right.Z - left.Z * right.Y,
+          left.W * right.Y + left.Z * right.X - left.X * right.Z,
+          left.W * right.Z + left.X * right.Y - left.Y * right.X,
+          -left.X * right.X - left.Y * right.Y - left.Z * right.Z);
+      }
+      else
+        throw new Error("my quaternion rotations are only defined for 3-component vectors.");
+    }
+
+    /// <summary>Normalizes the quaternion.</summary>
+    /// <param name="quaternion">The quaternion to normalize.</param>
+    /// <returns>The normalization of the given quaternion.</returns>
+    public static Quaternion<Fraction128> Normalize(Quaternion<Fraction128> quaternion)
+    {
+      Fraction128 normalizer = Quaternion<Fraction128>.Magnitude(quaternion);
+      if (normalizer != 0)
+        return quaternion * (1 / normalizer);
+      else
+        return Quaternion<Fraction128>.FactoryIdentity;
+    }
+
+    /// <summary>Inverts a quaternion.</summary>
+    /// <param name="quaternion">The quaternion to find the inverse of.</param>
+    /// <returns>The inverse of the given quaternion.</returns>
+    public static Quaternion<Fraction128> Invert(Quaternion<Fraction128> quaternion)
+    {
+      Fraction128 normalizer = Quaternion<Fraction128>.MagnitudeSquared(quaternion);
+      if (normalizer == 0)
+        return new Quaternion<Fraction128>(quaternion.X, quaternion.Y, quaternion.Z, quaternion.W);
+      normalizer = 1 / normalizer;
+      return new Quaternion<Fraction128>(
+        -quaternion.X * normalizer,
+        -quaternion.Y * normalizer,
+        -quaternion.Z * normalizer,
+        quaternion.W * normalizer);
+    }
+
+    /// <summary>Lenearly interpolates between two quaternions.</summary>
+    /// <param name="left">The starting point of the interpolation.</param>
+    /// <param name="right">The ending point of the interpolation.</param>
+    /// <param name="blend">The ratio 0.0-1.0 of how far to interpolate between the left and right quaternions.</param>
+    /// <returns>The result of the interpolation.</returns>
+    public static Quaternion<Fraction128> Lerp(Quaternion<Fraction128> left, Quaternion<Fraction128> right, Fraction128 blend)
+    {
+      if (blend < 0 || blend > 1)
+        throw new Error("invalid blending value during lerp !(blend < 0.0f || blend > 1.0f).");
+      if (Quaternion<Fraction128>.MagnitudeSquared(left) == 0)
+      {
+        if (Quaternion<Fraction128>.MagnitudeSquared(right) == 0)
+          return Quaternion<Fraction128>.FactoryIdentity;
+        else
+          return new Quaternion<Fraction128>(right.X, right.Y, right.Z, right.W);
+      }
+      else if (Quaternion<Fraction128>.MagnitudeSquared(right) == 0)
+        return new Quaternion<Fraction128>(left.X, left.Y, left.Z, left.W);
+      Quaternion<Fraction128> result = new Quaternion<Fraction128>(
+        1 - blend * left.X + blend * right.X,
+        1 - blend * left.Y + blend * right.Y,
+        1 - blend * left.Z + blend * right.Z,
+        1 - blend * left.W + blend * right.W);
+      if (Quaternion<Fraction128>.MagnitudeSquared(result) > 0)
+        return Quaternion<Fraction128>.Normalize(result);
+      else
+        return Quaternion<Fraction128>.FactoryIdentity;
+    }
+
+    /// <summary>Sphereically interpolates between two quaternions.</summary>
+    /// <param name="left">The starting point of the interpolation.</param>
+    /// <param name="right">The ending point of the interpolation.</param>
+    /// <param name="blend">The ratio of how far to interpolate between the left and right quaternions.</param>
+    /// <returns>The result of the interpolation.</returns>
+    public static Quaternion<Fraction128> Slerp(Quaternion<Fraction128> left, Quaternion<Fraction128> right, Fraction128 blend)
+    {
+      if (blend < 0 || blend > 1)
+        throw new Error("invalid blending value during lerp !(blend < 0.0f || blend > 1.0f).");
+      if (LinearAlgebra.MagnitudeSquared(left) == 0)
+      {
+        if (LinearAlgebra.MagnitudeSquared(right) == 0)
+          return Quaternion<Fraction128>.FactoryIdentity;
+        else
+          return new Quaternion<Fraction128>(right.X, right.Y, right.Z, right.W);
+      }
+      else if (LinearAlgebra.MagnitudeSquared(right) == 0)
+        return new Quaternion<Fraction128>(left.X, left.Y, left.Z, left.W);
+      Fraction128 cosHalfAngle = left.X * right.X + left.Y * right.Y + left.Z * right.Z + left.W * right.W;
+      if (cosHalfAngle >= 1 || cosHalfAngle <= -1)
+        return new Quaternion<Fraction128>(left.X, left.Y, left.Z, left.W);
+      else if (cosHalfAngle < 0)
+      {
+        right = new Quaternion<Fraction128>(-left.X, -left.Y, -left.Z, -left.W);
+        cosHalfAngle = -cosHalfAngle;
+      }
+      Fraction128 halfAngle = Trigonometry.arccos(cosHalfAngle);
+      Fraction128 sinHalfAngle = Trigonometry.sin(halfAngle);
+      Fraction128 blendA = Trigonometry.sin(halfAngle * (1 - blend)) / sinHalfAngle;
+      Fraction128 blendB = Trigonometry.sin(halfAngle * blend) / sinHalfAngle;
+      Quaternion<Fraction128> result = new Quaternion<Fraction128>(
+        blendA * left.X + blendB * right.X,
+        blendA * left.Y + blendB * right.Y,
+        blendA * left.Z + blendB * right.Z,
+        blendA * left.W + blendB * right.W);
+      if (LinearAlgebra.MagnitudeSquared(result) > 0)
+        return LinearAlgebra.Normalize(result);
+      else
+        return Quaternion<Fraction128>.FactoryIdentity;
+    }
+
+    /// <summary>Rotates a vector by a quaternion [v' = qvq'].</summary>
+    /// <param name="rotation">The quaternion to rotate the vector by.</param>
+    /// <param name="vector">The vector to be rotated by.</param>
+    /// <returns>The result of the rotation.</returns>
+    public static Vector<Fraction128> Rotate(Quaternion<Fraction128> rotation, Vector<Fraction128> vector)
+    {
+      if (vector.Dimensions != 3)
+        throw new Error("my quaternion rotations are only defined for 3-component vectors.");
+      Quaternion<Fraction128> answer = LinearAlgebra.Multiply(LinearAlgebra.Multiply(rotation, vector), LinearAlgebra.Conjugate(rotation));
+      return new Vector<Fraction128>(answer.X, answer.Y, answer.Z);
+    }
+
+    /// <summary>Does a value equality check.</summary>
+    /// <param name="left">The first quaternion to check for equality.</param>
+    /// <param name="right">The second quaternion  to check for equality.</param>
+    /// <returns>True if values are equal, false if not.</returns>
+    public static bool EqualsValue(Quaternion<Fraction128> left, Quaternion<Fraction128> right)
+    {
+      return
+        left.X == right.X &&
+        left.Y == right.Y &&
+        left.Z == right.Z &&
+        left.W == right.W;
+    }
+
+    /// <summary>Does a value equality check with leniency.</summary>
+    /// <param name="left">The first quaternion to check for equality.</param>
+    /// <param name="right">The second quaternion to check for equality.</param>
+    /// <param name="leniency">How much the values can vary but still be considered equal.</param>
+    /// <returns>True if values are equal, false if not.</returns>
+    public static bool EqualsValue(Quaternion<Fraction128> left, Quaternion<Fraction128> right, Fraction128 leniency)
+    {
+      return
+        Logic.Abs(left.X - right.X) < leniency &&
+        Logic.Abs(left.Y - right.Y) < leniency &&
+        Logic.Abs(left.Z - right.Z) < leniency &&
+        Logic.Abs(left.W - right.W) < leniency;
+    }
+
+    #endregion
+
+    #endregion
+
+    #region Fraction64
+
+    #region vector
+
+    /// <summary>Adds two vectors together.</summary>
+    /// <param name="left">The first vector of the addition.</param>
+    /// <param name="right">The second vector of the addiiton.</param>
+    /// <returns>The result of the addiion.</returns>
+    public static Fraction64[] Add(Fraction64[] left, Fraction64[] right)
+    {
+      if (left.Length != right.Length)
+        throw new Error("invalid dimensions on vector addition.");
+      Fraction64[] result = new Fraction64[left.Length];
+      for (int i = 0; i < left.Length; i++)
+        result[i] = left[i] + right[i];
+      return result;
+    }
+
+    /// <summary>Negates all the values in a vector.</summary>
+    /// <param name="vector">The vector to have its values negated.</param>
+    /// <returns>The result of the negations.</returns>
+    public static Fraction64[] Negate(Fraction64[] vector)
+    {
+      Fraction64[] result = new Fraction64[vector.Length];
+      for (int i = 0; i < vector.Length; i++)
+        result[i] = -vector[i];
+      return result;
+    }
+
+    /// <summary>Subtracts two vectors.</summary>
+    /// <param name="left">The left vector of the subtraction.</param>
+    /// <param name="right">The right vector of the subtraction.</param>
+    /// <returns>The result of the vector subtracton.</returns>
+    public static Fraction64[] Subtract(Fraction64[] left, Fraction64[] right)
+    {
+      if (left.Length != right.Length)
+        throw new Error("invalid dimensions on vector subtraction.");
+      Fraction64[] result = new Fraction64[left.Length];
+      for (int i = 0; i < left.Length; i++)
+        result[i] = left[i] - right[i];
+      return result;
+    }
+
+    /// <summary>Multiplies all the components of a vecotr by a scalar.</summary>
+    /// <param name="left">The vector to have the components multiplied by.</param>
+    /// <param name="right">The scalars to multiply the vector components by.</param>
+    /// <returns>The result of the multiplications.</returns>
+    public static Fraction64[] Multiply(Fraction64[] left, Fraction64 right)
+    {
+      Fraction64[] result = new Fraction64[left.Length];
+      for (int i = 0; i < left.Length; i++)
+        result[i] = left[i] * right;
+      return result;
+    }
+
+    /// <summary>Divides all the components of a vector by a scalar.</summary>
+    /// <param name="vector">The vector to have the components divided by.</param>
+    /// <param name="right">The scalar to divide the vector components by.</param>
+    /// <returns>The resulting vector after teh divisions.</returns>
+    public static Fraction64[] Divide(Fraction64[] vector, Fraction64 right)
+    {
+      Fraction64[] result = new Fraction64[vector.Length];
+      int arrayLength = vector.Length;
+      for (int i = 0; i < arrayLength; i++)
+        result[i] = vector[i] / right;
+      return result;
+    }
+
+    /// <summary>Computes the dot product between two vectors.</summary>
+    /// <param name="left">The first vector of the dot product operation.</param>
+    /// <param name="right">The second vector of the dot product operation.</param>
+    /// <returns>The result of the dot product operation.</returns>
+    public static Fraction64 DotProduct(Fraction64[] left, Fraction64[] right)
+    {
+      if (left.Length != right.Length)
+        throw new Error("invalid dimensions on vector dot product.");
+      Fraction64 result = 0;
+      for (int i = 0; i < left.Length; i++)
+        result += (left[i] * right[i]);
+      return result;
+    }
+
+    /// <summary>Computes teh cross product of two vectors.</summary>
+    /// <param name="left">The first vector of the cross product operation.</param>
+    /// <param name="right">The second vector of the cross product operation.</param>
+    /// <returns>The result of the cross product operation.</returns>
+    public static Fraction64[] CrossProduct(Fraction64[] left, Fraction64[] right)
+    {
+      if (left.Length != right.Length)
+        throw new Error("invalid cross product !(left.Dimensions == right.Dimensions)");
+      if (left.Length == 3 || left.Length == 4)
+      {
+        return new Fraction64[] {
+          left[1] * right[2] - left[2] * right[1],
+          left[2] * right[0] - left[0] * right[2],
+          left[0] * right[1] - left[1] * right[0] };
+      }
+      throw new Error("my cross product function is only defined for 3-component vectors.");
+    }
+
+    /// <summary>Normalizes a vector.</summary>
+    /// <param name="vector">The vector to normalize.</param>
+    /// <returns>The result of the normalization.</returns>
+    public static Fraction64[] Normalize(Fraction64[] vector)
+    {
+      Fraction64 length = LinearAlgebra.Magnitude(vector);
+      if (length != 0)
+      {
+        Fraction64[] result = new Fraction64[vector.Length];
+        for (int i = 0; i < vector.Length; i++)
+          result[i] = vector[i] / length;
+        return result;
+      }
+      else
+        return new Fraction64[vector.Length];
+    }
+
+    /// <summary>Computes the length of a vector.</summary>
+    /// <param name="vector">The vector to calculate the length of.</param>
+    /// <returns>The computed length of the vector.</returns>
+    public static Fraction64 Magnitude(Fraction64[] vector)
+    {
+      Fraction64 result = 0;
+      int arrayLength = vector.Length;
+      for (int i = 0; i < arrayLength; i++)
+        result += (vector[i] * vector[i]);
+      return (Fraction64)System.Math.Sqrt((double)result);
+    }
+
+    /// <summary>Computes the length of a vector but doesn't square root it for efficiency (length remains squared).</summary>
+    /// <param name="vector">The vector to compute the length squared of.</param>
+    /// <returns>The computed length squared of the vector.</returns>
+    public static Fraction64 MagnitudeSquared(Fraction64[] vector)
+    {
+      Fraction64 result = 0;
+      for (int i = 0; i < vector.Length; i++)
+        result += (vector[i] * vector[i]);
+      return result;
+    }
+
+    /// <summary>Computes the angle between two vectors.</summary>
+    /// <param name="first">The first vector to determine the angle between.</param>
+    /// <param name="second">The second vector to determine the angle between.</param>
+    /// <returns>The angle between the two vectors in radians.</returns>
+    public static Fraction64 Angle(Fraction64[] first, Fraction64[] second)
+    {
+      return (Fraction64)System.Math.Acos((double)(LinearAlgebra.DotProduct(first, second) / (LinearAlgebra.Magnitude(first) * LinearAlgebra.Magnitude(second))));
+    }
+
+    /// <summary>Rotates a vector by the specified axis and rotation values.</summary>
+    /// <param name="vector">The vector to rotate.</param>
+    /// <param name="angle">The angle of the rotation.</param>
+    /// <param name="x">The x component of the axis vector to rotate about.</param>
+    /// <param name="y">The y component of the axis vector to rotate about.</param>
+    /// <param name="z">The z component of the axis vector to rotate about.</param>
+    /// <returns>The result of the rotation.</returns>
+    public static Fraction64[] RotateBy(Fraction64[] vector, Fraction64 angle, Fraction64 x, Fraction64 y, Fraction64 z)
+    {
+      if (vector.Length == 3)
+      {
+        // Note: the angle is in radians
+        Fraction64 sinHalfAngle = (Fraction64)System.Math.Sin((double)angle / 2d);
+        Fraction64 cosHalfAngle = (Fraction64)System.Math.Cos((double)angle / 2d);
+        x *= sinHalfAngle;
+        y *= sinHalfAngle;
+        z *= sinHalfAngle;
+        Fraction64 x2 = cosHalfAngle * vector[0] + y * vector[2] - z * vector[1];
+        Fraction64 y2 = cosHalfAngle * vector[1] + z * vector[0] - x * vector[2];
+        Fraction64 z2 = cosHalfAngle * vector[2] + x * vector[1] - y * vector[0];
+        Fraction64 w2 = -x * vector[0] - y * vector[1] - z * vector[2];
+        return new Fraction64[] {
+          x * w2 + cosHalfAngle * x2 + y * z2 - z * y2,
+          y * w2 + cosHalfAngle * y2 + z * x2 - x * z2,
+          z * w2 + cosHalfAngle * z2 + x * y2 - y * x2 };
+      }
+      throw new Error("my RotateBy() function is only defined for 3-component vectors.");
+    }
+
+    /// <summary>Rotates a vector by a quaternion rotation.</summary>
+    /// <param name="vector">The vector to be rotated.</param>
+    /// <param name="quaternion">The rotation to be applied.</param>
+    /// <returns>The vector after the rotation.</returns>
+    public static Fraction64[] RotateBy(Fraction64[] vector, Quaternion<Fraction64> quaternion)
+    {
+      return Rotate(quaternion, vector);
+    }
+
+    /// <summary>Computes the linear interpolation between two vectors.</summary>
+    /// <param name="left">The starting vector of the interpolation.</param>
+    /// <param name="right">The ending vector of the interpolation.</param>
+    /// <param name="blend">The ratio 0.0 to 1.0 of the interpolation between the start and end.</param>
+    /// <returns>The result of the interpolation.</returns>
+    public static Fraction64[] Lerp(Fraction64[] left, Fraction64[] right, Fraction64 blend)
+    {
+      if (blend < 0 || blend > 1)
+        throw new Error("invalid lerp blend value: (blend < 0.0f || blend > 1.0f).");
+      if (left.Length != right.Length)
+        throw new Error("invalid lerp matrix length: (left.Dimensions != right.Dimensions)");
+      Fraction64[] result = new Fraction64[left.Length];
+      for (int i = 0; i < left.Length; i++)
+        result[i] = left[i] + blend * (right[i] - left[i]);
+      return result;
+    }
+
+    /// <summary>Sphereically interpolates between two vectors.</summary>
+    /// <param name="left">The starting vector of the interpolation.</param>
+    /// <param name="right">The ending vector of the interpolation.</param>
+    /// <param name="blend">The ratio 0.0 to 1.0 defining the interpolation distance between the two vectors.</param>
+    /// <returns>The result of the slerp operation.</returns>
+    public static Fraction64[] Slerp(Fraction64[] left, Fraction64[] right, Fraction64 blend)
+    {
+      if (blend < 0 || blend > 1)
+        throw new Error("invalid slerp blend value: (blend < 0.0f || blend > 1.0f).");
+      Fraction64 dot = LinearAlgebra.DotProduct(left, right);
+      dot = dot < -1 ? -1 : dot;
+      dot = dot > 1 ? 1 : dot;
+      Fraction64 theta = (Fraction64)System.Math.Acos((double)dot) * blend;
+      return LinearAlgebra.Multiply(LinearAlgebra.Add(LinearAlgebra.Multiply(left, (Fraction64)System.Math.Cos((double)theta)),
+        LinearAlgebra.Normalize(LinearAlgebra.Subtract(right, LinearAlgebra.Multiply(left, dot)))), (Fraction64)System.Math.Sin((double)theta));
+    }
+
+    /// <summary>Interpolates between three vectors using barycentric coordinates.</summary>
+    /// <param name="a">The first vector of the interpolation.</param>
+    /// <param name="b">The second vector of the interpolation.</param>
+    /// <param name="c">The thrid vector of the interpolation.</param>
+    /// <param name="u">The "U" value of the barycentric interpolation equation.</param>
+    /// <param name="v">The "V" value of the barycentric interpolation equation.</param>
+    /// <returns>The resulting vector of the barycentric interpolation.</returns>
+    public static Fraction64[] Blerp(Fraction64[] a, Fraction64[] b, Fraction64[] c, Fraction64 u, Fraction64 v)
+    {
+      return LinearAlgebra.Add(LinearAlgebra.Add(LinearAlgebra.Multiply(LinearAlgebra.Subtract(b, a), u),
+        LinearAlgebra.Multiply(LinearAlgebra.Subtract(c, a), v)), a);
+    }
+
+    /// <summary>Does a value equality check.</summary>
+    /// <param name="left">The first matrix to check for equality.</param>
+    /// <param name="right">The second matrix to check for equality.</param>
+    /// <returns>True if values are equal, false if not.</returns>
+    public static bool EqualsValue(Fraction64[] left, Fraction64[] right)
+    {
+      if (left.GetLength(0) != right.GetLength(0))
+        return false;
+      for (int i = 0; i < left.GetLength(0); i++)
+        if (left[i] != right[i])
+          return false;
+      return true;
+    }
+
+    /// <summary>Does a value equality check with leniency.</summary>
+    /// <param name="left">The first matrix to check for equality.</param>
+    /// <param name="right">The second matrix to check for equality.</param>
+    /// <param name="leniency">How much the values can vary but still be considered equal.</param>
+    /// <returns>True if values are equal, false if not.</returns>
+    public static bool EqualsValue(Fraction64[] left, Fraction64[] right, Fraction64 leniency)
+    {
+      if (left.GetLength(0) != right.GetLength(0) || left.GetLength(1) != right.GetLength(1))
+        return false;
+      for (int i = 0; i < left.GetLength(0); i++)
+        if (Logic.Abs(left[i] - right[i]) > leniency)
+          return false;
+      return true;
+    }
+
+    #endregion
+
+    #region matrix
+
+    /// <summary>Constructs a new identity-matrix of the given dimensions.</summary>
+    /// <param name="rows">The number of rows of the matrix.</param>
+    /// <param name="columns">The number of columns of the matrix.</param>
+    /// <returns>The newly constructed identity-matrix.</returns>
+    public static Fraction64[,] MatrixFactoryIdentity_Fraction64(int rows, int columns)
+    {
+      Fraction64[,] matrix;
+      try { matrix = new Fraction64[rows, columns]; }
+      catch { throw new Error("invalid dimensions."); }
+      if (rows <= columns)
+        for (int i = 0; i < rows; i++)
+          matrix[i, i] = 1;
+      else
+        for (int i = 0; i < columns; i++)
+          matrix[i, i] = 1;
+      return matrix;
+    }
+
+    /// <summary>Determines if a matrix is symetric or not.</summary>
+    /// <param name="matrix">The matrix to determine symetry of.</param>
+    /// <returns>True if symetric; false if not.</returns>
+    public static bool IsSymmetric(Fraction64[,] matrix)
+    {
+      int rows = matrix.GetLength(0);
+      int cols = matrix.GetLength(1);
+
+      if (rows != cols)
+        return false;
+
+      for (var row = 0; row < rows; row++)
+        for (var column = row + 1; column < cols; column++)
+          if (matrix[row, column] != matrix[column, row])
+            return false;
+
+      return true;
+    }
+
+    /// <summary>Negates all the values in a matrix.</summary>
+    /// <param name="matrix">The matrix to have its values negated.</param>
+    /// <returns>The resulting matrix after the negations.</returns>
+    public static Fraction64[,] Negate(Fraction64[,] matrix)
+    {
+      Fraction64[,] result = new Fraction64[matrix.GetLength(0), matrix.GetLength(1)];
+      for (int i = 0; i < matrix.GetLength(0); i++)
+        for (int j = 0; j < matrix.GetLength(1); j++)
+          result[i, j] = -matrix[i, j];
+      return result;
+    }
+
+    /// <summary>Does standard addition of two matrices.</summary>
+    /// <param name="left">The left matrix of the addition.</param>
+    /// <param name="right">The right matrix of the addition.</param>
+    /// <returns>The resulting matrix after the addition.</returns>
+    public static Fraction64[,] Add(Fraction64[,] left, Fraction64[,] right)
+    {
+      if (left.GetLength(0) != right.GetLength(0) || left.GetLength(1) != right.GetLength(1))
+        throw new Error("invalid addition (size miss-match).");
+      Fraction64[,] result = new Fraction64[left.GetLength(0), left.GetLength(1)];
+      for (int i = 0; i < result.GetLength(0); i++)
+        for (int j = 0; j < result.GetLength(1); j++)
+          result[i, j] = left[i, j] + right[i, j];
+      return result;
+    }
+
+    /// <summary>Subtracts a scalar from all the values in a matrix.</summary>
+    /// <param name="left">The matrix to have the values subtracted from.</param>
+    /// <param name="right">The scalar to subtract from all the matrix values.</param>
+    /// <returns>The resulting matrix after the subtractions.</returns>
+    public static Fraction64[,] Subtract(Fraction64[,] left, Fraction64[,] right)
+    {
+      if (left.GetLength(0) != right.GetLength(0) || left.GetLength(1) != right.GetLength(1))
+        throw new Error("invalid subtraction (size miss-match).");
+      Fraction64[,] result = new Fraction64[left.GetLength(0), left.GetLength(1)];
+      for (int i = 0; i < result.GetLength(0); i++)
+        for (int j = 0; j < result.GetLength(1); j++)
+          result[i, j] = left[i, j] - right[i, j];
+      return result;
+    }
+
+    /// <summary>Performs multiplication on two matrices.</summary>
+    /// <param name="left">The left matrix of the multiplication.</param>
+    /// <param name="right">The right matrix of the multiplication.</param>
+    /// <returns>The resulting matrix of the multiplication.</returns>
+    public static Fraction64[,] Multiply(Fraction64[,] left, Fraction64[,] right)
+    {
+      if (left.GetLength(1) != right.GetLength(0))
+        throw new LinearAlgebra.Error("invalid multiplication (size miss-match).");
+      Fraction64[,] result = new Fraction64[left.GetLength(0), right.GetLength(1)];
+      for (int i = 0; i < result.GetLength(0); i++)
+        for (int j = 0; j < result.GetLength(1); j++)
+          for (int k = 0; k < left.GetLength(1); k++)
+            result[i, j] += left[i, k] * right[k, j];
+      return result;
+    }
+
+    /// <summary>Does a standard (triple for looped) multiplication between matrices.</summary>
+    /// <param name="left">The left matrix of the multiplication.</param>
+    /// <param name="right">The right matrix of the multiplication.</param>
+    /// <returns>The resulting matrix of the multiplication.</returns>
+    public static Fraction64[] Multiply(Fraction64[,] left, Fraction64[] right)
+    {
+      if (left.GetLength(1) != right.GetLength(0))
+        throw new Error("invalid multiplication (size miss-match).");
+      Fraction64[] result = new Fraction64[left.GetLength(1)];
+      for (int i = 0; i < left.GetLength(0); i++)
+        for (int j = 0; j < right.GetLength(1); j++)
+          result[i] = result[i] + left[i, j] * right[j];
+      return result;
+    }
+
+    /// <summary>Multiplies all the values in a matrix by a scalar.</summary>
+    /// <param name="left">The matrix to have the values multiplied.</param>
+    /// <param name="right">The scalar to multiply the values by.</param>
+    /// <returns>The resulting matrix after the multiplications.</returns>
+    public static Fraction64[,] Multiply(Fraction64[,] left, Fraction64 right)
+    {
+      Fraction64[,] result = new Fraction64[left.GetLength(0), left.GetLength(1)];
+      for (int i = 0; i < left.GetLength(0); i++)
+        for (int j = 0; j < left.GetLength(1); j++)
+          result[i, j] = left[i, j] * right;
+      return result;
+    }
+
+    /// <summary>Applies a power to a square matrix.</summary>
+    /// <param name="matrix">The matrix to be powered by.</param>
+    /// <param name="power">The power to apply to the matrix.</param>
+    /// <returns>The resulting matrix of the power operation.</returns>
+    public static Fraction64[,] Power(Fraction64[,] matrix, int power)
+    {
+      if (!(matrix.GetLength(0) == matrix.GetLength(1)))
+        throw new Error("invalid power (!matrix.IsSquare).");
+      if (!(power >= 0))
+        throw new Error("invalid power !(power > -1)");
+      if (power == 0)
+        return LinearAlgebra.MatrixFactoryIdentity_Fraction64(matrix.GetLength(0), matrix.GetLength(1));
+      Fraction64[,] result = matrix.Clone() as Fraction64[,];
+      for (int i = 0; i < power; i++)
+        result = LinearAlgebra.Multiply(result, result);
+      return result;
+    }
+
+    /// <summary>Divides all the values in the matrix by a scalar.</summary>
+    /// <param name="matrix">The matrix to divide the values of.</param>
+    /// <param name="right">The scalar to divide all the matrix values by.</param>
+    /// <returns>The resulting matrix with the divided values.</returns>
+    public static Fraction64[,] Divide(Fraction64[,] matrix, Fraction64 right)
+    {
+      Fraction64[,] result = new Fraction64[matrix.GetLength(0), matrix.GetLength(1)];
+      for (int i = 0; i < matrix.GetLength(0); i++)
+        for (int j = 0; j < matrix.GetLength(1); j++)
+          result[i, j] = matrix[i, j] / right;
+      return result;
+    }
+
+    /// <summary>Gets the minor of a matrix.</summary>
+    /// <param name="matrix">The matrix to get the minor of.</param>
+    /// <param name="row">The restricted row to form the minor.</param>
+    /// <param name="column">The restricted column to form the minor.</param>
+    /// <returns>The minor of the matrix.</returns>
+    public static Fraction64[,] Minor(Fraction64[,] matrix, int row, int column)
+    {
+      Fraction64[,] minor = new Fraction64[matrix.GetLength(0) - 1, matrix.GetLength(1) - 1];
+      int m = 0, n = 0;
+      for (int i = 0; i < matrix.GetLength(0); i++)
+      {
+        if (i == row) continue;
+        n = 0;
+        for (int j = 0; j < matrix.GetLength(1); j++)
+        {
+          if (j == column) continue;
+          minor[m, n] = matrix[i, j];
+          n++;
+        }
+        m++;
+      }
+      return minor;
+    }
+
+    /// <summary>Combines two matrices from left to right 
+    /// (result.Rows = left.Rows && result.Columns = left.Columns + right.Columns).</summary>
+    /// <param name="left">The left matrix of the concatenation.</param>
+    /// <param name="right">The right matrix of the concatenation.</param>
+    /// <returns>The resulting matrix of the concatenation.</returns>
+    public static Fraction64[,] ConcatenateRowWise(Fraction64[,] left, Fraction64[,] right)
+    {
+      if (left.GetLength(0) != right.GetLength(0))
+        throw new Error("invalid row-wise concatenation !(left.Rows == right.Rows).");
+      Fraction64[,] result = new Fraction64[left.GetLength(0), left.GetLength(1) + right.GetLength(1)];
+      for (int i = 0; i < result.GetLength(0); i++)
+        for (int j = 0; j < result.GetLength(1); j++)
+        {
+          if (j < left.GetLength(1)) result[i, j] = left[i, j];
+          else result[i, j] = right[i, j - left.GetLength(1)];
+        }
+      return result;
+    }
+
+    /// <summary>Calculates the echelon of a matrix (aka REF).</summary>
+    /// <param name="matrix">The matrix to calculate the echelon of (aka REF).</param>
+    /// <returns>The echelon of the matrix (aka REF).</returns>
+    public static Fraction64[,] Echelon(Fraction64[,] matrix)
+    {
+      try
+      {
+        Fraction64[,] result = matrix.Clone() as Fraction64[,];
+        for (int i = 0; i < matrix.GetLength(0); i++)
+        {
+          if (result[i, i] == 0)
+            for (int j = i + 1; j < result.GetLength(0); j++)
+              if (result[j, i] != 0)
+                LinearAlgebra.SwapRows(result, i, j);
+          if (result[i, i] == 0)
+            continue;
+          if (result[i, i] != 1)
+            for (int j = i + 1; j < result.GetLength(0); j++)
+              if (result[j, i] == 1)
+                LinearAlgebra.SwapRows(result, i, j);
+          LinearAlgebra.RowMultiplication(result, i, 1 / result[i, i]);
+          for (int j = i + 1; j < result.GetLength(0); j++)
+            LinearAlgebra.RowAddition(result, j, i, -result[j, i]);
+        }
+        return result;
+      }
+      catch { throw new Error("echelon computation failed."); }
+    }
+
+    /// <summary>Calculates the echelon of a matrix and reduces it (aka RREF).</summary>
+    /// <param name="matrix">The matrix matrix to calculate the reduced echelon of (aka RREF).</param>
+    /// <returns>The reduced echelon of the matrix (aka RREF).</returns>
+    public static Fraction64[,] ReducedEchelon(Fraction64[,] matrix)
+    {
+      try
+      {
+        Fraction64[,] result = matrix.Clone() as Fraction64[,];
+        for (int i = 0; i < matrix.GetLength(0); i++)
+        {
+          if (result[i, i] == 0)
+            for (int j = i + 1; j < result.GetLength(0); j++)
+              if (result[j, i] != 0)
+                LinearAlgebra.SwapRows(result, i, j);
+          if (result[i, i] == 0) continue;
+          if (result[i, i] != 1)
+            for (int j = i + 1; j < result.GetLength(0); j++)
+              if (result[j, i] == 1)
+                LinearAlgebra.SwapRows(result, i, j);
+          LinearAlgebra.RowMultiplication(result, i, 1 / result[i, i]);
+          for (int j = i + 1; j < result.GetLength(0); j++)
+            LinearAlgebra.RowAddition(result, j, i, -result[j, i]);
+          for (int j = i - 1; j >= 0; j--)
+            LinearAlgebra.RowAddition(result, j, i, -result[j, i]);
+        }
+        return result;
+      }
+      catch (Error e) { throw new Error("reduced echelon calculation failed."); }
+    }
+
+    /// <summary>Calculates the determinent of a square matrix.</summary>
+    /// <param name="matrix">The matrix to calculate the determinent of.</param>
+    /// <returns>The determinent of the matrix.</returns>
+    public static Fraction64 Determinent(Fraction64[,] matrix)
+    {
+      if (!(matrix.GetLength(0) == matrix.GetLength(1)))
+        throw new Error("invalid determinent !(matrix.IsSquare).");
+      try
+      {
+        Fraction64 det = 1;
+        Fraction64[,] rref = matrix.Clone() as Fraction64[,];
+        for (int i = 0; i < matrix.GetLength(0); i++)
+        {
+          if (rref[i, i] == 0)
+            for (int j = i + 1; j < rref.GetLength(0); j++)
+              if (rref[j, i] != 0)
+              {
+                LinearAlgebra.SwapRows(rref, i, j);
+                det *= -1;
+              }
+          det *= rref[i, i];
+          LinearAlgebra.RowMultiplication(rref, i, 1 / rref[i, i]);
+          for (int j = i + 1; j < rref.GetLength(0); j++)
+            LinearAlgebra.RowAddition(rref, j, i, -rref[j, i]);
+          for (int j = i - 1; j >= 0; j--)
+            LinearAlgebra.RowAddition(rref, j, i, -rref[j, i]);
+        }
+        return det;
+      }
+      catch { throw new Error("determinent computation failed."); }
+    }
+
+    /// <summary>Calculates the inverse of a matrix.</summary>
+    /// <param name="matrix">The matrix to calculate the inverse of.</param>
+    /// <returns>The inverse of the matrix.</returns>
+    public static Fraction64[,] Inverse(Fraction64[,] matrix)
+    {
+      if (LinearAlgebra.Determinent(matrix) == 0)
+        throw new Error("inverse calculation failed.");
+      try
+      {
+        Fraction64[,] identity = LinearAlgebra.MatrixFactoryIdentity_Fraction64(matrix.GetLength(0), matrix.GetLength(1));
+        Fraction64[,] rref = matrix.Clone() as Fraction64[,];
+        for (int i = 0; i < matrix.GetLength(0); i++)
+        {
+          if (rref[i, i] == 0)
+            for (int j = i + 1; j < rref.GetLength(0); j++)
+              if (rref[j, i] != 0)
+              {
+                LinearAlgebra.SwapRows(rref, i, j);
+                LinearAlgebra.SwapRows(identity, i, j);
+              }
+          LinearAlgebra.RowMultiplication(identity, i, 1 / rref[i, i]);
+          LinearAlgebra.RowMultiplication(rref, i, 1 / rref[i, i]);
+          for (int j = i + 1; j < rref.GetLength(0); j++)
+          {
+            LinearAlgebra.RowAddition(identity, j, i, -rref[j, i]);
+            LinearAlgebra.RowAddition(rref, j, i, -rref[j, i]);
+          }
+          for (int j = i - 1; j >= 0; j--)
+          {
+            LinearAlgebra.RowAddition(identity, j, i, -rref[j, i]);
+            LinearAlgebra.RowAddition(rref, j, i, -rref[j, i]);
+          }
+        }
+        return identity;
+      }
+      catch { throw new Error("inverse calculation failed."); }
+    }
+
+    /// <summary>Calculates the adjoint of a matrix.</summary>
+    /// <param name="matrix">The matrix to calculate the adjoint of.</param>
+    /// <returns>The adjoint of the matrix.</returns>
+    public static Fraction64[,] Adjoint(Fraction64[,] matrix)
+    {
+      if (!(matrix.GetLength(0) == matrix.GetLength(1)))
+        throw new Error("Adjoint of a non-square matrix does not exists");
+      Fraction64[,] AdjointMatrix = new Fraction64[matrix.GetLength(0), matrix.GetLength(1)];
+      for (int i = 0; i < matrix.GetLength(0); i++)
+        for (int j = 0; j < matrix.GetLength(1); j++)
+          if ((i + j) % 2 == 0)
+            AdjointMatrix[i, j] = LinearAlgebra.Determinent(LinearAlgebra.Minor(matrix, i, j));
+          else
+            AdjointMatrix[i, j] = -LinearAlgebra.Determinent(LinearAlgebra.Minor(matrix, i, j));
+      return LinearAlgebra.Transpose(AdjointMatrix);
+    }
+
+    /// <summary>Returns the transpose of a matrix.</summary>
+    /// <param name="matrix">The matrix to transpose.</param>
+    /// <returns>The transpose of the matrix.</returns>
+    public static Fraction64[,] Transpose(Fraction64[,] matrix)
+    {
+      Fraction64[,] transpose = new Fraction64[matrix.GetLength(1), matrix.GetLength(0)];
+      for (int i = 0; i < transpose.GetLength(0); i++)
+        for (int j = 0; j < transpose.GetLength(1); j++)
+          transpose[i, j] = matrix[j, i];
+      return transpose;
+    }
+
+    /// <summary>Decomposes a matrix into lower-upper reptresentation.</summary>
+    /// <param name="matrix">The matrix to decompose.</param>
+    /// <param name="Lower">The computed lower triangular matrix.</param>
+    /// <param name="Upper">The computed upper triangular matrix.</param>
+    public static void DecomposeLU(Fraction64[,] matrix, out Fraction64[,] Lower, out Fraction64[,] Upper)
+    {
+      if (!(matrix.GetLength(0) == matrix.GetLength(1)))
+        throw new Error("The matrix is not square!");
+      Lower = LinearAlgebra.MatrixFactoryIdentity_Fraction64(matrix.GetLength(0), matrix.GetLength(1));
+      Upper = matrix.Clone() as Fraction64[,];
+      int[] permutation = new int[matrix.GetLength(0)];
+      for (int i = 0; i < matrix.GetLength(0); i++) permutation[i] = i;
+      Fraction64 p = 0, pom2, detOfP = 1;
+      int k0 = 0, pom1 = 0;
+      for (int k = 0; k < matrix.GetLength(1) - 1; k++)
+      {
+        p = 0;
+        for (int i = k; i < matrix.GetLength(0); i++)
+          if ((Upper[i, k] > 0 ? Upper[i, k] : -Upper[i, k]) > p)
+          {
+            p = Upper[i, k] > 0 ? Upper[i, k] : -Upper[i, k];
+            k0 = i;
+          }
+        if (p == 0)
+          throw new Error("The matrix is singular!");
+        pom1 = permutation[k];
+        permutation[k] = permutation[k0];
+        permutation[k0] = pom1;
+        for (int i = 0; i < k; i++)
+        {
+          pom2 = Lower[k, i];
+          Lower[k, i] = Lower[k0, i];
+          Lower[k0, i] = pom2;
+        }
+        if (k != k0)
+          detOfP *= -1;
+        for (int i = 0; i < matrix.GetLength(1); i++)
+        {
+          pom2 = Upper[k, i];
+          Upper[k, i] = Upper[k0, i];
+          Upper[k0, i] = pom2;
+        }
+        for (int i = k + 1; i < matrix.GetLength(0); i++)
+        {
+          Lower[i, k] = Upper[i, k] / Upper[k, k];
+          for (int j = k; j < matrix.GetLength(1); j++)
+            Upper[i, j] = Upper[i, j] - Lower[i, k] * Upper[k, j];
+        }
+      }
+    }
+
+    /// <summary>Creates a copy of a matrix.</summary>
+    /// <param name="matrix">The matrix to copy.</param>
+    /// <returns>A copy of the matrix.</returns>
+    public static Fraction64[,] Clone(Fraction64[,] matrix)
+    {
+      Fraction64[,] result = new Fraction64[matrix.GetLength(0), matrix.GetLength(1)];
+      for (int i = 0; i < matrix.GetLength(0); i++)
+        for (int j = 0; j < matrix.GetLength(1); j++)
+          result[i, j] = matrix[i, j];
+      return result;
+    }
+
+    private static void RowMultiplication(Fraction64[,] matrix, int row, Fraction64 scalar)
+    {
+      for (int j = 0; j < matrix.GetLength(1); j++)
+        matrix[row, j] *= scalar;
+    }
+
+    private static void RowAddition(Fraction64[,] matrix, int target, int second, Fraction64 scalar)
+    {
+      for (int j = 0; j < matrix.GetLength(1); j++)
+        matrix[target, j] += (matrix[second, j] * scalar);
+    }
+
+    private static void SwapRows(Fraction64[,] matrix, int row1, int row2)
+    {
+      for (int j = 0; j < matrix.GetLength(1); j++)
+      {
+        Fraction64 temp = matrix[row1, j];
+        matrix[row1, j] = matrix[row2, j];
+        matrix[row2, j] = temp;
+      }
+    }
+
+    /// <summary>Does a value equality check.</summary>
+    /// <param name="left">The first matrix to check for equality.</param>
+    /// <param name="right">The second matrix to check for equality.</param>
+    /// <returns>True if values are equal, false if not.</returns>
+    public static bool EqualsValue(Fraction64[,] left, Fraction64[,] right)
+    {
+      if (left.GetLength(0) != right.GetLength(0) || left.GetLength(1) != right.GetLength(1))
+        return false;
+      for (int i = 0; i < left.GetLength(0); i++)
+        for (int j = 0; j < left.GetLength(1); j++)
+          if (left[i, j] != right[i, j])
+            return false;
+      return true;
+    }
+
+    /// <summary>Does a value equality check with leniency.</summary>
+    /// <param name="left">The first matrix to check for equality.</param>
+    /// <param name="right">The second matrix to check for equality.</param>
+    /// <param name="leniency">How much the values can vary but still be considered equal.</param>
+    /// <returns>True if values are equal, false if not.</returns>
+    public static bool EqualsValue(Fraction64[,] left, Fraction64[,] right, Fraction64 leniency)
+    {
+      if (left.GetLength(0) != right.GetLength(0) || left.GetLength(1) != right.GetLength(1))
+        return false;
+      for (int i = 0; i < left.GetLength(0); i++)
+        for (int j = 0; j < left.GetLength(1); j++)
+          if (Logic.Abs(left[i, j] - right[i, j]) > leniency)
+            return false;
+      return true;
+    }
+
+    #endregion
+
+    #region quaterion
+
+    /// <summary>Computes the length of quaternion.</summary>
+    /// <param name="quaternion">The quaternion to compute the length of.</param>
+    /// <returns>The length of the given quaternion.</returns>
+    public static Fraction64 Magnitude(Quaternion<Fraction64> quaternion)
+    {
+      return Algebra.sqrt(
+          (quaternion.X * quaternion.X +
+          quaternion.Y * quaternion.Y +
+          quaternion.Z * quaternion.Z +
+          quaternion.W * quaternion.W));
+    }
+
+    /// <summary>Computes the length of a quaternion, but doesn't square root it
+    /// for optimization possibilities.</summary>
+    /// <param name="quaternion">The quaternion to compute the length squared of.</param>
+    /// <returns>The squared length of the given quaternion.</returns>
+    public static Fraction64 MagnitudeSquared(Quaternion<Fraction64> quaternion)
+    {
+      return
+        quaternion.X * quaternion.X +
+        quaternion.Y * quaternion.Y +
+        quaternion.Z * quaternion.Z +
+        quaternion.W * quaternion.W;
+    }
+
+    /// <summary>Gets the conjugate of the quaternion.</summary>
+    /// <param name="quaternion">The quaternion to conjugate.</param>
+    /// <returns>The conjugate of teh given quaternion.</returns>
+    public static Quaternion<Fraction64> Conjugate(Quaternion<Fraction64> quaternion)
+    {
+      return new Quaternion<Fraction64>(
+        -quaternion.X,
+        -quaternion.Y,
+        -quaternion.Z,
+        quaternion.W);
+    }
+
+    /// <summary>Adds two quaternions together.</summary>
+    /// <param name="left">The first quaternion of the addition.</param>
+    /// <param name="right">The second quaternion of the addition.</param>
+    /// <returns>The result of the addition.</returns>
+    public static Quaternion<Fraction64> Add(Quaternion<Fraction64> left, Quaternion<Fraction64> right)
+    {
+      return new Quaternion<Fraction64>(
+        left.X + right.X,
+        left.Y + right.Y,
+        left.Z + right.Z,
+        left.W + right.W);
+    }
+
+    /// <summary>Subtracts two quaternions.</summary>
+    /// <param name="left">The left quaternion of the subtraction.</param>
+    /// <param name="right">The right quaternion of the subtraction.</param>
+    /// <returns>The resulting quaternion after the subtraction.</returns>
+    public static Quaternion<Fraction64> Subtract(Quaternion<Fraction64> left, Quaternion<Fraction64> right)
+    {
+      return new Quaternion<Fraction64>(
+        left.X - right.X,
+        left.Y - right.Y,
+        left.Z - right.Z,
+        left.W - right.W);
+    }
+
+    /// <summary>Multiplies two quaternions together.</summary>
+    /// <param name="left">The first quaternion of the multiplication.</param>
+    /// <param name="right">The second quaternion of the multiplication.</param>
+    /// <returns>The resulting quaternion after the multiplication.</returns>
+    public static Quaternion<Fraction64> Multiply(Quaternion<Fraction64> left, Quaternion<Fraction64> right)
+    {
+      return new Quaternion<Fraction64>(
+        left.X * right.W + left.W * right.X + left.Y * right.Z - left.Z * right.Y,
+        left.Y * right.W + left.W * right.Y + left.Z * right.X - left.X * right.Z,
+        left.Z * right.W + left.W * right.Z + left.X * right.Y - left.Y * right.X,
+        left.W * right.W - left.X * right.X - left.Y * right.Y - left.Z * right.Z);
+    }
+
+    /// <summary>Multiplies all the values of the quaternion by a scalar value.</summary>
+    /// <param name="left">The quaternion of the multiplication.</param>
+    /// <param name="right">The scalar of the multiplication.</param>
+    /// <returns>The result of multiplying all the values in the quaternion by the scalar.</returns>
+    public static Quaternion<Fraction64> Multiply(Quaternion<Fraction64> left, Fraction64 right)
+    {
+      return new Quaternion<Fraction64>(
+        left.X * right,
+        left.Y * right,
+        left.Z * right,
+        left.W * right);
+    }
+
+    /// <summary>Pre-multiplies a 3-component vector by a quaternion.</summary>
+    /// <param name="left">The quaternion to pre-multiply the vector by.</param>
+    /// <param name="right">The vector to be multiplied.</param>
+    /// <returns>The resulting quaternion of the multiplication.</returns>
+    public static Quaternion<Fraction64> Multiply(Quaternion<Fraction64> left, Vector<Fraction64> right)
+    {
+      if (right.Dimensions == 3)
+      {
+        return new Quaternion<Fraction64>(
+          left.W * right.X + left.Y * right.Z - left.Z * right.Y,
+          left.W * right.Y + left.Z * right.X - left.X * right.Z,
+          left.W * right.Z + left.X * right.Y - left.Y * right.X,
+          -left.X * right.X - left.Y * right.Y - left.Z * right.Z);
+      }
+      else
+        throw new Error("my quaternion rotations are only defined for 3-component vectors.");
+    }
+
+    /// <summary>Normalizes the quaternion.</summary>
+    /// <param name="quaternion">The quaternion to normalize.</param>
+    /// <returns>The normalization of the given quaternion.</returns>
+    public static Quaternion<Fraction64> Normalize(Quaternion<Fraction64> quaternion)
+    {
+      Fraction64 normalizer = Quaternion<Fraction64>.Magnitude(quaternion);
+      if (normalizer != 0)
+        return quaternion * (1 / normalizer);
+      else
+        return Quaternion<Fraction64>.FactoryIdentity;
+    }
+
+    /// <summary>Inverts a quaternion.</summary>
+    /// <param name="quaternion">The quaternion to find the inverse of.</param>
+    /// <returns>The inverse of the given quaternion.</returns>
+    public static Quaternion<Fraction64> Invert(Quaternion<Fraction64> quaternion)
+    {
+      Fraction64 normalizer = Quaternion<Fraction64>.MagnitudeSquared(quaternion);
+      if (normalizer == 0)
+        return new Quaternion<Fraction64>(quaternion.X, quaternion.Y, quaternion.Z, quaternion.W);
+      normalizer = 1 / normalizer;
+      return new Quaternion<Fraction64>(
+        -quaternion.X * normalizer,
+        -quaternion.Y * normalizer,
+        -quaternion.Z * normalizer,
+        quaternion.W * normalizer);
+    }
+
+    /// <summary>Lenearly interpolates between two quaternions.</summary>
+    /// <param name="left">The starting point of the interpolation.</param>
+    /// <param name="right">The ending point of the interpolation.</param>
+    /// <param name="blend">The ratio 0.0-1.0 of how far to interpolate between the left and right quaternions.</param>
+    /// <returns>The result of the interpolation.</returns>
+    public static Quaternion<Fraction64> Lerp(Quaternion<Fraction64> left, Quaternion<Fraction64> right, Fraction64 blend)
+    {
+      if (blend < 0 || blend > 1)
+        throw new Error("invalid blending value during lerp !(blend < 0.0f || blend > 1.0f).");
+      if (Quaternion<Fraction64>.MagnitudeSquared(left) == 0)
+      {
+        if (Quaternion<Fraction64>.MagnitudeSquared(right) == 0)
+          return Quaternion<Fraction64>.FactoryIdentity;
+        else
+          return new Quaternion<Fraction64>(right.X, right.Y, right.Z, right.W);
+      }
+      else if (Quaternion<Fraction64>.MagnitudeSquared(right) == 0)
+        return new Quaternion<Fraction64>(left.X, left.Y, left.Z, left.W);
+      Quaternion<Fraction64> result = new Quaternion<Fraction64>(
+        1 - blend * left.X + blend * right.X,
+        1 - blend * left.Y + blend * right.Y,
+        1 - blend * left.Z + blend * right.Z,
+        1 - blend * left.W + blend * right.W);
+      if (Quaternion<Fraction64>.MagnitudeSquared(result) > 0)
+        return Quaternion<Fraction64>.Normalize(result);
+      else
+        return Quaternion<Fraction64>.FactoryIdentity;
+    }
+
+    /// <summary>Sphereically interpolates between two quaternions.</summary>
+    /// <param name="left">The starting point of the interpolation.</param>
+    /// <param name="right">The ending point of the interpolation.</param>
+    /// <param name="blend">The ratio of how far to interpolate between the left and right quaternions.</param>
+    /// <returns>The result of the interpolation.</returns>
+    public static Quaternion<Fraction64> Slerp(Quaternion<Fraction64> left, Quaternion<Fraction64> right, Fraction64 blend)
+    {
+      if (blend < 0 || blend > 1)
+        throw new Error("invalid blending value during lerp !(blend < 0.0f || blend > 1.0f).");
+      if (LinearAlgebra.MagnitudeSquared(left) == 0)
+      {
+        if (LinearAlgebra.MagnitudeSquared(right) == 0)
+          return Quaternion<Fraction64>.FactoryIdentity;
+        else
+          return new Quaternion<Fraction64>(right.X, right.Y, right.Z, right.W);
+      }
+      else if (LinearAlgebra.MagnitudeSquared(right) == 0)
+        return new Quaternion<Fraction64>(left.X, left.Y, left.Z, left.W);
+      Fraction64 cosHalfAngle = left.X * right.X + left.Y * right.Y + left.Z * right.Z + left.W * right.W;
+      if (cosHalfAngle >= 1 || cosHalfAngle <= -1)
+        return new Quaternion<Fraction64>(left.X, left.Y, left.Z, left.W);
+      else if (cosHalfAngle < 0)
+      {
+        right = new Quaternion<Fraction64>(-left.X, -left.Y, -left.Z, -left.W);
+        cosHalfAngle = -cosHalfAngle;
+      }
+      Fraction64 halfAngle = Trigonometry.arccos(cosHalfAngle);
+      Fraction64 sinHalfAngle = Trigonometry.sin(halfAngle);
+      Fraction64 blendA = Trigonometry.sin(halfAngle * (1 - blend)) / sinHalfAngle;
+      Fraction64 blendB = Trigonometry.sin(halfAngle * blend) / sinHalfAngle;
+      Quaternion<Fraction64> result = new Quaternion<Fraction64>(
+        blendA * left.X + blendB * right.X,
+        blendA * left.Y + blendB * right.Y,
+        blendA * left.Z + blendB * right.Z,
+        blendA * left.W + blendB * right.W);
+      if (LinearAlgebra.MagnitudeSquared(result) > 0)
+        return LinearAlgebra.Normalize(result);
+      else
+        return Quaternion<Fraction64>.FactoryIdentity;
+    }
+
+    /// <summary>Rotates a vector by a quaternion [v' = qvq'].</summary>
+    /// <param name="rotation">The quaternion to rotate the vector by.</param>
+    /// <param name="vector">The vector to be rotated by.</param>
+    /// <returns>The result of the rotation.</returns>
+    public static Vector<Fraction64> Rotate(Quaternion<Fraction64> rotation, Vector<Fraction64> vector)
+    {
+      if (vector.Dimensions != 3)
+        throw new Error("my quaternion rotations are only defined for 3-component vectors.");
+      Quaternion<Fraction64> answer = LinearAlgebra.Multiply(LinearAlgebra.Multiply(rotation, vector), LinearAlgebra.Conjugate(rotation));
+      return new Vector<Fraction64>(answer.X, answer.Y, answer.Z);
+    }
+
+    /// <summary>Does a value equality check.</summary>
+    /// <param name="left">The first quaternion to check for equality.</param>
+    /// <param name="right">The second quaternion  to check for equality.</param>
+    /// <returns>True if values are equal, false if not.</returns>
+    public static bool EqualsValue(Quaternion<Fraction64> left, Quaternion<Fraction64> right)
+    {
+      return
+        left.X == right.X &&
+        left.Y == right.Y &&
+        left.Z == right.Z &&
+        left.W == right.W;
+    }
+
+    /// <summary>Does a value equality check with leniency.</summary>
+    /// <param name="left">The first quaternion to check for equality.</param>
+    /// <param name="right">The second quaternion to check for equality.</param>
+    /// <param name="leniency">How much the values can vary but still be considered equal.</param>
+    /// <returns>True if values are equal, false if not.</returns>
+    public static bool EqualsValue(Quaternion<Fraction64> left, Quaternion<Fraction64> right, Fraction64 leniency)
+    {
+      return
+        Logic.Abs(left.X - right.X) < leniency &&
+        Logic.Abs(left.Y - right.Y) < leniency &&
+        Logic.Abs(left.Z - right.Z) < leniency &&
+        Logic.Abs(left.W - right.W) < leniency;
+    }
+
+    #endregion
+
+    #endregion
 
     #region decimal
 
@@ -2865,6 +5216,25 @@ namespace Seven.Mathematics
         for (int i = 0; i < columns; i++)
           matrix[i, i] = 1;
       return matrix;
+    }
+
+    /// <summary>Determines if a matrix is symetric or not.</summary>
+    /// <param name="matrix">The matrix to determine symetry of.</param>
+    /// <returns>True if symetric; false if not.</returns>
+    public static bool IsSymmetric(decimal[,] matrix)
+    {
+      int rows = matrix.GetLength(0);
+      int cols = matrix.GetLength(1);
+
+      if (rows != cols)
+        return false;
+
+      for (var row = 0; row < rows; row++)
+        for (var column = row + 1; column < cols; column++)
+          if (matrix[row, column] != matrix[column, row])
+            return false;
+
+      return true;
     }
 
     /// <summary>Negates all the values in a matrix.</summary>
@@ -3819,6 +6189,25 @@ namespace Seven.Mathematics
     #endregion
 
     #region matrix
+
+    /// <summary>Determines if a matrix is symetric or not.</summary>
+    /// <param name="matrix">The matrix to determine symetry of.</param>
+    /// <returns>True if symetric; false if not.</returns>
+    public static bool IsSymmetric(double[,] matrix)
+    {
+      int rows = matrix.GetLength(0);
+      int cols = matrix.GetLength(1);
+
+      if (rows != cols)
+        return false;
+
+      for (var row = 0; row < rows; row++)
+        for (var column = row + 1; column < cols; column++)
+          if (matrix[row, column] != matrix[column, row])
+            return false;
+
+      return true;
+    }
 
     /// <summary>Constructs a new identity-matrix of the given dimensions.</summary>
 		/// <param name="rows">The number of rows of the matrix.</param>
@@ -4813,6 +7202,25 @@ namespace Seven.Mathematics
 
     #region matrix
 
+    /// <summary>Determines if a matrix is symetric or not.</summary>
+    /// <param name="matrix">The matrix to determine symetry of.</param>
+    /// <returns>True if symetric; false if not.</returns>
+    public static bool IsSymmetric(float[,] matrix)
+    {
+      int rows = matrix.GetLength(0);
+      int cols = matrix.GetLength(1);
+
+      if (rows != cols)
+        return false;
+
+      for (var row = 0; row < rows; row++)
+        for (var column = row + 1; column < cols; column++)
+          if (matrix[row, column] != matrix[column, row])
+            return false;
+
+      return true;
+    }
+
     /// <summary>Constructs a new identity-matrix of the given dimensions.</summary>
     /// <param name="rows">The number of rows of the matrix.</param>
     /// <param name="columns">The number of columns of the matrix.</param>
@@ -5786,6 +8194,25 @@ namespace Seven.Mathematics
     #endregion
 
     #region matrix
+
+    /// <summary>Determines if a matrix is symetric or not.</summary>
+    /// <param name="matrix">The matrix to determine symetry of.</param>
+    /// <returns>True if symetric; false if not.</returns>
+    public static bool IsSymmetric(long[,] matrix)
+    {
+      int rows = matrix.GetLength(0);
+      int cols = matrix.GetLength(1);
+
+      if (rows != cols)
+        return false;
+
+      for (var row = 0; row < rows; row++)
+        for (var column = row + 1; column < cols; column++)
+          if (matrix[row, column] != matrix[column, row])
+            return false;
+
+      return true;
+    }
 
     /// <summary>Constructs a new identity-matrix of the given dimensions.</summary>
     /// <param name="rows">The number of rows of the matrix.</param>
@@ -6763,6 +9190,25 @@ namespace Seven.Mathematics
 
     #region matrix
 
+    /// <summary>Determines if a matrix is symetric or not.</summary>
+    /// <param name="matrix">The matrix to determine symetry of.</param>
+    /// <returns>True if symetric; false if not.</returns>
+    public static bool IsSymmetric(int[,] matrix)
+    {
+      int rows = matrix.GetLength(0);
+      int cols = matrix.GetLength(1);
+
+      if (rows != cols)
+        return false;
+
+      for (var row = 0; row < rows; row++)
+        for (var column = row + 1; column < cols; column++)
+          if (matrix[row, column] != matrix[column, row])
+            return false;
+
+      return true;
+    }
+
     /// <summary>Constructs a new identity-matrix of the given dimensions.</summary>
     /// <param name="rows">The number of rows of the matrix.</param>
     /// <param name="columns">The number of columns of the matrix.</param>
@@ -7482,9 +9928,449 @@ namespace Seven.Mathematics
     #endregion
   }
 
-  /// <summary>Non-generic linear algrbra extension methods for base C# arrays.</summary>
+  /// <summary>Non-generic linear algrbra extension methods for C# arrays.</summary>
   public static class LinearAlgebra_Extensions
   {
+    #region Fraction128
+
+    /// <summary>Adds two vectors together.</summary>
+    /// <param name="left">The first vector of the addition.</param>
+    /// <param name="right">The second vector of the addiiton.</param>
+    /// <returns>The result of the addiion.</returns>
+    public static Fraction128[] Add(this Fraction128[] left, Fraction128[] right)
+    { return LinearAlgebra.Add(left, right); }
+
+    /// <summary>Negates all the values in a vector.</summary>
+    /// <param name="vector">The vector to have its values negated.</param>
+    /// <returns>The result of the negations.</returns>
+    public static Fraction128[] Negate(this Fraction128[] vector)
+    { return LinearAlgebra.Negate(vector); }
+
+    /// <summary>Subtracts two vectors.</summary>
+    /// <param name="left">The left vector of the subtraction.</param>
+    /// <param name="right">The right vector of the subtraction.</param>
+    /// <returns>The result of the vector subtracton.</returns>
+    public static Fraction128[] Subtract(this Fraction128[] left, Fraction128[] right)
+    { return LinearAlgebra.Subtract(left, right); }
+
+    /// <summary>Multiplies all the components of a vecotr by a scalar.</summary>
+    /// <param name="left">The vector to have the components multiplied by.</param>
+    /// <param name="right">The scalars to multiply the vector components by.</param>
+    /// <returns>The result of the multiplications.</returns>
+    public static Fraction128[] Multiply(this Fraction128[] left, Fraction128 right)
+    { return LinearAlgebra.Multiply(left, right); }
+
+    /// <summary>Divides all the components of a vector by a scalar.</summary>
+    /// <param name="vector">The vector to have the components divided by.</param>
+    /// <param name="right">The scalar to divide the vector components by.</param>
+    /// <returns>The resulting vector after teh divisions.</returns>
+    public static Fraction128[] Divide(this Fraction128[] vector, Fraction128 right)
+    { return LinearAlgebra.Divide(vector, right); }
+
+    /// <summary>Computes the dot product between two vectors.</summary>
+    /// <param name="left">The first vector of the dot product operation.</param>
+    /// <param name="right">The second vector of the dot product operation.</param>
+    /// <returns>The result of the dot product operation.</returns>
+    public static Fraction128 DotProduct(this Fraction128[] left, Fraction128[] right)
+    { return LinearAlgebra.DotProduct(left, right); }
+
+    /// <summary>Computes teh cross product of two vectors.</summary>
+    /// <param name="left">The first vector of the cross product operation.</param>
+    /// <param name="right">The second vector of the cross product operation.</param>
+    /// <returns>The result of the cross product operation.</returns>
+    public static Fraction128[] CrossProduct(this Fraction128[] left, Fraction128[] right)
+    { return LinearAlgebra.CrossProduct(left, right); }
+
+    /// <summary>Normalizes a vector.</summary>
+    /// <param name="vector">The vector to normalize.</param>
+    /// <returns>The result of the normalization.</returns>
+    public static Fraction128[] Normalize(this Fraction128[] vector)
+    { return LinearAlgebra.Normalize(vector); }
+
+    /// <summary>Computes the length of a vector.</summary>
+    /// <param name="vector">The vector to calculate the length of.</param>
+    /// <returns>The computed length of the vector.</returns>
+    public static Fraction128 Magnitude(this Fraction128[] vector)
+    { return LinearAlgebra.Magnitude(vector); }
+
+    /// <summary>Computes the length of a vector but doesn't square root it for efficiency (length remains squared).</summary>
+    /// <param name="vector">The vector to compute the length squared of.</param>
+    /// <returns>The computed length squared of the vector.</returns>
+    public static Fraction128 MagnitudeSquared(this Fraction128[] vector)
+    { return LinearAlgebra.MagnitudeSquared(vector); }
+
+    /// <summary>Computes the angle between two vectors.</summary>
+    /// <param name="first">The first vector to determine the angle between.</param>
+    /// <param name="second">The second vector to determine the angle between.</param>
+    /// <returns>The angle between the two vectors in radians.</returns>
+    public static Fraction128 Angle(this Fraction128[] first, Fraction128[] second)
+    { return LinearAlgebra.Angle(first, second); }
+
+    /// <summary>Rotates a vector by the specified axis and rotation values.</summary>
+    /// <param name="vector">The vector to rotate.</param>
+    /// <param name="angle">The angle of the rotation.</param>
+    /// <param name="x">The x component of the axis vector to rotate about.</param>
+    /// <param name="y">The y component of the axis vector to rotate about.</param>
+    /// <param name="z">The z component of the axis vector to rotate about.</param>
+    /// <returns>The result of the rotation.</returns>
+    public static Fraction128[] RotateBy(this Fraction128[] vector, Fraction128 angle, Fraction128 x, Fraction128 y, Fraction128 z)
+    { return LinearAlgebra.RotateBy(vector, angle, x, y, z); }
+
+    /// <summary>Computes the linear interpolation between two vectors.</summary>
+    /// <param name="left">The starting vector of the interpolation.</param>
+    /// <param name="right">The ending vector of the interpolation.</param>
+    /// <param name="blend">The ratio 0.0 to 1.0 of the interpolation between the start and end.</param>
+    /// <returns>The result of the interpolation.</returns>
+    public static Fraction128[] Lerp(this Fraction128[] left, Fraction128[] right, Fraction128 blend)
+    { return LinearAlgebra.Lerp(left, right, blend); }
+
+    /// <summary>Sphereically interpolates between two vectors.</summary>
+    /// <param name="left">The starting vector of the interpolation.</param>
+    /// <param name="right">The ending vector of the interpolation.</param>
+    /// <param name="blend">The ratio 0.0 to 1.0 defining the interpolation distance between the two vectors.</param>
+    /// <returns>The result of the slerp operation.</returns>
+    public static Fraction128[] Slerp(this Fraction128[] left, Fraction128[] right, Fraction128 blend)
+    { return LinearAlgebra.Slerp(left, right, blend); }
+
+    /// <summary>Interpolates between three vectors using barycentric coordinates.</summary>
+    /// <param name="a">The first vector of the interpolation.</param>
+    /// <param name="b">The second vector of the interpolation.</param>
+    /// <param name="c">The thrid vector of the interpolation.</param>
+    /// <param name="u">The "U" value of the barycentric interpolation equation.</param>
+    /// <param name="v">The "V" value of the barycentric interpolation equation.</param>
+    /// <returns>The resulting vector of the barycentric interpolation.</returns>
+    public static Fraction128[] Blerp(this Fraction128[] a, Fraction128[] b, Fraction128[] c, Fraction128 u, Fraction128 v)
+    { return LinearAlgebra.Blerp(a, b, c, u, v); }
+
+    /// <summary>Negates all the values in a matrix.</summary>
+    /// <param name="matrix">The matrix to have its values negated.</param>
+    /// <returns>The resulting matrix after the negations.</returns>
+    public static Fraction128[,] Negate(this Fraction128[,] matrix)
+    { return LinearAlgebra.Negate(matrix); }
+
+    /// <summary>Does standard addition of two matrices.</summary>
+    /// <param name="left">The left matrix of the addition.</param>
+    /// <param name="right">The right matrix of the addition.</param>
+    /// <returns>The resulting matrix after the addition.</returns>
+    public static Fraction128[,] Add(this Fraction128[,] left, Fraction128[,] right)
+    { return LinearAlgebra.Add(left, right); }
+
+    /// <summary>Subtracts a scalar from all the values in a matrix.</summary>
+    /// <param name="left">The matrix to have the values subtracted from.</param>
+    /// <param name="right">The scalar to subtract from all the matrix values.</param>
+    /// <returns>The resulting matrix after the subtractions.</returns>
+    public static Fraction128[,] Subtract(this Fraction128[,] left, Fraction128[,] right)
+    { return LinearAlgebra.Subtract(left, right); }
+
+    /// <summary>Performs multiplication on two matrices.</summary>
+    /// <param name="left">The left matrix of the multiplication.</param>
+    /// <param name="right">The right matrix of the multiplication.</param>
+    /// <returns>The resulting matrix of the multiplication.</returns>
+    public static Fraction128[,] Multiply(this Fraction128[,] left, Fraction128[,] right)
+    { return LinearAlgebra.Multiply(left, right); }
+
+    /// <summary>Multiplies all the values in a matrix by a scalar.</summary>
+    /// <param name="left">The matrix to have the values multiplied.</param>
+    /// <param name="right">The scalar to multiply the values by.</param>
+    /// <returns>The resulting matrix after the multiplications.</returns>
+    public static Fraction128[,] Multiply(this Fraction128[,] left, Fraction128 right)
+    { return LinearAlgebra.Multiply(left, right); }
+
+    /// <summary>Applies a power to a square matrix.</summary>
+    /// <param name="matrix">The matrix to be powered by.</param>
+    /// <param name="power">The power to apply to the matrix.</param>
+    /// <returns>The resulting matrix of the power operation.</returns>
+    public static Fraction128[,] Power(this Fraction128[,] matrix, int power)
+    { return LinearAlgebra.Power(matrix, power); }
+
+    /// <summary>Divides all the values in the matrix by a scalar.</summary>
+    /// <param name="matrix">The matrix to divide the values of.</param>
+    /// <param name="right">The scalar to divide all the matrix values by.</param>
+    /// <returns>The resulting matrix with the divided values.</returns>
+    public static Fraction128[,] Divide(this Fraction128[,] matrix, Fraction128 right)
+    { return LinearAlgebra.Divide(matrix, right); }
+
+    /// <summary>Gets the minor of a matrix.</summary>
+    /// <param name="matrix">The matrix to get the minor of.</param>
+    /// <param name="row">The restricted row to form the minor.</param>
+    /// <param name="column">The restricted column to form the minor.</param>
+    /// <returns>The minor of the matrix.</returns>
+    public static Fraction128[,] Minor(this Fraction128[,] matrix, int row, int column)
+    { return LinearAlgebra.Minor(matrix, row, column); }
+
+    /// <summary>Combines two matrices from left to right 
+    /// (result.Rows = left.Rows && result.Columns = left.Columns + right.Columns).</summary>
+    /// <param name="left">The left matrix of the concatenation.</param>
+    /// <param name="right">The right matrix of the concatenation.</param>
+    /// <returns>The resulting matrix of the concatenation.</returns>
+    public static Fraction128[,] ConcatenateRowWise(this Fraction128[,] left, Fraction128[,] right)
+    { return LinearAlgebra.ConcatenateRowWise(left, right); }
+
+    /// <summary>Calculates the echelon of a matrix (aka REF).</summary>
+    /// <param name="matrix">The matrix to calculate the echelon of (aka REF).</param>
+    /// <returns>The echelon of the matrix (aka REF).</returns>
+    public static Fraction128[,] Echelon(this Fraction128[,] matrix)
+    { return LinearAlgebra.Echelon(matrix); }
+
+    /// <summary>Calculates the echelon of a matrix and reduces it (aka RREF).</summary>
+    /// <param name="matrix">The matrix matrix to calculate the reduced echelon of (aka RREF).</param>
+    /// <returns>The reduced echelon of the matrix (aka RREF).</returns>
+    public static Fraction128[,] ReducedEchelon(this Fraction128[,] matrix)
+    { return LinearAlgebra.ReducedEchelon(matrix); }
+
+    /// <summary>Calculates the determinent of a square matrix.</summary>
+    /// <param name="matrix">The matrix to calculate the determinent of.</param>
+    /// <returns>The determinent of the matrix.</returns>
+    public static Fraction128 Determinent(this Fraction128[,] matrix)
+    { return LinearAlgebra.Determinent(matrix); }
+
+    /// <summary>Calculates the inverse of a matrix.</summary>
+    /// <param name="matrix">The matrix to calculate the inverse of.</param>
+    /// <returns>The inverse of the matrix.</returns>
+    public static Fraction128[,] Inverse(this Fraction128[,] matrix)
+    { return LinearAlgebra.Inverse(matrix); }
+
+    /// <summary>Calculates the adjoint of a matrix.</summary>
+    /// <param name="matrix">The matrix to calculate the adjoint of.</param>
+    /// <returns>The adjoint of the matrix.</returns>
+    public static Fraction128[,] Adjoint(this Fraction128[,] matrix)
+    { return LinearAlgebra.Adjoint(matrix); }
+
+    /// <summary>Returns the transpose of a matrix.</summary>
+    /// <param name="matrix">The matrix to transpose.</param>
+    /// <returns>The transpose of the matrix.</returns>
+    public static Fraction128[,] Transpose(this Fraction128[,] matrix)
+    { return LinearAlgebra.Transpose(matrix); }
+
+    /// <summary>Decomposes a matrix into lower-upper reptresentation.</summary>
+    /// <param name="matrix">The matrix to decompose.</param>
+    /// <param name="lower">The computed lower triangular matrix.</param>
+    /// <param name="upper">The computed upper triangular matrix.</param>
+    public static void DecomposeLU(this Fraction128[,] matrix, out Fraction128[,] lower, out Fraction128[,] upper)
+    { LinearAlgebra.DecomposeLU(matrix, out lower, out upper); }
+
+    #endregion
+
+    #region Fraction64
+
+    /// <summary>Adds two vectors together.</summary>
+    /// <param name="left">The first vector of the addition.</param>
+    /// <param name="right">The second vector of the addiiton.</param>
+    /// <returns>The result of the addiion.</returns>
+    public static Fraction64[] Add(this Fraction64[] left, Fraction64[] right)
+    { return LinearAlgebra.Add(left, right); }
+
+    /// <summary>Negates all the values in a vector.</summary>
+    /// <param name="vector">The vector to have its values negated.</param>
+    /// <returns>The result of the negations.</returns>
+    public static Fraction64[] Negate(this Fraction64[] vector)
+    { return LinearAlgebra.Negate(vector); }
+
+    /// <summary>Subtracts two vectors.</summary>
+    /// <param name="left">The left vector of the subtraction.</param>
+    /// <param name="right">The right vector of the subtraction.</param>
+    /// <returns>The result of the vector subtracton.</returns>
+    public static Fraction64[] Subtract(this Fraction64[] left, Fraction64[] right)
+    { return LinearAlgebra.Subtract(left, right); }
+
+    /// <summary>Multiplies all the components of a vecotr by a scalar.</summary>
+    /// <param name="left">The vector to have the components multiplied by.</param>
+    /// <param name="right">The scalars to multiply the vector components by.</param>
+    /// <returns>The result of the multiplications.</returns>
+    public static Fraction64[] Multiply(this Fraction64[] left, Fraction64 right)
+    { return LinearAlgebra.Multiply(left, right); }
+
+    /// <summary>Divides all the components of a vector by a scalar.</summary>
+    /// <param name="vector">The vector to have the components divided by.</param>
+    /// <param name="right">The scalar to divide the vector components by.</param>
+    /// <returns>The resulting vector after teh divisions.</returns>
+    public static Fraction64[] Divide(this Fraction64[] vector, Fraction64 right)
+    { return LinearAlgebra.Divide(vector, right); }
+
+    /// <summary>Computes the dot product between two vectors.</summary>
+    /// <param name="left">The first vector of the dot product operation.</param>
+    /// <param name="right">The second vector of the dot product operation.</param>
+    /// <returns>The result of the dot product operation.</returns>
+    public static Fraction64 DotProduct(this Fraction64[] left, Fraction64[] right)
+    { return LinearAlgebra.DotProduct(left, right); }
+
+    /// <summary>Computes teh cross product of two vectors.</summary>
+    /// <param name="left">The first vector of the cross product operation.</param>
+    /// <param name="right">The second vector of the cross product operation.</param>
+    /// <returns>The result of the cross product operation.</returns>
+    public static Fraction64[] CrossProduct(this Fraction64[] left, Fraction64[] right)
+    { return LinearAlgebra.CrossProduct(left, right); }
+
+    /// <summary>Normalizes a vector.</summary>
+    /// <param name="vector">The vector to normalize.</param>
+    /// <returns>The result of the normalization.</returns>
+    public static Fraction64[] Normalize(this Fraction64[] vector)
+    { return LinearAlgebra.Normalize(vector); }
+
+    /// <summary>Computes the length of a vector.</summary>
+    /// <param name="vector">The vector to calculate the length of.</param>
+    /// <returns>The computed length of the vector.</returns>
+    public static Fraction64 Magnitude(this Fraction64[] vector)
+    { return LinearAlgebra.Magnitude(vector); }
+
+    /// <summary>Computes the length of a vector but doesn't square root it for efficiency (length remains squared).</summary>
+    /// <param name="vector">The vector to compute the length squared of.</param>
+    /// <returns>The computed length squared of the vector.</returns>
+    public static Fraction64 MagnitudeSquared(this Fraction64[] vector)
+    { return LinearAlgebra.MagnitudeSquared(vector); }
+
+    /// <summary>Computes the angle between two vectors.</summary>
+    /// <param name="first">The first vector to determine the angle between.</param>
+    /// <param name="second">The second vector to determine the angle between.</param>
+    /// <returns>The angle between the two vectors in radians.</returns>
+    public static Fraction64 Angle(this Fraction64[] first, Fraction64[] second)
+    { return LinearAlgebra.Angle(first, second); }
+
+    /// <summary>Rotates a vector by the specified axis and rotation values.</summary>
+    /// <param name="vector">The vector to rotate.</param>
+    /// <param name="angle">The angle of the rotation.</param>
+    /// <param name="x">The x component of the axis vector to rotate about.</param>
+    /// <param name="y">The y component of the axis vector to rotate about.</param>
+    /// <param name="z">The z component of the axis vector to rotate about.</param>
+    /// <returns>The result of the rotation.</returns>
+    public static Fraction64[] RotateBy(this Fraction64[] vector, Fraction64 angle, Fraction64 x, Fraction64 y, Fraction64 z)
+    { return LinearAlgebra.RotateBy(vector, angle, x, y, z); }
+
+    /// <summary>Computes the linear interpolation between two vectors.</summary>
+    /// <param name="left">The starting vector of the interpolation.</param>
+    /// <param name="right">The ending vector of the interpolation.</param>
+    /// <param name="blend">The ratio 0.0 to 1.0 of the interpolation between the start and end.</param>
+    /// <returns>The result of the interpolation.</returns>
+    public static Fraction64[] Lerp(this Fraction64[] left, Fraction64[] right, Fraction64 blend)
+    { return LinearAlgebra.Lerp(left, right, blend); }
+
+    /// <summary>Sphereically interpolates between two vectors.</summary>
+    /// <param name="left">The starting vector of the interpolation.</param>
+    /// <param name="right">The ending vector of the interpolation.</param>
+    /// <param name="blend">The ratio 0.0 to 1.0 defining the interpolation distance between the two vectors.</param>
+    /// <returns>The result of the slerp operation.</returns>
+    public static Fraction64[] Slerp(this Fraction64[] left, Fraction64[] right, Fraction64 blend)
+    { return LinearAlgebra.Slerp(left, right, blend); }
+
+    /// <summary>Interpolates between three vectors using barycentric coordinates.</summary>
+    /// <param name="a">The first vector of the interpolation.</param>
+    /// <param name="b">The second vector of the interpolation.</param>
+    /// <param name="c">The thrid vector of the interpolation.</param>
+    /// <param name="u">The "U" value of the barycentric interpolation equation.</param>
+    /// <param name="v">The "V" value of the barycentric interpolation equation.</param>
+    /// <returns>The resulting vector of the barycentric interpolation.</returns>
+    public static Fraction64[] Blerp(this Fraction64[] a, Fraction64[] b, Fraction64[] c, Fraction64 u, Fraction64 v)
+    { return LinearAlgebra.Blerp(a, b, c, u, v); }
+
+    /// <summary>Negates all the values in a matrix.</summary>
+    /// <param name="matrix">The matrix to have its values negated.</param>
+    /// <returns>The resulting matrix after the negations.</returns>
+    public static Fraction64[,] Negate(this Fraction64[,] matrix)
+    { return LinearAlgebra.Negate(matrix); }
+
+    /// <summary>Does standard addition of two matrices.</summary>
+    /// <param name="left">The left matrix of the addition.</param>
+    /// <param name="right">The right matrix of the addition.</param>
+    /// <returns>The resulting matrix after the addition.</returns>
+    public static Fraction64[,] Add(this Fraction64[,] left, Fraction64[,] right)
+    { return LinearAlgebra.Add(left, right); }
+
+    /// <summary>Subtracts a scalar from all the values in a matrix.</summary>
+    /// <param name="left">The matrix to have the values subtracted from.</param>
+    /// <param name="right">The scalar to subtract from all the matrix values.</param>
+    /// <returns>The resulting matrix after the subtractions.</returns>
+    public static Fraction64[,] Subtract(this Fraction64[,] left, Fraction64[,] right)
+    { return LinearAlgebra.Subtract(left, right); }
+
+    /// <summary>Performs multiplication on two matrices.</summary>
+    /// <param name="left">The left matrix of the multiplication.</param>
+    /// <param name="right">The right matrix of the multiplication.</param>
+    /// <returns>The resulting matrix of the multiplication.</returns>
+    public static Fraction64[,] Multiply(this Fraction64[,] left, Fraction64[,] right)
+    { return LinearAlgebra.Multiply(left, right); }
+
+    /// <summary>Multiplies all the values in a matrix by a scalar.</summary>
+    /// <param name="left">The matrix to have the values multiplied.</param>
+    /// <param name="right">The scalar to multiply the values by.</param>
+    /// <returns>The resulting matrix after the multiplications.</returns>
+    public static Fraction64[,] Multiply(this Fraction64[,] left, Fraction64 right)
+    { return LinearAlgebra.Multiply(left, right); }
+
+    /// <summary>Applies a power to a square matrix.</summary>
+    /// <param name="matrix">The matrix to be powered by.</param>
+    /// <param name="power">The power to apply to the matrix.</param>
+    /// <returns>The resulting matrix of the power operation.</returns>
+    public static Fraction64[,] Power(this Fraction64[,] matrix, int power)
+    { return LinearAlgebra.Power(matrix, power); }
+
+    /// <summary>Divides all the values in the matrix by a scalar.</summary>
+    /// <param name="matrix">The matrix to divide the values of.</param>
+    /// <param name="right">The scalar to divide all the matrix values by.</param>
+    /// <returns>The resulting matrix with the divided values.</returns>
+    public static Fraction64[,] Divide(this Fraction64[,] matrix, Fraction64 right)
+    { return LinearAlgebra.Divide(matrix, right); }
+
+    /// <summary>Gets the minor of a matrix.</summary>
+    /// <param name="matrix">The matrix to get the minor of.</param>
+    /// <param name="row">The restricted row to form the minor.</param>
+    /// <param name="column">The restricted column to form the minor.</param>
+    /// <returns>The minor of the matrix.</returns>
+    public static Fraction64[,] Minor(this Fraction64[,] matrix, int row, int column)
+    { return LinearAlgebra.Minor(matrix, row, column); }
+
+    /// <summary>Combines two matrices from left to right 
+    /// (result.Rows = left.Rows && result.Columns = left.Columns + right.Columns).</summary>
+    /// <param name="left">The left matrix of the concatenation.</param>
+    /// <param name="right">The right matrix of the concatenation.</param>
+    /// <returns>The resulting matrix of the concatenation.</returns>
+    public static Fraction64[,] ConcatenateRowWise(this Fraction64[,] left, Fraction64[,] right)
+    { return LinearAlgebra.ConcatenateRowWise(left, right); }
+
+    /// <summary>Calculates the echelon of a matrix (aka REF).</summary>
+    /// <param name="matrix">The matrix to calculate the echelon of (aka REF).</param>
+    /// <returns>The echelon of the matrix (aka REF).</returns>
+    public static Fraction64[,] Echelon(this Fraction64[,] matrix)
+    { return LinearAlgebra.Echelon(matrix); }
+
+    /// <summary>Calculates the echelon of a matrix and reduces it (aka RREF).</summary>
+    /// <param name="matrix">The matrix matrix to calculate the reduced echelon of (aka RREF).</param>
+    /// <returns>The reduced echelon of the matrix (aka RREF).</returns>
+    public static Fraction64[,] ReducedEchelon(this Fraction64[,] matrix)
+    { return LinearAlgebra.ReducedEchelon(matrix); }
+
+    /// <summary>Calculates the determinent of a square matrix.</summary>
+    /// <param name="matrix">The matrix to calculate the determinent of.</param>
+    /// <returns>The determinent of the matrix.</returns>
+    public static Fraction64 Determinent(this Fraction64[,] matrix)
+    { return LinearAlgebra.Determinent(matrix); }
+
+    /// <summary>Calculates the inverse of a matrix.</summary>
+    /// <param name="matrix">The matrix to calculate the inverse of.</param>
+    /// <returns>The inverse of the matrix.</returns>
+    public static Fraction64[,] Inverse(this Fraction64[,] matrix)
+    { return LinearAlgebra.Inverse(matrix); }
+
+    /// <summary>Calculates the adjoint of a matrix.</summary>
+    /// <param name="matrix">The matrix to calculate the adjoint of.</param>
+    /// <returns>The adjoint of the matrix.</returns>
+    public static Fraction64[,] Adjoint(this Fraction64[,] matrix)
+    { return LinearAlgebra.Adjoint(matrix); }
+
+    /// <summary>Returns the transpose of a matrix.</summary>
+    /// <param name="matrix">The matrix to transpose.</param>
+    /// <returns>The transpose of the matrix.</returns>
+    public static Fraction64[,] Transpose(this Fraction64[,] matrix)
+    { return LinearAlgebra.Transpose(matrix); }
+
+    /// <summary>Decomposes a matrix into lower-upper reptresentation.</summary>
+    /// <param name="matrix">The matrix to decompose.</param>
+    /// <param name="lower">The computed lower triangular matrix.</param>
+    /// <param name="upper">The computed upper triangular matrix.</param>
+    public static void DecomposeLU(this Fraction64[,] matrix, out Fraction64[,] lower, out Fraction64[,] upper)
+    { LinearAlgebra.DecomposeLU(matrix, out lower, out upper); }
+
+    #endregion
+
     #region decimal
 
     /// <summary>Adds two vectors together.</summary>
@@ -8760,6 +11646,16 @@ namespace Seven.Mathematics
 		/// <returns>The T[] of the vector.</returns>
 		public static implicit operator Vector<T>(T[] array)
     { return new Vector<T>(array); }
+    /// <summary>Converts a vector into a matrix.</summary>
+    /// <param name="vector">The vector to convert.</param>
+    /// <returns>The resulting matrix.</returns>
+    public static explicit operator Matrix<T>(Vector<T> vector)
+    {
+      T[,] matrix = new T[1,vector.Dimensions];
+      for (int i = 0; i < vector.Dimensions; i++)
+        matrix[0, i] = vector[i];
+      return new Matrix<T>(matrix);
+    }
 
     #endregion
 
@@ -9119,25 +12015,26 @@ namespace Seven.Mathematics
 	/// <typeparam name="T">The numeric type of this Quaternion.</typeparam>
 	public class Quaternion<T>
   {
+    // the values of the quaternion
     protected T _x, _y, _z, _w;
 
     #region runtime function mapping
 
-    private static LinearAlgebra.delegates._Quaternion_Magnitude<T> _Quaternion_Magnitude;
-    private static LinearAlgebra.delegates._Quaternion_MagnitudeSquared<T> _Quaternion_MagnitudeSquared;
-    private static LinearAlgebra.delegates._Quaternion_Conjugate<T> _Quaternion_Conjugate;
-    private static LinearAlgebra.delegates._Quaternion_Add<T> _Quaternion_Add;
-    private static LinearAlgebra.delegates._Quaternion_Subtract<T> _Quaternion_Subtract;
-    private static LinearAlgebra.delegates._Quaternion_Multiply<T> _Quaternion_Multiply;
-    private static LinearAlgebra.delegates._Quaternion_Multiply_scalar<T> _Quaternion_Multiply_scalar;
-    private static LinearAlgebra.delegates._Multiply_Vector<T> _Quaternion_Multiply_Vector;
-    private static LinearAlgebra.delegates._Quaternion_Normalize<T> _Quaternion_Normalize;
-    private static LinearAlgebra.delegates._Quaternion_Invert<T> _Quaternion_Invert;
-    private static LinearAlgebra.delegates._Quaternion_Lerp<T> _Quaternion_Lerp;
-    private static LinearAlgebra.delegates._Quaternion_Slerp<T> _Quaternion_Slerp;
-    private static LinearAlgebra.delegates._Quaternion_Rotate<T> _Quaternion_Rotate;
-    private static LinearAlgebra.delegates._Quaternion_EqualsValue<T> _Quaternion_EqualsValue;
-    private static LinearAlgebra.delegates._Quaternion_EqualsValue_leniency<T> _Quaternion_EqualsValue_leniency;
+    private static LinearAlgebra.delegates.Quaternion_Magnitude<T> _Quaternion_Magnitude;
+    private static LinearAlgebra.delegates.Quaternion_MagnitudeSquared<T> _Quaternion_MagnitudeSquared;
+    private static LinearAlgebra.delegates.Quaternion_Conjugate<T> _Quaternion_Conjugate;
+    private static LinearAlgebra.delegates.Quaternion_Add<T> _Quaternion_Add;
+    private static LinearAlgebra.delegates.Quaternion_Subtract<T> _Quaternion_Subtract;
+    private static LinearAlgebra.delegates.Quaternion_Multiply<T> _Quaternion_Multiply;
+    private static LinearAlgebra.delegates.Quaternion_Multiply_scalar<T> _Quaternion_Multiply_scalar;
+    private static LinearAlgebra.delegates.Quaternion_Multiply_Vector<T> _Quaternion_Multiply_Vector;
+    private static LinearAlgebra.delegates.Quaternion_Normalize<T> _Quaternion_Normalize;
+    private static LinearAlgebra.delegates.Quaternion_Invert<T> _Quaternion_Invert;
+    private static LinearAlgebra.delegates.Quaternion_Lerp<T> _Quaternion_Lerp;
+    private static LinearAlgebra.delegates.Quaternion_Slerp<T> _Quaternion_Slerp;
+    private static LinearAlgebra.delegates.Quaternion_Rotate<T> _Quaternion_Rotate;
+    private static LinearAlgebra.delegates.Quaternion_EqualsValue<T> _Quaternion_EqualsValue;
+    private static LinearAlgebra.delegates.Quaternion_EqualsValue_leniency<T> _Quaternion_EqualsValue_leniency;
 
     // Constants
     private static T _zero;

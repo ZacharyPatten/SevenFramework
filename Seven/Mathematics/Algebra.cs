@@ -1,7 +1,7 @@
 ﻿// Seven
 // https://github.com/53V3N1X/SevenFramework
-// LISCENSE: See "LISCENSE.txt" in th root project directory.
-// SUPPORT: See "README.txt" in the root project directory.
+// LISCENSE: See "LISCENSE.md" in th root project directory.
+// SUPPORT: See "SUPPORT.md" in the root project directory.
 
 using Seven.Structures;
 
@@ -11,35 +11,80 @@ namespace Seven.Mathematics
   /// <typeparam name="T">The type this algebra library can perform on.</typeparam>
   public interface Algebra<T>
   {
+    #region property
+
     /// <summary>Computes the natural log of the operand.</summary>
-    Algebra._ln<T> ln { get; }
+    Algebra.delegates.ln<T> ln { get; }
     /// <summary>Computes the log of an operand using the base of the other operand.</summary>
-    Algebra._log<T> log { get; }
+    Algebra.delegates.log<T> log { get; }
 		/// <summary>Computes the square root of a given value.</summary>
-    Algebra._sqrt<T> sqrt { get; }
+    Algebra.delegates.sqrt<T> sqrt { get; }
 		/// <summary>Takes one operand to the root of the other.</summary>
-    Algebra._root<T> root { get; }
+    Algebra.delegates.root<T> root { get; }
     /// <summary>Computes the exponential of the eperand.</summary>
-    Algebra._exp<T> exp { get; }
+    Algebra.delegates.exp<T> exp { get; }
     /// <summary>Computes the prime factors of a given value.</summary>
-    Algebra._factorPrimes<T> factorPrimes { get; }
+    Algebra.delegates.factorPrimes<T> factorPrimes { get; }
 		/// <summary>Computes the reciprocal of the operand.</summary>
-    Algebra._invert_mult<T> invert_mult { get; }
+    Algebra.delegates.invert<T> invert_mult { get; }
+
+    #endregion
   }
 
   /// <summary>Provides extensions for the Algebra interface.</summary>
   public static class Algebra
   {
-		public delegate T _ln<T>(T value);
-		public delegate T _log<T>(T value, T _base);
-		public delegate T _sqrt<T>(T value);
-		public delegate T _root<T>(T _base, T root);
-		public delegate T _exp<T>(T value);
-		public delegate T[] _factorPrimes<T>(T value);
-		public delegate T _invert_mult<T>(T value);
-		public delegate T _invert_add<T>(T value);
+    #region delegate
 
-		private static Map<object, System.Type> _algebras =
+    /// <summary>Contains the delegates for algebra mathematical operations.</summary>
+    public static class delegates
+    {
+
+      /// <summary>Computes (natrual log): [ ln(n) ].</summary>
+      /// <typeparam name="T">The numeric type of the operation.</typeparam>
+      /// <param name="n">The value to compute the natural log of.</param>
+      /// <returns>The result of the natrual log operation.</returns>
+      public delegate T ln<T>(T n);
+      /// <summary>Computes: [ log_b(n) ].</summary>
+      /// <typeparam name="T">The numeric type of the operation.</typeparam>
+      /// <param name="n">The value to be log-ed.</param>
+      /// <param name="b">The base of the log operation.</param>
+      /// <returns>[ log_b(n) ]</returns>
+      public delegate T log<T>(T n, T b);
+      /// <summary>Solves for "x": [ x ^ 2 = b ].</summary>
+      /// <typeparam name="T">The numeric type of the operation.</typeparam>
+      /// <param name="b">The value to be square rooted.</param>
+      /// <returns>x from: [ x ^ 2 = b ]</returns>
+      public delegate T sqrt<T>(T b);
+      /// <summary>Solves for "x": [ x ^ r = b ].</summary>
+      /// <typeparam name="T">The numeric type of the operation.</typeparam>
+      /// <param name="b">The number to be rooted.</param>
+      /// <param name="r">The root to find of b.</param>
+      /// <returns>x from: [ x ^ r = b ]</returns>
+      public delegate T root<T>(T b, T r);
+      /// <summary>Computes: [ e ^ x ].</summary>
+      /// <typeparam name="T">The numeric type of the operation.</typeparam>
+      /// <param name="x">The exponent.</param>
+      /// <returns>[ e ^ x ]</returns>
+      public delegate T exp<T>(T x);
+      /// <summary>Computes the prime factors of n.</summary>
+      /// <typeparam name="T">The numeric type of the operation.</typeparam>
+      /// <param name="n">The value to find the prime roots of.</param>
+      /// <returns>The prime factors.</returns>
+      public delegate T[] factorPrimes<T>(T n);
+      /// <summary>Computes: [ 1 / n ].</summary>
+      /// <typeparam name="T">The numeric type of the operation.</typeparam>
+      /// <param name="n">The value to be inverted.</param>
+      /// <returns>The result of the inversion.</returns>
+      public delegate T invert<T>(T n);
+
+    }
+
+    #endregion
+
+    #region library
+
+    private static Map<object, System.Type> _algebras =
 			new Map_Linked<object, System.Type>(
 				(System.Type left, System.Type right) => { return left == right; },
 				(System.Type type) => { return type.GetHashCode(); })
@@ -69,7 +114,7 @@ namespace Seven.Mathematics
       //catch { throw new Error("Could not load algebra for " + typeof(T)); }
 		}
 
-    #region Libraries
+    #region provided
 
     private class Algebra_decimal : Algebra<decimal>
     {
@@ -88,22 +133,20 @@ namespace Seven.Mathematics
 
       public static Algebra_decimal Get { get { return Instance; } }
 
-      public Algebra._ln<decimal> ln
+      public Algebra.delegates.ln<decimal> ln
       { get { return Algebra.ln; } }
-      public Algebra._log<decimal> log
+      public Algebra.delegates.log<decimal> log
       { get { return Algebra.log; } }
-      public Algebra._sqrt<decimal> sqrt
+      public Algebra.delegates.sqrt<decimal> sqrt
       { get { return Algebra.sqrt; } }
-      public Algebra._root<decimal> root
+      public Algebra.delegates.root<decimal> root
       { get { return Algebra.root; } }
-      public Algebra._exp<decimal> exp
+      public Algebra.delegates.exp<decimal> exp
       { get { return Algebra.exp; } }
-      public Algebra._factorPrimes<decimal> factorPrimes
+      public Algebra.delegates.factorPrimes<decimal> factorPrimes
       { get { return Algebra.factorPrimes; } }
-      public Algebra._invert_mult<decimal> invert_mult
+      public Algebra.delegates.invert<decimal> invert_mult
       { get { return Algebra.invert_mult; } }
-      public Algebra._invert_add<decimal> invert_add
-      { get { return Algebra.invert_add; } }
     }
 
     private class Algebra_double : Algebra<double>
@@ -123,22 +166,20 @@ namespace Seven.Mathematics
 
       public static Algebra_double Get { get { return Instance; } }
 
-      public Algebra._ln<double> ln
+      public Algebra.delegates.ln<double> ln
       { get { return Algebra.ln; } }
-      public Algebra._log<double> log
+      public Algebra.delegates.log<double> log
       { get { return Algebra.log; } }
-      public Algebra._sqrt<double> sqrt
+      public Algebra.delegates.sqrt<double> sqrt
       { get { return Algebra.sqrt; } }
-      public Algebra._root<double> root
+      public Algebra.delegates.root<double> root
       { get { return Algebra.root; } }
-      public Algebra._exp<double> exp
+      public Algebra.delegates.exp<double> exp
       { get { return Algebra.exp; } }
-      public Algebra._factorPrimes<double> factorPrimes
+      public Algebra.delegates.factorPrimes<double> factorPrimes
       { get { return Algebra.factorPrimes; } }
-      public Algebra._invert_mult<double> invert_mult
+      public Algebra.delegates.invert<double> invert_mult
       { get { return Algebra.invert_mult; } }
-      public Algebra._invert_add<double> invert_add
-      { get { return Algebra.invert_add; } }
     }
 
     private class Algebra_float : Algebra<float>
@@ -158,22 +199,20 @@ namespace Seven.Mathematics
 
       public static Algebra_float Get { get { return Instance; } }
 
-      public Algebra._ln<float> ln
+      public Algebra.delegates.ln<float> ln
       { get { return Algebra.ln; } }
-      public Algebra._log<float> log
+      public Algebra.delegates.log<float> log
       { get { return Algebra.log; } }
-      public Algebra._sqrt<float> sqrt
+      public Algebra.delegates.sqrt<float> sqrt
       { get { return Algebra.sqrt; } }
-      public Algebra._root<float> root
+      public Algebra.delegates.root<float> root
       { get { return Algebra.root; } }
-      public Algebra._exp<float> exp
+      public Algebra.delegates.exp<float> exp
       { get { return Algebra.exp; } }
-      public Algebra._factorPrimes<float> factorPrimes
+      public Algebra.delegates.factorPrimes<float> factorPrimes
       { get { return Algebra.factorPrimes; } }
-      public Algebra._invert_mult<float> invert_mult
+      public Algebra.delegates.invert<float> invert_mult
       { get { return Algebra.invert_mult; } }
-      public Algebra._invert_add<float> invert_add
-      { get { return Algebra.invert_add; } }
     }
 
     private class Algebra_long : Algebra<long>
@@ -193,22 +232,20 @@ namespace Seven.Mathematics
 
       public static Algebra_long Get { get { return Instance; } }
 
-      public Algebra._ln<long> ln
+      public Algebra.delegates.ln<long> ln
       { get { return Algebra.ln; } }
-      public Algebra._log<long> log
+      public Algebra.delegates.log<long> log
       { get { return Algebra.log; } }
-      public Algebra._sqrt<long> sqrt
+      public Algebra.delegates.sqrt<long> sqrt
       { get { return Algebra.sqrt; } }
-      public Algebra._root<long> root
+      public Algebra.delegates.root<long> root
       { get { return Algebra.root; } }
-      public Algebra._exp<long> exp
+      public Algebra.delegates.exp<long> exp
       { get { return Algebra.exp; } }
-      public Algebra._factorPrimes<long> factorPrimes
+      public Algebra.delegates.factorPrimes<long> factorPrimes
       { get { return Algebra.factorPrimes; } }
-      public Algebra._invert_mult<long> invert_mult
+      public Algebra.delegates.invert<long> invert_mult
       { get { return Algebra.invert_mult; } }
-      public Algebra._invert_add<long> invert_add
-      { get { return Algebra.invert_add; } }
     }
 
     private class Algebra_int : Algebra<int>
@@ -228,22 +265,20 @@ namespace Seven.Mathematics
 
       public static Algebra_int Get { get { return Instance; } }
 
-      public Algebra._ln<int> ln
+      public Algebra.delegates.ln<int> ln
       { get { return Algebra.ln; } }
-      public Algebra._log<int> log
+      public Algebra.delegates.log<int> log
       { get { return Algebra.log; } }
-      public Algebra._sqrt<int> sqrt
+      public Algebra.delegates.sqrt<int> sqrt
       { get { return Algebra.sqrt; } }
-      public Algebra._root<int> root
+      public Algebra.delegates.root<int> root
       { get { return Algebra.root; } }
-      public Algebra._exp<int> exp
+      public Algebra.delegates.exp<int> exp
       { get { return Algebra.exp; } }
-      public Algebra._factorPrimes<int> factorPrimes
+      public Algebra.delegates.factorPrimes<int> factorPrimes
       { get { return Algebra.factorPrimes; } }
-      public Algebra._invert_mult<int> invert_mult
+      public Algebra.delegates.invert<int> invert_mult
       { get { return Algebra.invert_mult; } }
-      public Algebra._invert_add<int> invert_add
-      { get { return Algebra.invert_add; } }
     }
 
     private class Algebra_unsupported<T> : Algebra<T>
@@ -263,27 +298,249 @@ namespace Seven.Mathematics
 
       public static Algebra_unsupported<T> Get { get { return Instance; } }
 
-      public Algebra._ln<T> ln
+      public Algebra.delegates.ln<T> ln
       { get { throw new Error("there is no implementation of algebra for " + typeof(T)); } }
-      public Algebra._log<T> log
+      public Algebra.delegates.log<T> log
       { get { throw new Error("there is no implementation of algebra for " + typeof(T)); } }
-      public Algebra._sqrt<T> sqrt
+      public Algebra.delegates.sqrt<T> sqrt
       { get { throw new Error("there is no implementation of algebra for " + typeof(T)); } }
-      public Algebra._root<T> root
+      public Algebra.delegates.root<T> root
       { get { throw new Error("there is no implementation of algebra for " + typeof(T)); } }
-      public Algebra._exp<T> exp
+      public Algebra.delegates.exp<T> exp
       { get { throw new Error("there is no implementation of algebra for " + typeof(T)); } }
-      public Algebra._factorPrimes<T> factorPrimes
+      public Algebra.delegates.factorPrimes<T> factorPrimes
       { get { throw new Error("there is no implementation of algebra for " + typeof(T)); } }
-      public Algebra._invert_mult<T> invert_mult
-      { get { throw new Error("there is no implementation of algebra for " + typeof(T)); } }
-      public Algebra._invert_add<T> invert_add
+      public Algebra.delegates.invert<T> invert_mult
       { get { throw new Error("there is no implementation of algebra for " + typeof(T)); } }
     }
 
     #endregion
 
+    #endregion
+
     #region Implementations
+
+    #region Fraction128
+
+    public static Fraction128 ln(Fraction128 value)
+    {
+      throw new System.NotImplementedException();
+    }
+
+    public static Fraction128 log(Fraction128 value, Fraction128 _base)
+    {
+      return (Fraction128)System.Math.Log((double)value, (double)_base);
+    }
+
+    public static Fraction128 root(Fraction128 _base, Fraction128 root)
+    {
+      throw new System.NotImplementedException();
+    }
+
+    public static Fraction128 exp(Fraction128 value)
+    {
+      throw new System.NotImplementedException();
+    }
+
+    public static Fraction128[] factorPrimes(Fraction128 value)
+    {
+      throw new System.NotImplementedException();
+    }
+
+    public static Fraction128 invert_mult(Fraction128 value)
+    {
+      return 1 / value;
+    }
+
+    public static Fraction128 invert_add(Fraction128 value)
+    {
+      return -value;
+    }
+
+    public static bool IsPrime(Fraction128 candidate)
+    {
+      if (candidate % 1 == 0)
+      {
+        if (candidate == 2) return true;
+        Fraction128 squareRoot = Algebra.sqrt(candidate);
+        for (int divisor = 3; divisor <= squareRoot; divisor += 2)
+          if ((candidate % divisor) == 0)
+            return false;
+        return true;
+      }
+      else
+        return false;
+    }
+
+    public static AvlTree<Fraction128> PrimeFactors(Fraction128 a)
+    {
+      AvlTree<Fraction128> factors =
+        new AvlTree_Linked<Fraction128>(Logic.Compare);
+      if (IsPrime(a))
+        factors.Add(a);
+      else
+        for (Fraction128 b = 2; a > 1; b++)
+          while (a % b == 0)
+          {
+            a /= b;
+            factors.Add(b);
+          }
+      return factors;
+    }
+
+    public static Fraction128 sqrt(Fraction128 number)
+    {
+      return (Fraction128)System.Math.Sqrt((double)number);
+    }
+
+    private static Fraction128 GreatestCommonDenominator(Fraction128 first, Fraction128 second)
+    {
+      if (first % 1 == 0 && second % 1 == 0)
+      {
+        if (first < 0) first = -first;
+        if (second < 0) second = -second;
+        Fraction128 temp = first;
+        do
+        {
+          if (first < second)
+          {
+            temp = first;
+            first = second;
+            second = temp;
+          }
+          first = first % second;
+        } while (first != 0);
+        return second;
+      }
+      throw new Error("GCD cannot be performed on non-natural numbers");
+    }
+
+    static public Fraction128 Lerp(Fraction128 x, Fraction128 x0, Fraction128 x1, Fraction128 y0, Fraction128 y1)
+    {
+      if ((x1 - x0) == 0)
+        return (y0 + y1) / 2;
+      return y0 + (x - x0) * (y1 - y0) / (x1 - x0);
+    }
+
+    public static Fraction128 Lerp(Fraction128 x, Fraction128 x0, Fraction128 x1)
+    {
+      if (x < 0 || x > 1)
+        throw new Error("invalid lerp blend value: (blend < 0.0f || blend > 1.0f).");
+      return x0 + x * (x1 - x0);
+    }
+
+    #endregion
+
+    #region Fraction64
+
+    public static Fraction64 ln(Fraction64 value)
+    {
+      throw new System.NotImplementedException();
+    }
+
+    public static Fraction64 log(Fraction64 value, Fraction64 _base)
+    {
+      return (Fraction64)System.Math.Log((double)value, (double)_base);
+    }
+
+    public static Fraction64 root(Fraction64 _base, Fraction64 root)
+    {
+      throw new System.NotImplementedException();
+    }
+
+    public static Fraction64 exp(Fraction64 value)
+    {
+      throw new System.NotImplementedException();
+    }
+
+    public static Fraction64[] factorPrimes(Fraction64 value)
+    {
+      throw new System.NotImplementedException();
+    }
+
+    public static Fraction64 invert_mult(Fraction64 value)
+    {
+      return 1 / value;
+    }
+
+    public static Fraction64 invert_add(Fraction64 value)
+    {
+      return -value;
+    }
+
+    public static bool IsPrime(Fraction64 candidate)
+    {
+      if (candidate % 1 == 0)
+      {
+        if (candidate == 2) return true;
+        Fraction64 squareRoot = Algebra.sqrt(candidate);
+        for (int divisor = 3; divisor <= squareRoot; divisor += 2)
+          if ((candidate % divisor) == 0)
+            return false;
+        return true;
+      }
+      else
+        return false;
+    }
+
+    public static AvlTree<Fraction64> PrimeFactors(Fraction64 a)
+    {
+      AvlTree<Fraction64> factors =
+        new AvlTree_Linked<Fraction64>(Logic.Compare);
+      if (IsPrime(a))
+        factors.Add(a);
+      else
+        for (Fraction64 b = 2; a > 1; b++)
+          while (a % b == 0)
+          {
+            a /= b;
+            factors.Add(b);
+          }
+      return factors;
+    }
+
+    public static Fraction64 sqrt(Fraction64 number)
+    {
+      return (Fraction64)System.Math.Sqrt((double)number);
+    }
+
+    private static Fraction64 GreatestCommonDenominator(Fraction64 first, Fraction64 second)
+    {
+      if (first % 1 == 0 && second % 1 == 0)
+      {
+        if (first < 0) first = -first;
+        if (second < 0) second = -second;
+        Fraction64 temp = first;
+        do
+        {
+          if (first < second)
+          {
+            temp = first;
+            first = second;
+            second = temp;
+          }
+          first = first % second;
+        } while (first != 0);
+        return second;
+      }
+      throw new Error("GCD cannot be performed on non-natural numbers");
+    }
+
+    static public Fraction64 Lerp(Fraction64 x, Fraction64 x0, Fraction64 x1, Fraction64 y0, Fraction64 y1)
+    {
+      if ((x1 - x0) == 0)
+        return (y0 + y1) / 2;
+      return y0 + (x - x0) * (y1 - y0) / (x1 - x0);
+    }
+
+    public static Fraction64 Lerp(Fraction64 x, Fraction64 x0, Fraction64 x1)
+    {
+      if (x < 0 || x > 1)
+        throw new Error("invalid lerp blend value: (blend < 0.0f || blend > 1.0f).");
+      return x0 + x * (x1 - x0);
+    }
+
+    #endregion
 
     #region decimal
 
@@ -848,71 +1105,71 @@ namespace Seven.Mathematics
     internal static System.Reflection.MemberInfo[] _lnMethods =
       new System.Reflection.MemberInfo[]
     {
-      ((_ln<decimal>)Algebra.ln).Method,
-      ((_ln<double>)Algebra.ln).Method,
-      ((_ln<float>)Algebra.ln).Method,
-      ((_ln<long>)Algebra.ln).Method,
-      ((_ln<int>)Algebra.ln).Method,
+      ((Algebra.delegates.ln<decimal>)Algebra.ln).Method,
+      ((Algebra.delegates.ln<double>)Algebra.ln).Method,
+      ((Algebra.delegates.ln<float>)Algebra.ln).Method,
+      ((Algebra.delegates.ln<long>)Algebra.ln).Method,
+      ((Algebra.delegates.ln<int>)Algebra.ln).Method,
     };
 
     internal static System.Reflection.MemberInfo[] _logMethods =
       new System.Reflection.MemberInfo[]
     {
-      ((_log<decimal>)Algebra.log).Method,
-      ((_log<double>)Algebra.log).Method,
-      ((_log<float>)Algebra.log).Method,
-      ((_log<long>)Algebra.log).Method,
-      ((_log<int>)Algebra.log).Method,
+      ((Algebra.delegates.log<decimal>)Algebra.log).Method,
+      ((Algebra.delegates.log<double>)Algebra.log).Method,
+      ((Algebra.delegates.log<float>)Algebra.log).Method,
+      ((Algebra.delegates.log<long>)Algebra.log).Method,
+      ((Algebra.delegates.log<int>)Algebra.log).Method,
     };
 
     internal static System.Reflection.MemberInfo[] _sqrtMethods =
       new System.Reflection.MemberInfo[]
     {
-      ((_sqrt<decimal>)Algebra.sqrt).Method,
-      ((_sqrt<double>)Algebra.sqrt).Method,
-      ((_sqrt<float>)Algebra.sqrt).Method,
-      ((_sqrt<long>)Algebra.sqrt).Method,
-      ((_sqrt<int>)Algebra.sqrt).Method,
+      ((Algebra.delegates.sqrt<decimal>)Algebra.sqrt).Method,
+      ((Algebra.delegates.sqrt<double>)Algebra.sqrt).Method,
+      ((Algebra.delegates.sqrt<float>)Algebra.sqrt).Method,
+      ((Algebra.delegates.sqrt<long>)Algebra.sqrt).Method,
+      ((Algebra.delegates.sqrt<int>)Algebra.sqrt).Method,
     };
 
     internal static System.Reflection.MemberInfo[] _rootMethods =
       new System.Reflection.MemberInfo[]
     {
-      ((_root<decimal>)Algebra.root).Method,
-      ((_root<double>)Algebra.root).Method,
-      ((_root<float>)Algebra.root).Method,
-      ((_root<long>)Algebra.root).Method,
-      ((_root<int>)Algebra.root).Method,
+      ((Algebra.delegates.root<decimal>)Algebra.root).Method,
+      ((Algebra.delegates.root<double>)Algebra.root).Method,
+      ((Algebra.delegates.root<float>)Algebra.root).Method,
+      ((Algebra.delegates.root<long>)Algebra.root).Method,
+      ((Algebra.delegates.root<int>)Algebra.root).Method,
     };
 
     internal static System.Reflection.MemberInfo[] _expMethods =
       new System.Reflection.MemberInfo[]
     {
-      ((_exp<decimal>)Algebra.exp).Method,
-      ((_exp<double>)Algebra.exp).Method,
-      ((_exp<float>)Algebra.exp).Method,
-      ((_exp<long>)Algebra.exp).Method,
-      ((_exp<int>)Algebra.exp).Method,
+      ((Algebra.delegates.exp<decimal>)Algebra.exp).Method,
+      ((Algebra.delegates.exp<double>)Algebra.exp).Method,
+      ((Algebra.delegates.exp<float>)Algebra.exp).Method,
+      ((Algebra.delegates.exp<long>)Algebra.exp).Method,
+      ((Algebra.delegates.exp<int>)Algebra.exp).Method,
     };
 
     internal static System.Reflection.MemberInfo[] _factorPrimesMethods =
       new System.Reflection.MemberInfo[]
     {
-      ((_factorPrimes<decimal>)Algebra.factorPrimes).Method,
-      ((_factorPrimes<double>)Algebra.factorPrimes).Method,
-      ((_factorPrimes<float>)Algebra.factorPrimes).Method,
-      ((_factorPrimes<long>)Algebra.factorPrimes).Method,
-      ((_factorPrimes<int>)Algebra.factorPrimes).Method,
+      ((Algebra.delegates.factorPrimes<decimal>)Algebra.factorPrimes).Method,
+      ((Algebra.delegates.factorPrimes<double>)Algebra.factorPrimes).Method,
+      ((Algebra.delegates.factorPrimes<float>)Algebra.factorPrimes).Method,
+      ((Algebra.delegates.factorPrimes<long>)Algebra.factorPrimes).Method,
+      ((Algebra.delegates.factorPrimes<int>)Algebra.factorPrimes).Method,
     };
 
     internal static System.Reflection.MemberInfo[] _invertMethods =
       new System.Reflection.MemberInfo[]
     {
-      ((_invert_mult<decimal>)Algebra.invert_mult).Method,
-      ((_invert_mult<double>)Algebra.invert_mult).Method,
-      ((_invert_mult<float>)Algebra.invert_mult).Method,
-      ((_invert_mult<long>)Algebra.invert_mult).Method,
-      ((_invert_mult<int>)Algebra.invert_mult).Method,
+      ((Algebra.delegates.invert<decimal>)Algebra.invert_mult).Method,
+      ((Algebra.delegates.invert<double>)Algebra.invert_mult).Method,
+      ((Algebra.delegates.invert<float>)Algebra.invert_mult).Method,
+      ((Algebra.delegates.invert<long>)Algebra.invert_mult).Method,
+      ((Algebra.delegates.invert<int>)Algebra.invert_mult).Method,
     };
 
     //internal static System.Reflection.MemberInfo[] _factorPrimesMethods =
@@ -927,10 +1184,14 @@ namespace Seven.Mathematics
 
     #endregion
 
+    #region error
+
     /// <summary>Error type for all algebra computations.</summary>
     public class Error : Seven.Error
     {
       public Error(string message) : base(message) { }
     }
+
+    #endregion
   }
 }
