@@ -12,17 +12,17 @@ namespace Seven.Mathematics
     #region method
 
     /// <summary>Negates a value.</summary>
-    T Negate(T value);
+    Arithmetic.delegates.Negate<T> Negate { get; }
     /// <summary>Divides two operands.</summary>
-    T Divide(T left, T right);
+    Arithmetic.delegates.Divide<T> Divide { get; }
     /// <summary>Multiplies two operands.</summary>
-    T Multiply(T left, T right);
+    Arithmetic.delegates.Multiply<T> Multiply { get; }
     /// <summary>Adds two operands.</summary>
-    T Add(T left, T right);
+    Arithmetic.delegates.Add<T> Add { get; }
     /// <summary>Subtracts two operands.</summary>
-    T Subtract(T left, T right);
+    Arithmetic.delegates.Subtract<T> Subtract { get; }
     /// <summary>Takes one operand to the power of the other.</summary>
-    T Power(T _base, T power);
+    Arithmetic.delegates.Power<T> Power { get; }
 
     #endregion
   }
@@ -97,6 +97,122 @@ namespace Seven.Mathematics
 
     #endregion
 
+    #region implementation
+
+    #region Fraction128
+
+    public static Fraction128 Negate(Fraction128 i) { return -i; }
+
+    public static Fraction128 Divide(Fraction128 l, Fraction128 r) { return l / r; }
+
+    public static Fraction128 Multiply(Fraction128 l, Fraction128 r) { return l * r; }
+
+    public static Fraction128 Add(Fraction128 l, Fraction128 r) { return l + r; }
+
+    public static Fraction128 Subtract(Fraction128 l, Fraction128 r) { return l - r; }
+
+    public static Fraction128 Power(Fraction128 l, Fraction128 r) { return (Fraction128)System.Math.Pow((double)l, (double)r); }
+
+    #endregion
+
+    #region Fraction64
+
+    public static Fraction64 Negate(Fraction64 i) { return -i; }
+
+    public static Fraction64 Divide(Fraction64 l, Fraction64 r) { return l / r; }
+
+    public static Fraction64 Multiply(Fraction64 l, Fraction64 r) { return l * r; }
+
+    public static Fraction64 Add(Fraction64 l, Fraction64 r) { return l + r; }
+
+    public static Fraction64 Subtract(Fraction64 l, Fraction64 r) { return l - r; }
+
+    public static Fraction64 Power(Fraction64 l, Fraction64 r) { return (Fraction64)System.Math.Pow((double)l, (double)r); }
+
+    #endregion
+
+    #region decimal
+
+    public static decimal Negate(decimal i) { return -i; }
+
+    public static decimal Divide(decimal l, decimal r) { return l / r; }
+
+    public static decimal Multiply(decimal l, decimal r) { return l * r; }
+
+    public static decimal Add(decimal l, decimal r) { return l + r; }
+
+    public static decimal Subtract(decimal l, decimal r) { return l - r; }
+
+    public static decimal Power(decimal l, decimal r) { return (decimal)System.Math.Pow((double)l, (double)r); }
+
+    #endregion
+
+    #region double
+
+    public static double Negate(double i) { return -i; }
+
+    public static double Divide(double l, double r) { return l / r; }
+
+    public static double Multiply(double l, double r) { return l * r; }
+
+    public static double Add(double l, double r) { return l + r; }
+
+    public static double Subtract(double l, double r) { return l - r; }
+
+    public static double Power(double l, double r) { return (double)System.Math.Pow(l, r); }
+
+    #endregion
+
+    #region float
+
+    public static float Negate(float i) { return -i; }
+
+    public static float Divide(float l, float r) { return l / r; }
+
+    public static float Multiply(float l, float r) { return l * r; }
+
+    public static float Add(float l, float r) { return l + r; }
+
+    public static float Subtract(float l, float r) { return l - r; }
+
+    public static float Power(float l, float r) { return (float)System.Math.Pow(l, r); }
+
+    #endregion
+
+    #region long
+
+    public static long Negate(long i) { return -i; }
+
+    public static long Divide(long l, long r) { return l / r; }
+
+    public static long Multiply(long l, long r) { return l * r; }
+
+    public static long Add(long l, long r) { return l + r; }
+
+    public static long Subtract(long l, long r) { return l - r; }
+
+    public static long Power(long l, long r) { return (long)System.Math.Pow(l, r); }
+
+    #endregion
+
+    #region int
+
+    public static int Negate(int i) { return -i; }
+
+    public static int Divide(int l, int r) { return l / r; }
+
+    public static int Multiply(int l, int r) { return l * r; }
+
+    public static int Add(int l, int r) { return l + r; }
+
+    public static int Subtract(int l, int r) { return l - r; }
+
+    public static int Power(int l, int r) { return (int)System.Math.Pow(l, r); }
+
+    #endregion
+
+    #endregion
+
     #region library
 
     public static Seven.Structures.Map<object, System.Type> _arithmetics =
@@ -104,13 +220,13 @@ namespace Seven.Mathematics
         (System.Type left, System.Type right) => { return left == right; },
         (System.Type type) => { return type.GetHashCode(); })
 				{
+          { typeof(Fraction128), Arithmetic.Arithmetic_Fraction128.Get },
+          { typeof(Fraction64), Arithmetic.Arithmetic_Fraction64.Get },
+          { typeof(decimal), Arithmetic.Arithmetic_decimal.Get },
+          { typeof(double), Arithmetic.Arithmetic_double.Get },
+          { typeof(float), Arithmetic.Arithmetic_float.Get },
+          { typeof(long), Arithmetic.Arithmetic_long.Get },
 					{ typeof(int), Arithmetic.Arithmetic_int.Get },
-					{ typeof(double), Arithmetic.Arithmetic_double.Get },
-					{ typeof(float), Arithmetic.Arithmetic_float.Get },
-					{ typeof(decimal), Arithmetic.Arithmetic_decimal.Get },
-					{ typeof(long), Arithmetic.Arithmetic_long.Get },
-					{ typeof(short), Arithmetic.Arithmetic_short.Get },
-					{ typeof(byte), Arithmetic.Arithmetic_byte.Get }
 				};
 
     public static Arithmetic<T> Get<T>()
@@ -121,124 +237,68 @@ namespace Seven.Mathematics
 
     #region provided
 
-    private class Arithmetic_int : Arithmetic<int>
+    private class Arithmetic_Fraction128 : Arithmetic<Fraction128>
     {
-      private Arithmetic_int() { _instance = this; }
-      private static Arithmetic_int _instance;
-      private static Arithmetic_int Instance
+      private Arithmetic_Fraction128() { _instance = this; }
+      private static Arithmetic_Fraction128 _instance;
+      private static Arithmetic_Fraction128 Instance
       {
         get
         {
           if (_instance == null)
-            return _instance = new Arithmetic_int();
+            return _instance = new Arithmetic_Fraction128();
           else
             return _instance;
         }
       }
 
-      /// <summary>Gets Arithmetic for "int" types.</summary>
-      public static Arithmetic_int Get { get { return Instance; } }
+      /// <summary>Gets Arithmetic for "Fraction128" types.</summary>
+      public static Arithmetic_Fraction128 Get { get { return Instance; } }
 
       /// <summary>Negates a value.</summary>
-      public int Negate(int value) { return -value; }
-      /// <summary>Returns the value ignoring the sign.</summary>
-      public int Absolute(int value) { return System.Math.Abs(value); }
+      public Arithmetic.delegates.Negate<Fraction128> Negate { get { return Arithmetic.Negate; } }
       /// <summary>Divides two operands.</summary>
-      public int Divide(int left, int right) { return left / right; }
+      public Arithmetic.delegates.Divide<Fraction128> Divide { get { return Arithmetic.Divide; } }
       /// <summary>Multiplies two operands.</summary>
-      public int Multiply(int left, int right) { return left * right; }
+      public Arithmetic.delegates.Multiply<Fraction128> Multiply { get { return Arithmetic.Multiply; } }
       /// <summary>Adds two operands.</summary>
-      public int Add(int left, int right) { return left + right; }
+      public Arithmetic.delegates.Add<Fraction128> Add { get { return Arithmetic.Add; } }
       /// <summary>Subtracts two operands.</summary>
-      public int Subtract(int left, int right) { return left - right; }
+      public Arithmetic.delegates.Subtract<Fraction128> Subtract { get { return Arithmetic.Subtract; } }
       /// <summary>Takes one operand to the power of the other.</summary>
-      public int Power(int _base, int power) { return (int)System.Math.Pow(_base, power); }
-
-      /// <summary>Error type for all arithmetic computations.</summary>
-      public class Error : Arithmetic.Error
-      {
-        public Error(string message) : base(message) { }
-      }
+      public Arithmetic.delegates.Power<Fraction128> Power { get { return Arithmetic.Power; } }
     }
 
-    private class Arithmetic_float : Arithmetic<float>
+    private class Arithmetic_Fraction64 : Arithmetic<Fraction64>
     {
-      private Arithmetic_float() { _instance = this; }
-      private static Arithmetic_float _instance;
-      private static Arithmetic_float Instance
+      private Arithmetic_Fraction64() { _instance = this; }
+      private static Arithmetic_Fraction64 _instance;
+      private static Arithmetic_Fraction64 Instance
       {
         get
         {
           if (_instance == null)
-            return _instance = new Arithmetic_float();
+            return _instance = new Arithmetic_Fraction64();
           else
             return _instance;
         }
       }
 
-      /// <summary>Gets Arithmetic for "float" types.</summary>
-      public static Arithmetic_float Get { get { return Instance; } }
+      /// <summary>Gets Arithmetic for "Fraction64" types.</summary>
+      public static Arithmetic_Fraction64 Get { get { return Instance; } }
 
       /// <summary>Negates a value.</summary>
-      public float Negate(float value) { return -value; }
-      /// <summary>Returns the value ignoring the sign.</summary>
-      public float Absolute(float value) { return System.Math.Abs(value); }
+      public Arithmetic.delegates.Negate<Fraction64> Negate { get { return Arithmetic.Negate; } }
       /// <summary>Divides two operands.</summary>
-      public float Divide(float left, float right) { return left / right; }
+      public Arithmetic.delegates.Divide<Fraction64> Divide { get { return Arithmetic.Divide; } }
       /// <summary>Multiplies two operands.</summary>
-      public float Multiply(float left, float right) { return left * right; }
+      public Arithmetic.delegates.Multiply<Fraction64> Multiply { get { return Arithmetic.Multiply; } }
       /// <summary>Adds two operands.</summary>
-      public float Add(float left, float right) { return left + right; }
+      public Arithmetic.delegates.Add<Fraction64> Add { get { return Arithmetic.Add; } }
       /// <summary>Subtracts two operands.</summary>
-      public float Subtract(float left, float right) { return left - right; }
+      public Arithmetic.delegates.Subtract<Fraction64> Subtract { get { return Arithmetic.Subtract; } }
       /// <summary>Takes one operand to the power of the other.</summary>
-      public float Power(float left, float right) { return (float)System.Math.Pow(left, right); }
-
-      /// <summary>Error type for all arithmetic computations.</summary>
-      public class Error : Arithmetic.Error
-      {
-        public Error(string message) : base(message) { }
-      }
-    }
-
-    private class Arithmetic_double : Arithmetic<double>
-    {
-      private Arithmetic_double() { _instance = this; }
-      private static Arithmetic_double _instance;
-      private static Arithmetic_double Instance
-      {
-        get
-        {
-          if (_instance == null)
-            return _instance = new Arithmetic_double();
-          else
-            return _instance;
-        }
-      }
-
-      /// <summary>Gets Arithmetic for "double" types.</summary>
-      public static Arithmetic_double Get { get { return Instance; } }
-
-      /// <summary>Negates a value.</summary>
-      public double Negate(double value) { return -value; }
-      /// <summary>Returns the value ignoring the sign.</summary>
-      public double Absolute(double value) { return System.Math.Abs(value); }
-      /// <summary>Divides two operands.</summary>
-      public double Divide(double left, double right) { return left / right; }
-      /// <summary>Multiplies two operands.</summary>
-      public double Multiply(double left, double right) { return left * right; }
-      /// <summary>Adds two operands.</summary>
-      public double Add(double left, double right) { return left + right; }
-      /// <summary>Subtracts two operands.</summary>
-      public double Subtract(double left, double right) { return left - right; }
-      /// <summary>Takes one operand to the power of the other.</summary>
-      public double Power(double left, double right) { return System.Math.Pow(left, right); }
-
-      /// <summary>Error type for all arithmetic computations.</summary>
-      public class Error : Arithmetic.Error
-      {
-        public Error(string message) : base(message) { }
-      }
+      public Arithmetic.delegates.Power<Fraction64> Power { get { return Arithmetic.Power; } }
     }
 
     private class Arithmetic_decimal : Arithmetic<decimal>
@@ -260,25 +320,81 @@ namespace Seven.Mathematics
       public static Arithmetic_decimal Get { get { return Instance; } }
 
       /// <summary>Negates a value.</summary>
-      public decimal Negate(decimal value) { return -value; }
-      /// <summary>Returns the value ignoring the sign.</summary>
-      public decimal Absolute(decimal value) { return System.Math.Abs(value); }
+      public Arithmetic.delegates.Negate<decimal> Negate { get { return Arithmetic.Negate; } }
       /// <summary>Divides two operands.</summary>
-      public decimal Divide(decimal left, decimal right) { return left / right; }
+      public Arithmetic.delegates.Divide<decimal> Divide { get { return Arithmetic.Divide; } }
       /// <summary>Multiplies two operands.</summary>
-      public decimal Multiply(decimal left, decimal right) { return left * right; }
+      public Arithmetic.delegates.Multiply<decimal> Multiply { get { return Arithmetic.Multiply; } }
       /// <summary>Adds two operands.</summary>
-      public decimal Add(decimal left, decimal right) { return left + right; }
+      public Arithmetic.delegates.Add<decimal> Add { get { return Arithmetic.Add; } }
       /// <summary>Subtracts two operands.</summary>
-      public decimal Subtract(decimal left, decimal right) { return left - right; }
+      public Arithmetic.delegates.Subtract<decimal> Subtract { get { return Arithmetic.Subtract; } }
       /// <summary>Takes one operand to the power of the other.</summary>
-      public decimal Power(decimal left, decimal right) { return (decimal)System.Math.Pow((double)left, (double)right); }
+      public Arithmetic.delegates.Power<decimal> Power { get { return Arithmetic.Power; } }
+    }
 
-      /// <summary>Error type for all arithmetic computations.</summary>
-      public class Error : Arithmetic.Error
+    private class Arithmetic_double : Arithmetic<double>
+    {
+      private Arithmetic_double() { _instance = this; }
+      private static Arithmetic_double _instance;
+      private static Arithmetic_double Instance
       {
-        public Error(string message) : base(message) { }
+        get
+        {
+          if (_instance == null)
+            return _instance = new Arithmetic_double();
+          else
+            return _instance;
+        }
       }
+
+      /// <summary>Gets Arithmetic for "double" types.</summary>
+      public static Arithmetic_double Get { get { return Instance; } }
+
+      /// <summary>Negates a value.</summary>
+      public Arithmetic.delegates.Negate<double> Negate { get { return Arithmetic.Negate; } }
+      /// <summary>Divides two operands.</summary>
+      public Arithmetic.delegates.Divide<double> Divide { get { return Arithmetic.Divide; } }
+      /// <summary>Multiplies two operands.</summary>
+      public Arithmetic.delegates.Multiply<double> Multiply { get { return Arithmetic.Multiply; } }
+      /// <summary>Adds two operands.</summary>
+      public Arithmetic.delegates.Add<double> Add { get { return Arithmetic.Add; } }
+      /// <summary>Subtracts two operands.</summary>
+      public Arithmetic.delegates.Subtract<double> Subtract { get { return Arithmetic.Subtract; } }
+      /// <summary>Takes one operand to the power of the other.</summary>
+      public Arithmetic.delegates.Power<double> Power { get { return Arithmetic.Power; } }
+    }
+
+    private class Arithmetic_float : Arithmetic<float>
+    {
+      private Arithmetic_float() { _instance = this; }
+      private static Arithmetic_float _instance;
+      private static Arithmetic_float Instance
+      {
+        get
+        {
+          if (_instance == null)
+            return _instance = new Arithmetic_float();
+          else
+            return _instance;
+        }
+      }
+
+      /// <summary>Gets Arithmetic for "float" types.</summary>
+      public static Arithmetic_float Get { get { return Instance; } }
+
+      /// <summary>Negates a value.</summary>
+      public Arithmetic.delegates.Negate<float> Negate { get { return Arithmetic.Negate; } }
+      /// <summary>Divides two operands.</summary>
+      public Arithmetic.delegates.Divide<float> Divide { get { return Arithmetic.Divide; } }
+      /// <summary>Multiplies two operands.</summary>
+      public Arithmetic.delegates.Multiply<float> Multiply { get { return Arithmetic.Multiply; } }
+      /// <summary>Adds two operands.</summary>
+      public Arithmetic.delegates.Add<float> Add { get { return Arithmetic.Add; } }
+      /// <summary>Subtracts two operands.</summary>
+      public Arithmetic.delegates.Subtract<float> Subtract { get { return Arithmetic.Subtract; } }
+      /// <summary>Takes one operand to the power of the other.</summary>
+      public Arithmetic.delegates.Power<float> Power { get { return Arithmetic.Power; } }
     }
 
     private class Arithmetic_long : Arithmetic<long>
@@ -300,105 +416,49 @@ namespace Seven.Mathematics
       public static Arithmetic_long Get { get { return Instance; } }
 
       /// <summary>Negates a value.</summary>
-      public long Negate(long value) { return -value; }
-      /// <summary>Returns the value ignoring the sign.</summary>
-      public long Absolute(long value) { return System.Math.Abs(value); }
+      public Arithmetic.delegates.Negate<long> Negate { get { return Arithmetic.Negate; } }
       /// <summary>Divides two operands.</summary>
-      public long Divide(long left, long right) { return left / right; }
+      public Arithmetic.delegates.Divide<long> Divide { get { return Arithmetic.Divide; } }
       /// <summary>Multiplies two operands.</summary>
-      public long Multiply(long left, long right) { return left * right; }
+      public Arithmetic.delegates.Multiply<long> Multiply { get { return Arithmetic.Multiply; } }
       /// <summary>Adds two operands.</summary>
-      public long Add(long left, long right) { return left + right; }
+      public Arithmetic.delegates.Add<long> Add { get { return Arithmetic.Add; } }
       /// <summary>Subtracts two operands.</summary>
-      public long Subtract(long left, long right) { return left - right; }
+      public Arithmetic.delegates.Subtract<long> Subtract { get { return Arithmetic.Subtract; } }
       /// <summary>Takes one operand to the power of the other.</summary>
-      public long Power(long left, long right) { return (long)System.Math.Pow(left, right); }
-
-      /// <summary>Error type for all arithmetic computations.</summary>
-      public class Error : Arithmetic.Error
-      {
-        public Error(string message) : base(message) { }
-      }
+      public Arithmetic.delegates.Power<long> Power { get { return Arithmetic.Power; } }
     }
 
-    private class Arithmetic_short : Arithmetic<short>
+    private class Arithmetic_int : Arithmetic<int>
     {
-      private Arithmetic_short() { _instance = this; }
-      private static Arithmetic_short _instance;
-      private static Arithmetic_short Instance
+      private Arithmetic_int() { _instance = this; }
+      private static Arithmetic_int _instance;
+      private static Arithmetic_int Instance
       {
         get
         {
           if (_instance == null)
-            return _instance = new Arithmetic_short();
+            return _instance = new Arithmetic_int();
           else
             return _instance;
         }
       }
 
-      /// <summary>Gets Arithmetic for "short" types.</summary>
-      public static Arithmetic_short Get { get { return Instance; } }
+      /// <summary>Gets Arithmetic for "int" types.</summary>
+      public static Arithmetic_int Get { get { return Instance; } }
 
       /// <summary>Negates a value.</summary>
-      public short Negate(short value) { return (short)-value; }
-      /// <summary>Returns the value ignoring the sign.</summary>
-      public short Absolute(short value) { return System.Math.Abs(value); }
+      public Arithmetic.delegates.Negate<int> Negate { get { return Arithmetic.Negate; } }
       /// <summary>Divides two operands.</summary>
-      public short Divide(short left, short right) { return (short)(left / right); }
+      public Arithmetic.delegates.Divide<int> Divide { get { return Arithmetic.Divide; } }
       /// <summary>Multiplies two operands.</summary>
-      public short Multiply(short left, short right) { return (short)(left * right); }
+      public Arithmetic.delegates.Multiply<int> Multiply { get { return Arithmetic.Multiply; } }
       /// <summary>Adds two operands.</summary>
-      public short Add(short left, short right) { return (short)(left + right); }
+      public Arithmetic.delegates.Add<int> Add { get { return Arithmetic.Add; } }
       /// <summary>Subtracts two operands.</summary>
-      public short Subtract(short left, short right) { return (short)(left - right); }
+      public Arithmetic.delegates.Subtract<int> Subtract { get { return Arithmetic.Subtract; } }
       /// <summary>Takes one operand to the power of the other.</summary>
-      public short Power(short left, short right) { return (short)System.Math.Pow(left, right); }
-
-      /// <summary>Error type for all arithmetic computations.</summary>
-      public class Error : Arithmetic.Error
-      {
-        public Error(string message) : base(message) { }
-      }
-    }
-
-    private class Arithmetic_byte : Arithmetic<byte>
-    {
-      private Arithmetic_byte() { _instance = this; }
-      private static Arithmetic_byte _instance;
-      private static Arithmetic_byte Instance
-      {
-        get
-        {
-          if (_instance == null)
-            return _instance = new Arithmetic_byte();
-          else
-            return _instance;
-        }
-      }
-
-      /// <summary>Gets Arithmetic for "byte" types.</summary>
-      public static Arithmetic_byte Get { get { return Instance; } }
-
-      /// <summary>Negates a value.</summary>
-      public byte Negate(byte b) { throw new Arithmetic.Error("attempting to negate a byte."); }
-      /// <summary>Returns the value ignoring the sign.</summary>
-      public byte Absolute(byte b) { return b; }
-      /// <summary>Divides two operands.</summary>
-      public byte Divide(byte left, byte right) { return (byte)(left / right); }
-      /// <summary>Multiplies two operands.</summary>
-      public byte Multiply(byte left, byte right) { return (byte)(left * right); }
-      /// <summary>Adds two operands.</summary>
-      public byte Add(byte left, byte right) { return (byte)(left + right); }
-      /// <summary>Subtracts two operands.</summary>
-      public byte Subtract(byte left, byte right) { return (byte)(left - right); }
-      /// <summary>Takes one operand to the power of the other.</summary>
-      public byte Power(byte left, byte right) { return (byte)System.Math.Pow(left, right); }
-
-      /// <summary>Error type for all arithmetic computations.</summary>
-      public class Error : Arithmetic.Error
-      {
-        public Error(string message) : base(message) { }
-      }
+      public Arithmetic.delegates.Power<int> Power { get { return Arithmetic.Power; } }
     }
 
     #endregion

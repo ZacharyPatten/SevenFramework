@@ -89,8 +89,14 @@ namespace Seven.Mathematics
 				(System.Type left, System.Type right) => { return left == right; },
 				(System.Type type) => { return type.GetHashCode(); })
 				{
+          // provided types
+          { typeof(Fraction128), Algebra_Fraction128.Get },
+          { typeof(Fraction64), Algebra_Fraction64.Get },
+          { typeof(decimal), Algebra_decimal.Get },
 					{ typeof(double), Algebra_double.Get },
           { typeof(float), Algebra_float.Get },
+          { typeof(long), Algebra_long.Get },
+          { typeof(int), Algebra_int.Get },
 				};
 
     public static void Set<T>(Algebra<T> _algebra)
@@ -115,6 +121,72 @@ namespace Seven.Mathematics
 		}
 
     #region provided
+
+    private class Algebra_Fraction128 : Algebra<Fraction128>
+    {
+      private Algebra_Fraction128() { _instance = this; }
+      private static Algebra_Fraction128 _instance;
+      private static Algebra_Fraction128 Instance
+      {
+        get
+        {
+          if (_instance == null)
+            return _instance = new Algebra_Fraction128();
+          else
+            return _instance;
+        }
+      }
+
+      public static Algebra_Fraction128 Get { get { return Instance; } }
+
+      public Algebra.delegates.ln<Fraction128> ln
+      { get { return Algebra.ln; } }
+      public Algebra.delegates.log<Fraction128> log
+      { get { return Algebra.log; } }
+      public Algebra.delegates.sqrt<Fraction128> sqrt
+      { get { return Algebra.sqrt; } }
+      public Algebra.delegates.root<Fraction128> root
+      { get { return Algebra.root; } }
+      public Algebra.delegates.exp<Fraction128> exp
+      { get { return Algebra.exp; } }
+      public Algebra.delegates.factorPrimes<Fraction128> factorPrimes
+      { get { return Algebra.factorPrimes; } }
+      public Algebra.delegates.invert<Fraction128> invert_mult
+      { get { return Algebra.invert_mult; } }
+    }
+
+    private class Algebra_Fraction64 : Algebra<Fraction64>
+    {
+      private Algebra_Fraction64() { _instance = this; }
+      private static Algebra_Fraction64 _instance;
+      private static Algebra_Fraction64 Instance
+      {
+        get
+        {
+          if (_instance == null)
+            return _instance = new Algebra_Fraction64();
+          else
+            return _instance;
+        }
+      }
+
+      public static Algebra_Fraction64 Get { get { return Instance; } }
+
+      public Algebra.delegates.ln<Fraction64> ln
+      { get { return Algebra.ln; } }
+      public Algebra.delegates.log<Fraction64> log
+      { get { return Algebra.log; } }
+      public Algebra.delegates.sqrt<Fraction64> sqrt
+      { get { return Algebra.sqrt; } }
+      public Algebra.delegates.root<Fraction64> root
+      { get { return Algebra.root; } }
+      public Algebra.delegates.exp<Fraction64> exp
+      { get { return Algebra.exp; } }
+      public Algebra.delegates.factorPrimes<Fraction64> factorPrimes
+      { get { return Algebra.factorPrimes; } }
+      public Algebra.delegates.invert<Fraction64> invert_mult
+      { get { return Algebra.invert_mult; } }
+    }
 
     private class Algebra_decimal : Algebra<decimal>
     {
@@ -299,19 +371,19 @@ namespace Seven.Mathematics
       public static Algebra_unsupported<T> Get { get { return Instance; } }
 
       public Algebra.delegates.ln<T> ln
-      { get { throw new Error("there is no implementation of algebra for " + typeof(T)); } }
+      { get { return (T a) => { throw new Error("there is no implementation of algebra for " + typeof(T)); }; } }
       public Algebra.delegates.log<T> log
-      { get { throw new Error("there is no implementation of algebra for " + typeof(T)); } }
+      { get { return (T a, T b) => { throw new Error("there is no implementation of algebra for " + typeof(T)); }; } }
       public Algebra.delegates.sqrt<T> sqrt
-      { get { throw new Error("there is no implementation of algebra for " + typeof(T)); } }
+      { get { return (T a) => { throw new Error("there is no implementation of algebra for " + typeof(T)); }; } }
       public Algebra.delegates.root<T> root
-      { get { throw new Error("there is no implementation of algebra for " + typeof(T)); } }
+      { get { return (T a, T b) => { throw new Error("there is no implementation of algebra for " + typeof(T)); }; } }
       public Algebra.delegates.exp<T> exp
-      { get { throw new Error("there is no implementation of algebra for " + typeof(T)); } }
+      { get { return (T a) => { throw new Error("there is no implementation of algebra for " + typeof(T)); }; } }
       public Algebra.delegates.factorPrimes<T> factorPrimes
-      { get { throw new Error("there is no implementation of algebra for " + typeof(T)); } }
+      { get { return (T a) => { throw new Error("there is no implementation of algebra for " + typeof(T)); }; } }
       public Algebra.delegates.invert<T> invert_mult
-      { get { throw new Error("there is no implementation of algebra for " + typeof(T)); } }
+      { get { return (T a) => { throw new Error("there is no implementation of algebra for " + typeof(T)); }; } }
     }
 
     #endregion
