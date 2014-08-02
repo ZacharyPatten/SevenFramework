@@ -11,26 +11,16 @@ namespace Seven.Mathematics
   {
     #region property
 
-    /// <summary>Gets the absolute value of a value.</summary>
-		T Abs(T value);
-    /// <summary>Determines the largest value of the operands.</summary>
-    T Max(params T[] values);
-    /// <summary>Determines and returns the larger operand.</summary>
-    T Max(T left, T right);
-    /// <summary>Determines the smallest value of the operands.</summary>
-    T Min(params T[] values);
-    /// <summary>Determines and returns the smaller operand.</summary>
-    T Min(T left, T right);
-    /// <summary>Determines equality between two operands.</summary>
-    bool Equate(T left, T right);
-    /// <summary>Determines equality between two operands with a leniency.</summary>
-    bool Equate(T left, T right, T leniency);
-    /// <summary>Determines equality between multiple operands.</summary>
-    bool Equate(params T[] values);
-    /// <summary>Compares two operands.</summary>
-    Comparison Compare(T left, T right);
-		/// <summary>Clamps a value by a minimum and maximum.</summary>
-		T Clamp(T value, T minimum, T maximum);
+    Logic.delegates.abs<T> abs { get; }
+    Logic.delegates.max_params<T>  max_params { get; }
+    Logic.delegates.max<T> max { get; }
+    Logic.delegates.min_params<T> min_params { get; }
+    Logic.delegates.min<T> min { get; }
+    Logic.delegates.clamp<T> clamp { get; }
+    Logic.delegates.equ_len<T> equ_len { get; }
+    Equate<T> equ { get; }
+    Equate_params<T> equ_params { get; }
+    Compare<T> comp { get; }
 
     #endregion
   }
@@ -77,6 +67,13 @@ namespace Seven.Mathematics
       /// <param name="maximum">The maximum value allowed.</param>
       /// <returns>The possibly clamped value.</returns>
       public delegate T clamp<T>(T value, T minimum, T maximum);
+      /// <summary>Checks for equality by value with a leniency.</summary>
+      /// <typeparam name="T">The numeric type of the min operation.</typeparam>
+      /// <param name="left">The left operand of the equate operation.</param>
+      /// <param name="right">The right operand of the equate operation.</param>
+      /// <param name="leniency">The leniency of the equate operation.</param>
+      /// <returns>True if the operand are within the leniency of each other.</returns>
+      public delegate bool equ_len<T>(T left, T right, T leniency);
 
     }
 
@@ -123,30 +120,16 @@ namespace Seven.Mathematics
 
       public static Logic_decimal Get { get { return Instance; } }
 
-      /// <summary>Returns a less/greater/equal comparison.</summary>
-      public Comparison Compare(decimal left, decimal right) { return Logic.Compare(left, right); }
-      /// <summary>Returns true if all values are equal.</summary>
-      public bool Equate(params decimal[] values) { return Logic.Equate(values); }
-      /// <summary>Returns left == right.</summary>
-      public bool Equate(decimal left, decimal right) { return Logic.Equate(left, right); }
-      /// <summary>Returns Abs(left - right) < leniency.</summary>
-      public bool Equate(decimal left, decimal right, decimal leniency) { return Logic.Equate(left, right, leniency); }
-      /// <summary>Returns the maximum value.</summary>
-      public decimal Max(params decimal[] values) { return Logic.Max(values); }
-      /// <summary>Returns the maximum value.</summary>
-      public decimal Max(decimal first, decimal second) { return Logic.Max(first, second); }
-      /// <summary>Returns the minimum value.</summary>
-      public decimal Min(params decimal[] values) { return Logic.Min(values); }
-      /// <summary>Returns the minimum value.</summary>
-      public decimal Min(decimal first, decimal second) { return Logic.Min(first, second); }
-      /// <summary>Returns the absolute value of the provided value.</summary>
-      public decimal Abs(decimal number) { return Logic.Abs(number); }
-      /// <summary>Returns left < right.</summary>
-      public bool LessThan(decimal left, decimal right) { return Logic.LessThan(left, right); }
-      /// <summary>Returns left > right.</summary>
-      public bool GreaterThan(decimal left, decimal right) { return Logic.GreaterThan(left, right); }
-      /// <summary>Clamps a value to be within a given minimum and maximum range.</summary>
-      public decimal Clamp(decimal value, decimal minimum, decimal maximum) { return Logic.Clamp(value, minimum, maximum); }
+      public Logic.delegates.abs<decimal> abs { get { return Logic.Abs; } }
+      public Logic.delegates.max_params<decimal> max_params { get { return Logic.Max; } }
+      public Logic.delegates.max<decimal> max { get { return Logic.Max; } }
+      public Logic.delegates.min_params<decimal> min_params { get { return Logic.Min; } }
+      public Logic.delegates.min<decimal> min { get { return Logic.Min; } }
+      public Logic.delegates.clamp<decimal> clamp { get { return Logic.Clamp; } }
+      public Logic.delegates.equ_len<decimal> equ_len { get { return Logic.Equate; } }
+      public Equate<decimal> equ { get { return Logic.Equate; } }
+      public Equate_params<decimal> equ_params { get { return Logic.Equate; } }
+      public Compare<decimal> comp { get { return Logic.Compare; } }
     }
 
     public class Logic_double : Logic<double>
@@ -166,30 +149,16 @@ namespace Seven.Mathematics
 
       public static Logic_double Get { get { return Instance; } }
 
-      /// <summary>Returns a less/greater/equal comparison.</summary>
-      public Comparison Compare(double left, double right) { return Logic.Compare(left, right); }
-      /// <summary>Returns true if all values are equal.</summary>
-      public bool Equate(params double[] values) { return Logic.Equate(values); }
-      /// <summary>Returns left == right.</summary>
-      public bool Equate(double left, double right) { return Logic.Equate(left, right); }
-      /// <summary>Returns Abs(left - right) < leniency.</summary>
-      public bool Equate(double left, double right, double leniency) { return Logic.Equate(left, right, leniency); }
-      /// <summary>Returns the maximum value.</summary>
-      public double Max(params double[] values) { return Logic.Max(values); }
-      /// <summary>Returns the maximum value.</summary>
-      public double Max(double first, double second) { return Logic.Max(first, second); }
-      /// <summary>Returns the minimum value.</summary>
-      public double Min(params double[] values) { return Logic.Min(values); }
-      /// <summary>Returns the minimum value.</summary>
-      public double Min(double first, double second) { return Logic.Min(first, second); }
-      /// <summary>Returns the absolute value of the provided value.</summary>
-      public double Abs(double number) { return Logic.Abs(number); }
-      /// <summary>Returns left < right.</summary>
-      public bool LessThan(double left, double right) { return Logic.LessThan(left, right); }
-      /// <summary>Returns left > right.</summary>
-      public bool GreaterThan(double left, double right) { return Logic.GreaterThan(left, right); }
-      /// <summary>Clamps a value to be within a given minimum and maximum range.</summary>
-      public double Clamp(double value, double minimum, double maximum) { return Logic.Clamp(value, minimum, maximum); }
+      public Logic.delegates.abs<double> abs { get { return Logic.Abs; } }
+      public Logic.delegates.max_params<double> max_params { get { return Logic.Max; } }
+      public Logic.delegates.max<double> max { get { return Logic.Max; } }
+      public Logic.delegates.min_params<double> min_params { get { return Logic.Min; } }
+      public Logic.delegates.min<double> min { get { return Logic.Min; } }
+      public Logic.delegates.clamp<double> clamp { get { return Logic.Clamp; } }
+      public Logic.delegates.equ_len<double> equ_len { get { return Logic.Equate; } }
+      public Equate<double> equ { get { return Logic.Equate; } }
+      public Equate_params<double> equ_params { get { return Logic.Equate; } }
+      public Compare<double> comp { get { return Logic.Compare; } }
     }
 
     public class Logic_float : Logic<float>
@@ -209,30 +178,16 @@ namespace Seven.Mathematics
 
       public static Logic_float Get { get { return Instance; } }
 
-      /// <summary>Returns a less/greater/equal comparison.</summary>
-      public Comparison Compare(float left, float right) { return Logic.Compare(left, right); }
-      /// <summary>Returns true if all values are equal.</summary>
-      public bool Equate(params float[] values) { return Logic.Equate(values); }
-      /// <summary>Returns left == right.</summary>
-      public bool Equate(float left, float right) { return Logic.Equate(left, right); }
-      /// <summary>Returns Abs(left - right) < leniency.</summary>
-      public bool Equate(float left, float right, float leniency) { return Logic.Equate(left, right, leniency); }
-      /// <summary>Returns the maximum value.</summary>
-      public float Max(params float[] values) { return Logic.Max(values); }
-      /// <summary>Returns the maximum value.</summary>
-      public float Max(float first, float second) { return Logic.Max(first, second); }
-      /// <summary>Returns the minimum value.</summary>
-      public float Min(params float[] values) { return Logic.Min(values); }
-      /// <summary>Returns the minimum value.</summary>
-      public float Min(float first, float second) { return Logic.Min(first, second); }
-      /// <summary>Returns the absolute value of the provided value.</summary>
-      public float Abs(float number) { return Logic.Abs(number); }
-      /// <summary>Returns left < right.</summary>
-      public bool LessThan(float left, float right) { return Logic.LessThan(left, right); }
-      /// <summary>Returns left > right.</summary>
-      public bool GreaterThan(float left, float right) { return Logic.GreaterThan(left, right); }
-      /// <summary>Clamps a value to be within a given minimum and maximum range.</summary>
-      public float Clamp(float value, float minimum, float maximum) { return Logic.Clamp(value, minimum, maximum); }
+      public Logic.delegates.abs<float> abs { get { return Logic.Abs; } }
+      public Logic.delegates.max_params<float> max_params { get { return Logic.Max; } }
+      public Logic.delegates.max<float> max { get { return Logic.Max; } }
+      public Logic.delegates.min_params<float> min_params { get { return Logic.Min; } }
+      public Logic.delegates.min<float> min { get { return Logic.Min; } }
+      public Logic.delegates.clamp<float> clamp { get { return Logic.Clamp; } }
+      public Logic.delegates.equ_len<float> equ_len { get { return Logic.Equate; } }
+      public Equate<float> equ { get { return Logic.Equate; } }
+      public Equate_params<float> equ_params { get { return Logic.Equate; } }
+      public Compare<float> comp { get { return Logic.Compare; } }
     }
 
     public class Logic_long : Logic<long>
@@ -252,30 +207,16 @@ namespace Seven.Mathematics
 
       public static Logic_long Get { get { return Instance; } }
 
-      /// <summary>Returns a less/greater/equal comparison.</summary>
-      public Comparison Compare(long left, long right) { return Logic.Compare(left, right); }
-      /// <summary>Returns true if all values are equal.</summary>
-      public bool Equate(params long[] values) { return Logic.Equate(values); }
-      /// <summary>Returns left == right.</summary>
-      public bool Equate(long left, long right) { return Logic.Equate(left, right); }
-      /// <summary>Returns Abs(left - right) < leniency.</summary>
-      public bool Equate(long left, long right, long leniency) { return Logic.Equate(left, right, leniency); }
-      /// <summary>Returns the maximum value.</summary>
-      public long Max(params long[] values) { return Logic.Max(values); }
-      /// <summary>Returns the maximum value.</summary>
-      public long Max(long first, long second) { return Logic.Max(first, second); }
-      /// <summary>Returns the minimum value.</summary>
-      public long Min(params long[] values) { return Logic.Min(values); }
-      /// <summary>Returns the minimum value.</summary>
-      public long Min(long first, long second) { return Logic.Min(first, second); }
-      /// <summary>Returns the absolute value of the provided value.</summary>
-      public long Abs(long number) { return Logic.Abs(number); }
-      /// <summary>Returns left < right.</summary>
-      public bool LessThan(long left, long right) { return Logic.LessThan(left, right); }
-      /// <summary>Returns left > right.</summary>
-      public bool GreaterThan(long left, long right) { return Logic.GreaterThan(left, right); }
-      /// <summary>Clamps a value to be within a given minimum and maximum range.</summary>
-      public long Clamp(long value, long minimum, long maximum) { return Logic.Clamp(value, minimum, maximum); }
+      public Logic.delegates.abs<long> abs { get { return Logic.Abs; } }
+      public Logic.delegates.max_params<long> max_params { get { return Logic.Max; } }
+      public Logic.delegates.max<long> max { get { return Logic.Max; } }
+      public Logic.delegates.min_params<long> min_params { get { return Logic.Min; } }
+      public Logic.delegates.min<long> min { get { return Logic.Min; } }
+      public Logic.delegates.clamp<long> clamp { get { return Logic.Clamp; } }
+      public Logic.delegates.equ_len<long> equ_len { get { return Logic.Equate; } }
+      public Equate<long> equ { get { return Logic.Equate; } }
+      public Equate_params<long> equ_params { get { return Logic.Equate; } }
+      public Compare<long> comp { get { return Logic.Compare; } }
     }
 
     public class Logic_int : Logic<int>
@@ -295,30 +236,16 @@ namespace Seven.Mathematics
 
       public static Logic_int Get { get { return Instance; } }
 
-      /// <summary>Returns a less/greater/equal comparison.</summary>
-      public Comparison Compare(int left, int right) { return Logic.Compare(left, right); }
-      /// <summary>Returns true if all values are equal.</summary>
-      public bool Equate(params int[] values) { return Logic.Equate(values); }
-      /// <summary>Returns left == right.</summary>
-      public bool Equate(int left, int right) { return Logic.Equate(left, right); }
-      /// <summary>Returns Abs(left - right) < leniency.</summary>
-      public bool Equate(int left, int right, int leniency) { return Logic.Equate(left, right, leniency); }
-      /// <summary>Returns the maximum value.</summary>
-      public int Max(params int[] values) { return Logic.Max(values); }
-      /// <summary>Returns the maximum value.</summary>
-      public int Max(int first, int second) { return Logic.Max(first, second); }
-      /// <summary>Returns the minimum value.</summary>
-      public int Min(params int[] values) { return Logic.Min(values); }
-      /// <summary>Returns the minimum value.</summary>
-      public int Min(int first, int second) { return Logic.Min(first, second); }
-      /// <summary>Returns the absolute value of the provided value.</summary>
-      public int Abs(int number) { return Logic.Abs(number); }
-      /// <summary>Returns left < right.</summary>
-      public bool LessThan(int left, int right) { return Logic.LessThan(left, right); }
-      /// <summary>Returns left > right.</summary>
-      public bool GreaterThan(int left, int right) { return Logic.GreaterThan(left, right); }
-      /// <summary>Clamps a value to be within a given minimum and maximum range.</summary>
-      public int Clamp(int value, int minimum, int maximum) { return Logic.Clamp(value, minimum, maximum); }
+      public Logic.delegates.abs<int> abs { get { return Logic.Abs; } }
+      public Logic.delegates.max_params<int> max_params { get { return Logic.Max; } }
+      public Logic.delegates.max<int> max { get { return Logic.Max; } }
+      public Logic.delegates.min_params<int> min_params { get { return Logic.Min; } }
+      public Logic.delegates.min<int> min { get { return Logic.Min; } }
+      public Logic.delegates.clamp<int> clamp { get { return Logic.Clamp; } }
+      public Logic.delegates.equ_len<int> equ_len { get { return Logic.Equate; } }
+      public Equate<int> equ { get { return Logic.Equate; } }
+      public Equate_params<int> equ_params { get { return Logic.Equate; } }
+      public Compare<int> comp { get { return Logic.Compare; } }
     }
 
     public class Logic_short : Logic<short>
@@ -338,30 +265,16 @@ namespace Seven.Mathematics
 
       public static Logic_short Get { get { return Instance; } }
 
-      /// <summary>Returns a less/greater/equal comparison.</summary>
-      public Comparison Compare(short left, short right) { return Logic.Compare(left, right); }
-      /// <summary>Returns true if all values are equal.</summary>
-      public bool Equate(params short[] values) { return Logic.Equate(values); }
-      /// <summary>Returns left == right.</summary>
-      public bool Equate(short left, short right) { return Logic.Equate(left, right); }
-      /// <summary>Returns Abs(left - right) < leniency.</summary>
-      public bool Equate(short left, short right, short leniency) { return Logic.Equate(left, right, leniency); }
-      /// <summary>Returns the maximum value.</summary>
-      public short Max(params short[] values) { return Logic.Max(values); }
-      /// <summary>Returns the maximum value.</summary>
-      public short Max(short first, short second) { return Logic.Max(first, second); }
-      /// <summary>Returns the minimum value.</summary>
-      public short Min(params short[] values) { return Logic.Min(values); }
-      /// <summary>Returns the minimum value.</summary>
-      public short Min(short first, short second) { return Logic.Min(first, second); }
-      /// <summary>Returns the absolute value of the provided value.</summary>
-      public short Abs(short number) { return Logic.Abs(number); }
-      /// <summary>Returns left < right.</summary>
-      public bool LessThan(short left, short right) { return Logic.LessThan(left, right); }
-      /// <summary>Returns left > right.</summary>
-      public bool GreaterThan(short left, short right) { return Logic.GreaterThan(left, right); }
-      /// <summary>Clamps a value to be within a given minimum and maximum range.</summary>
-      public short Clamp(short value, short minimum, short maximum) { return Logic.Clamp(value, minimum, maximum); }
+      public Logic.delegates.abs<short> abs { get { return Logic.Abs; } }
+      public Logic.delegates.max_params<short> max_params { get { return Logic.Max; } }
+      public Logic.delegates.max<short> max { get { return Logic.Max; } }
+      public Logic.delegates.min_params<short> min_params { get { return Logic.Min; } }
+      public Logic.delegates.min<short> min { get { return Logic.Min; } }
+      public Logic.delegates.clamp<short> clamp { get { return Logic.Clamp; } }
+      public Logic.delegates.equ_len<short> equ_len { get { return Logic.Equate; } }
+      public Equate<short> equ { get { return Logic.Equate; } }
+      public Equate_params<short> equ_params { get { return Logic.Equate; } }
+      public Compare<short> comp { get { return Logic.Compare; } }
     }
 
     public class Logic_byte : Logic<byte>
@@ -381,30 +294,16 @@ namespace Seven.Mathematics
 
       public static Logic_byte Get { get { return Instance; } }
 
-      /// <summary>Returns a less/greater/equal comparison.</summary>
-      public Comparison Compare(byte left, byte right) { return Logic.Compare(left, right); }
-      /// <summary>Returns true if all values are equal.</summary>
-      public bool Equate(params byte[] values) { return Logic.Equate(values); }
-      /// <summary>Returns left == right.</summary>
-      public bool Equate(byte left, byte right) { return Logic.Equate(left, right); }
-      /// <summary>Returns Abs(left - right) < leniency.</summary>
-      public bool Equate(byte left, byte right, byte leniency) { return Logic.Equate(left, right, leniency); }
-      /// <summary>Returns the maximum value.</summary>
-      public byte Max(params byte[] values) { return Logic.Max(values); }
-      /// <summary>Returns the maximum value.</summary>
-      public byte Max(byte first, byte second) { return Logic.Max(first, second); }
-      /// <summary>Returns the minimum value.</summary>
-      public byte Min(params byte[] values) { return Logic.Min(values); }
-      /// <summary>Returns the minimum value.</summary>
-      public byte Min(byte first, byte second) { return Logic.Min(first, second); }
-      /// <summary>Returns the absolute value of the provided value.</summary>
-      public byte Abs(byte number) { return Logic.Abs(number); }
-      /// <summary>Returns left < right.</summary>
-      public bool LessThan(byte left, byte right) { return Logic.LessThan(left, right); }
-      /// <summary>Returns left > right.</summary>
-      public bool GreaterThan(byte left, byte right) { return Logic.GreaterThan(left, right); }
-      /// <summary>Clamps a value to be within a given minimum and maximum range.</summary>
-      public byte Clamp(byte value, byte minimum, byte maximum) { return Logic.Clamp(value, minimum, maximum); }
+      public Logic.delegates.abs<byte> abs { get { return Logic.Abs; } }
+      public Logic.delegates.max_params<byte> max_params { get { return Logic.Max; } }
+      public Logic.delegates.max<byte> max { get { return Logic.Max; } }
+      public Logic.delegates.min_params<byte> min_params { get { return Logic.Min; } }
+      public Logic.delegates.min<byte> min { get { return Logic.Min; } }
+      public Logic.delegates.clamp<byte> clamp { get { return Logic.Clamp; } }
+      public Logic.delegates.equ_len<byte> equ_len { get { return Logic.Equate; } }
+      public Equate<byte> equ { get { return Logic.Equate; } }
+      public Equate_params<byte> equ_params { get { return Logic.Equate; } }
+      public Compare<byte> comp { get { return Logic.Compare; } }
     }
 
     #endregion

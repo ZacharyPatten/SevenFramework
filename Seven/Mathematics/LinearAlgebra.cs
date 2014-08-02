@@ -1541,9 +1541,9 @@ namespace Seven.Mathematics
       private Algebra.delegates.invert<T> _Invert_Multiplicative;
 
       // Trigonometry
-      private Trigonometry._sin<T> _sin;
-      private Trigonometry._cos<T> _cos;
-      private Trigonometry._arccos<T> _acos;
+      private Trigonometry.delegates.sin<T> _sin;
+      private Trigonometry.delegates.cos<T> _cos;
+      private Trigonometry.delegates.acos<T> _acos;
 
       #endregion
 
@@ -1563,9 +1563,9 @@ namespace Seven.Mathematics
         Arithmetic.delegates.Divide<T> divide,
         Algebra.delegates.sqrt<T> sqrt,
         Algebra.delegates.invert<T> invert_mult,
-        Trigonometry._sin<T> sin,
-        Trigonometry._cos<T> cos,
-        Trigonometry._arccos<T> arccos)
+        Trigonometry.delegates.sin<T> sin,
+        Trigonometry.delegates.cos<T> cos,
+        Trigonometry.delegates.acos<T> arccos)
       {
         _zero = zero;
         _one = one;

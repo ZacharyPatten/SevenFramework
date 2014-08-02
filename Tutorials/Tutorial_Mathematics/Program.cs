@@ -1,11 +1,11 @@
 ﻿using System;
+using System.Linq.Expressions;
+
 using Seven;
 using Seven.Mathematics;
 using Seven.Mathematics.Symbolics;
-using System.Linq.Expressions;
-using Seven.Mathematics.Symbolics.Tools;
-
 using Seven.Mathematics.Syntax;
+using Seven.Mathematics.Symbolics.Tools;
 
 namespace Tutorial_Mathematics
 {
