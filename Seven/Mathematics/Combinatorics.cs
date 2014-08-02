@@ -58,9 +58,9 @@ namespace Seven.Mathematics
 				{
 					{ typeof(int), Combinatorics_int.Get },
           { typeof(long), Combinatorics_long.Get },
-          { typeof(long), Combinatorics_float.Get },
-          { typeof(long), Combinatorics_double.Get },
-          { typeof(long), Combinatorics_decimal.Get },
+          { typeof(float), Combinatorics_float.Get },
+          { typeof(double), Combinatorics_double.Get },
+          { typeof(decimal), Combinatorics_decimal.Get },
 				};
 
     public static Combinatorics<T> Get<T>()
@@ -507,7 +507,7 @@ namespace Seven.Mathematics
       catch { throw new Error("overflow occured in factorial."); }
     }
 
-    /// <summary>Computes: [ N! / (n[0]! + n[1]! + n[3]! ...) ].</summary>
+    /// <summary>Computes: [ N! / (n[0]! * n[1]! * n[3]! ...) ].</summary>
     /// <param name="N">The total number of items in the set.</param>
     /// <param name="n">The number of items in the respective sub-sets.</param>
     /// <returns>[ N! / (n[0]! + n[1]! + n[3]! ...) ]</returns>

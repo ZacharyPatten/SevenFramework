@@ -6,14 +6,14 @@
 
 namespace Seven.Mathematics.Symbolics.Tree
 {
-    public abstract class TermNode : Node, ITermNode
-    {
-        public string Name { get; private set; }
+  public abstract class TermNode : Node, ITermNode
+  {
+    public string Name { get; private set; }
 
-        protected TermNode(string name, params INode[] childs)
-             :base(childs)
-        {
-            Name = name;
-        }
+    protected TermNode(string name, params INode[] childs)
+      : base(childs)
+    {
+      Name = name;
     }
+  }
 }

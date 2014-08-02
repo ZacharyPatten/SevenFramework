@@ -6359,9 +6359,12 @@ namespace Seven.Mathematics
 		/// <returns>The resulting matrix with the divided values.</returns>
 		public static double[,] Divide(double[,] matrix, double right)
 		{
-			double[,] result = new double[matrix.GetLength(0), matrix.GetLength(1)];
-			for (int i = 0; i < matrix.GetLength(0); i++)
-				for (int j = 0; j < matrix.GetLength(1); j++)
+      int matrix_row = matrix.GetLength(0);
+      int matrix_col = matrix.GetLength(1);
+
+      double[,] result = new double[matrix_row, matrix_col];
+      for (int i = 0; i < matrix_row; i++)
+        for (int j = 0; j < matrix_col; j++)
 					result[i, j] = matrix[i, j] / right;
 			return result;
 		}
@@ -6782,7 +6785,7 @@ namespace Seven.Mathematics
     /// <returns>The resulting quaternion of the multiplication.</returns>
     public static Quaternion<double> Multiply(Quaternion<double> left, Vector<double> right)
     {
-      if (right.Dimensions == 3)
+      if (right.Dimensions == 3 || right.Dimensions == 4)
       {
         return new Quaternion<double>(
           left.W * right.X + left.Y * right.Z - left.Z * right.Y,
@@ -6898,7 +6901,7 @@ namespace Seven.Mathematics
     /// <returns>The result of the rotation.</returns>
     public static Vector<double> Rotate(Quaternion<double> rotation, Vector<double> vector)
     {
-      if (vector.Dimensions != 3)
+      if (vector.Dimensions != 3 && vector.Dimensions != 4)
         throw new Error("my quaternion rotations are only defined for 3-component vectors.");
       Quaternion<double> answer = LinearAlgebra.Multiply(LinearAlgebra.Multiply(rotation, vector), LinearAlgebra.Conjugate(rotation));
       return new Vector<double>(answer.X, answer.Y, answer.Z);

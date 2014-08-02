@@ -8,6 +8,36 @@ namespace Seven.Mathematics.Syntax
   /// <summary>Syntax Sugar (yay hacks :P).</summary>
   public class _
   {
+    // This class is just a syntax helper. Since you cannot add operators without
+    // altering the C# compiler, this is as close as you'll get while still maintaining
+    // fully compatible C# syntax, keep intellisense, and keep most type-checking.
+    //
+    // Numerics: 
+    //   equ
+    //   neg add sub mul div pow gdc
+    //   ln log sqrt root exp inv
+    //   sin cos tan sec csc cot asin acos atan acsc asec acot
+    //   fact combin choos
+    //
+    // Vector:
+    //   len
+    //   equ
+    //   neg add sub mul div
+    //   dot cros norm mag mag2 angl
+    //   lerp slerp blerp
+    //
+    // Matrix:
+    //   row col
+    //   equ
+    //   neg add sub mul div pow
+    //   det rref tran
+    //
+    // Quaternion:
+    //   equ
+    //   neg add sub mul div pow
+    //   mag mag2 con add sub mul norm inv
+    //   lerp slerp
+    
     #region Fraction128
 
     #region arithmetic
@@ -816,11 +846,13 @@ namespace Seven.Mathematics.Syntax
     #region algebra
 
     public static int ln(int n) { return Algebra.ln(n); }
-    public static int log(int n, int b) { return Algebra.log(n, b); }
+    public static int log(int b, int n) { return Algebra.log(b, n); }
     public static int sqrt(int b) { return Algebra.sqrt(b); }
     public static int root(int b, int r) { return Algebra.root(b, r); }
     public static int exp(int x) { return Algebra.exp(x); }
     public static int inv(int n) { return Algebra.invert_mult(n); }
+    public static int gdc(int a, int b) { return Algebra.GreatestCommonDenominator(a, b); }
+    public static bool isprime(int a) { return Algebra.IsPrime(a); }
 
     #endregion
 

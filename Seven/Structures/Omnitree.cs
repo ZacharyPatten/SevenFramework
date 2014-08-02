@@ -344,96 +344,96 @@ namespace Seven.Structures
       this._top = new Leaf(min, max, null, _load);
     }
 
-    /// <summary>Constructor for an Omnitree_Linked.</summary>
-    /// <param name="min">The minimum values of the tree.</param>
-    /// <param name="max">The maximum values of the tree.</param>
-    /// <param name="locate">A function for locating an item along the provided dimensions.</param>
-    /// <param name="compare">A function for comparing two items of the types of the axis.</param>
-    /// <param name="average">A function for computing the average between two items of the axis types.</param>
-    public Omnitree_Linked(
-      M[] min, M[] max,
-      Omnitree.Locate_NonOut<T, M> locate,
-      Compare<M> compare,
-      Omnitree.Average<M> average)
-    {
-      if (min.Length != max.Length)
-        throw new Error("min/max values for omnitree mismatch dimensions");
+    ///// <summary>Constructor for an Omnitree_Linked.</summary>
+    ///// <param name="min">The minimum values of the tree.</param>
+    ///// <param name="max">The maximum values of the tree.</param>
+    ///// <param name="locate">A function for locating an item along the provided dimensions.</param>
+    ///// <param name="compare">A function for comparing two items of the types of the axis.</param>
+    ///// <param name="average">A function for computing the average between two items of the axis types.</param>
+    //public Omnitree_Linked(
+    //  M[] min, M[] max,
+    //  Omnitree.Locate_NonOut<T, M> locate,
+    //  Compare<M> compare,
+    //  Omnitree.Average<M> average)
+    //{
+    //  if (min.Length != max.Length)
+    //    throw new Error("min/max values for omnitree mismatch dimensions");
 
-      // This is just an adapter, JIT will optimize
-      this._locate = (T item, out M[] ms) => { ms = locate(item); };
-      this._average = average;
-      this._compare = compare;
+    //  // This is just an adapter, JIT will optimize
+    //  this._locate = (T item, out M[] ms) => { ms = locate(item); };
+    //  this._average = average;
+    //  this._compare = compare;
 
-      this._top = new Leaf(min, max, null, _load);
-      this._dimensions = min.Length;
-      this._children = 1 << this._dimensions;
-      this._load = _defaultLoad;
-      this._loadPlusOneSquared = (this._load + 1) * (this._load + 1);
-      this._loadSquared = this._load * this._load;
-      this._count = 0;
-      this._top = new Leaf(min, max, null, _load);
-    }
+    //  this._top = new Leaf(min, max, null, _load);
+    //  this._dimensions = min.Length;
+    //  this._children = 1 << this._dimensions;
+    //  this._load = _defaultLoad;
+    //  this._loadPlusOneSquared = (this._load + 1) * (this._load + 1);
+    //  this._loadSquared = this._load * this._load;
+    //  this._count = 0;
+    //  this._top = new Leaf(min, max, null, _load);
+    //}
 
-    /// <summary>Constructor for an Omnitree_Linked.</summary>
-    /// <param name="min">The minimum values of the tree.</param>
-    /// <param name="max">The maximum values of the tree.</param>
-    /// <param name="locate">A function for locating an item along the provided dimensions.</param>
-    /// <param name="compare">A function for comparing two items of the types of the axis.</param>
-    /// <param name="average">A function for computing the average between two items of the axis types.</param>
-    /// <param name="load">The initial load (slight optimization for large populations).</param>
-    public Omnitree_Linked(
-      M[] min, M[] max,
-      Omnitree.Locate<T, M> locate,
-      Compare<M> compare,
-      Omnitree.Average<M> average,
-      int load)
-    {
-      if (min.Length != max.Length)
-        throw new Error("min/max values for omnitree mismatch dimensions");
+    ///// <summary>Constructor for an Omnitree_Linked.</summary>
+    ///// <param name="min">The minimum values of the tree.</param>
+    ///// <param name="max">The maximum values of the tree.</param>
+    ///// <param name="locate">A function for locating an item along the provided dimensions.</param>
+    ///// <param name="compare">A function for comparing two items of the types of the axis.</param>
+    ///// <param name="average">A function for computing the average between two items of the axis types.</param>
+    ///// <param name="load">The initial load (slight optimization for large populations).</param>
+    //public Omnitree_Linked(
+    //  M[] min, M[] max,
+    //  Omnitree.Locate<T, M> locate,
+    //  Compare<M> compare,
+    //  Omnitree.Average<M> average,
+    //  int load)
+    //{
+    //  if (min.Length != max.Length)
+    //    throw new Error("min/max values for omnitree mismatch dimensions");
 
-      this._locate = locate;
-      this._average = average;
-      this._compare = compare;
+    //  this._locate = locate;
+    //  this._average = average;
+    //  this._compare = compare;
 
-      this._dimensions = min.Length;
-      this._children = 1 << this._dimensions;
-      this._load = load;
-      this._loadPlusOneSquared = (this._load + 1) * (this._load + 1);
-      this._loadSquared = this._load * this._load;
-      this._count = 0;
-      this._top = new Leaf(min, max, null, _load);
-    }
+    //  this._dimensions = min.Length;
+    //  this._children = 1 << this._dimensions;
+    //  this._load = load;
+    //  this._loadPlusOneSquared = (this._load + 1) * (this._load + 1);
+    //  this._loadSquared = this._load * this._load;
+    //  this._count = 0;
+    //  this._top = new Leaf(min, max, null, _load);
+    //}
 
-    /// <summary>Constructor for an Omnitree_Linked.</summary>
-    /// <param name="min">The minimum values of the tree.</param>
-    /// <param name="max">The maximum values of the tree.</param>
-    /// <param name="locate">A function for locating an item along the provided dimensions.</param>
-    /// <param name="compare">A function for comparing two items of the types of the axis.</param>
-    /// <param name="average">A function for computing the average between two items of the axis types.</param>
-    /// <param name="load">The initial load (slight optimization for large populations).</param>
-    public Omnitree_Linked(
-      M[] min, M[] max,
-      Omnitree.Locate_NonOut<T, M> locate,
-      Compare<M> compare,
-      Omnitree.Average<M> average,
-      int load)
-    {
-      if (min.Length != max.Length)
-        throw new Error("min/max values for omnitree mismatch dimensions");
+    ///// <summary>Constructor for an Omnitree_Linked.</summary>
+    ///// <param name="min">The minimum values of the tree.</param>
+    ///// <param name="max">The maximum values of the tree.</param>
+    ///// <param name="locate">A function for locating an item along the provided dimensions.</param>
+    ///// <param name="compare">A function for comparing two items of the types of the axis.</param>
+    ///// <param name="average">A function for computing the average between two items of the axis types.</param>
+    ///// <param name="load">The initial load (slight optimization for large populations).</param>
+    //public Omnitree_Linked(
+    //  M[] min, M[] max,
+    //  Omnitree.Locate_NonOut<T, M> locate,
+    //  Compare<M> compare,
+    //  Omnitree.Average<M> average,
+    //  int load)
+    //{
+    //  if (min.Length != max.Length)
+    //    throw new Error("min/max values for omnitree mismatch dimensions");
 
-      // This is just an adapter, JIT will optimize
-      this._locate = (T item, out M[] ms) => { ms = locate(item); };
-      this._average = average;
-      this._compare = compare;
+    //  // This is just an adapter, JIT will optimize
+    //  this._locate = (T item, out M[] ms) => { ms = locate(item); };
+    //  this._average = average;
+    //  this._compare = compare;
 
-      this._dimensions = min.Length;
-      this._children = 1 << this._dimensions;
-      this._load = load;
-      this._loadPlusOneSquared = (this._load + 1) * (this._load + 1);
-      this._loadSquared = this._load * this._load;
-      this._count = 0;
-      this._top = new Leaf(min, max, null, _load);
-    }
+    //  this._dimensions = min.Length;
+    //  this._children = 1 << this._dimensions;
+    //  this._load = load;
+    //  this._loadPlusOneSquared = (this._load + 1) * (this._load + 1);
+    //  this._loadSquared = this._load * this._load;
+    //  this._count = 0;
+    //  this._top = new Leaf(min, max, null, _load);
+    //}
 
     #endregion
 

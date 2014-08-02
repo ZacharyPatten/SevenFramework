@@ -32,13 +32,13 @@ namespace Seven.Mathematics.Symbolics.Tools
                 var operand = (BinaryExpression)e;
                 switch (e.NodeType)
                 {
-                    case System.Linq.Expressions.ExpressionType.Add:                        
+                    case ExpressionType.Add:                        
                         return new Arithmetic_Operators.Plus<double>(GetTree(operand.Left), GetTree(operand.Right));
-                    case System.Linq.Expressions.ExpressionType.Subtract:
+                    case ExpressionType.Subtract:
                         return new Arithmetic_Operators.Minus<double>(GetTree(operand.Left), GetTree(operand.Right));
-                    case System.Linq.Expressions.ExpressionType.Multiply:
+                    case ExpressionType.Multiply:
                         return new Arithmetic_Operators.Product<double>(GetTree(operand.Left), GetTree(operand.Right));
-                    case System.Linq.Expressions.ExpressionType.Divide:
+                    case ExpressionType.Divide:
                         return new Arithmetic_Operators.Divide<double>(GetTree(operand.Left), GetTree(operand.Right));
                     case ExpressionType.Power:
                         return new Arithmetic_Operators.Pow<double>(GetTree(operand.Left), GetTree(operand.Right));

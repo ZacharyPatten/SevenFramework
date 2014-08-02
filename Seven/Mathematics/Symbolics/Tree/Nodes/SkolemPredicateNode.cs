@@ -6,22 +6,23 @@
 
 namespace Seven.Mathematics.Symbolics.Tree
 {
-    /// <summary>
-    /// This is a ordinary predicate, but with indication of negation. 
-    /// </summary>
-    public class SkolemPredicateNode : PredicateNode
+  /// <summary>
+  /// This is a ordinary predicate, but with indication of negation. 
+  /// </summary>
+  public class SkolemPredicateNode : PredicateNode
+  {
+    public static readonly string NegationSymbol = "!";
+    public bool IsNegate { get; set; }
+
+    public SkolemPredicateNode(string name, bool negation, params INode[] childs)
+      : base(name, childs)
     {
-        public static readonly string NegationSymbol = "!"; 
-        public bool IsNegate { get; set; }
-
-        public SkolemPredicateNode(string name, bool negation, params INode[] childs) : base(name, childs)
-        {
-            IsNegate = negation;
-        }
-
-        public override string ToString()
-        {
-            return (IsNegate) ? NegationSymbol + base.ToString() : base.ToString();
-        }
+      IsNegate = negation;
     }
+
+    public override string ToString()
+    {
+      return (IsNegate) ? NegationSymbol + base.ToString() : base.ToString();
+    }
+  }
 }

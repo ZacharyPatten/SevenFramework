@@ -50,7 +50,7 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Seven\Seven.csproj">
+    <ProjectReference Include="..\..\Seven\Seven.csproj">
       <Project>{9f8e4738-7aa5-4d37-964f-83cfaeede8aa}</Project>
       <Name>Seven</Name>
     </ProjectReference>

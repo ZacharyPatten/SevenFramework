@@ -1074,9 +1074,9 @@ namespace Seven.Mathematics
       throw new System.NotImplementedException();
     }
 
-    public static int log(int value, int _base)
+    public static int log(int _base, int value)
     {
-      return (int)System.Math.Log((int)value, (int)_base);
+      return (int)System.Math.Log((int)_base, (int)value);
     }
 
     public static int root(int _base, int root)
@@ -1089,7 +1089,7 @@ namespace Seven.Mathematics
       throw new System.NotImplementedException();
     }
 
-    public static int[] factorPrimes(int value)
+    public static int[] factorPrimes(int a)
     {
       throw new System.NotImplementedException();
     }
@@ -1098,12 +1098,6 @@ namespace Seven.Mathematics
     {
       throw new Error("rational mathematics required");
     }
-
-    public static int invert_add(int value)
-    {
-      return -value;
-    }
-
 
     public static bool IsPrime(int candidate)
     {
@@ -1115,19 +1109,17 @@ namespace Seven.Mathematics
       return true;
     }
 
-    public static Seven.Structures.List<int> PrimeFactors(int a)
+    public static void PrimeFactors(int a, Foreach<int> function)
     {
-      Seven.Structures.List<int> factors = new Seven.Structures.List_Linked<int>();
       if (IsPrime(a))
-        factors.Add(a);
+        function(a);
       else
         for (int b = 2; a > 1; b++)
           while (a % b == 0)
           {
             a /= b;
-            factors.Add(b);
+            function(b);
           }
-      return factors;
     }
 
     public static int sqrt(int number)
@@ -1136,7 +1128,7 @@ namespace Seven.Mathematics
       // I have not written my own version of this function yet, just use the System for now...
     }
 
-    private static int GreatestCommonDenominator(int first, int second)
+    public static int GreatestCommonDenominator(int first, int second)
     {
       if (first < 0) first = -first;
       if (second < 0) second = -second;

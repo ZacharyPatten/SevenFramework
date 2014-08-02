@@ -10,42 +10,43 @@ using System.Linq.Expressions;
 
 namespace Seven.Mathematics.Symbolics.Tree
 {
-    public class Constant : Node
+  public class Constant : Node
+  {
+    protected readonly object Data;
+
+    protected Constant(Type type, object data)
+      : base(0)
     {
-        protected readonly object Data;
-
-        protected Constant(Type type, object data) : base(0)
-        {
-            Data = data;
-            Type = type;
-        }
-
-        public override Expression BuildExpression()
-        {
-            return
-                Expression.Lambda (
-                   Expression.Constant(Data, Type),
-                Expression.Parameter(typeof (IList)));
-        }
-   
-        
-        public override string ToString()
-        {
-            return Data.ToString();
-        }
-
-        
-
-        public static Constant<double> Double(double arg) { return new Constant<double>(arg); }
-        public static Constant<int> Int(int arg) { return new Constant<int>(arg); }
-        public static Constant<bool> Bool(bool arg) { return new Constant<bool>(arg); }
-
+      Data = data;
+      Type = type;
     }
 
-    public class Constant<T> : Constant, INode<T>
+    public override Expression BuildExpression()
     {
-        public Constant(T data) : base(typeof(T),data) {}
-        public T Value { get { return (T)base.Data; } }
-   
+      return
+          Expression.Lambda(
+             Expression.Constant(Data, Type),
+          Expression.Parameter(typeof(IList)));
     }
+
+
+    public override string ToString()
+    {
+      return Data.ToString();
+    }
+
+
+
+    public static Constant<double> Double(double arg) { return new Constant<double>(arg); }
+    public static Constant<int> Int(int arg) { return new Constant<int>(arg); }
+    public static Constant<bool> Bool(bool arg) { return new Constant<bool>(arg); }
+
+  }
+
+  public class Constant<T> : Constant, INode<T>
+  {
+    public Constant(T data) : base(typeof(T), data) { }
+    public T Value { get { return (T)base.Data; } }
+
+  }
 }
