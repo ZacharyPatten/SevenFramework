@@ -96,7 +96,7 @@ namespace Tutorial_Mathematics
       ConsoleWrite(V + V);
 
       // Vector Dot Product
-      Console.WriteLine("    V dot V: " + V.DotProduct(V));
+      Console.WriteLine("    V dot V: " + _.dot(V, V));
 
       Console.WriteLine();
 
@@ -167,6 +167,20 @@ namespace Tutorial_Mathematics
       // Quaternion-Vector Rotation
       Console.WriteLine("    Q * V * Q':");
       ConsoleWrite(V.RotateBy(Q));
+
+      double[,] tableau = new double[,]
+      {                                  
+        { 0.0, -0.5, -3.0, -1.0, -4.0, },
+        { 40.0, 1.0, 1.0, 1.0, 1.0, },
+        { 10.0, -2.0, -1.0, 1.0, 1.0, },
+        { 10.0, 0.0, 1.0, 0.0, -1.0, },
+      };
+
+      Console.WriteLine("    tableau:");
+      ConsoleWrite(tableau); Console.WriteLine();
+
+      Console.WriteLine("    simplex(tableau):");
+      ConsoleWrite(LinearAlgebra.Simplex(ref tableau));
 
       #endregion
 

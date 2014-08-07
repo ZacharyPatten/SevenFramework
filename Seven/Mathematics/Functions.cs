@@ -132,4 +132,6 @@ namespace Seven.Mathematics
   //  //  return accumulator
   //  //}
   //}
+
+  
 }

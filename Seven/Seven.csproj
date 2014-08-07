@@ -89,6 +89,7 @@
     <Compile Include="Mathematics\Syntax\Syntax.cs" />
     <Compile Include="Mathematics\Trigonometry.cs" />
     <Compile Include="Mathematics\Tween.cs" />
+    <Compile Include="Parallels\AutoParallel.cs" />
     <Compile Include="Parallels\BackgroundThread.cs" />
     <Compile Include="Parallels\ReaderWriterLock.cs" />
     <Compile Include="Predicate.cs" />

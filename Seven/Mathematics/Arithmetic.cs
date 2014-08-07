@@ -76,27 +76,6 @@ namespace Seven.Mathematics
 
     #endregion
 
-    #region enum
-
-    /// <summary>The operations of arithmetic.</summary>
-    public enum Operation
-    {
-      /// <summary>Negation arithmatic operation.</summary>
-      Negate,
-      /// <summary>Division arithmatic operation</summary>
-      Divide,
-      /// <summary>Multiplication arithmatic operation</summary>
-      Multiply,
-      /// <summary>Addition arithmatic operation</summary>
-      Add,
-      /// <summary>Subtraction arithmatic operation</summary>
-      Subtract,
-      /// <summary>Power arithmatic operation</summary>
-      Power
-    }
-
-    #endregion
-
     #region implementation
 
     #region Fraction128
