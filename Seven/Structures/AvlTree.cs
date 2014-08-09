@@ -3,16 +3,22 @@
 // LISCENSE: See "LISCENSE.md" in th root project directory.
 // SUPPORT: See "SUPPORT.md" in the root project directory.
 
-// THIS FILE CONTAINS EXTERNAL CITATIONS
-
-using Seven.Parallels;
-
 namespace Seven.Structures
 {
-  /// <summary>Polymorphism base for all AVL trees in the Seven framework.</summary>
-  /// <typeparam name="Type"></typeparam>
-  public interface AvlTree<Type> : Structure<Type>
+  /// <summary>A self-sorting binary tree based on the heights of each node.</summary>
+  /// <typeparam name="T"></typeparam>
+  public interface AvlTree<T> : Structure<T>
   {
+    #region event
+
+    /// <summary>
+    /// Event for handling duplicate additions to the map. Asigning this event
+    /// will trigger the delegate instead of throwing an exception.
+    /// </summary>
+    event Foreach<T> HandleDuplicate;
+
+    #endregion
+
     #region property
 
     int Count { get; }
@@ -22,41 +28,41 @@ namespace Seven.Structures
 
     #region method
 
-    void Add(Type addition);
+    void Add(T addition);
     //bool TryAdd(Type addition);
     //void Remove(Type removal);
     //bool TryRemove(Type removal);
     
     void Clear();
 
-    bool Contains<Key>(Key key, Compare<Type, Key> comparison);
-    Type Get<Key>(Key get, Compare<Type, Key> comparison);
-    bool TryGet<Key>(Key get, Compare<Type, Key> comparison, out Type item);
-    void Remove<Key>(Key removal, Compare<Type, Key> comparison);
-    bool TryRemove<Key>(Key removal, Compare<Type, Key> comparison);
+    bool Contains<Key>(Key key, Compare<T, Key> comparison);
+    T Get<Key>(Key get, Compare<T, Key> comparison);
+    bool TryGet<Key>(Key get, Compare<T, Key> comparison, out T item);
+    void Remove<Key>(Key removal, Compare<T, Key> comparison);
+    bool TryRemove<Key>(Key removal, Compare<T, Key> comparison);
 
     /// <summary>Foreach loop that takes advantage of the AvlTree structure.</summary>
     /// <param name="function"></param>
     /// <param name="minimum"></param>
     /// <param name="maximum"></param>
-    void Foreach(Foreach<Type> function, Type minimum, Type maximum);
+    void Foreach(Foreach<T> function, T minimum, T maximum);
     /// <summary>Foreach loop that takes advantage of the AvlTree structure.</summary>
     /// <param name="function"></param>
     /// <param name="minimum"></param>
     /// <param name="maximum"></param>
-    void Foreach(ForeachRef<Type> function, Type minimum, Type maximum);
-    /// <summary>Foreach loop that takes advantage of the AvlTree structure.</summary>
-    /// <param name="function"></param>
-    /// <param name="minimum"></param>
-    /// <param name="maximum"></param>
-    /// <returns></returns>
-    ForeachStatus Foreach(ForeachBreak<Type> function, Type minimum, Type maximum);
+    void Foreach(ForeachRef<T> function, T minimum, T maximum);
     /// <summary>Foreach loop that takes advantage of the AvlTree structure.</summary>
     /// <param name="function"></param>
     /// <param name="minimum"></param>
     /// <param name="maximum"></param>
     /// <returns></returns>
-    ForeachStatus Foreach(ForeachRefBreak<Type> function, Type minimum, Type maximum);
+    ForeachStatus Foreach(ForeachBreak<T> function, T minimum, T maximum);
+    /// <summary>Foreach loop that takes advantage of the AvlTree structure.</summary>
+    /// <param name="function"></param>
+    /// <param name="minimum"></param>
+    /// <param name="maximum"></param>
+    /// <returns></returns>
+    ForeachStatus Foreach(ForeachRefBreak<T> function, T minimum, T maximum);
 
     #endregion
   }
@@ -67,7 +73,7 @@ namespace Seven.Structures
     // currently none
   }
 
-  /// <summary>Implements an AVL Tree where the items are sorted by string id values.</summary>
+  /// <summary>A self-sorting binary tree based on the heights of each node.</summary>
   /// <remarks>The runtimes of each public member are included in the "remarks" xml tags.</remarks>
   /// <citation>
   /// This AVL tree imlpementation was originally developed by 
@@ -75,24 +81,24 @@ namespace Seven.Structures
   /// been modified since its addition into the Seven framework.
   /// </citation>
   [System.Serializable]
-  public class AvlTree_Linked<Type> : AvlTree<Type>
+  public class AvlTree_Linked<T> : AvlTree<T>
   {
     #region class
 
     /// <summary>This class just holds the data for each individual node of the tree.</summary>
     protected class Node
     {
-      private Type _value;
+      private T _value;
       private Node _leftChild;
       private Node _rightChild;
       private int _height;
 
-      public Type Value { get { return _value; } set { _value = value; } }
+      public T Value { get { return _value; } set { _value = value; } }
       public Node LeftChild { get { return _leftChild; } set { _leftChild = value; } }
       public Node RightChild { get { return _rightChild; } set { _rightChild = value; } }
       public int Height { get { return _height; } set { _height = value; } }
 
-      public Node(Type value)
+      public Node(T value)
       {
         _value = value;
         _leftChild = null;
@@ -108,7 +114,17 @@ namespace Seven.Structures
     protected Node _avlTree;
     protected int _count;
 
-    protected Compare<Type> _compare;
+    protected Compare<T> _compare;
+
+    #endregion
+
+    #region event
+
+    /// <summary>
+    /// Event for handling duplicate additions to the map. Asigning this event
+    /// will trigger the delegate instead of throwing an exception.
+    /// </summary>
+    public event Foreach<T> HandleDuplicate;
 
     #endregion
 
@@ -130,7 +146,7 @@ namespace Seven.Structures
     /// <summary>Constructs an AVL Tree.</summary>
     /// <param name="compare">The comparison function for sorting the items.</param>
     /// <remarks>Runtime: O(1).</remarks>
-    public AvlTree_Linked(Compare<Type> compare)
+    public AvlTree_Linked(Compare<T> compare)
     {
       _avlTree = null;
       _count = 0;
@@ -209,8 +225,8 @@ namespace Seven.Structures
     }
 
     /// <summary>FOR COMPATIBILITY ONLY. AVOID IF POSSIBLE.</summary>
-    System.Collections.Generic.IEnumerator<Type>
-      System.Collections.Generic.IEnumerable<Type>.GetEnumerator()
+    System.Collections.Generic.IEnumerator<T>
+      System.Collections.Generic.IEnumerable<T>.GetEnumerator()
     {
       Stack<Node> forks = new Stack_Linked<Node>();
       Node current = _avlTree;
@@ -230,7 +246,7 @@ namespace Seven.Structures
       }
     }
 
-    public virtual bool Contains<Key>(Key key, Compare<Type, Key> comparison)
+    public virtual bool Contains<Key>(Key key, Compare<T, Key> comparison)
     {
       // THIS THIS THE ITERATIVE VERSION OF THIS FUNCTION. THERE IS A RECURSIVE
       // VERSION IN THE "RECURSIVE" REGION SHOULD YOU WISH TO SEE IT.
@@ -252,7 +268,7 @@ namespace Seven.Structures
     /// <param name="id">The string ID to look for.</param>
     /// <returns>The object with the desired string ID if it exists.</returns>
     /// <remarks>Runtime: O(ln(n)), Omega(1).</remarks>
-    public virtual Type Get<Key>(Key get, Compare<Type, Key> comparison)
+    public virtual T Get<Key>(Key get, Compare<T, Key> comparison)
     {
       // THIS THIS THE ITERATIVE VERSION OF THIS FUNCTION. THERE IS A RECURSIVE
       // VERSION IN THE "RECURSIVE" REGION SHOULD YOU WISH TO SEE IT.
@@ -274,7 +290,7 @@ namespace Seven.Structures
     /// <param name="id">The string ID to look for.</param>
     /// <returns>The object with the desired string ID if it exists.</returns>
     /// <remarks>Runtime: O(ln(n)), Omega(1).</remarks>
-    public virtual bool TryGet<Key>(Key get, Compare<Type, Key> comparison, out Type result)
+    public virtual bool TryGet<Key>(Key get, Compare<T, Key> comparison, out T result)
     {
       // THIS THIS THE ITERATIVE VERSION OF THIS FUNCTION. THERE IS A RECURSIVE
       // VERSION IN THE "RECURSIVE" REGION SHOULD YOU WISH TO SEE IT.
@@ -292,25 +308,31 @@ namespace Seven.Structures
         else // (compareResult == Comparison.Less)
           _current = _current.RightChild;
       }
-      result = default(Type);
+      result = default(T);
       return false;
     }
 
     /// <summary>Adds an object to the AVL Tree.</summary>
     /// <param name="addition">The object to add.</param>
     /// <remarks>Runtime: Theta(ln(n)).</remarks>
-    public virtual void Add(Type addition)
+    public virtual void Add(T addition)
     {
       this._avlTree = Add(addition, this._avlTree);
       this._count++;
     }
 
-    protected virtual Node Add(Type addition, Node avlTree)
+    protected virtual Node Add(T addition, Node avlTree)
     {
       if (avlTree == null) return new Node(addition);
       Comparison compareResult = this._compare(avlTree.Value, addition);
       if (compareResult == Comparison.Equal)
-        throw new Exception("Attempting to add an already existing id exists.");
+        if (this.HandleDuplicate == null)
+          throw new Exception("Attempting to add an already existing id exists.");
+        else
+        {
+          this.HandleDuplicate(avlTree.Value);
+          return avlTree;
+        }
       else if (compareResult == Comparison.Greater) 
        avlTree.LeftChild = Add(addition, avlTree.LeftChild);
       else // (compareResult == Comparison.Less)
@@ -321,7 +343,7 @@ namespace Seven.Structures
     /// <summary>Adds an object to the AVL Tree.</summary>
     /// <param name="addition">The object to add.</param>
     /// <remarks>Runtime: Theta(ln(n)).</remarks>
-    public virtual bool TryAdd(Type addition)
+    public virtual bool TryAdd(T addition)
     {
       bool added;
       this._avlTree = TryAdd(addition, _avlTree, out added);
@@ -329,7 +351,7 @@ namespace Seven.Structures
       return added;
     }
 
-    protected Node TryAdd(Type addition, Node avlTree, out bool added)
+    protected Node TryAdd(T addition, Node avlTree, out bool added)
     {
       if (avlTree == null)
       {
@@ -352,7 +374,7 @@ namespace Seven.Structures
     /// <summary>Removes an object from the AVL Tree.</summary>
     /// <param name="removal">The string ID of the object to remove.</param>
     /// <remarks>Runtime: Theta(ln(n)).</remarks>
-    public virtual void Remove(Type removal)
+    public virtual void Remove(T removal)
     {
       _avlTree = Remove(removal, _avlTree);
       _count--;
@@ -363,7 +385,7 @@ namespace Seven.Structures
     /// <param name="avlTree">The binary tree to remove from.</param>
     /// <returns>The resulting tree after the removal.</returns>
     /// <remarks>Runtime: Theta(ln(n)).</remarks>
-    protected Node Remove(Type removal, Node avlTree)
+    protected Node Remove(T removal, Node avlTree)
     {
       if (avlTree != null)
       {
@@ -403,7 +425,7 @@ namespace Seven.Structures
     /// <summary>Removes an object from the AVL Tree.</summary>
     /// <param name="removal">The string ID of the object to remove.</param>
     /// <remarks>Runtime: Theta(ln(n)).</remarks>
-    public virtual bool TryRemove(Type removal)
+    public virtual bool TryRemove(T removal)
     {
       try
       {
@@ -420,7 +442,7 @@ namespace Seven.Structures
     /// <summary>Removes an object from the AVL Tree.</summary>
     /// <param name="removal">The string ID of the object to remove.</param>
     /// <remarks>Runtime: Theta(ln(n)).</remarks>
-    public virtual void Remove<Key>(Key removal, Compare<Type, Key> comparison)
+    public virtual void Remove<Key>(Key removal, Compare<T, Key> comparison)
     {
       _avlTree = Remove(removal, comparison, _avlTree);
       _count--;
@@ -431,7 +453,7 @@ namespace Seven.Structures
     /// <param name="avlTree">The binary tree to remove from.</param>
     /// <returns>The resulting tree after the removal.</returns>
     /// <remarks>Runtime: Theta(ln(n)).</remarks>
-    protected Node Remove<Key>(Key removal, Compare<Type, Key> comparison, Node avlTree)
+    protected Node Remove<Key>(Key removal, Compare<T, Key> comparison, Node avlTree)
     {
       if (avlTree != null)
       {
@@ -471,7 +493,7 @@ namespace Seven.Structures
     /// <summary>Removes an object from the AVL Tree.</summary>
     /// <param name="removal">The string ID of the object to remove.</param>
     /// <remarks>Runtime: Theta(ln(n)).</remarks>
-    public virtual bool TryRemove<Key>(Key removal, Compare<Type, Key> comparison)
+    public virtual bool TryRemove<Key>(Key removal, Compare<T, Key> comparison)
     {
       try
       {
@@ -623,7 +645,7 @@ namespace Seven.Structures
     /// <summary>Invokes a delegate for each entry in the data structure.</summary>
     /// <param name="function">The delegate to invoke on each item in the structure.</param>
     /// <remarks>Runtime: O(n * traversalFunction).</remarks>
-    public void Foreach(Foreach<Type> function)
+    public void Foreach(Foreach<T> function)
     {
       this.ForeachInOrder(function);
     }
@@ -631,7 +653,7 @@ namespace Seven.Structures
     /// <summary>Invokes a delegate for each entry in the data structure.</summary>
     /// <param name="function">The delegate to invoke on each item in the structure.</param>
     /// <remarks>Runtime: O(n * traversalFunction).</remarks>
-    public void Foreach(ForeachRef<Type> function)
+    public void Foreach(ForeachRef<T> function)
     {
       this.ForeachInOrder(function);
     }
@@ -640,7 +662,7 @@ namespace Seven.Structures
     /// <param name="function">The delegate to invoke on each item in the structure.</param>
     /// <returns>The resulting status of the iteration.</returns>
     /// <remarks>Runtime: O(n * traversalFunction).</remarks>
-    public ForeachStatus Foreach(ForeachBreak<Type> function)
+    public ForeachStatus Foreach(ForeachBreak<T> function)
     {
       return this.ForeachInOrder(function);
     }
@@ -649,7 +671,7 @@ namespace Seven.Structures
     /// <param name="function">The delegate to invoke on each item in the structure.</param>
     /// <returns>The resulting status of the iteration.</returns>
     /// <remarks>Runtime: O(n * traversalFunction).</remarks>
-    public ForeachStatus Foreach(ForeachRefBreak<Type> function)
+    public ForeachStatus Foreach(ForeachRefBreak<T> function)
     {
       return this.ForeachInOrder(function);
     }
@@ -657,7 +679,7 @@ namespace Seven.Structures
     /// <summary>Invokes a delegate for each entry in the data structure.</summary>
     /// <param name="function">The delegate to invoke on each item in the structure.</param>
     /// <remarks>Runtime: O(n * traversalFunction).</remarks>
-    public void Foreach(Foreach<Type> function, Type minimum, Type maximum)
+    public void Foreach(Foreach<T> function, T minimum, T maximum)
     {
       this.ForeachInOrder(function, minimum, maximum);
     }
@@ -665,7 +687,7 @@ namespace Seven.Structures
     /// <summary>Invokes a delegate for each entry in the data structure.</summary>
     /// <param name="function">The delegate to invoke on each item in the structure.</param>
     /// <remarks>Runtime: O(n * traversalFunction).</remarks>
-    public void Foreach(ForeachRef<Type> function, Type minimum, Type maximum)
+    public void Foreach(ForeachRef<T> function, T minimum, T maximum)
     {
       this.ForeachInOrder(function, minimum, maximum);
     }
@@ -674,7 +696,7 @@ namespace Seven.Structures
     /// <param name="function">The delegate to invoke on each item in the structure.</param>
     /// <returns>The resulting status of the iteration.</returns>
     /// <remarks>Runtime: O(n * traversalFunction).</remarks>
-    public ForeachStatus Foreach(ForeachBreak<Type> function, Type minimum, Type maximum)
+    public ForeachStatus Foreach(ForeachBreak<T> function, T minimum, T maximum)
     {
       return this.ForeachInOrder(function, minimum, maximum);
     }
@@ -683,7 +705,7 @@ namespace Seven.Structures
     /// <param name="function">The delegate to invoke on each item in the structure.</param>
     /// <returns>The resulting status of the iteration.</returns>
     /// <remarks>Runtime: O(n * traversalFunction).</remarks>
-    public ForeachStatus Foreach(ForeachRefBreak<Type> function, Type minimum, Type maximum)
+    public ForeachStatus Foreach(ForeachRefBreak<T> function, T minimum, T maximum)
     {
       return this.ForeachInOrder(function, minimum, maximum);
     }
@@ -705,17 +727,17 @@ namespace Seven.Structures
     /// <summary>Invokes a delegate for each entry in the data structure.</summary>
     /// <param name="function">The delegate to invoke on each item in the structure.</param>
     /// <remarks>Runtime: O(n * traversalFunction).</remarks>
-    public virtual void ForeachInOrder(Foreach<Type> function)
+    public virtual void ForeachInOrder(Foreach<T> function)
     {
-      AvlTree_Linked<Type>.TraversalInOrder(function, _avlTree);
+      AvlTree_Linked<T>.TraversalInOrder(function, _avlTree);
     }
-    protected static bool TraversalInOrder(Foreach<Type> function, Node avltreeNode)
+    protected static bool TraversalInOrder(Foreach<T> function, Node avltreeNode)
     {
       if (avltreeNode != null)
       {
-        AvlTree_Linked<Type>.TraversalInOrder(function, avltreeNode.LeftChild);
+        AvlTree_Linked<T>.TraversalInOrder(function, avltreeNode.LeftChild);
         function(avltreeNode.Value);
-        AvlTree_Linked<Type>.TraversalInOrder(function, avltreeNode.RightChild);
+        AvlTree_Linked<T>.TraversalInOrder(function, avltreeNode.RightChild);
       }
       return true;
     }
@@ -723,13 +745,13 @@ namespace Seven.Structures
     /// <summary>Invokes a delegate for each entry in the data structure.</summary>
     /// <param name="function">The delegate to invoke on each item in the structure.</param>
     /// <remarks>Runtime: O(n * traversalFunction).</remarks>
-    public virtual void ForeachInOrder(Foreach<Type> function, Type minimum, Type maximum)
+    public virtual void ForeachInOrder(Foreach<T> function, T minimum, T maximum)
     {
       if (this._compare(minimum, maximum) == Comparison.Greater)
         throw new Exception("invalid minimum and maximum values on Avl traversal.");
-      AvlTree_Linked<Type>.TraversalInOrder(function, _avlTree);
+      AvlTree_Linked<T>.TraversalInOrder(function, _avlTree);
     }
-    protected void TraversalInOrder(Foreach<Type> function, Node node, Type minimum, Type maximum)
+    protected void TraversalInOrder(Foreach<T> function, Node node, T minimum, T maximum)
     {
       if (node != null)
       {
@@ -749,19 +771,19 @@ namespace Seven.Structures
     /// <summary>Invokes a delegate for each entry in the data structure.</summary>
     /// <param name="function">The delegate to invoke on each item in the structure.</param>
     /// <remarks>Runtime: O(n * traversalFunction).</remarks>
-    public virtual void ForeachInOrder(ForeachRef<Type> function)
+    public virtual void ForeachInOrder(ForeachRef<T> function)
     {
-      AvlTree_Linked<Type>.TraversalInOrder(function, _avlTree);
+      AvlTree_Linked<T>.TraversalInOrder(function, _avlTree);
     }
-    protected static bool TraversalInOrder(ForeachRef<Type> function, Node avltreeNode)
+    protected static bool TraversalInOrder(ForeachRef<T> function, Node avltreeNode)
     {
       if (avltreeNode != null)
       {
-        AvlTree_Linked<Type>.TraversalInOrder(function, avltreeNode.LeftChild);
-        Type value = avltreeNode.Value;
+        AvlTree_Linked<T>.TraversalInOrder(function, avltreeNode.LeftChild);
+        T value = avltreeNode.Value;
         function(ref value);
         avltreeNode.Value = value;
-        AvlTree_Linked<Type>.TraversalInOrder(function, avltreeNode.RightChild);
+        AvlTree_Linked<T>.TraversalInOrder(function, avltreeNode.RightChild);
       }
       return true;
     }
@@ -769,13 +791,13 @@ namespace Seven.Structures
     /// <summary>Invokes a delegate for each entry in the data structure.</summary>
     /// <param name="function">The delegate to invoke on each item in the structure.</param>
     /// <remarks>Runtime: O(n * traversalFunction).</remarks>
-    public virtual void ForeachInOrder(ForeachRef<Type> function, Type minimum, Type maximum)
+    public virtual void ForeachInOrder(ForeachRef<T> function, T minimum, T maximum)
     {
       if (this._compare(minimum, maximum) == Comparison.Greater)
         throw new Exception("invalid minimum and maximum values on Avl traversal.");
       this.TraversalInOrder(function, _avlTree, minimum, maximum);
     }
-    protected void TraversalInOrder(ForeachRef<Type> function, Node node, Type minimum, Type maximum)
+    protected void TraversalInOrder(ForeachRef<T> function, Node node, T minimum, T maximum)
     {
       if (node != null)
       {
@@ -786,7 +808,7 @@ namespace Seven.Structures
         else
         {
           this.TraversalInOrder(function, node.LeftChild, minimum, maximum);
-          Type temp = node.Value;
+          T temp = node.Value;
           function(ref temp);
           node.Value = temp;
           this.TraversalInOrder(function, node.RightChild, minimum, maximum);
@@ -797,22 +819,22 @@ namespace Seven.Structures
     /// <summary>Invokes a delegate for each entry in the data structure.</summary>
     /// <param name="function">The delegate to invoke on each item in the structure.</param>
     /// <remarks>Runtime: O(n * traversalFunction).</remarks>
-    public virtual ForeachStatus ForeachInOrder(ForeachBreak<Type> function)
+    public virtual ForeachStatus ForeachInOrder(ForeachBreak<T> function)
     {
-      return AvlTree_Linked<Type>.ForeachInOrder(function, _avlTree);
+      return AvlTree_Linked<T>.ForeachInOrder(function, _avlTree);
     }
-    protected static ForeachStatus ForeachInOrder(ForeachBreak<Type> function, Node avltreeNode)
+    protected static ForeachStatus ForeachInOrder(ForeachBreak<T> function, Node avltreeNode)
     {
       if (avltreeNode != null)
       {
-        if (AvlTree_Linked<Type>.ForeachInOrder(function, avltreeNode.LeftChild) == ForeachStatus.Break)
+        if (AvlTree_Linked<T>.ForeachInOrder(function, avltreeNode.LeftChild) == ForeachStatus.Break)
           return ForeachStatus.Break;
-        Type value = avltreeNode.Value;
+        T value = avltreeNode.Value;
         ForeachStatus status = function(value);
         avltreeNode.Value = value;
         if (status == ForeachStatus.Break)
           return ForeachStatus.Break;
-        if (AvlTree_Linked<Type>.ForeachInOrder(function, avltreeNode.RightChild) == ForeachStatus.Break)
+        if (AvlTree_Linked<T>.ForeachInOrder(function, avltreeNode.RightChild) == ForeachStatus.Break)
           return ForeachStatus.Break;
       }
       return ForeachStatus.Continue;
@@ -821,13 +843,13 @@ namespace Seven.Structures
     /// <summary>Invokes a delegate for each entry in the data structure.</summary>
     /// <param name="function">The delegate to invoke on each item in the structure.</param>
     /// <remarks>Runtime: O(n * traversalFunction).</remarks>
-    public virtual ForeachStatus ForeachInOrder(ForeachBreak<Type> function, Type minimum, Type maximum)
+    public virtual ForeachStatus ForeachInOrder(ForeachBreak<T> function, T minimum, T maximum)
     {
       if (this._compare(minimum, maximum) == Comparison.Greater)
         throw new Exception("invalid minimum and maximum values on Avl traversal.");
       return this.ForeachInOrder(function, _avlTree, minimum, maximum);
     }
-    protected ForeachStatus ForeachInOrder(ForeachBreak<Type> function, Node node, Type minimum, Type maximum)
+    protected ForeachStatus ForeachInOrder(ForeachBreak<T> function, Node node, T minimum, T maximum)
     {
       if (node != null)
       {
@@ -839,7 +861,7 @@ namespace Seven.Structures
         {
           if (this.ForeachInOrder(function, node.LeftChild, minimum, maximum) == ForeachStatus.Break)
             return ForeachStatus.Break;
-          Type value = node.Value;
+          T value = node.Value;
           ForeachStatus status = function(value);
           node.Value = value;
           if (status == ForeachStatus.Break)
@@ -854,22 +876,22 @@ namespace Seven.Structures
     /// <summary>Invokes a delegate for each entry in the data structure.</summary>
     /// <param name="function">The delegate to invoke on each item in the structure.</param>
     /// <remarks>Runtime: O(n * traversalFunction).</remarks>
-    public virtual ForeachStatus ForeachInOrder(ForeachRefBreak<Type> function)
+    public virtual ForeachStatus ForeachInOrder(ForeachRefBreak<T> function)
     {
-      return AvlTree_Linked<Type>.ForeachInOrder(function, _avlTree);
+      return AvlTree_Linked<T>.ForeachInOrder(function, _avlTree);
     }
-    protected static ForeachStatus ForeachInOrder(ForeachRefBreak<Type> function, Node avltreeNode)
+    protected static ForeachStatus ForeachInOrder(ForeachRefBreak<T> function, Node avltreeNode)
     {
       if (avltreeNode != null)
       {
-        if (AvlTree_Linked<Type>.ForeachInOrder(function, avltreeNode.LeftChild) == ForeachStatus.Break)
+        if (AvlTree_Linked<T>.ForeachInOrder(function, avltreeNode.LeftChild) == ForeachStatus.Break)
           return ForeachStatus.Break;
-        Type value = avltreeNode.Value;
+        T value = avltreeNode.Value;
         ForeachStatus status = function(ref value);
         avltreeNode.Value = value;
         if (status == ForeachStatus.Break)
           return ForeachStatus.Break;
-        if (AvlTree_Linked<Type>.ForeachInOrder(function, avltreeNode.RightChild) == ForeachStatus.Break)
+        if (AvlTree_Linked<T>.ForeachInOrder(function, avltreeNode.RightChild) == ForeachStatus.Break)
           return ForeachStatus.Break;
       }
       return ForeachStatus.Continue;
@@ -878,13 +900,13 @@ namespace Seven.Structures
     /// <summary>Invokes a delegate for each entry in the data structure.</summary>
     /// <param name="function">The delegate to invoke on each item in the structure.</param>
     /// <remarks>Runtime: O(n * traversalFunction).</remarks>
-    public virtual ForeachStatus ForeachInOrder(ForeachRefBreak<Type> function, Type minimum, Type maximum)
+    public virtual ForeachStatus ForeachInOrder(ForeachRefBreak<T> function, T minimum, T maximum)
     {
       if (this._compare(minimum, maximum) == Comparison.Greater)
         throw new Exception("invalid minimum and maximum values on Avl traversal.");
       return this.ForeachInOrder(function, _avlTree, minimum, maximum);
     }
-    protected ForeachStatus ForeachInOrder(ForeachRefBreak<Type> function, Node node, Type minimum, Type maximum)
+    protected ForeachStatus ForeachInOrder(ForeachRefBreak<T> function, Node node, T minimum, T maximum)
     {
       if (node != null)
       {
@@ -896,7 +918,7 @@ namespace Seven.Structures
         {
           if (this.ForeachInOrder(function, node.LeftChild, minimum, maximum) == ForeachStatus.Break)
             return ForeachStatus.Break;
-          Type value = node.Value;
+          T value = node.Value;
           ForeachStatus status = function(ref value);
           node.Value = value;
           if (status == ForeachStatus.Break)
@@ -911,17 +933,17 @@ namespace Seven.Structures
     /// <summary>Invokes a delegate for each entry in the data structure.</summary>
     /// <param name="function">The delegate to invoke on each item in the structure.</param>
     /// <remarks>Runtime: O(n * traversalFunction).</remarks>
-    public virtual void ForeachPreOrder(Foreach<Type> function)
+    public virtual void ForeachPreOrder(Foreach<T> function)
     {
-      AvlTree_Linked<Type>.TraversalPreOrder(function, _avlTree);
+      AvlTree_Linked<T>.TraversalPreOrder(function, _avlTree);
     }
-    protected static bool TraversalPreOrder(Foreach<Type> function, Node avltreeNode)
+    protected static bool TraversalPreOrder(Foreach<T> function, Node avltreeNode)
     {
       if (avltreeNode != null)
       {
         function(avltreeNode.Value);
-        AvlTree_Linked<Type>.TraversalPreOrder(function, avltreeNode.LeftChild);
-        AvlTree_Linked<Type>.TraversalPreOrder(function, avltreeNode.RightChild);
+        AvlTree_Linked<T>.TraversalPreOrder(function, avltreeNode.LeftChild);
+        AvlTree_Linked<T>.TraversalPreOrder(function, avltreeNode.RightChild);
       }
       return true;
     }
@@ -929,19 +951,19 @@ namespace Seven.Structures
     /// <summary>Invokes a delegate for each entry in the data structure.</summary>
     /// <param name="function">The delegate to invoke on each item in the structure.</param>
     /// <remarks>Runtime: O(n * traversalFunction).</remarks>
-    public virtual void ForeachPreOrder(ForeachRef<Type> function)
+    public virtual void ForeachPreOrder(ForeachRef<T> function)
     {
-      AvlTree_Linked<Type>.TraversalPreOrder(function, _avlTree);
+      AvlTree_Linked<T>.TraversalPreOrder(function, _avlTree);
     }
-    protected static bool TraversalPreOrder(ForeachRef<Type> function, Node avltreeNode)
+    protected static bool TraversalPreOrder(ForeachRef<T> function, Node avltreeNode)
     {
       if (avltreeNode != null)
       {
-        Type value = avltreeNode.Value;
+        T value = avltreeNode.Value;
         function(ref value);
         avltreeNode.Value = value;
-        AvlTree_Linked<Type>.TraversalPreOrder(function, avltreeNode.LeftChild);
-        AvlTree_Linked<Type>.TraversalPreOrder(function, avltreeNode.RightChild);
+        AvlTree_Linked<T>.TraversalPreOrder(function, avltreeNode.LeftChild);
+        AvlTree_Linked<T>.TraversalPreOrder(function, avltreeNode.RightChild);
       }
       return true;
     }
@@ -949,22 +971,22 @@ namespace Seven.Structures
     /// <summary>Invokes a delegate for each entry in the data structure.</summary>
     /// <param name="function">The delegate to invoke on each item in the structure.</param>
     /// <remarks>Runtime: O(n * traversalFunction).</remarks>
-    public virtual ForeachStatus ForeachPreOrder(ForeachBreak<Type> function)
+    public virtual ForeachStatus ForeachPreOrder(ForeachBreak<T> function)
     {
-      return AvlTree_Linked<Type>.TraversalPreOrder(function, _avlTree);
+      return AvlTree_Linked<T>.TraversalPreOrder(function, _avlTree);
     }
-    protected static ForeachStatus TraversalPreOrder(ForeachBreak<Type> function, Node avltreeNode)
+    protected static ForeachStatus TraversalPreOrder(ForeachBreak<T> function, Node avltreeNode)
     {
       if (avltreeNode != null)
       {
-        Type value = avltreeNode.Value;
+        T value = avltreeNode.Value;
         ForeachStatus status = function(value);
         avltreeNode.Value = value;
         if (status == ForeachStatus.Break)
           return ForeachStatus.Break;
-        if (AvlTree_Linked<Type>.TraversalPreOrder(function, avltreeNode.LeftChild) == ForeachStatus.Break)
+        if (AvlTree_Linked<T>.TraversalPreOrder(function, avltreeNode.LeftChild) == ForeachStatus.Break)
           return ForeachStatus.Break;
-        if (AvlTree_Linked<Type>.TraversalPreOrder(function, avltreeNode.RightChild) == ForeachStatus.Break)
+        if (AvlTree_Linked<T>.TraversalPreOrder(function, avltreeNode.RightChild) == ForeachStatus.Break)
           return ForeachStatus.Break;
       }
       return ForeachStatus.Continue;
@@ -973,22 +995,22 @@ namespace Seven.Structures
     /// <summary>Invokes a delegate for each entry in the data structure.</summary>
     /// <param name="function">The delegate to invoke on each item in the structure.</param>
     /// <remarks>Runtime: O(n * traversalFunction).</remarks>
-    public virtual ForeachStatus ForeachPreOrder(ForeachRefBreak<Type> function)
+    public virtual ForeachStatus ForeachPreOrder(ForeachRefBreak<T> function)
     {
-      return AvlTree_Linked<Type>.TraversalPreOrder(function, _avlTree);
+      return AvlTree_Linked<T>.TraversalPreOrder(function, _avlTree);
     }
-    protected static ForeachStatus TraversalPreOrder(ForeachRefBreak<Type> function, Node avltreeNode)
+    protected static ForeachStatus TraversalPreOrder(ForeachRefBreak<T> function, Node avltreeNode)
     {
       if (avltreeNode != null)
       {
-        Type value = avltreeNode.Value;
+        T value = avltreeNode.Value;
         ForeachStatus status = function(ref value);
         avltreeNode.Value = value;
         if (status == ForeachStatus.Break)
           return ForeachStatus.Break;
-        if (AvlTree_Linked<Type>.TraversalPreOrder(function, avltreeNode.LeftChild) == ForeachStatus.Break)
+        if (AvlTree_Linked<T>.TraversalPreOrder(function, avltreeNode.LeftChild) == ForeachStatus.Break)
           return ForeachStatus.Break;
-        if (AvlTree_Linked<Type>.TraversalPreOrder(function, avltreeNode.RightChild) == ForeachStatus.Break)
+        if (AvlTree_Linked<T>.TraversalPreOrder(function, avltreeNode.RightChild) == ForeachStatus.Break)
           return ForeachStatus.Break;
       }
       return ForeachStatus.Continue;
@@ -997,17 +1019,17 @@ namespace Seven.Structures
     /// <summary>Invokes a delegate for each entry in the data structure.</summary>
     /// <param name="function">The delegate to invoke on each item in the structure.</param>
     /// <remarks>Runtime: O(n * traversalFunction).</remarks>
-    public virtual void ForeachPostOrder(Foreach<Type> function)
+    public virtual void ForeachPostOrder(Foreach<T> function)
     {
-      AvlTree_Linked<Type>.TraversalPostOrder(function, _avlTree);
+      AvlTree_Linked<T>.TraversalPostOrder(function, _avlTree);
     }
-    protected static bool TraversalPostOrder(Foreach<Type> function, Node avltreeNode)
+    protected static bool TraversalPostOrder(Foreach<T> function, Node avltreeNode)
     {
       if (avltreeNode != null)
       {
-        AvlTree_Linked<Type>.TraversalPostOrder(function, avltreeNode.RightChild);
+        AvlTree_Linked<T>.TraversalPostOrder(function, avltreeNode.RightChild);
         function(avltreeNode.Value);
-        AvlTree_Linked<Type>.TraversalPostOrder(function, avltreeNode.LeftChild);
+        AvlTree_Linked<T>.TraversalPostOrder(function, avltreeNode.LeftChild);
       }
       return true;
     }
@@ -1015,19 +1037,19 @@ namespace Seven.Structures
     /// <summary>Invokes a delegate for each entry in the data structure.</summary>
     /// <param name="function">The delegate to invoke on each item in the structure.</param>
     /// <remarks>Runtime: O(n * traversalFunction).</remarks>
-    public virtual void ForeachPostOrder(ForeachRef<Type> function)
+    public virtual void ForeachPostOrder(ForeachRef<T> function)
     {
-      AvlTree_Linked<Type>.TraversalPostOrder(function, _avlTree);
+      AvlTree_Linked<T>.TraversalPostOrder(function, _avlTree);
     }
-    protected static bool TraversalPostOrder(ForeachRef<Type> function, Node avltreeNode)
+    protected static bool TraversalPostOrder(ForeachRef<T> function, Node avltreeNode)
     {
       if (avltreeNode != null)
       {
-        AvlTree_Linked<Type>.TraversalPostOrder(function, avltreeNode.RightChild);
-        Type value = avltreeNode.Value;
+        AvlTree_Linked<T>.TraversalPostOrder(function, avltreeNode.RightChild);
+        T value = avltreeNode.Value;
         function(ref value);
         avltreeNode.Value = value;
-        AvlTree_Linked<Type>.TraversalPostOrder(function, avltreeNode.LeftChild);
+        AvlTree_Linked<T>.TraversalPostOrder(function, avltreeNode.LeftChild);
       }
       return true;
     }
@@ -1035,22 +1057,22 @@ namespace Seven.Structures
     /// <summary>Invokes a delegate for each entry in the data structure.</summary>
     /// <param name="function">The delegate to invoke on each item in the structure.</param>
     /// <remarks>Runtime: O(n * traversalFunction).</remarks>
-    public virtual ForeachStatus ForeachPostOrder(ForeachBreak<Type> function)
+    public virtual ForeachStatus ForeachPostOrder(ForeachBreak<T> function)
     {
-      return AvlTree_Linked<Type>.TraversalPostOrder(function, _avlTree);
+      return AvlTree_Linked<T>.TraversalPostOrder(function, _avlTree);
     }
-    protected static ForeachStatus TraversalPostOrder(ForeachBreak<Type> function, Node avltreeNode)
+    protected static ForeachStatus TraversalPostOrder(ForeachBreak<T> function, Node avltreeNode)
     {
       if (avltreeNode != null)
       {
-        if (AvlTree_Linked<Type>.TraversalPostOrder(function, avltreeNode.RightChild) == ForeachStatus.Break)
+        if (AvlTree_Linked<T>.TraversalPostOrder(function, avltreeNode.RightChild) == ForeachStatus.Break)
           return ForeachStatus.Break;
-        Type value = avltreeNode.Value;
+        T value = avltreeNode.Value;
         ForeachStatus status = function(value);
         avltreeNode.Value = value;
         if (status == ForeachStatus.Break)
           return ForeachStatus.Break;
-        if (AvlTree_Linked<Type>.TraversalPostOrder(function, avltreeNode.LeftChild) == ForeachStatus.Break)
+        if (AvlTree_Linked<T>.TraversalPostOrder(function, avltreeNode.LeftChild) == ForeachStatus.Break)
           return ForeachStatus.Break;
       }
       return ForeachStatus.Continue;
@@ -1059,22 +1081,22 @@ namespace Seven.Structures
     /// <summary>Invokes a delegate for each entry in the data structure.</summary>
     /// <param name="function">The delegate to invoke on each item in the structure.</param>
     /// <remarks>Runtime: O(n * traversalFunction).</remarks>
-    public virtual ForeachStatus ForeachPostOrder(ForeachRefBreak<Type> function)
+    public virtual ForeachStatus ForeachPostOrder(ForeachRefBreak<T> function)
     {
-      return AvlTree_Linked<Type>.TraversalPostOrder(function, _avlTree);
+      return AvlTree_Linked<T>.TraversalPostOrder(function, _avlTree);
     }
-    protected static ForeachStatus TraversalPostOrder(ForeachRefBreak<Type> function, Node avltreeNode)
+    protected static ForeachStatus TraversalPostOrder(ForeachRefBreak<T> function, Node avltreeNode)
     {
       if (avltreeNode != null)
       {
-        if (AvlTree_Linked<Type>.TraversalPostOrder(function, avltreeNode.RightChild) == ForeachStatus.Break)
+        if (AvlTree_Linked<T>.TraversalPostOrder(function, avltreeNode.RightChild) == ForeachStatus.Break)
           return ForeachStatus.Break;
-        Type value = avltreeNode.Value;
+        T value = avltreeNode.Value;
         ForeachStatus status = function(ref value);
         avltreeNode.Value = value;
         if (status == ForeachStatus.Break)
           return ForeachStatus.Break;
-        if (AvlTree_Linked<Type>.TraversalPostOrder(function, avltreeNode.LeftChild) == ForeachStatus.Break)
+        if (AvlTree_Linked<T>.TraversalPostOrder(function, avltreeNode.LeftChild) == ForeachStatus.Break)
           return ForeachStatus.Break;
       }
       return ForeachStatus.Continue;
@@ -1083,13 +1105,13 @@ namespace Seven.Structures
     /// <summary>Creates an array out of the values in this structure.</summary>
     /// <returns>An array containing the values in this structure.</returns>
     /// <remarks>Runtime: Theta(n).</remarks>
-    public virtual Type[] ToArray()
+    public virtual T[] ToArray()
     {
-      Type[] array = new Type[_count];
+      T[] array = new T[_count];
       ToArray(array, _avlTree, 0);
       return array;
     }
-    protected void ToArray(Type[] array, Node avltreeNode, int position)
+    protected void ToArray(T[] array, Node avltreeNode, int position)
     {
       if (avltreeNode != null)
       {
@@ -1155,10 +1177,10 @@ namespace Seven.Structures
     //  }
     //}
 
-    public Structure<Type> Clone()
+    public Structure<T> Clone()
     {
-      AvlTree_Linked<Type> clone = new AvlTree_Linked<Type>(this._compare);
-      foreach (Type current in this)
+      AvlTree_Linked<T> clone = new AvlTree_Linked<T>(this._compare);
+      foreach (T current in this)
         clone.Add(current);
       return clone;
     }
@@ -1176,14 +1198,14 @@ namespace Seven.Structures
     #endregion
   }
 
-  /// <summary>Implements an AVL Tree where the items are sorted by string id values.</summary>
+  /// <summary>A self-sorting binary tree based on the heights of each node.</summary>
   /// <remarks>The runtimes of each public member are included in the "remarks" xml tags.</remarks>
   [System.Serializable]
-  public class AvlTreeLinkedThreadSafe<Type> : AvlTree_Linked<Type>
+  internal class AvlTreeLinkedThreadSafe<T> : AvlTree_Linked<T>
   {
     #region field
 
-    ReaderWriterLock _readerWriterLock;
+    Seven.Parallels.ReaderWriterLock _readerWriterLock;
 
     #endregion
 
@@ -1192,9 +1214,11 @@ namespace Seven.Structures
     /// <summary>Constructs an AVL Tree.</summary>
     /// <param name="compare">The comparison function for sorting the items.</param>
     /// <remarks>Runtime: O(1).</remarks>
-    public AvlTreeLinkedThreadSafe(Compare<Type> compare) : base(compare)
+    public AvlTreeLinkedThreadSafe(Compare<T> compare) : base(compare)
     {
-      this._readerWriterLock = new ReaderWriterLock();
+      throw new Error("thread safe versions still in development");
+
+      this._readerWriterLock = new Seven.Parallels.ReaderWriterLock();
     }
 
     #endregion
@@ -1206,7 +1230,7 @@ namespace Seven.Structures
     /// <param name="key"></param>
     /// <param name="compare"></param>
     /// <returns></returns>
-    public new bool Contains<Key>(Key key, Compare<Type, Key> compare)
+    public new bool Contains<Key>(Key key, Compare<T, Key> compare)
     {
       try
       {
@@ -1223,7 +1247,7 @@ namespace Seven.Structures
     /// <param name="id">The string ID to look for.</param>
     /// <returns>The object with the desired string ID if it exists.</returns>
     /// <remarks>Runtime: O(ln(n)), Omega(1).</remarks>
-    public new Type Get<Key>(Key get, Compare<Type, Key> comparison)
+    public new T Get<Key>(Key get, Compare<T, Key> comparison)
     {
       try
       {
@@ -1240,7 +1264,7 @@ namespace Seven.Structures
     /// <param name="id">The string ID to look for.</param>
     /// <returns>The object with the desired string ID if it exists.</returns>
     /// <remarks>Runtime: O(ln(n)), Omega(1).</remarks>
-    public new bool TryGet<Key>(Key get, Compare<Type, Key> compare, out Type result)
+    public new bool TryGet<Key>(Key get, Compare<T, Key> compare, out T result)
     {
       try
       {
@@ -1256,7 +1280,7 @@ namespace Seven.Structures
     /// <summary>Adds an object to the AVL Tree.</summary>
     /// <param name="addition">The object to add.</param>
     /// <remarks>Runtime: Theta(ln(n)).</remarks>
-    public new void Add(Type addition)
+    public new void Add(T addition)
     {
       try
       {
@@ -1272,7 +1296,7 @@ namespace Seven.Structures
     /// <summary>Adds an object to the AVL Tree.</summary>
     /// <param name="addition">The object to add.</param>
     /// <remarks>Runtime: Theta(ln(n)).</remarks>
-    public new bool TryAdd(Type addition)
+    public new bool TryAdd(T addition)
     {
       try
       {
@@ -1288,7 +1312,7 @@ namespace Seven.Structures
     /// <summary>Removes an object from the AVL Tree.</summary>
     /// <param name="removal">The string ID of the object to remove.</param>
     /// <remarks>Runtime: Theta(ln(n)).</remarks>
-    public new void Remove(Type removal)
+    public new void Remove(T removal)
     {
       try
       {
@@ -1304,7 +1328,7 @@ namespace Seven.Structures
     /// <summary>Removes an object from the AVL Tree.</summary>
     /// <param name="removal">The string ID of the object to remove.</param>
     /// <remarks>Runtime: Theta(ln(n)).</remarks>
-    public new bool TryRemove(Type removal)
+    public new bool TryRemove(T removal)
     {
       try
       {
@@ -1320,7 +1344,7 @@ namespace Seven.Structures
     /// <summary>Removes an object from the AVL Tree.</summary>
     /// <param name="removal">The string ID of the object to remove.</param>
     /// <remarks>Runtime: Theta(ln(n)).</remarks>
-    public new void Remove<Key>(Key removal, Compare<Type, Key> compare)
+    public new void Remove<Key>(Key removal, Compare<T, Key> compare)
     {
       try
       {
@@ -1336,7 +1360,7 @@ namespace Seven.Structures
     /// <summary>Removes an object from the AVL Tree.</summary>
     /// <param name="removal">The string ID of the object to remove.</param>
     /// <remarks>Runtime: Theta(ln(n)).</remarks>
-    public new bool TryRemove<Key>(Key removal, Compare<Type, Key> compare)
+    public new bool TryRemove<Key>(Key removal, Compare<T, Key> compare)
     {
       try
       {
@@ -1366,7 +1390,7 @@ namespace Seven.Structures
     /// <summary>Invokes a delegate for each entry in the data structure.</summary>
     /// <param name="function">The delegate to invoke on each item in the structure.</param>
     /// <remarks>Runtime: O(n * traversalFunction).</remarks>
-    public new void Foreach(Foreach<Type> function)
+    public new void Foreach(Foreach<T> function)
     {
       try
       {
@@ -1382,7 +1406,7 @@ namespace Seven.Structures
     /// <summary>Invokes a delegate for each entry in the data structure.</summary>
     /// <param name="function">The delegate to invoke on each item in the structure.</param>
     /// <remarks>Runtime: O(n * traversalFunction).</remarks>
-    public new void Foreach(ForeachRef<Type> function)
+    public new void Foreach(ForeachRef<T> function)
     {
       try
       {
@@ -1399,7 +1423,7 @@ namespace Seven.Structures
     /// <param name="function">The delegate to invoke on each item in the structure.</param>
     /// <returns>The resulting status of the iteration.</returns>
     /// <remarks>Runtime: O(n * traversalFunction).</remarks>
-    public new ForeachStatus Foreach(ForeachBreak<Type> function)
+    public new ForeachStatus Foreach(ForeachBreak<T> function)
     {
       try
       {
@@ -1416,7 +1440,7 @@ namespace Seven.Structures
     /// <param name="function">The delegate to invoke on each item in the structure.</param>
     /// <returns>The resulting status of the iteration.</returns>
     /// <remarks>Runtime: O(n * traversalFunction).</remarks>
-    public new ForeachStatus Foreach(ForeachRefBreak<Type> function)
+    public new ForeachStatus Foreach(ForeachRefBreak<T> function)
     {
       try
       {
@@ -1432,7 +1456,7 @@ namespace Seven.Structures
     /// <summary>Invokes a delegate for each entry in the data structure.</summary>
     /// <param name="function">The delegate to invoke on each item in the structure.</param>
     /// <remarks>Runtime: O(n * traversalFunction).</remarks>
-    public new void ForeachInOrder(Foreach<Type> function)
+    public new void ForeachInOrder(Foreach<T> function)
     {
       try
       {
@@ -1448,7 +1472,7 @@ namespace Seven.Structures
     /// <summary>Invokes a delegate for each entry in the data structure.</summary>
     /// <param name="function">The delegate to invoke on each item in the structure.</param>
     /// <remarks>Runtime: O(n * traversalFunction).</remarks>
-    public new void ForeachInOrder(ForeachRef<Type> function)
+    public new void ForeachInOrder(ForeachRef<T> function)
     {
       try
       {
@@ -1464,7 +1488,7 @@ namespace Seven.Structures
     /// <summary>Invokes a delegate for each entry in the data structure.</summary>
     /// <param name="function">The delegate to invoke on each item in the structure.</param>
     /// <remarks>Runtime: O(n * traversalFunction).</remarks>
-    public new ForeachStatus ForeachInOrder(ForeachBreak<Type> function)
+    public new ForeachStatus ForeachInOrder(ForeachBreak<T> function)
     {
       try
       {
@@ -1480,7 +1504,7 @@ namespace Seven.Structures
     /// <summary>Invokes a delegate for each entry in the data structure.</summary>
     /// <param name="function">The delegate to invoke on each item in the structure.</param>
     /// <remarks>Runtime: O(n * traversalFunction).</remarks>
-    public new ForeachStatus ForeachInOrder(ForeachRefBreak<Type> function)
+    public new ForeachStatus ForeachInOrder(ForeachRefBreak<T> function)
     {
       try
       {
@@ -1496,7 +1520,7 @@ namespace Seven.Structures
     /// <summary>Invokes a delegate for each entry in the data structure.</summary>
     /// <param name="function">The delegate to invoke on each item in the structure.</param>
     /// <remarks>Runtime: O(n * traversalFunction).</remarks>
-    public new void ForeachPreOrder(Foreach<Type> function)
+    public new void ForeachPreOrder(Foreach<T> function)
     {
       try
       {
@@ -1512,7 +1536,7 @@ namespace Seven.Structures
     /// <summary>Invokes a delegate for each entry in the data structure.</summary>
     /// <param name="function">The delegate to invoke on each item in the structure.</param>
     /// <remarks>Runtime: O(n * traversalFunction).</remarks>
-    public new void ForeachPreOrder(ForeachRef<Type> function)
+    public new void ForeachPreOrder(ForeachRef<T> function)
     {
       try
       {
@@ -1528,7 +1552,7 @@ namespace Seven.Structures
     /// <summary>Invokes a delegate for each entry in the data structure.</summary>
     /// <param name="function">The delegate to invoke on each item in the structure.</param>
     /// <remarks>Runtime: O(n * traversalFunction).</remarks>
-    public new ForeachStatus ForeachPreOrder(ForeachBreak<Type> function)
+    public new ForeachStatus ForeachPreOrder(ForeachBreak<T> function)
     {
       try
       {
@@ -1544,7 +1568,7 @@ namespace Seven.Structures
     /// <summary>Invokes a delegate for each entry in the data structure.</summary>
     /// <param name="function">The delegate to invoke on each item in the structure.</param>
     /// <remarks>Runtime: O(n * traversalFunction).</remarks>
-    public new ForeachStatus ForeachPreOrder(ForeachRefBreak<Type> function)
+    public new ForeachStatus ForeachPreOrder(ForeachRefBreak<T> function)
     {
       try
       {
@@ -1560,7 +1584,7 @@ namespace Seven.Structures
     /// <summary>Invokes a delegate for each entry in the data structure.</summary>
     /// <param name="function">The delegate to invoke on each item in the structure.</param>
     /// <remarks>Runtime: O(n * traversalFunction).</remarks>
-    public new void ForeachPostOrder(Foreach<Type> function)
+    public new void ForeachPostOrder(Foreach<T> function)
     {
       try
       {
@@ -1576,7 +1600,7 @@ namespace Seven.Structures
     /// <summary>Invokes a delegate for each entry in the data structure.</summary>
     /// <param name="function">The delegate to invoke on each item in the structure.</param>
     /// <remarks>Runtime: O(n * traversalFunction).</remarks>
-    public new void ForeachPostOrder(ForeachRef<Type> function)
+    public new void ForeachPostOrder(ForeachRef<T> function)
     {
       try
       {
@@ -1592,7 +1616,7 @@ namespace Seven.Structures
     /// <summary>Invokes a delegate for each entry in the data structure.</summary>
     /// <param name="function">The delegate to invoke on each item in the structure.</param>
     /// <remarks>Runtime: O(n * traversalFunction).</remarks>
-    public new ForeachStatus ForeachPostOrder(ForeachBreak<Type> function)
+    public new ForeachStatus ForeachPostOrder(ForeachBreak<T> function)
     {
       try
       {
@@ -1608,7 +1632,7 @@ namespace Seven.Structures
     /// <summary>Invokes a delegate for each entry in the data structure.</summary>
     /// <param name="function">The delegate to invoke on each item in the structure.</param>
     /// <remarks>Runtime: O(n * traversalFunction).</remarks>
-    public new ForeachStatus ForeachPostOrder(ForeachRefBreak<Type> function)
+    public new ForeachStatus ForeachPostOrder(ForeachRefBreak<T> function)
     {
       try
       {
@@ -1624,7 +1648,7 @@ namespace Seven.Structures
     /// <summary>Creates an array out of the values in this structure.</summary>
     /// <returns>An array containing the values in this structure.</returns>
     /// <remarks>Runtime: Theta(n).</remarks>
-    public new Type[] ToArray()
+    public new T[] ToArray()
     {
       try
       {
@@ -1643,24 +1667,24 @@ namespace Seven.Structures
   /// <summary>Implements an AVL Tree where the items are sorted by string id values.</summary>
   /// <remarks>The runtimes of each public member are included in the "remarks" xml tags.</remarks>
   [System.Serializable]
-  public class AvlTree_Array<Type>// : AvlTree<Type>
+  internal class AvlTree_Array<T>// : AvlTree<Type>
   {
     #region class
 
     public struct Node
     {
       public bool _occupied;
-      public Type _value;
+      public T _value;
     }
 
     #endregion
 
     #region field
 
-    internal Link<bool, Type>[] _avlTree;
+    internal Link<bool, T>[] _avlTree;
     protected int _count;
 
-    protected Compare<Type> _compare;
+    protected Compare<T> _compare;
 
     #endregion
 
@@ -1680,11 +1704,13 @@ namespace Seven.Structures
     /// <summary>Constructs an AVL Tree.</summary>
     /// <param name="compare">The comparison function for sorting the items.</param>
     /// <remarks>Runtime: O(1).</remarks>
-    public AvlTree_Array(Compare<Type> compare, int maximumSize)
+    internal AvlTree_Array(Compare<T> compare, int maximumSize)
     {
+      throw new Error("still in development");
+
       if (maximumSize < 1)
-        throw new AvlTree_Array<Type>.Exception("");
-      _avlTree = new Link<bool,Type>[maximumSize + 1];
+        throw new AvlTree_Array<T>.Exception("");
+      _avlTree = new Link<bool,T>[maximumSize + 1];
       _count = 0;
       _compare = compare;
     }
@@ -1698,7 +1724,7 @@ namespace Seven.Structures
       return (index - 1) / 2;
     }
 
-    public virtual bool Contains<Key>(Key key, Compare<Type, Key> comparison)
+    public virtual bool Contains<Key>(Key key, Compare<T, Key> comparison)
     {
       // THIS THIS THE ITERATIVE VERSION OF THIS FUNCTION. THERE IS A RECURSIVE
       // VERSION IN THE "RECURSIVE" REGION SHOULD YOU WISH TO SEE IT.

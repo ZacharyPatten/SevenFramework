@@ -63,10 +63,23 @@ namespace Seven.Mathematics
           { typeof(decimal), Combinatorics_decimal.Get },
 				};
 
+    public static void Set<T>(Combinatorics<T> _algebra)
+    {
+      _combinatorics[typeof(T)] = _algebra;
+    }
+
+    public static bool Contains<T>()
+    {
+      return _combinatorics.Contains(typeof(T));
+    }
+
     public static Combinatorics<T> Get<T>()
     {
-      try { return (Combinatorics<T>)_combinatorics[typeof(T)]; }
-      catch { throw new Error("LinearAlgebra does not yet exist for " + typeof(T).ToString()); }
+      object temp;
+      if (_combinatorics.TryGet(typeof(T), out temp))
+        return temp as Combinatorics<T>;
+      else
+        return new Combinatorics_unsupported<T>();
     }
 
     #region provided
@@ -196,32 +209,19 @@ namespace Seven.Mathematics
       public Combinatorics.delegates.Choose<int> Choose { get { return Combinatorics.Choose; } }
     }
 
-    private class Combinatorics_unsupported : Combinatorics<int>
+    private class Combinatorics_unsupported<T> : Combinatorics<T>
     {
-      private Combinatorics_unsupported() { _instance = this; }
-      private static Combinatorics_unsupported _instance;
-      private static Combinatorics_unsupported Instance
-      {
-        get
-        {
-          if (_instance == null)
-            return _instance = new Combinatorics_unsupported();
-          else
-            return _instance;
-        }
-      }
-
-      public static Combinatorics_unsupported Get { get { return Instance; } }
+      public Combinatorics_unsupported() {  }
 
       /// <summary>Computes: [ N! ].</summary>
-      public Combinatorics.delegates.Factorial<int> Factorial
-      { get { return Combinatorics.Factorial; } }
+      public Combinatorics.delegates.Factorial<T> Factorial
+      { get { return (T a) => { throw new Error("Combinatorics is undefined for type: " + typeof(T)); }; } }
       /// <summary>Computes: [ N! / (n[0]! + n[1]! + n[3]! ...) ].</summary>
-      public Combinatorics.delegates.Combinations<int> Combinations
-      { get { return Combinatorics.Combinations; } }
+      public Combinatorics.delegates.Combinations<T> Combinations
+      { get { return (T a, T[] b) => { throw new Error("Combinatorics is undefined for type: " + typeof(T)); }; } }
       /// <summary>Computes: [ N! / (N - n)! ]</summary>
-      public Combinatorics.delegates.Choose<int> Choose
-      { get { return Combinatorics.Choose; } }
+      public Combinatorics.delegates.Choose<T> Choose
+      { get { return (T a, T b) => { throw new Error("Combinatorics is undefined for type: " + typeof(T)); }; } }
     }
 
     #endregion

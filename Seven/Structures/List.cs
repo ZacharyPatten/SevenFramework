@@ -435,41 +435,6 @@ namespace Seven.Structures
     #endregion
   }
 
-  /// <summary>Implements a growing, singularly-linked list data structure that inherits InterfaceTraversable.</summary>
-  /// <typeparam name="Type">The type of objects to be placed in the list.</typeparam>
-  /// <remarks>The runtimes of each public member are included in the "remarks" xml tags.</remarks>
-  [System.Serializable]
-  public class List_Linked_ThreadSafe<Type> : List_Linked<Type>
-  {
-    #region field
-
-    Seven.Parallels.ReaderWriterLock _readerWriterLock;
-
-    #endregion
-
-    #region construct
-
-    /// <summary>Creates an instance of a stalistck.</summary>
-    /// <remarks>Runtime: O(1).</remarks>
-    public List_Linked_ThreadSafe() : base()
-    {
-      this._readerWriterLock = new Seven.Parallels.ReaderWriterLock();
-      throw new Error("the thread safe version wrappers are not yet finished. sorry.");
-    }
-
-    #endregion
-
-    #region error
-
-    /// <summary>This is used for throwing AVL Tree exceptions only to make debugging faster.</summary>
-    private class Error : Structure.Error
-    {
-      public Error(string message) : base(message) { }
-    }
-
-    #endregion
-  }
-
   /// <summary>Implements a growing list as an array (with expansions/contractions) 
   /// data structure that inherits InterfaceTraversable.</summary>
   /// <typeparam name="Type">The type of objects to be placed in the list.</typeparam>
@@ -852,11 +817,12 @@ namespace Seven.Structures
     #endregion
   }
 
-  /// <summary>Implements a growing, singularly-linked list data structure that inherits InterfaceTraversable.</summary>
+  /// <summary>Implements a growing list as an array (with expansions/contractions) 
+  /// data structure that inherits InterfaceTraversable.</summary>
   /// <typeparam name="Type">The type of objects to be placed in the list.</typeparam>
   /// <remarks>The runtimes of each public member are included in the "remarks" xml tags.</remarks>
   [System.Serializable]
-  public class List_Array_ThreadSafe<Type> : List_Array<Type>
+  internal class List_Array_ThreadSafe<Type> : List_Array<Type>
   {
     #region field
 
@@ -864,16 +830,324 @@ namespace Seven.Structures
 
     #endregion
 
+    #region property
+
+    /// <summary>Allows you to adjust the minimum capacity of this list.</summary>
+    /// <remarks>Runtime: O(n), Omega(1).</remarks>
+    public int MinimumCapacity
+    {
+      get
+      {
+        int returnValue = _minimumCapacity;
+        return returnValue;
+      }
+      set
+      {
+        _readerWriterLock.WriterLock();
+
+        if (value < 1)
+          throw new Error("Attempting to set a minimum capacity to a negative or zero value.");
+        else if (value > _list.Length)
+        {
+          Type[] newList = new Type[value];
+          _list.CopyTo(newList, 0);
+          _list = newList;
+        }
+        else
+          _minimumCapacity = value;
+
+        _readerWriterLock.WriterUnlock();
+      }
+    }
+
+    /// <summary>Look-up and set an indexed item in the list.</summary>
+    /// <param name="index">The index of the item to get or set.</param>
+    /// <returns>The value at the given index.</returns>
+    public Type this[int index]
+    {
+      get
+      {
+        if (index < 0 || index > _count)
+        {
+          throw new Error("Attempting an index look-up outside the ListArray's current size.");
+        }
+        Type returnValue = _list[index];
+        return returnValue;
+      }
+      set
+      {
+        if (index < 0 || index > _count)
+        {
+          throw new Error("Attempting an index assignment outside the ListArray's current size.");
+        }
+        _list[index] = value;
+      }
+    }
+
+    #endregion
+
     #region construct
 
-    /// <summary>Creates an instance of a stalistck.</summary>
+    /// <summary>Creates an instance of a ListArray, and sets it's minimum capacity.</summary>
     /// <remarks>Runtime: O(1).</remarks>
-    public List_Array_ThreadSafe(int minimumCapacity)
-      : base(minimumCapacity)
+    public List_Array_ThreadSafe() : base()
     {
-      this._readerWriterLock = new Seven.Parallels.ReaderWriterLock();
+      _readerWriterLock = new Parallels.ReaderWriterLock();
 
-      throw new Error("thread safe wrappers are not yet complete. sorry.");
+      throw new Error("thread-safe versions still in development");
+    }
+
+    /// <summary>Creates an instance of a ListArray, and sets it's minimum capacity.</summary>
+    /// <param name="minimumCapacity">The initial and smallest array size allowed by this list.</param>
+    /// <remarks>Runtime: O(1).</remarks>
+    public List_Array_ThreadSafe(int minimumCapacity) : base()
+    {
+      _readerWriterLock = new Parallels.ReaderWriterLock();
+
+      throw new Error("thread-safe versions still in development");
+    }
+
+    #endregion
+
+    #region method
+
+    /// <summary>Determines if an object reference exists in the array.</summary>
+    /// <param name="reference">The reference to the object.</param>
+    /// <returns>Whether or not the object reference exists.</returns>
+    public bool Contains(Type reference)
+    {
+      for (int i = 0; i < _count; i++)
+        if (_list[i].Equals(reference))
+          return true;
+      return false;
+    }
+
+    /// <summary>Adds an item to the end of the list.</summary>
+    /// <param name="addition">The item to be added.</param>
+    /// <remarks>Runtime: O(n), EstAvg(1). </remarks>
+    public void Add(Type addition)
+    {
+      if (_count == _list.Length)
+      {
+        if (_list.Length > int.MaxValue / 2)
+          throw new Error("Your list is so large that it can no longer double itself (int.MaxValue barrier reached).");
+        Type[] newList = new Type[_list.Length * 2];
+        _list.CopyTo(newList, 0);
+        _list = newList;
+      }
+      _list[_count++] = addition;
+    }
+
+    /// <summary>Removes the item at a specific index.</summary>
+    /// <param name="removal">The item to be removed.</param>
+    /// <param name="compare">The technique of determining equality.</param>
+    /// <remarks>Runtime: Theta(n).</remarks>
+    public void RemoveFirst(Type removal, Compare<Type> compare)
+    {
+      int i;
+      for (i = 0; i < this._count; i++)
+        if (compare(removal, this._list[i]) == Comparison.Equal)
+          break;
+      if (i == this._count)
+        throw new Error("Attempting to remove a non-existing item from this list.");
+      Remove(i);
+    }
+
+    /// <summary>Removes the item at a specific index.</summary>
+    /// <param name="removal">The item to be removed.</param>
+    /// <param name="compare">The technique of determining equality.</param>
+    /// <returns>True if the item was found and removed; false if not.</returns>
+    /// <remarks>Runtime: Theta(n).</remarks>
+    public bool TryRemoveFirst(Type removal, Compare<Type> compare)
+    {
+      int i;
+      for (i = 0; i < this._count; i++)
+        if (compare(removal, this._list[i]) == Comparison.Equal)
+          break;
+      if (i == this._count)
+        return false;
+      Remove(i);
+      return true;
+    }
+
+    /// <summary>Removes the item at a specific index.</summary>
+    /// <param name="index">The index of the item to be removed.</param>
+    /// <remarks>Runtime: Theta(n - index).</remarks>
+    public void Remove(int index)
+    {
+      if (index < 0 || index > _count)
+        throw new Error("Attempting to remove an index outside the ListArray's current size.");
+      if (_count < _list.Length / 4 && _list.Length / 2 > _minimumCapacity)
+      {
+        Type[] newList = new Type[_list.Length / 2];
+        for (int i = 0; i < _count; i++)
+          newList[i] = _list[i];
+        _list = newList;
+      }
+      for (int i = index; i < _count; i++)
+        _list[i] = _list[i + 1];
+      _count--;
+    }
+
+    /// <summary>Removes all occurences of a given item.</summary>
+    /// <param name="item">The itme to genocide.</param>
+    /// <remarks>Runtime: Theta(n).</remarks>
+    public void RemoveAll(Type item, Compare<Type> compare)
+    {
+      if (this._count == 0)
+        return;
+      int removed = 0;
+      for (int i = 0; i < this._count; i++)
+        if (compare(item, this._list[i]) == Comparison.Equal)
+          removed++;
+        else
+          this._list[i - removed] = this._list[i];
+      this._count -= removed;
+      if (_count < _list.Length / 4 && _list.Length / 2 > _minimumCapacity)
+      {
+        Type[] newList = new Type[_list.Length / 2];
+        for (int i = 0; i < this._count; i++)
+          newList[i] = this._list[i];
+        this._list = newList;
+      }
+    }
+
+    /// <summary>Resizes this allocation to the current count.</summary>
+    public void Trim()
+    {
+      Type[] newList = new Type[this._count];
+      for (int i = 0; i < this._count; i++)
+        newList[i] = this._list[i];
+      this._list = newList;
+    }
+
+    /// <summary>Empties the list back and reduces it back to its original capacity.</summary>
+    /// <remarks>Runtime: O(1).</remarks>
+    public void Clear()
+    {
+      _list = new Type[_minimumCapacity];
+      _count = 0;
+    }
+
+    #region .Net Framework Compatibility
+    
+    ///// <summary>FOR COMPATIBILITY ONLY. AVOID IF POSSIBLE.</summary>
+    //System.Collections.IEnumerator
+    //  System.Collections.IEnumerable.GetEnumerator()
+    //{
+    //  for (int i = 0; i < base._count; i++)
+    //    yield return base._list[i];
+    //}
+
+    ///// <summary>FOR COMPATIBILITY ONLY. AVOID IF POSSIBLE.</summary>
+    //System.Collections.Generic.IEnumerator<Type>
+    //  System.Collections.Generic.IEnumerable<Type>.GetEnumerator()
+    //{
+    //  for (int i = 0; i < base._count; i++)
+    //    yield return base._list[i];
+    //}
+    #endregion
+
+    /// <summary>Gets the current memory imprint of this structure in bytes.</summary>
+    /// <remarks>Returns long.MaxValue on overflow.</remarks>
+    public int SizeOf { get { return this._list.Length; } }
+
+    /// <summary>Pulls out all the values in the structure that are equivalent to the key.</summary>
+    /// <typeparam name="Key">The type of the key to check for.</typeparam>
+    /// <param name="key">The key to check for.</param>
+    /// <param name="compare">Delegate representing comparison technique.</param>
+    /// <returns>An array containing all the values matching the key or null if non were found.</returns>
+    //Type[] GetValues<Key>(Key key, Compare<Type, Key> compare);
+
+    /// <summary>Pulls out all the values in the structure that are equivalent to the key.</summary>
+    /// <typeparam name="Key">The type of the key to check for.</typeparam>
+    /// <param name="key">The key to check for.</param>
+    /// <param name="compare">Delegate representing comparison technique.</param>
+    /// <returns>An array containing all the values matching the key or null if non were found.</returns>
+    /// <param name="values">The values that matched the given key.</param>
+    /// <returns>true if 1 or more values were found; false if no values were found.</returns>
+    //bool TryGetValues<Key>(Key key, Compare<Type, Key> compare, out Type[] values);
+
+    /// <summary>Checks to see if a given object is in this data structure.</summary>
+    /// <param name="item">The item to check for.</param>
+    /// <param name="compare">Delegate representing comparison technique.</param>
+    /// <returns>true if the item is in this structure; false if not.</returns>
+    public bool Contains(Type item, Compare<Type> compare)
+    {
+      for (int i = 0; i < this._count; i++)
+        if (compare(this._list[i], item) == Comparison.Equal)
+          return true;
+      return false;
+    }
+
+    /// <summary>Checks to see if a given object is in this data structure.</summary>
+    /// <typeparam name="Key">The type of the key to check for.</typeparam>
+    /// <param name="key">The key to check for.</param>
+    /// <param name="compare">Delegate representing comparison technique.</param>
+    /// <returns>true if the item is in this structure; false if not.</returns>
+    public bool Contains<Key>(Key key, Compare<Type, Key> compare)
+    {
+      for (int i = 0; i < this._count; i++)
+        if (compare(this._list[i], key) == Comparison.Equal)
+          return true;
+      return false;
+    }
+
+    /// <summary>Invokes a delegate for each entry in the data structure.</summary>
+    /// <param name="function">The delegate to invoke on each item in the structure.</param>
+    public void Foreach(Foreach<Type> function)
+    {
+      for (int i = 0; i < this._count; i++)
+        function(this._list[i]);
+    }
+
+    /// <summary>Invokes a delegate for each entry in the data structure.</summary>
+    /// <param name="function">The delegate to invoke on each item in the structure.</param>
+    public void Foreach(ForeachRef<Type> function)
+    {
+      for (int i = 0; i < this._count; i++)
+        function(ref this._list[i]);
+    }
+
+    /// <summary>Invokes a delegate for each entry in the data structure.</summary>
+    /// <param name="function">The delegate to invoke on each item in the structure.</param>
+    /// <returns>The resulting status of the iteration.</returns>
+    public ForeachStatus Foreach(ForeachBreak<Type> function)
+    {
+      for (int i = 0; i < this._count; i++)
+        if (function(this._list[i]) == ForeachStatus.Break)
+          return ForeachStatus.Break;
+      return ForeachStatus.Continue;
+    }
+
+    /// <summary>Invokes a delegate for each entry in the data structure.</summary>
+    /// <param name="function">The delegate to invoke on each item in the structure.</param>
+    /// <returns>The resulting status of the iteration.</returns>
+    public ForeachStatus Foreach(ForeachRefBreak<Type> function)
+    {
+      for (int i = 0; i < this._count; i++)
+        if (function(ref this._list[i]) == ForeachStatus.Break)
+          return ForeachStatus.Break;
+      return ForeachStatus.Continue;
+    }
+
+    /// <summary>Creates a shallow clone of this data structure.</summary>
+    /// <returns>A shallow clone of this data structure.</returns>
+    public Structure<Type> Clone()
+    {
+      List_Array<Type> clone = new List_Array<Type>(this._minimumCapacity);
+      for (int i = 0; i < this._count; i++)
+        clone.Add(this._list[i]);
+      return clone;
+    }
+
+    /// <summary>Converts the list array into a standard array.</summary>
+    /// <returns>A standard array of all the elements.</returns>
+    public Type[] ToArray()
+    {
+      Type[] array = new Type[_count];
+      for (int i = 0; i < _count; i++) array[i] = _list[i];
+      return array;
     }
 
     #endregion
@@ -881,9 +1155,9 @@ namespace Seven.Structures
     #region error
 
     /// <summary>This is used for throwing AVL Tree exceptions only to make debugging faster.</summary>
-    private class Exception : Structure.Error
+    private class Error : Structure.Error
     {
-      public Exception(string message) : base(message) { }
+      public Error(string message) : base(message) { }
     }
 
     #endregion

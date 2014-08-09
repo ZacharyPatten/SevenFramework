@@ -87,261 +87,276 @@ namespace Seven.Mathematics
           { typeof(double), Trigonometry_double.Get },
 				};
 
-		public static Trigonometry<T> Get<T>()
-		{
-			try { return _trigonometries[typeof(T)] as Trigonometry<T>; }
-			catch { throw new Error("Arithmetic does not yet exist for " + typeof(T).ToString()); }
-		}
-
-    #region Built-In
-
-    private class Trigonometry_float //: Trigonometry<float>
+    public static void Set<T>(Trigonometry<T> _algebra)
     {
-      private Trigonometry_float() { _instance = this; }
-      private static Trigonometry_float _instance;
-      private static Trigonometry_float Instance
-      {
-        get
-        {
-          if (_instance == null)
-            return _instance = new Trigonometry_float();
-          else
-            return _instance;
-        }
-      }
-
-      public static Trigonometry_float Get { get { return Instance; } }
-
-      public float toRadians(float angle)
-      {
-        return angle * Constants.pi_float / 180f;
-      }
-
-      public float toDegrees(float angle)
-      {
-        return angle * 180f / Constants.pi_float;
-      }
-
-      public float sin(float angle)
-      {
-        return (float)System.Math.Sin(angle);
-
-        // THE FOLLOWING IS PERSONAL SIN FUNCTION. IT WORKS BUT IT IS NOT AS FAST AS
-        // THE SYSTEM FUNCTION IN ITS CURRENT STATE
-        #region Custom Sin Function
-        //// get the angle to be within the unit circle
-        //angle = angle % (TwoPi);
-
-        //// if the angle is negative, inverse it against the full unit circle
-        //if (angle < 0)
-        //  angle = TwoPi + angle;
-
-        //// adjust for quadrants
-        //// NOTE: if you want more accuracy, you can follow this pattern
-        //// sin(x) = x - x^3/3! + x^5/5! - x^7/7! ...
-        //// the more terms you include the more accurate it is
-        //float angleCubed;
-        //float angleToTheFifth;
-        //// quadrant 1
-        //if (angle <= HalfPi)
-        //{
-        //  angleCubed = angle * angle * angle;
-        //  angleToTheFifth = angleCubed * angle * angle;
-        //  return angle
-        //    - ((angleCubed) / 6)
-        //    + ((angleToTheFifth) / 120);
-        //}
-        //// quadrant 2
-        //else if (angle <= Pi)
-        //{
-        //  angle = HalfPi - (angle % HalfPi);
-        //  angleCubed = angle * angle * angle;
-        //  angleToTheFifth = angleCubed * angle * angle;
-        //  return angle
-        //    - ((angleCubed) / 6)
-        //    + ((angleToTheFifth) / 120);
-        //}
-        //// quadrant 3
-        //else if (angle <= ThreeHalvesPi)
-        //{
-        //  angle = angle % Pi;
-        //  angleCubed = angle * angle * angle;
-        //  angleToTheFifth = angleCubed * angle * angle;
-        //  return -(angle
-        //      - ((angleCubed) / 6)
-        //      + ((angleToTheFifth) / 120));
-        //}
-        //// quadrant 4  
-        //else
-        //{
-        //  angle = HalfPi - (angle % HalfPi);
-        //  angleCubed = angle * angle * angle;
-        //  angleToTheFifth = angleCubed * angle * angle;
-        //  return -(angle
-        //      - ((angleCubed) / 6)
-        //      + ((angleToTheFifth) / 120));
-        //}
-        #endregion
-      }
-
-      public float cos(float angle)
-      {
-        return (float)System.Math.Cos(angle);
-
-        // THE FOLLOWING IS MY PERSONAL FUNCTION. IT WORKS BUT IT IS NOT AS FAST AS
-        // THE SYSTEM FUNCTION IN ITS CURRENT STATE
-        #region Custom Cos Function
-        //// If you wanted to be cheap, you could just use the following commented line...
-        //// return Sin(angle + (Pi / 2));
-
-        //// get the angle to be within the unit circle
-        //angle = angle % (TwoPi);
-
-        //// if the angle is negative, inverse it against the full unit circle
-        //if (angle < 0)
-        //  angle = TwoPi + angle;
-
-        //// adjust for quadrants
-        //// NOTE: if you want more accuracy, you can follow this pattern
-        //// cos(x) = 1 - x^2/2! + x^4/4! - x^6/6! ...
-        //// the terms you include the more accuracy it is
-        //float angleSquared;
-        //float angleToTheFourth;
-        //float angleToTheSixth;
-        //// quadrant 1
-        //if (angle <= HalfPi)
-        //{
-        //  angleSquared = angle * angle;
-        //  angleToTheFourth = angleSquared * angle * angle;
-        //  angleToTheSixth = angleToTheFourth * angle * angle;
-        //  return 1
-        //    - (angleSquared / 2)
-        //    + (angleToTheFourth / 24)
-        //    - (angleToTheSixth / 720);
-        //}
-        //// quadrant 2
-        //else if (angle <= Pi)
-        //{
-        //  angle = HalfPi - (angle % HalfPi);
-        //  angleSquared = angle * angle;
-        //  angleToTheFourth = angleSquared * angle * angle;
-        //  angleToTheSixth = angleToTheFourth * angle * angle;
-        //  return -(1
-        //    - (angleSquared / 2)
-        //    + (angleToTheFourth / 24)
-        //    - (angleToTheSixth / 720));
-        //}
-        //// quadrant 3
-        //else if (angle <= ThreeHalvesPi)
-        //{
-        //  angle = angle % Pi;
-        //  angleSquared = angle * angle;
-        //  angleToTheFourth = angleSquared * angle * angle;
-        //  angleToTheSixth = angleToTheFourth * angle * angle;
-        //  return -(1
-        //    - (angleSquared / 2)
-        //    + (angleToTheFourth / 24)
-        //    - (angleToTheSixth / 720));
-        //}
-        //// quadrant 4  
-        //else
-        //{
-        //  angle = HalfPi - (angle % HalfPi);
-        //  angleSquared = angle * angle;
-        //  angleToTheFourth = angleSquared * angle * angle;
-        //  angleToTheSixth = angleToTheFourth * angle * angle;
-        //  return 1
-        //    - (angleSquared / 2)
-        //    + (angleToTheFourth / 24)
-        //    - (angleToTheSixth / 720);
-        //}
-        #endregion
-      }
-
-      public float tan(float angle)
-      {
-        return (float)System.Math.Tan(angle);
-
-        // THE FOLLOWING IS MY PERSONAL FUNCTION. IT WORKS BUT IT IS NOT AS FAST AS
-        // THE SYSTEM FUNCTION IN ITS CURRENT STATE
-        #region Custom Tan Function
-        //// "sin / cos" results in "opposite side / adjacent side", which is equal to tangent
-        //return Sin(angle) / Cos(angle);
-        #endregion
-      }
-
-      public float sec(float angle)
-      {
-        return 1.0f / (float)System.Math.Cos(angle);
-
-        // THE FOLLOWING IS MY PERSONAL FUNCTION. IT WORKS BUT IT IS NOT AS FAST AS
-        // THE SYSTEM FUNCTION IN ITS CURRENT STATE
-        #region Custom Sec Function
-        //// by definition, sec is the reciprical of cos
-        //return 1 / Cos(angle);
-        #endregion
-      }
-
-      public float csc(float angle)
-      {
-        return 1.0f / (float)System.Math.Sin(angle);
-
-        // THE FOLLOWING IS MY PERSONAL FUNCTION. IT WORKS BUT IT IS NOT AS FAST AS
-        // THE SYSTEM FUNCTION IN ITS CURRENT STATE
-        #region Custom Csc Function
-        //// by definition, csc is the reciprical of sin
-        //return 1 / Sin(angle);
-        #endregion
-      }
-
-      public float cot(float angle)
-      {
-        return 1.0f / (float)System.Math.Tan(angle);
-
-        // THE FOLLOWING IS MY PERSONAL FUNCTION. IT WORKS BUT IT IS NOT AS FAST AS
-        // THE SYSTEM FUNCTION IN ITS CURRENT STATE
-        #region Custom Cot Function
-        //// by definition, cot is the reciprical of tan
-        //return 1 / Tan(angle);
-        #endregion
-      }
-
-      public float arcsin(float sinRatio)
-      {
-        return (float)System.Math.Asin(sinRatio);
-        //I haven't made a custom ArcSin function yet...
-      }
-
-      public float arccos(float cosRatio)
-      {
-        return (float)System.Math.Acos(cosRatio);
-        //I haven't made a custom ArcCos function yet...
-      }
-
-      public float arctan(float tanRatio)
-      {
-        return (float)System.Math.Atan(tanRatio);
-        //I haven't made a custom ArcTan function yet...
-      }
-
-      public float arccsc(float cscRatio)
-      {
-        return (float)System.Math.Asin(1.0f / cscRatio);
-        //I haven't made a custom ArcCsc function yet...
-      }
-
-      public float arcsec(float secRatio)
-      {
-        return (float)System.Math.Acos(1.0f / secRatio);
-        //I haven't made a custom ArcSec function yet...
-      }
-
-      public float arccot(float cotRatio)
-      {
-        return (float)System.Math.Atan(1.0f / cotRatio);
-        //I haven't made a custom ArcCot function yet...
-      }
+      _trigonometries[typeof(T)] = _algebra;
     }
+
+    public static bool Contains<T>()
+    {
+      return _trigonometries.Contains(typeof(T));
+    }
+
+    public static Trigonometry<T> Get<T>()
+    {
+      object temp;
+      if (_trigonometries.TryGet(typeof(T), out temp))
+        return temp as Trigonometry<T>;
+      else
+        return new Trigonometry_unsupported<T>();
+    }
+
+    #region provided
+
+    #region Back-UP
+    //private class Trigonometry_float : Trigonometry<float>
+    //{
+    //  private Trigonometry_float() { _instance = this; }
+    //  private static Trigonometry_float _instance;
+    //  private static Trigonometry_float Instance
+    //  {
+    //    get
+    //    {
+    //      if (_instance == null)
+    //        return _instance = new Trigonometry_float();
+    //      else
+    //        return _instance;
+    //    }
+    //  }
+
+    //  public static Trigonometry_float Get { get { return Instance; } }
+
+    //  public float toRadians(float angle)
+    //  {
+    //    return angle * Constants.pi_float / 180f;
+    //  }
+
+    //  public float toDegrees(float angle)
+    //  {
+    //    return angle * 180f / Constants.pi_float;
+    //  }
+
+    //  public float sin(float angle)
+    //  {
+    //    return (float)System.Math.Sin(angle);
+
+    //    // THE FOLLOWING IS PERSONAL SIN FUNCTION. IT WORKS BUT IT IS NOT AS FAST AS
+    //    // THE SYSTEM FUNCTION IN ITS CURRENT STATE
+    //    #region Custom Sin Function
+    //    //// get the angle to be within the unit circle
+    //    //angle = angle % (TwoPi);
+
+    //    //// if the angle is negative, inverse it against the full unit circle
+    //    //if (angle < 0)
+    //    //  angle = TwoPi + angle;
+
+    //    //// adjust for quadrants
+    //    //// NOTE: if you want more accuracy, you can follow this pattern
+    //    //// sin(x) = x - x^3/3! + x^5/5! - x^7/7! ...
+    //    //// the more terms you include the more accurate it is
+    //    //float angleCubed;
+    //    //float angleToTheFifth;
+    //    //// quadrant 1
+    //    //if (angle <= HalfPi)
+    //    //{
+    //    //  angleCubed = angle * angle * angle;
+    //    //  angleToTheFifth = angleCubed * angle * angle;
+    //    //  return angle
+    //    //    - ((angleCubed) / 6)
+    //    //    + ((angleToTheFifth) / 120);
+    //    //}
+    //    //// quadrant 2
+    //    //else if (angle <= Pi)
+    //    //{
+    //    //  angle = HalfPi - (angle % HalfPi);
+    //    //  angleCubed = angle * angle * angle;
+    //    //  angleToTheFifth = angleCubed * angle * angle;
+    //    //  return angle
+    //    //    - ((angleCubed) / 6)
+    //    //    + ((angleToTheFifth) / 120);
+    //    //}
+    //    //// quadrant 3
+    //    //else if (angle <= ThreeHalvesPi)
+    //    //{
+    //    //  angle = angle % Pi;
+    //    //  angleCubed = angle * angle * angle;
+    //    //  angleToTheFifth = angleCubed * angle * angle;
+    //    //  return -(angle
+    //    //      - ((angleCubed) / 6)
+    //    //      + ((angleToTheFifth) / 120));
+    //    //}
+    //    //// quadrant 4  
+    //    //else
+    //    //{
+    //    //  angle = HalfPi - (angle % HalfPi);
+    //    //  angleCubed = angle * angle * angle;
+    //    //  angleToTheFifth = angleCubed * angle * angle;
+    //    //  return -(angle
+    //    //      - ((angleCubed) / 6)
+    //    //      + ((angleToTheFifth) / 120));
+    //    //}
+    //    #endregion
+    //  }
+
+    //  public float cos(float angle)
+    //  {
+    //    return (float)System.Math.Cos(angle);
+
+    //    // THE FOLLOWING IS MY PERSONAL FUNCTION. IT WORKS BUT IT IS NOT AS FAST AS
+    //    // THE SYSTEM FUNCTION IN ITS CURRENT STATE
+    //    #region Custom Cos Function
+    //    //// If you wanted to be cheap, you could just use the following commented line...
+    //    //// return Sin(angle + (Pi / 2));
+
+    //    //// get the angle to be within the unit circle
+    //    //angle = angle % (TwoPi);
+
+    //    //// if the angle is negative, inverse it against the full unit circle
+    //    //if (angle < 0)
+    //    //  angle = TwoPi + angle;
+
+    //    //// adjust for quadrants
+    //    //// NOTE: if you want more accuracy, you can follow this pattern
+    //    //// cos(x) = 1 - x^2/2! + x^4/4! - x^6/6! ...
+    //    //// the terms you include the more accuracy it is
+    //    //float angleSquared;
+    //    //float angleToTheFourth;
+    //    //float angleToTheSixth;
+    //    //// quadrant 1
+    //    //if (angle <= HalfPi)
+    //    //{
+    //    //  angleSquared = angle * angle;
+    //    //  angleToTheFourth = angleSquared * angle * angle;
+    //    //  angleToTheSixth = angleToTheFourth * angle * angle;
+    //    //  return 1
+    //    //    - (angleSquared / 2)
+    //    //    + (angleToTheFourth / 24)
+    //    //    - (angleToTheSixth / 720);
+    //    //}
+    //    //// quadrant 2
+    //    //else if (angle <= Pi)
+    //    //{
+    //    //  angle = HalfPi - (angle % HalfPi);
+    //    //  angleSquared = angle * angle;
+    //    //  angleToTheFourth = angleSquared * angle * angle;
+    //    //  angleToTheSixth = angleToTheFourth * angle * angle;
+    //    //  return -(1
+    //    //    - (angleSquared / 2)
+    //    //    + (angleToTheFourth / 24)
+    //    //    - (angleToTheSixth / 720));
+    //    //}
+    //    //// quadrant 3
+    //    //else if (angle <= ThreeHalvesPi)
+    //    //{
+    //    //  angle = angle % Pi;
+    //    //  angleSquared = angle * angle;
+    //    //  angleToTheFourth = angleSquared * angle * angle;
+    //    //  angleToTheSixth = angleToTheFourth * angle * angle;
+    //    //  return -(1
+    //    //    - (angleSquared / 2)
+    //    //    + (angleToTheFourth / 24)
+    //    //    - (angleToTheSixth / 720));
+    //    //}
+    //    //// quadrant 4  
+    //    //else
+    //    //{
+    //    //  angle = HalfPi - (angle % HalfPi);
+    //    //  angleSquared = angle * angle;
+    //    //  angleToTheFourth = angleSquared * angle * angle;
+    //    //  angleToTheSixth = angleToTheFourth * angle * angle;
+    //    //  return 1
+    //    //    - (angleSquared / 2)
+    //    //    + (angleToTheFourth / 24)
+    //    //    - (angleToTheSixth / 720);
+    //    //}
+    //    #endregion
+    //  }
+
+    //  public float tan(float angle)
+    //  {
+    //    return (float)System.Math.Tan(angle);
+
+    //    // THE FOLLOWING IS MY PERSONAL FUNCTION. IT WORKS BUT IT IS NOT AS FAST AS
+    //    // THE SYSTEM FUNCTION IN ITS CURRENT STATE
+    //    #region Custom Tan Function
+    //    //// "sin / cos" results in "opposite side / adjacent side", which is equal to tangent
+    //    //return Sin(angle) / Cos(angle);
+    //    #endregion
+    //  }
+
+    //  public float sec(float angle)
+    //  {
+    //    return 1.0f / (float)System.Math.Cos(angle);
+
+    //    // THE FOLLOWING IS MY PERSONAL FUNCTION. IT WORKS BUT IT IS NOT AS FAST AS
+    //    // THE SYSTEM FUNCTION IN ITS CURRENT STATE
+    //    #region Custom Sec Function
+    //    //// by definition, sec is the reciprical of cos
+    //    //return 1 / Cos(angle);
+    //    #endregion
+    //  }
+
+    //  public float csc(float angle)
+    //  {
+    //    return 1.0f / (float)System.Math.Sin(angle);
+
+    //    // THE FOLLOWING IS MY PERSONAL FUNCTION. IT WORKS BUT IT IS NOT AS FAST AS
+    //    // THE SYSTEM FUNCTION IN ITS CURRENT STATE
+    //    #region Custom Csc Function
+    //    //// by definition, csc is the reciprical of sin
+    //    //return 1 / Sin(angle);
+    //    #endregion
+    //  }
+
+    //  public float cot(float angle)
+    //  {
+    //    return 1.0f / (float)System.Math.Tan(angle);
+
+    //    // THE FOLLOWING IS MY PERSONAL FUNCTION. IT WORKS BUT IT IS NOT AS FAST AS
+    //    // THE SYSTEM FUNCTION IN ITS CURRENT STATE
+    //    #region Custom Cot Function
+    //    //// by definition, cot is the reciprical of tan
+    //    //return 1 / Tan(angle);
+    //    #endregion
+    //  }
+
+    //  public float arcsin(float sinRatio)
+    //  {
+    //    return (float)System.Math.Asin(sinRatio);
+    //    //I haven't made a custom ArcSin function yet...
+    //  }
+
+    //  public float arccos(float cosRatio)
+    //  {
+    //    return (float)System.Math.Acos(cosRatio);
+    //    //I haven't made a custom ArcCos function yet...
+    //  }
+
+    //  public float arctan(float tanRatio)
+    //  {
+    //    return (float)System.Math.Atan(tanRatio);
+    //    //I haven't made a custom ArcTan function yet...
+    //  }
+
+    //  public float arccsc(float cscRatio)
+    //  {
+    //    return (float)System.Math.Asin(1.0f / cscRatio);
+    //    //I haven't made a custom ArcCsc function yet...
+    //  }
+
+    //  public float arcsec(float secRatio)
+    //  {
+    //    return (float)System.Math.Acos(1.0f / secRatio);
+    //    //I haven't made a custom ArcSec function yet...
+    //  }
+
+    //  public float arccot(float cotRatio)
+    //  {
+    //    return (float)System.Math.Atan(1.0f / cotRatio);
+    //    //I haven't made a custom ArcCot function yet...
+    //  }
+    //}
+    #endregion
 
     private class Trigonometry_double : Trigonometry<double>
     {
@@ -384,6 +399,36 @@ namespace Seven.Mathematics
       public Trigonometry.delegates.acsch<double> acsch { get { return Trigonometry.acsch; } }
       public Trigonometry.delegates.asech<double> asech { get { return Trigonometry.asech; } }
       public Trigonometry.delegates.acoth<double> acoth { get { return Trigonometry.acoth; } }
+    }
+
+    private class Trigonometry_unsupported<T> : Trigonometry<T>
+    {
+      public Trigonometry_unsupported() { }
+
+      public Trigonometry.delegates.sin<T> sin { get { return (T a) => { throw new Error("Trigonometry is undefined for type: " + typeof(T)); }; } }
+      public Trigonometry.delegates.cos<T> cos { get { return (T a) => { throw new Error("Trigonometry is undefined for type: " + typeof(T)); }; } }
+      public Trigonometry.delegates.tan<T> tan { get { return (T a) => { throw new Error("Trigonometry is undefined for type: " + typeof(T)); }; } }
+      public Trigonometry.delegates.sec<T> sec { get { return (T a) => { throw new Error("Trigonometry is undefined for type: " + typeof(T)); }; } }
+      public Trigonometry.delegates.csc<T> csc { get { return (T a) => { throw new Error("Trigonometry is undefined for type: " + typeof(T)); }; } }
+      public Trigonometry.delegates.cot<T> cot { get { return (T a) => { throw new Error("Trigonometry is undefined for type: " + typeof(T)); }; } }
+      public Trigonometry.delegates.asin<T> asin { get { return (T a) => { throw new Error("Trigonometry is undefined for type: " + typeof(T)); }; } }
+      public Trigonometry.delegates.acos<T> acos { get { return (T a) => { throw new Error("Trigonometry is undefined for type: " + typeof(T)); }; } }
+      public Trigonometry.delegates.atan<T> atan { get { return (T a) => { throw new Error("Trigonometry is undefined for type: " + typeof(T)); }; } }
+      public Trigonometry.delegates.acsc<T> acsc { get { return (T a) => { throw new Error("Trigonometry is undefined for type: " + typeof(T)); }; } }
+      public Trigonometry.delegates.asec<T> asec { get { return (T a) => { throw new Error("Trigonometry is undefined for type: " + typeof(T)); }; } }
+      public Trigonometry.delegates.acot<T> acot { get { return (T a) => { throw new Error("Trigonometry is undefined for type: " + typeof(T)); }; } }
+      public Trigonometry.delegates.sinh<T> sinh { get { return (T a) => { throw new Error("Trigonometry is undefined for type: " + typeof(T)); }; } }
+      public Trigonometry.delegates.cosh<T> cosh { get { return (T a) => { throw new Error("Trigonometry is undefined for type: " + typeof(T)); }; } }
+      public Trigonometry.delegates.tanh<T> tanh { get { return (T a) => { throw new Error("Trigonometry is undefined for type: " + typeof(T)); }; } }
+      public Trigonometry.delegates.sech<T> sech { get { return (T a) => { throw new Error("Trigonometry is undefined for type: " + typeof(T)); }; } }
+      public Trigonometry.delegates.csch<T> csch { get { return (T a) => { throw new Error("Trigonometry is undefined for type: " + typeof(T)); }; } }
+      public Trigonometry.delegates.coth<T> coth { get { return (T a) => { throw new Error("Trigonometry is undefined for type: " + typeof(T)); }; } }
+      public Trigonometry.delegates.asinh<T> asinh { get { return (T a) => { throw new Error("Trigonometry is undefined for type: " + typeof(T)); }; } }
+      public Trigonometry.delegates.acosh<T> acosh { get { return (T a) => { throw new Error("Trigonometry is undefined for type: " + typeof(T)); }; } }
+      public Trigonometry.delegates.atanh<T> atanh { get { return (T a) => { throw new Error("Trigonometry is undefined for type: " + typeof(T)); }; } }
+      public Trigonometry.delegates.acsch<T> acsch { get { return (T a) => { throw new Error("Trigonometry is undefined for type: " + typeof(T)); }; } }
+      public Trigonometry.delegates.asech<T> asech { get { return (T a) => { throw new Error("Trigonometry is undefined for type: " + typeof(T)); }; } }
+      public Trigonometry.delegates.acoth<T> acoth { get { return (T a) => { throw new Error("Trigonometry is undefined for type: " + typeof(T));}; } }
     }
 
     #endregion

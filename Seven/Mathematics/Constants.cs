@@ -57,15 +57,26 @@ namespace Seven.Mathematics
 					{ typeof(float), Constants_float.Get },
 					{ typeof(decimal), Constants_decimal.Get },
 					{ typeof(long), Constants_long.Get },
-					//{ typeof(short), Constants_short.Get },
-					//{ typeof(byte), Constants_byte.Get }
 				};
+    
+    public static void Set<T>(Constants<T> _algebra)
+    {
+      _constants[typeof(T)] = _algebra;
+    }
 
-		public static Constants<T> Get<T>()
-		{
-			try { return _constants[typeof(T)] as Constants<T>; }
-			catch { throw new Error("Algebra does not yet exist for " + typeof(T).ToString()); }
-		}
+    public static bool Contains<T>()
+    {
+      return _constants.Contains(typeof(T));
+    }
+
+    public static Constants<T> Get<T>()
+    {
+      object temp;
+      if (_constants.TryGet(typeof(T), out temp))
+        return temp as Constants<T>;
+      else
+        return new Constants_unsupported<T>();
+    }
 
     #region provided
 
@@ -256,6 +267,19 @@ namespace Seven.Mathematics
       public int factory(float value) { return (int)value; }
       public int factory(double value) { return (int)value; }
       public int factory(decimal value) { return (int)value; }
+    }
+
+    private class Constants_unsupported<T> : Constants<T>
+    {
+      public Constants_unsupported() { }
+
+      public T e { get { throw new Constants.Error("constant e cannot be represented as an int"); } }
+      public T pi { get { throw new Constants.Error("constant e cannot be represented as an int"); } }
+             
+      public T factory(int value) { throw new Error("Constants are undefined for type: " + typeof(T)); }
+      public T factory(float value) { throw new Error("Constants are undefined for type: " + typeof(T)); }
+      public T factory(double value) { throw new Error("Constants are undefined for type: " + typeof(T)); }
+      public T factory(decimal value) { throw new Error("Constants are undefined for type: " + typeof(T)); }
     }
 
     #endregion

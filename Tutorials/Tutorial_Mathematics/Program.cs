@@ -2,6 +2,7 @@
 using System.Linq.Expressions;
 
 using Seven;
+using Seven.Structures;
 using Seven.Mathematics;
 using Seven.Mathematics.Symbolics;
 using Seven.Mathematics.Syntax;
@@ -24,6 +25,53 @@ namespace Tutorial_Mathematics
       Console.WriteLine();
       Console.WriteLine("Mathematics===========================================");
       Console.WriteLine();
+
+      #region Statistics
+
+      Console.WriteLine("  Statistics-----------------------------------------");
+      Console.WriteLine();
+
+      double mode_temp = random.NextDouble() * 100;
+      double[] statistics_data = new double[]
+      {
+        random.NextDouble() * 100,
+        mode_temp,
+        random.NextDouble() * 100,
+        random.NextDouble() * 100,
+        random.NextDouble() * 100,
+        random.NextDouble() * 100,
+        mode_temp
+      };
+
+      Console.WriteLine("    data: [" +
+        string.Format("{0:0.00}", statistics_data[0]) + ", " +
+        string.Format("{0:0.00}", statistics_data[1]) + ", " +
+        string.Format("{0:0.00}", statistics_data[2]) + ", " +
+        string.Format("{0:0.00}", statistics_data[3]) + ", " +
+        string.Format("{0:0.00}", statistics_data[4]) + ", " +
+        string.Format("{0:0.00}", statistics_data[5]) + ", " +
+        string.Format("{0:0.00}", statistics_data[6]) + "]");
+      Console.WriteLine();
+
+      // Mean
+      Console.WriteLine("    Mean(data): " +string.Format("{0:0.00}", _.mean(statistics_data)));
+      Console.WriteLine();
+
+      // Median
+      Console.WriteLine("    Median(data): " + string.Format("{0:0.00}", _.median(statistics_data)));
+      Console.WriteLine();
+
+      // Mode
+      Console.Write("    Mode(data): ");
+      int max_mode;
+      Heap<Link<double, int>> modeResults = _.mode(statistics_data);
+      max_mode = modeResults.Peek().Two;
+      while (modeResults.Peek().Two == max_mode)
+        Console.Write(string.Format("{0:0.00}", modeResults.Dequeue().One));
+      Console.WriteLine();
+      Console.WriteLine();
+
+      #endregion
 
       #region Algebra
 
@@ -168,6 +216,13 @@ namespace Tutorial_Mathematics
       Console.WriteLine("    Q * V * Q':");
       ConsoleWrite(V.RotateBy(Q));
 
+      #endregion
+
+      #region Convex Optimization
+
+      Console.WriteLine("  Convex Optimization-----------------------------------");
+      Console.WriteLine();
+
       double[,] tableau = new double[,]
       {                                  
         { 0.0, -0.5, -3.0, -1.0, -4.0, },
@@ -176,11 +231,16 @@ namespace Tutorial_Mathematics
         { 10.0, 0.0, 1.0, 0.0, -1.0, },
       };
 
-      Console.WriteLine("    tableau:");
+      Console.WriteLine("    tableau (double): ");
       ConsoleWrite(tableau); Console.WriteLine();
 
-      Console.WriteLine("    simplex(tableau):");
-      ConsoleWrite(LinearAlgebra.Simplex(ref tableau));
+      Vector<double> simplex_result = LinearAlgebra.Simplex(ref tableau);
+
+      Console.WriteLine("    simplex(tableau): ");
+      ConsoleWrite(tableau); Console.WriteLine();
+
+      Console.WriteLine("    resulting maximization: ");
+      ConsoleWrite(simplex_result);
 
       #endregion
 
@@ -209,10 +269,10 @@ namespace Tutorial_Mathematics
       Console.Write("      dF/dz = ");
       result = ComputerAlgebra.Differentiate(node, variable: "z");
       Console.WriteLine(result);
+      Console.WriteLine();
     
       #endregion
 
-      Console.WriteLine();
       Console.WriteLine();
       Console.WriteLine("=================================================");
       Console.WriteLine(" Tutorials Complete...");

@@ -3,4 +3,5 @@
 >      - [Avl Tree](https://github.com/53V3N1X/SevenFramework/wiki/Avl-Tree)<br />
 >      - [Array](https://github.com/53V3N1X/SevenFramework/wiki/Array)<br />
 >      - [List](https://github.com/53V3N1X/SevenFramework/wiki/List)<br />
+>      - [Omnitree](https://github.com/53V3N1X/SevenFramework/wiki/Omnitree)<br />
 >      - [Structure](https://github.com/53V3N1X/SevenFramework/wiki/Structure)<br />

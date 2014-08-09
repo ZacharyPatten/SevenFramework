@@ -1,8 +1,9 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿// Seven
+// https://github.com/53V3N1X/SevenFramework
+// LISCENSE: See "LISCENSE.md" in th root project directory.
+// SUPPORT: See "SUPPORT.md" in the root project directory.
+
+using System;
 using System.Threading;
 
 namespace Seven.Parallels
@@ -12,9 +13,9 @@ namespace Seven.Parallels
     private static int _cores = System.Environment.ProcessorCount;
 
     public delegate void Parallel();
-    public delegate Parallel Delegate_Factory(int current, int max);
+    public delegate Parallel Parallel_Factory(int current, int max);
 
-    public static void Invoke(Delegate_Factory factory)
+    public static void Invoke(Parallel_Factory factory)
     {
       Parallel[] parallels = new Parallel[_cores];
       object lock_obj = new object();

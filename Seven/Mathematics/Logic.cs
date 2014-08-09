@@ -11,12 +11,19 @@ namespace Seven.Mathematics
   {
     #region property
 
+    /// <summary>Computes the absolute value of a value.</summary>
     Logic.delegates.abs<T> abs { get; }
+    /// <summary>Finds the max value in a set.</summary>
     Logic.delegates.max_params<T>  max_params { get; }
+    /// <summary>Computes the max value between two operands.</summary>
     Logic.delegates.max<T> max { get; }
+    /// <summary>Finds the min value in a set.</summary>
     Logic.delegates.min_params<T> min_params { get; }
+    /// <summary>Computes the min value between two operands.</summary>
     Logic.delegates.min<T> min { get; }
+    /// <summary>Restricts a value to a min-max range.</summary>
     Logic.delegates.clamp<T> clamp { get; }
+    /// <summary>Checks for equality by value with a leniency.</summary>
     Logic.delegates.equ_len<T> equ_len { get; }
     Equate<T> equ { get; }
     Equate_params<T> equ_params { get; }
@@ -81,7 +88,7 @@ namespace Seven.Mathematics
 
     #region library
 
-    public static Seven.Structures.Map<object, System.Type> _logics =
+    private static Seven.Structures.Map<object, System.Type> _logics =
 			new Seven.Structures.Map_Linked<object, System.Type>(
 				(System.Type left, System.Type right) => { return left == right; },
 				(System.Type type) => { return type.GetHashCode(); })
@@ -92,18 +99,69 @@ namespace Seven.Mathematics
 					{ typeof(decimal), Logic_decimal.Get },
 					{ typeof(long), Logic_long.Get },
 					{ typeof(short), Logic_short.Get },
-					{ typeof(byte), Logic_byte.Get }
+					{ typeof(byte), Logic_byte.Get },
+          { typeof(string), Logic_string.Get }
 				};
 
-		public static Logic<T> Get<T>()
-		{
-			try { return _logics[typeof(T)] as Logic<T>; }
-			catch { throw new Error("Logic does not yet exist for " + typeof(T).ToString()); }
-		}
+    /// <summary>Checks to see if a logic implementaton exists for the given type.</summary>
+    /// <typeparam name="T">The type to check for a logic implementation.</typeparam>
+    /// <returns>True is an implementation exists; false if not.</returns>
+    public static bool Check<T>()
+    {
+      return _logics.Contains(typeof(T));
+    }
+
+    /// <summary>Adds an implementation of logic for a given type.</summary>
+    /// <typeparam name="T">The type the logic library operates on.</typeparam>
+    /// <param name="linearAlgebra">The logic library.</param>
+    public static void Set<T>(Logic<T> linearAlgebra)
+    {
+      _logics[typeof(T)] = linearAlgebra;
+    }
+
+    /// <summary>Gets a logic library for the given type.</summary>
+    /// <typeparam name="T">The type to get a logic library for.</typeparam>
+    /// <returns>A linear logic for the given type.</returns>
+    public static Logic<T> Get<T>()
+    {
+      if (_logics.Contains(typeof(T)))
+        return (Logic<T>)_logics[typeof(T)];
+      else
+        return new Logic_unsupported<T>();
+    }
 
     #region provided
 
-    public class Logic_decimal : Logic<decimal>
+    private class Logic_string : Logic<string>
+    {
+      private Logic_string() { _instance = this; }
+      private static Logic_string _instance;
+      private static Logic_string Instance
+      {
+        get
+        {
+          if (_instance == null)
+            return _instance = new Logic_string();
+          else
+            return _instance;
+        }
+      }
+
+      public static Logic_string Get { get { return Instance; } }
+
+      public Logic.delegates.abs<string> abs { get { return Logic.Abs; } }
+      public Logic.delegates.max_params<string> max_params { get { return Logic.Max; } }
+      public Logic.delegates.max<string> max { get { return Logic.Max; } }
+      public Logic.delegates.min_params<string> min_params { get { return Logic.Min; } }
+      public Logic.delegates.min<string> min { get { return Logic.Min; } }
+      public Logic.delegates.clamp<string> clamp { get { return Logic.Clamp; } }
+      public Logic.delegates.equ_len<string> equ_len { get { return Logic.Equate; } }
+      public Equate<string> equ { get { return Logic.Equate; } }
+      public Equate_params<string> equ_params { get { return Logic.Equate; } }
+      public Compare<string> comp { get { return Logic.Compare; } }
+    }
+
+    private class Logic_decimal : Logic<decimal>
     {
       private Logic_decimal() { _instance = this; }
       private static Logic_decimal _instance;
@@ -132,7 +190,7 @@ namespace Seven.Mathematics
       public Compare<decimal> comp { get { return Logic.Compare; } }
     }
 
-    public class Logic_double : Logic<double>
+    private class Logic_double : Logic<double>
     {
       private Logic_double() { _instance = this; }
       private static Logic_double _instance;
@@ -161,7 +219,7 @@ namespace Seven.Mathematics
       public Compare<double> comp { get { return Logic.Compare; } }
     }
 
-    public class Logic_float : Logic<float>
+    private class Logic_float : Logic<float>
     {
       private Logic_float() { _instance = this; }
       private static Logic_float _instance;
@@ -190,7 +248,7 @@ namespace Seven.Mathematics
       public Compare<float> comp { get { return Logic.Compare; } }
     }
 
-    public class Logic_long : Logic<long>
+    private class Logic_long : Logic<long>
     {
       private Logic_long() { _instance = this; }
       private static Logic_long _instance;
@@ -219,7 +277,7 @@ namespace Seven.Mathematics
       public Compare<long> comp { get { return Logic.Compare; } }
     }
 
-    public class Logic_int : Logic<int>
+    private class Logic_int : Logic<int>
     {
       private Logic_int() { _instance = this; }
       private static Logic_int _instance;
@@ -248,7 +306,7 @@ namespace Seven.Mathematics
       public Compare<int> comp { get { return Logic.Compare; } }
     }
 
-    public class Logic_short : Logic<short>
+    private class Logic_short : Logic<short>
     {
       private Logic_short() { _instance = this; }
       private static Logic_short _instance;
@@ -277,7 +335,7 @@ namespace Seven.Mathematics
       public Compare<short> comp { get { return Logic.Compare; } }
     }
 
-    public class Logic_byte : Logic<byte>
+    private class Logic_byte : Logic<byte>
     {
       private Logic_byte() { _instance = this; }
       private static Logic_byte _instance;
@@ -306,11 +364,128 @@ namespace Seven.Mathematics
       public Compare<byte> comp { get { return Logic.Compare; } }
     }
 
+    public class Logic_unsupported<T> : Logic<T>
+    {
+      public Logic_unsupported() {  }
+
+      public Logic.delegates.abs<T> abs { get { return (T value) => { throw new Error("Logic is undefined for type: " + typeof(T)); }; } }
+      public Logic.delegates.max_params<T> max_params { get { return (T[] value) => { throw new Error("Logic is undefined for type: " + typeof(T)); }; } }
+      public Logic.delegates.max<T> max { get { return (T a, T b) => { throw new Error("Logic is undefined for type: " + typeof(T)); }; } }
+      public Logic.delegates.min_params<T> min_params { get { return (T[] value) => { throw new Error("Logic is undefined for type: " + typeof(T)); }; } }
+      public Logic.delegates.min<T> min { get { return (T a, T b) => { throw new Error("Logic is undefined for type: " + typeof(T)); }; } }
+      public Logic.delegates.clamp<T> clamp { get { return (T a, T b, T c) => { throw new Error("Logic is undefined for type: " + typeof(T)); }; } }
+      public Logic.delegates.equ_len<T> equ_len { get { return (T a, T b, T c) => { throw new Error("Logic is undefined for type: " + typeof(T)); }; } }
+      public Equate<T> equ { get { return (T a, T b) => { throw new Error("Logic is undefined for type: " + typeof(T)); }; } }
+      public Equate_params<T> equ_params { get { return (T[] a) => { throw new Error("Logic is undefined for type: " + typeof(T)); }; } }
+      public Compare<T> comp { get { return (T a, T b) => { throw new Error("Logic is undefined for type: " + typeof(T)); }; } }
+    }
+
     #endregion
 
     #endregion
 
     #region Implementations
+
+    #region string
+
+    /// <summary>Returns a less/greater/equal comparison.</summary>
+    public static Comparison Compare(string left, string right)
+    {
+      int result = left.CompareTo(right);
+      if (result > 0)
+        return Comparison.Greater;
+      else if (result < 0)
+        return Comparison.Less;
+      else
+        return Comparison.Equal;
+    }
+
+    /// <summary>Returns true if all values are equal.</summary>
+    public static bool Equate(params string[] values)
+    {
+      for (int i = 0; i < values.Length - 1; i++)
+        if (values[i] != values[i + 1])
+          return false;
+      return true;
+    }
+
+    /// <summary>Returns left == right.</summary>
+    public static bool Equate(string left, string right)
+    {
+      return left.CompareTo(right) == 0;
+    }
+
+    /// <summary>Returns Abs(left - right) < leniency.</summary>
+    public static bool Equate(string left, string right, string leniency)
+    {
+      throw new Error("not yet implemented");
+    }
+
+    /// <summary>Returns the maximum value.</summary>
+    public static string Max(params string[] values)
+    {
+      string max = values[0];
+      for (int i = 0; i < values.Length; i++)
+        if (values[i].CompareTo(max) > 0)
+          max = values[i];
+      return max;
+    }
+
+    /// <summary>Returns the maximum value.</summary>
+    public static string Max(string first, string second)
+    {
+      if (second.CompareTo(first) > 0)
+        return second;
+      return first;
+    }
+
+    /// <summary>Returns the minimum value.</summary>
+    public static string Min(params string[] values)
+    {
+      string max = values[0];
+      for (int i = 0; i < values.Length; i++)
+        if (values[i].CompareTo(max) < 0)
+          max = values[i];
+      return max;
+    }
+
+    /// <summary>Returns the minimum value.</summary>
+    public static string Min(string first, string second)
+    {
+      if (second.CompareTo(first) < 0)
+        return second;
+      return first;
+    }
+
+    /// <summary>Returns the absolute value of the provided value.</summary>
+    public static string Abs(string number)
+    {
+      throw new Error("Abs is undefined for type string");
+    }
+
+    /// <summary>Returns left < right.</summary>
+    public static bool LessThan(string left, string right)
+    {
+      return left.CompareTo(right) < 0;
+    }
+
+    /// <summary>Returns left > right.</summary>
+    public static bool GreaterThan(string left, string right)
+    {
+      return left.CompareTo(right) > 0;
+    }
+
+    /// <summary>Clamps a value to be within a given minimum and maximum range.</summary>
+    public static string Clamp(string value, string minimum, string maximum)
+    {
+      if (value.CompareTo(minimum) < 0)
+        return minimum;
+      if (value.CompareTo(maximum) > 0)
+        return maximum;
+      return value;
+    }
+
+    #endregion
 
     #region Fraction128
 

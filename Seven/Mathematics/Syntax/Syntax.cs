@@ -3,6 +3,8 @@
 // LISCENSE: See "LISCENSE.md" in th root project directory.
 // SUPPORT: See "SUPPORT.md" in the root project directory.
 
+using Seven.Structures;
+
 namespace Seven.Mathematics.Syntax
 {
   /// <summary>Syntax Sugar (yay hacks :P).</summary>
@@ -561,6 +563,15 @@ namespace Seven.Mathematics.Syntax
     public static double acsc(double r) { return Trigonometry.arccsc(r); }
     public static double asec(double r) { return Trigonometry.arcsec(r); }
     public static double acot(double r) { return Trigonometry.arccot(r); }
+
+    #endregion
+
+    #region statistics
+
+    public static Heap<Link<double, int>> mode(params double[] values) { return Statistics.Mode(values); }
+    public static double mean(params double[] values) { return Statistics.Mean(values); }
+    public static double mean(double a, double b) { return Statistics.Mean(a, b); }
+    public static double median(params double[] values) { return Statistics.Median(values); }
 
     #endregion
 

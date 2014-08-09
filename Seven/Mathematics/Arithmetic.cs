@@ -76,6 +76,27 @@ namespace Seven.Mathematics
 
     #endregion
 
+    #region enum
+
+    /// <summary>The operations of arithmetic.</summary>
+    public enum Operation
+    {
+      /// <summary>Negation arithmatic operation.</summary>
+      Negate,
+      /// <summary>Division arithmatic operation</summary>
+      Divide,
+      /// <summary>Multiplication arithmatic operation</summary>
+      Multiply,
+      /// <summary>Addition arithmatic operation</summary>
+      Add,
+      /// <summary>Subtraction arithmatic operation</summary>
+      Subtract,
+      /// <summary>Power arithmatic operation</summary>
+      Power
+    }
+
+    #endregion
+
     #region implementation
 
     #region Fraction128
@@ -208,10 +229,23 @@ namespace Seven.Mathematics
 					{ typeof(int), Arithmetic.Arithmetic_int.Get },
 				};
 
+    public static void Set<T>(Arithmetic<T> _algebra)
+    {
+      _arithmetics[typeof(T)] = _algebra;
+    }
+
+    public static bool Contains<T>()
+    {
+      return _arithmetics.Contains(typeof(T));
+    }
+
     public static Arithmetic<T> Get<T>()
     {
-      try { return _arithmetics[typeof(T)] as Arithmetic<T>; }
-      catch { throw new Error("Arithmetic does not yet exist for " + typeof(T).ToString()); }
+      object temp;
+      if (_arithmetics.TryGet(typeof(T), out temp))
+        return temp as Arithmetic<T>;
+      else
+        return new Arithmetic_unsupported<T>();
     }
 
     #region provided
@@ -438,6 +472,24 @@ namespace Seven.Mathematics
       public Arithmetic.delegates.Subtract<int> Subtract { get { return Arithmetic.Subtract; } }
       /// <summary>Takes one operand to the power of the other.</summary>
       public Arithmetic.delegates.Power<int> Power { get { return Arithmetic.Power; } }
+    }
+
+    private class Arithmetic_unsupported<T> : Arithmetic<T>
+    {
+      public Arithmetic_unsupported() {  }
+
+      /// <summary>Negates a value.</summary>
+      public Arithmetic.delegates.Negate<T> Negate { get { return (T a) => { throw new Error("Arithmetic is undefined for type: " + typeof(T)); }; } }
+      /// <summary>Divides two operands.</summary>
+      public Arithmetic.delegates.Divide<T> Divide { get { return (T a, T b) => { throw new Error("Arithmetic is undefined for type: " + typeof(T)); }; } }
+      /// <summary>Multiplies two operands.</summary>
+      public Arithmetic.delegates.Multiply<T> Multiply { get { return (T a, T b) => { throw new Error("Arithmetic is undefined for type: " + typeof(T)); }; } }
+      /// <summary>Adds two operands.</summary>
+      public Arithmetic.delegates.Add<T> Add { get { return (T a, T b) => { throw new Error("Arithmetic is undefined for type: " + typeof(T)); }; } }
+      /// <summary>Subtracts two operands.</summary>
+      public Arithmetic.delegates.Subtract<T> Subtract { get { return (T a, T b) => { throw new Error("Arithmetic is undefined for type: " + typeof(T)); }; } }
+      /// <summary>Takes one operand to the power of the other.</summary>
+      public Arithmetic.delegates.Power<T> Power { get { return (T a, T b) => { throw new Error("Arithmetic is undefined for type: " + typeof(T)); }; } }
     }
 
     #endregion

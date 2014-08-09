@@ -280,7 +280,7 @@ namespace Seven.Structures
   /// <remarks>The runtimes of each public member are included in the "remarks" xml tags.
   /// Seven (Zachary Patten) 10-12-13.</remarks>
   [System.Serializable]
-  public class Stack_Linked_ThreadSafe<Type> : Stack_Linked<Type>
+  internal class Stack_Linked_ThreadSafe<Type> : Stack_Linked<Type>
   {
     ReaderWriterLock _readerWriterLock;
 
@@ -306,6 +306,8 @@ namespace Seven.Structures
     /// <remarks>Runtime: O(1).</remarks>
     public Stack_Linked_ThreadSafe() : base()
     {
+      throw new Error("still in development");
+
       _readerWriterLock = new ReaderWriterLock();
     }
 

@@ -8,8 +8,8 @@ using Seven;
 namespace Seven.Structures
 {
   /// <summary>Stores items based on priorities and allows access to the highest priority item.</summary>
-  /// <typeparam name="Type">The generic type to be stored within the heap.</typeparam>
-  public interface Heap<Type> : Structure<Type>
+  /// <typeparam name="T">The generic type to be stored within the heap.</typeparam>
+  public interface Heap<T> : Structure<T>
   {
     #region property
 
@@ -25,15 +25,15 @@ namespace Seven.Structures
 
     /// <summary>Enqueues an item into the heap.</summary>
     /// <param name="addition"></param>
-    void Enqueue(Type addition);
+    void Enqueue(T addition);
 
     /// <summary>Removes and returns the highest priority item.</summary>
     /// <returns>The highest priority item from the queue.</returns>
-    Type Dequeue();
+    T Dequeue();
 
     /// <summary>Returns the highest priority item.</summary>
     /// <returns>The highest priority item in the queue.</returns>
-    Type Peek();
+    T Peek();
 
     /// <summary>Returns the heap to an empty state.</summary>
     void Clear();
@@ -42,7 +42,7 @@ namespace Seven.Structures
   }
   
   /// <summary>Implements a priority heap with static priorities using an array.</summary>
-  /// <typeparam name="Type">The type of item to be stored in this priority heap.</typeparam>
+  /// <typeparam name="T">The type of item to be stored in this priority heap.</typeparam>
   /// <remarks>The runtimes of each public member are included in the "remarks" xml tags.</remarks>
   /// <citation>
   /// This AVL tree imlpementation was originally developed by 
@@ -50,12 +50,12 @@ namespace Seven.Structures
   /// been modified since its addition into the Seven framework.
   /// </citation>
   [System.Serializable]
-  public class Heap_Array<Type> : Heap<Type>
+  public class Heap_Array<T> : Heap<T>
   {
     #region field
 
-    private Compare<Type> _compare;
-    private Type[] _heap;
+    private Compare<T> _compare;
+    private T[] _heap;
     private int _minimumCapacity;
     private int _count;
 
@@ -85,10 +85,10 @@ namespace Seven.Structures
     /// <summary>Generates a priority queue with a capacity of the parameter. Runtime O(1).</summary>
     /// <param name="minimumCapacity">The capacity you want this priority queue to have.</param>
     /// <remarks>Runtime: Theta(capacity).</remarks>
-    public Heap_Array(Compare<Type> prioritize)
+    public Heap_Array(Compare<T> prioritize)
     {
       this._compare = prioritize;
-      this._heap = new Type[2];
+      this._heap = new T[2];
       this._minimumCapacity = 1;
       this._count = 0;
     }
@@ -97,10 +97,10 @@ namespace Seven.Structures
     /// <param name="compare">Delegate determining the comparison technique used for sorting.</param>
     /// <param name="minimumCapacity">The capacity you want this priority queue to have.</param>
     /// <remarks>Runtime: Theta(capacity).</remarks>
-    public Heap_Array(Compare<Type> compare, int minimumCapacity)
+    public Heap_Array(Compare<T> compare, int minimumCapacity)
     {
       this._compare = compare;
-      this._heap = new Type[minimumCapacity + 1];
+      this._heap = new T[minimumCapacity + 1];
       this._minimumCapacity = minimumCapacity;
       this._count = 0;
     }
@@ -140,13 +140,13 @@ namespace Seven.Structures
     /// <param name="addition">The item to be added.</param>
     /// <param name="priority">The priority of the addition. (LARGER PRIORITY -> HIGHER PRIORITY)</param>
     /// <remarks>Runtime: O(ln(n)), Omega(1), EstAvg(ln(n)).</remarks>
-    public void Enqueue(Type addition)
+    public void Enqueue(T addition)
     {
       if (!(_count + 1 < _heap.Length))
       {
         if (_heap.Length * 2 > int.MaxValue)
           throw new Error("this heap has become too large");
-        Type[] _newHeap = new Type[_heap.Length * 2];
+        T[] _newHeap = new T[_heap.Length * 2];
         for (int i = 1; i <= _count; i++)
           _newHeap[i] = this._heap[i];
         this._heap = _newHeap;
@@ -159,11 +159,11 @@ namespace Seven.Structures
     /// <summary>Dequeues the item with the highest priority.</summary>
     /// <returns>The item of the highest priority.</returns>
     /// <remarks>Runtime: Theta(ln(n)).</remarks>
-    public Type Dequeue()
+    public T Dequeue()
     {
       if (_count > 0)
       {
-        Type removal = this._heap[_root];
+        T removal = this._heap[_root];
         this.ArraySwap(_root, this._count);
         this._count--;
         this.ShiftDown(_root);
@@ -175,7 +175,7 @@ namespace Seven.Structures
     /// <summary>Requeues an item after a change has occured.</summary>
     /// <param name="item">The item to requeue.</param>
     /// <remarks>Runtime: O(n).</remarks>
-    public void Requeue(Type item)
+    public void Requeue(T item)
     {
       int i;
       for (i = 1; i <= this._count; i++)
@@ -189,7 +189,7 @@ namespace Seven.Structures
 
     /// <summary>This lets you peek at the top priority WITHOUT REMOVING it.</summary>
     /// <remarks>Runtime: O(1).</remarks>
-    public Type Peek()
+    public T Peek()
     {
       if (this._count > 0)
         return this._heap[_root];
@@ -249,7 +249,7 @@ namespace Seven.Structures
     /// <remarks>Runtime: O(1).</remarks>
     private void ArraySwap(int indexOne, int indexTwo)
     {
-      Type temp = this._heap[indexTwo];
+      T temp = this._heap[indexTwo];
       this._heap[indexTwo] = this._heap[indexOne];
       this._heap[indexOne] = temp;
     }
@@ -289,9 +289,9 @@ namespace Seven.Structures
 
     /// <summary>Converts the heap into an array using pre-order traversal (WARNING: items are not ordered).</summary>
     /// <returns>The array of priority-sorted items.</returns>
-    public Type[] ToArray()
+    public T[] ToArray()
     {
-      Type[] array = new Type[this._count];
+      T[] array = new T[this._count];
       for (int i = 1; i <= this._count; i++)
         array[i] = this._heap[i];
       return array;
@@ -306,8 +306,8 @@ namespace Seven.Structures
     }
 
     /// <summary>FOR COMPATIBILITY ONLY. AVOID IF POSSIBLE.</summary>
-    System.Collections.Generic.IEnumerator<Type>
-      System.Collections.Generic.IEnumerable<Type>.GetEnumerator()
+    System.Collections.Generic.IEnumerator<T>
+      System.Collections.Generic.IEnumerable<T>.GetEnumerator()
     {
       for (int i = 0; i <= _count; i++)
         yield return this._heap[i];
@@ -337,7 +337,7 @@ namespace Seven.Structures
     /// <param name="item">The item to check for.</param>
     /// <param name="compare">Delegate representing comparison technique.</param>
     /// <returns>true if the item is in this structure; false if not.</returns>
-    public bool Contains(Type item, Compare<Type> compare)
+    public bool Contains(T item, Compare<T> compare)
     {
       for (int i = 1; i <= this._count; i++)
         if (compare(this._heap[i], item) == Comparison.Equal)
@@ -350,7 +350,7 @@ namespace Seven.Structures
     /// <param name="key">The key to check for.</param>
     /// <param name="compare">Delegate representing comparison technique.</param>
     /// <returns>true if the item is in this structure; false if not.</returns>
-    public bool Contains<Key>(Key key, Compare<Type, Key> compare)
+    public bool Contains<Key>(Key key, Compare<T, Key> compare)
     {
       for (int i = 1; i <= this._count; i++)
         if (compare(this._heap[i], key) == Comparison.Equal)
@@ -360,7 +360,7 @@ namespace Seven.Structures
 
     /// <summary>Invokes a delegate for each entry in the data structure.</summary>
     /// <param name="function">The delegate to invoke on each item in the structure.</param>
-    public void Foreach(Foreach<Type> function)
+    public void Foreach(Foreach<T> function)
     {
       for (int i = 1; i <= this._count; i++)
         function(this._heap[i]);
@@ -368,7 +368,7 @@ namespace Seven.Structures
 
     /// <summary>Invokes a delegate for each entry in the data structure.</summary>
     /// <param name="function">The delegate to invoke on each item in the structure.</param>
-    public void Foreach(ForeachRef<Type> function)
+    public void Foreach(ForeachRef<T> function)
     {
       for (int i = 1; i <= this._count; i++)
         function(ref this._heap[i]);
@@ -377,7 +377,7 @@ namespace Seven.Structures
     /// <summary>Invokes a delegate for each entry in the data structure.</summary>
     /// <param name="function">The delegate to invoke on each item in the structure.</param>
     /// <returns>The resulting status of the iteration.</returns>
-    public ForeachStatus Foreach(ForeachBreak<Type> function)
+    public ForeachStatus Foreach(ForeachBreak<T> function)
     {
       for (int i = 1; i <= this._count; i++)
         if (function(this._heap[i]) == ForeachStatus.Break)
@@ -388,7 +388,7 @@ namespace Seven.Structures
     /// <summary>Invokes a delegate for each entry in the data structure.</summary>
     /// <param name="function">The delegate to invoke on each item in the structure.</param>
     /// <returns>The resulting status of the iteration.</returns>
-    public ForeachStatus Foreach(ForeachRefBreak<Type> function)
+    public ForeachStatus Foreach(ForeachRefBreak<T> function)
     {
       for (int i = 1; i <= this._count; i++)
         if (function(ref this._heap[i]) == ForeachStatus.Break)
@@ -398,11 +398,11 @@ namespace Seven.Structures
 
     /// <summary>Creates a shallow clone of this data structure.</summary>
     /// <returns>A shallow clone of this data structure.</returns>
-    public Structure<Type> Clone()
+    public Structure<T> Clone()
     {
-      Heap_Array<Type> clone =
-        new Heap_Array<Type>(this._compare);
-      Type[] cloneItems = new Type[this._heap.Length];
+      Heap_Array<T> clone =
+        new Heap_Array<T>(this._compare);
+      T[] cloneItems = new T[this._heap.Length];
       for (int i = 1; i <= this._count; i++)
         cloneItems[i] = _heap[i];
       clone._heap = cloneItems;

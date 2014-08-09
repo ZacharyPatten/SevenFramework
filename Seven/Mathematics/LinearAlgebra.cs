@@ -95,10 +95,10 @@ namespace Seven.Mathematics
 
     #region quaternion
 
-    /// <summary>Computes the length of quaternion.</summary>
+    /// <summary>Computes the magnitude of quaternion.</summary>
     LinearAlgebra.delegates.Quaternion_Magnitude<T> Quaternion_Magnitude { get; }
-    /// <summary>Computes the length of a quaternion, but doesn't square root it.</summary>
-    LinearAlgebra.delegates.Quaternion_MagnitudeSquared<T> _Quaternion_MagnitudeSquared { get; }
+    /// <summary>Computes the magnitude of a quaternion, but doesn't square root it.</summary>
+    LinearAlgebra.delegates.Quaternion_MagnitudeSquared<T> Quaternion_MagnitudeSquared { get; }
     /// <summary>Gets the conjugate of the quaternion.</summary>
     LinearAlgebra.delegates.Quaternion_Conjugate<T> Quaternion_Conjugate { get; }
     /// <summary>Adds two quaternions together.</summary>
@@ -110,7 +110,7 @@ namespace Seven.Mathematics
     /// <summary>Multiplies all the values of the quaternion by a scalar value.</summary>
     LinearAlgebra.delegates.Quaternion_Multiply_scalar<T> Quaternion_Multiply_scalar { get; }
     /// <summary>Pre-multiplies a 3-component vector by a quaternion.</summary>
-    LinearAlgebra.delegates.Quaternion_Multiply_Vector<T> Multiply_Vector { get; }
+    LinearAlgebra.delegates.Quaternion_Multiply_Vector<T> Quaternion_Multiply_Vector { get; }
     /// <summary>Normalizes the quaternion.</summary>
     LinearAlgebra.delegates.Quaternion_Normalize<T> Quaternion_Normalize { get; }
     /// <summary>Inverts a quaternion.</summary>
@@ -630,7 +630,7 @@ namespace Seven.Mathematics
       /// <summary>Computes the length of quaternion.</summary>
       public LinearAlgebra.delegates.Quaternion_Magnitude<Fraction128> Quaternion_Magnitude { get { return LinearAlgebra.Magnitude; } }
       /// <summary>Computes the length of a quaternion, but doesn't square root it.</summary>
-      public LinearAlgebra.delegates.Quaternion_MagnitudeSquared<Fraction128> _Quaternion_MagnitudeSquared { get { return LinearAlgebra.MagnitudeSquared; } }
+      public LinearAlgebra.delegates.Quaternion_MagnitudeSquared<Fraction128> Quaternion_MagnitudeSquared { get { return LinearAlgebra.MagnitudeSquared; } }
       /// <summary>Gets the conjugate of the quaternion.</summary>
       public LinearAlgebra.delegates.Quaternion_Conjugate<Fraction128> Quaternion_Conjugate { get { return LinearAlgebra.Conjugate; } }
       /// <summary>Adds two quaternions together.</summary>
@@ -642,7 +642,7 @@ namespace Seven.Mathematics
       /// <summary>Multiplies all the values of the quaternion by a scalar value.</summary>
       public LinearAlgebra.delegates.Quaternion_Multiply_scalar<Fraction128> Quaternion_Multiply_scalar { get { return LinearAlgebra.Multiply; } }
       /// <summary>Pre-multiplies a 3-component vector by a quaternion.</summary>
-      public LinearAlgebra.delegates.Quaternion_Multiply_Vector<Fraction128> Multiply_Vector { get { return LinearAlgebra.Multiply; } }
+      public LinearAlgebra.delegates.Quaternion_Multiply_Vector<Fraction128> Quaternion_Multiply_Vector { get { return LinearAlgebra.Multiply; } }
       /// <summary>Normalizes the quaternion.</summary>
       public LinearAlgebra.delegates.Quaternion_Normalize<Fraction128> Quaternion_Normalize { get { return LinearAlgebra.Normalize; } }
       /// <summary>Inverts a quaternion.</summary>
@@ -772,7 +772,7 @@ namespace Seven.Mathematics
       /// <summary>Computes the length of quaternion.</summary>
       public LinearAlgebra.delegates.Quaternion_Magnitude<Fraction64> Quaternion_Magnitude { get { return LinearAlgebra.Magnitude; } }
       /// <summary>Computes the length of a quaternion, but doesn't square root it.</summary>
-      public LinearAlgebra.delegates.Quaternion_MagnitudeSquared<Fraction64> _Quaternion_MagnitudeSquared { get { return LinearAlgebra.MagnitudeSquared; } }
+      public LinearAlgebra.delegates.Quaternion_MagnitudeSquared<Fraction64> Quaternion_MagnitudeSquared { get { return LinearAlgebra.MagnitudeSquared; } }
       /// <summary>Gets the conjugate of the quaternion.</summary>
       public LinearAlgebra.delegates.Quaternion_Conjugate<Fraction64> Quaternion_Conjugate { get { return LinearAlgebra.Conjugate; } }
       /// <summary>Adds two quaternions together.</summary>
@@ -784,7 +784,7 @@ namespace Seven.Mathematics
       /// <summary>Multiplies all the values of the quaternion by a scalar value.</summary>
       public LinearAlgebra.delegates.Quaternion_Multiply_scalar<Fraction64> Quaternion_Multiply_scalar { get { return LinearAlgebra.Multiply; } }
       /// <summary>Pre-multiplies a 3-component vector by a quaternion.</summary>
-      public LinearAlgebra.delegates.Quaternion_Multiply_Vector<Fraction64> Multiply_Vector { get { return LinearAlgebra.Multiply; } }
+      public LinearAlgebra.delegates.Quaternion_Multiply_Vector<Fraction64> Quaternion_Multiply_Vector { get { return LinearAlgebra.Multiply; } }
       /// <summary>Normalizes the quaternion.</summary>
       public LinearAlgebra.delegates.Quaternion_Normalize<Fraction64> Quaternion_Normalize { get { return LinearAlgebra.Normalize; } }
       /// <summary>Inverts a quaternion.</summary>
@@ -914,7 +914,7 @@ namespace Seven.Mathematics
       /// <summary>Computes the length of quaternion.</summary>
       public LinearAlgebra.delegates.Quaternion_Magnitude<decimal> Quaternion_Magnitude { get { return LinearAlgebra.Magnitude; } }
       /// <summary>Computes the length of a quaternion, but doesn't square root it.</summary>
-      public LinearAlgebra.delegates.Quaternion_MagnitudeSquared<decimal> _Quaternion_MagnitudeSquared { get { return LinearAlgebra.MagnitudeSquared; } }
+      public LinearAlgebra.delegates.Quaternion_MagnitudeSquared<decimal> Quaternion_MagnitudeSquared { get { return LinearAlgebra.MagnitudeSquared; } }
       /// <summary>Gets the conjugate of the quaternion.</summary>
       public LinearAlgebra.delegates.Quaternion_Conjugate<decimal> Quaternion_Conjugate { get { return LinearAlgebra.Conjugate; } }
       /// <summary>Adds two quaternions together.</summary>
@@ -926,7 +926,7 @@ namespace Seven.Mathematics
       /// <summary>Multiplies all the values of the quaternion by a scalar value.</summary>
       public LinearAlgebra.delegates.Quaternion_Multiply_scalar<decimal> Quaternion_Multiply_scalar { get { return LinearAlgebra.Multiply; } }
       /// <summary>Pre-multiplies a 3-component vector by a quaternion.</summary>
-      public LinearAlgebra.delegates.Quaternion_Multiply_Vector<decimal> Multiply_Vector { get { return LinearAlgebra.Multiply; } }
+      public LinearAlgebra.delegates.Quaternion_Multiply_Vector<decimal> Quaternion_Multiply_Vector { get { return LinearAlgebra.Multiply; } }
       /// <summary>Normalizes the quaternion.</summary>
       public LinearAlgebra.delegates.Quaternion_Normalize<decimal> Quaternion_Normalize { get { return LinearAlgebra.Normalize; } }
       /// <summary>Inverts a quaternion.</summary>
@@ -1056,7 +1056,7 @@ namespace Seven.Mathematics
       /// <summary>Computes the length of quaternion.</summary>
       public LinearAlgebra.delegates.Quaternion_Magnitude<double> Quaternion_Magnitude { get { return LinearAlgebra.Magnitude; } }
       /// <summary>Computes the length of a quaternion, but doesn't square root it.</summary>
-      public LinearAlgebra.delegates.Quaternion_MagnitudeSquared<double> _Quaternion_MagnitudeSquared { get { return LinearAlgebra.MagnitudeSquared; } }
+      public LinearAlgebra.delegates.Quaternion_MagnitudeSquared<double> Quaternion_MagnitudeSquared { get { return LinearAlgebra.MagnitudeSquared; } }
       /// <summary>Gets the conjugate of the quaternion.</summary>
       public LinearAlgebra.delegates.Quaternion_Conjugate<double> Quaternion_Conjugate { get { return LinearAlgebra.Conjugate; } }
       /// <summary>Adds two quaternions together.</summary>
@@ -1068,7 +1068,7 @@ namespace Seven.Mathematics
       /// <summary>Multiplies all the values of the quaternion by a scalar value.</summary>
       public LinearAlgebra.delegates.Quaternion_Multiply_scalar<double> Quaternion_Multiply_scalar { get { return LinearAlgebra.Multiply; } }
       /// <summary>Pre-multiplies a 3-component vector by a quaternion.</summary>
-      public LinearAlgebra.delegates.Quaternion_Multiply_Vector<double> Multiply_Vector { get { return LinearAlgebra.Multiply; } }
+      public LinearAlgebra.delegates.Quaternion_Multiply_Vector<double> Quaternion_Multiply_Vector { get { return LinearAlgebra.Multiply; } }
       /// <summary>Normalizes the quaternion.</summary>
       public LinearAlgebra.delegates.Quaternion_Normalize<double> Quaternion_Normalize { get { return LinearAlgebra.Normalize; } }
       /// <summary>Inverts a quaternion.</summary>
@@ -1198,7 +1198,7 @@ namespace Seven.Mathematics
       /// <summary>Computes the length of quaternion.</summary>
       public LinearAlgebra.delegates.Quaternion_Magnitude<float> Quaternion_Magnitude { get { return LinearAlgebra.Magnitude; } }
       /// <summary>Computes the length of a quaternion, but doesn't square root it.</summary>
-      public LinearAlgebra.delegates.Quaternion_MagnitudeSquared<float> _Quaternion_MagnitudeSquared { get { return LinearAlgebra.MagnitudeSquared; } }
+      public LinearAlgebra.delegates.Quaternion_MagnitudeSquared<float> Quaternion_MagnitudeSquared { get { return LinearAlgebra.MagnitudeSquared; } }
       /// <summary>Gets the conjugate of the quaternion.</summary>
       public LinearAlgebra.delegates.Quaternion_Conjugate<float> Quaternion_Conjugate { get { return LinearAlgebra.Conjugate; } }
       /// <summary>Adds two quaternions together.</summary>
@@ -1210,7 +1210,7 @@ namespace Seven.Mathematics
       /// <summary>Multiplies all the values of the quaternion by a scalar value.</summary>
       public LinearAlgebra.delegates.Quaternion_Multiply_scalar<float> Quaternion_Multiply_scalar { get { return LinearAlgebra.Multiply; } }
       /// <summary>Pre-multiplies a 3-component vector by a quaternion.</summary>
-      public LinearAlgebra.delegates.Quaternion_Multiply_Vector<float> Multiply_Vector { get { return LinearAlgebra.Multiply; } }
+      public LinearAlgebra.delegates.Quaternion_Multiply_Vector<float> Quaternion_Multiply_Vector { get { return LinearAlgebra.Multiply; } }
       /// <summary>Normalizes the quaternion.</summary>
       public LinearAlgebra.delegates.Quaternion_Normalize<float> Quaternion_Normalize { get { return LinearAlgebra.Normalize; } }
       /// <summary>Inverts a quaternion.</summary>
@@ -1340,7 +1340,7 @@ namespace Seven.Mathematics
       /// <summary>Computes the length of quaternion.</summary>
       public LinearAlgebra.delegates.Quaternion_Magnitude<long> Quaternion_Magnitude { get { return LinearAlgebra.Magnitude; } }
       /// <summary>Computes the length of a quaternion, but doesn't square root it.</summary>
-      public LinearAlgebra.delegates.Quaternion_MagnitudeSquared<long> _Quaternion_MagnitudeSquared { get { return LinearAlgebra.MagnitudeSquared; } }
+      public LinearAlgebra.delegates.Quaternion_MagnitudeSquared<long> Quaternion_MagnitudeSquared { get { return LinearAlgebra.MagnitudeSquared; } }
       /// <summary>Gets the conjugate of the quaternion.</summary>
       public LinearAlgebra.delegates.Quaternion_Conjugate<long> Quaternion_Conjugate { get { return LinearAlgebra.Conjugate; } }
       /// <summary>Adds two quaternions together.</summary>
@@ -1352,7 +1352,7 @@ namespace Seven.Mathematics
       /// <summary>Multiplies all the values of the quaternion by a scalar value.</summary>
       public LinearAlgebra.delegates.Quaternion_Multiply_scalar<long> Quaternion_Multiply_scalar { get { return LinearAlgebra.Multiply; } }
       /// <summary>Pre-multiplies a 3-component vector by a quaternion.</summary>
-      public LinearAlgebra.delegates.Quaternion_Multiply_Vector<long> Multiply_Vector { get { return LinearAlgebra.Multiply; } }
+      public LinearAlgebra.delegates.Quaternion_Multiply_Vector<long> Quaternion_Multiply_Vector { get { return LinearAlgebra.Multiply; } }
       /// <summary>Normalizes the quaternion.</summary>
       public LinearAlgebra.delegates.Quaternion_Normalize<long> Quaternion_Normalize { get { return LinearAlgebra.Normalize; } }
       /// <summary>Inverts a quaternion.</summary>
@@ -1482,7 +1482,7 @@ namespace Seven.Mathematics
       /// <summary>Computes the length of quaternion.</summary>
       public LinearAlgebra.delegates.Quaternion_Magnitude<int> Quaternion_Magnitude { get { return LinearAlgebra.Magnitude; } }
       /// <summary>Computes the length of a quaternion, but doesn't square root it.</summary>
-      public LinearAlgebra.delegates.Quaternion_MagnitudeSquared<int> _Quaternion_MagnitudeSquared { get { return LinearAlgebra.MagnitudeSquared; } }
+      public LinearAlgebra.delegates.Quaternion_MagnitudeSquared<int> Quaternion_MagnitudeSquared { get { return LinearAlgebra.MagnitudeSquared; } }
       /// <summary>Gets the conjugate of the quaternion.</summary>
       public LinearAlgebra.delegates.Quaternion_Conjugate<int> Quaternion_Conjugate { get { return LinearAlgebra.Conjugate; } }
       /// <summary>Adds two quaternions together.</summary>
@@ -1494,7 +1494,7 @@ namespace Seven.Mathematics
       /// <summary>Multiplies all the values of the quaternion by a scalar value.</summary>
       public LinearAlgebra.delegates.Quaternion_Multiply_scalar<int> Quaternion_Multiply_scalar { get { return LinearAlgebra.Multiply; } }
       /// <summary>Pre-multiplies a 3-component vector by a quaternion.</summary>
-      public LinearAlgebra.delegates.Quaternion_Multiply_Vector<int> Multiply_Vector { get { return LinearAlgebra.Multiply; } }
+      public LinearAlgebra.delegates.Quaternion_Multiply_Vector<int> Quaternion_Multiply_Vector { get { return LinearAlgebra.Multiply; } }
       /// <summary>Normalizes the quaternion.</summary>
       public LinearAlgebra.delegates.Quaternion_Normalize<int> Quaternion_Normalize { get { return LinearAlgebra.Normalize; } }
       /// <summary>Inverts a quaternion.</summary>
@@ -2474,7 +2474,7 @@ namespace Seven.Mathematics
       }
 
       /// <summary>Computes the length of a quaternion, but doesn't square root it.</summary>
-      public LinearAlgebra.delegates.Quaternion_MagnitudeSquared<T> _Quaternion_MagnitudeSquared
+      public LinearAlgebra.delegates.Quaternion_MagnitudeSquared<T> Quaternion_MagnitudeSquared
       {
         get
         {
@@ -2577,7 +2577,7 @@ namespace Seven.Mathematics
       }
 
       /// <summary>Pre-multiplies a 3-component vector by a quaternion.</summary>
-      public LinearAlgebra.delegates.Quaternion_Multiply_Vector<T> Multiply_Vector
+      public LinearAlgebra.delegates.Quaternion_Multiply_Vector<T> Quaternion_Multiply_Vector
       {
         get
         {
@@ -2724,7 +2724,7 @@ namespace Seven.Mathematics
             {
               if (vector.Dimensions != 3)
                 throw new Error("my quaternion rotations are only defined for 3-component vectors.");
-              Quaternion<T> answer = this.Quaternion_Multiply(this.Multiply_Vector(rotation, vector), Quaternion<T>.Conjugate(rotation));
+              Quaternion<T> answer = this.Quaternion_Multiply(this.Quaternion_Multiply_Vector(rotation, vector), Quaternion<T>.Conjugate(rotation));
               return new Vector<T>(answer.X, answer.Y, answer.Z);
             };
         }
@@ -2902,7 +2902,7 @@ namespace Seven.Mathematics
       public LinearAlgebra.delegates.Quaternion_Magnitude<T> Quaternion_Magnitude
       { get { return (Quaternion<T> a) => { throw new Error("a linear algebra for " + typeof(T) + " could not be found or created"); }; } }
       /// <summary>Computes the length of a quaternion, but doesn't square root it.</summary>
-      public LinearAlgebra.delegates.Quaternion_MagnitudeSquared<T> _Quaternion_MagnitudeSquared
+      public LinearAlgebra.delegates.Quaternion_MagnitudeSquared<T> Quaternion_MagnitudeSquared
       { get { return (Quaternion<T> a) => { throw new Error("a linear algebra for " + typeof(T) + " could not be found or created"); }; } }
       /// <summary>Gets the conjugate of the quaternion.</summary>
       public LinearAlgebra.delegates.Quaternion_Conjugate<T> Quaternion_Conjugate
@@ -2920,7 +2920,7 @@ namespace Seven.Mathematics
       public LinearAlgebra.delegates.Quaternion_Multiply_scalar<T> Quaternion_Multiply_scalar
       { get { return (Quaternion<T> a, T b) => { throw new Error("a linear algebra for " + typeof(T) + " could not be found or created"); }; } }
       /// <summary>Pre-multiplies a 3-component vector by a quaternion.</summary>
-      public LinearAlgebra.delegates.Quaternion_Multiply_Vector<T> Multiply_Vector
+      public LinearAlgebra.delegates.Quaternion_Multiply_Vector<T> Quaternion_Multiply_Vector
       { get { return (Quaternion<T> a, Vector<T> b) => { throw new Error("a linear algebra for " + typeof(T) + " could not be found or created"); }; } }
       /// <summary>Normalizes the quaternion.</summary>
       public LinearAlgebra.delegates.Quaternion_Normalize<T> Quaternion_Normalize
@@ -2952,6 +2952,515 @@ namespace Seven.Mathematics
     #endregion
 
     #region implementations
+
+    #region generic
+
+    #region vector
+
+    /// <summary>Adds two vectors together.</summary>
+    /// <param name="left">The first vector of the addition.</param>
+    /// <param name="right">The second vector of the addiiton.</param>
+    /// <returns>The result of the addiion.</returns>
+    public static T[] Add<T>(T[] left, T[] right)
+    {
+      return Get<T>().Vector_Add(left, right);
+    }
+
+    /// <summary>Negates all the values in a vector.</summary>
+    /// <param name="vector">The vector to have its values negated.</param>
+    /// <returns>The result of the negations.</returns>
+    public static T[] Negate<T>(T[] vector)
+    {
+      return Get<T>().Vector_Negate(vector);
+    }
+
+    /// <summary>Subtracts two vectors.</summary>
+    /// <param name="left">The left vector of the subtraction.</param>
+    /// <param name="right">The right vector of the subtraction.</param>
+    /// <returns>The result of the vector subtracton.</returns>
+    public static T[] Subtract<T>(T[] left, T[] right)
+    {
+      return Get<T>().Vector_Subtract(left, right);
+    }
+
+    /// <summary>Multiplies all the components of a vecotr by a scalar.</summary>
+    /// <param name="left">The vector to have the components multiplied by.</param>
+    /// <param name="right">The scalars to multiply the vector components by.</param>
+    /// <returns>The result of the multiplications.</returns>
+    public static T[] Multiply<T>(T[] left, T right)
+    {
+      return Get<T>().Vector_Multiply(left, right);
+    }
+
+    /// <summary>Divides all the components of a vector by a scalar.</summary>
+    /// <param name="vector">The vector to have the components divided by.</param>
+    /// <param name="right">The scalar to divide the vector components by.</param>
+    /// <returns>The resulting vector after teh divisions.</returns>
+    public static T[] Divide<T>(T[] vector, T right)
+    {
+      return Get<T>().Vector_Divide(vector, right);
+    }
+
+    /// <summary>Computes the dot product between two vectors.</summary>
+    /// <param name="left">The first vector of the dot product operation.</param>
+    /// <param name="right">The second vector of the dot product operation.</param>
+    /// <returns>The result of the dot product operation.</returns>
+    public static T DotProduct<T>(T[] left, T[] right)
+    {
+      return Get<T>().Vector_DotProduct(left, right);
+    }
+
+    /// <summary>Computes teh cross product of two vectors.</summary>
+    /// <param name="left">The first vector of the cross product operation.</param>
+    /// <param name="right">The second vector of the cross product operation.</param>
+    /// <returns>The result of the cross product operation.</returns>
+    public static T[] CrossProduct<T>(T[] left, T[] right)
+    {
+      return Get<T>().Vector_CrossProduct(left, right);
+    }
+
+    /// <summary>Normalizes a vector.</summary>
+    /// <param name="vector">The vector to normalize.</param>
+    /// <returns>The result of the normalization.</returns>
+    public static T[] Normalize<T>(T[] vector)
+    {
+      return Get<T>().Vector_Normalize(vector);
+    }
+
+    /// <summary>Computes the length of a vector.</summary>
+    /// <param name="vector">The vector to calculate the length of.</param>
+    /// <returns>The computed length of the vector.</returns>
+    public static T Magnitude<T>(T[] vector)
+    {
+      return Get<T>().Vector_Magnitude(vector);
+    }
+
+    /// <summary>Computes the length of a vector but doesn't square root it for efficiency (length remains squared).</summary>
+    /// <param name="vector">The vector to compute the length squared of.</param>
+    /// <returns>The computed length squared of the vector.</returns>
+    public static T MagnitudeSquared<T>(T[] vector)
+    {
+      return Get<T>().Vector_MagnitudeSquared(vector);
+    }
+
+    /// <summary>Computes the angle between two vectors.</summary>
+    /// <param name="first">The first vector to determine the angle between.</param>
+    /// <param name="second">The second vector to determine the angle between.</param>
+    /// <returns>The angle between the two vectors in radians.</returns>
+    public static T Angle<T>(T[] first, T[] second)
+    {
+      return Get<T>().Vector_Angle(first, second);
+    }
+
+    /// <summary>Rotates a vector by the specified axis and rotation values.</summary>
+    /// <param name="vector">The vector to rotate.</param>
+    /// <param name="angle">The angle of the rotation.</param>
+    /// <param name="x">The x component of the axis vector to rotate about.</param>
+    /// <param name="y">The y component of the axis vector to rotate about.</param>
+    /// <param name="z">The z component of the axis vector to rotate about.</param>
+    /// <returns>The result of the rotation.</returns>
+    public static T[] RotateBy<T>(T[] vector, T angle, T x, T y, T z)
+    {
+      return Get<T>().Vector_RotateBy(vector, angle, x, y, z);
+    }
+
+    /// <summary>Rotates a vector by a quaternion rotation.</summary>
+    /// <param name="vector">The vector to be rotated.</param>
+    /// <param name="quaternion">The rotation to be applied.</param>
+    /// <returns>The vector after the rotation.</returns>
+    public static T[] RotateBy<T>(T[] vector, Quaternion<T> quaternion)
+    {
+      return Get<T>().Vector_RotateBy_quaternion(vector, quaternion);
+    }
+
+    /// <summary>Computes the linear interpolation between two vectors.</summary>
+    /// <param name="left">The starting vector of the interpolation.</param>
+    /// <param name="right">The ending vector of the interpolation.</param>
+    /// <param name="blend">The ratio 0.0 to 1.0 of the interpolation between the start and end.</param>
+    /// <returns>The result of the interpolation.</returns>
+    public static T[] Lerp<T>(T[] left, T[] right, T blend)
+    {
+      return Get<T>().Vector_Lerp(left, right, blend);
+    }
+
+    /// <summary>Sphereically interpolates between two vectors.</summary>
+    /// <param name="left">The starting vector of the interpolation.</param>
+    /// <param name="right">The ending vector of the interpolation.</param>
+    /// <param name="blend">The ratio 0.0 to 1.0 defining the interpolation distance between the two vectors.</param>
+    /// <returns>The result of the slerp operation.</returns>
+    public static T[] Slerp<T>(T[] left, T[] right, T blend)
+    {
+      return Get<T>().Vector_Slerp(left, right, blend);
+    }
+
+    /// <summary>Interpolates between three vectors using barycentric coordinates.</summary>
+    /// <param name="a">The first vector of the interpolation.</param>
+    /// <param name="b">The second vector of the interpolation.</param>
+    /// <param name="c">The thrid vector of the interpolation.</param>
+    /// <param name="u">The "U" value of the barycentric interpolation equation.</param>
+    /// <param name="v">The "V" value of the barycentric interpolation equation.</param>
+    /// <returns>The resulting vector of the barycentric interpolation.</returns>
+    public static T[] Blerp<T>(T[] a, T[] b, T[] c, T u, T v)
+    {
+      return Get<T>().Vector_Blerp(a, b, c, u, v);
+    }
+
+    /// <summary>Does a value equality check.</summary>
+    /// <param name="left">The first matrix to check for equality.</param>
+    /// <param name="right">The second matrix to check for equality.</param>
+    /// <returns>True if values are equal, false if not.</returns>
+    public static bool EqualsValue<T>(T[] left, T[] right)
+    {
+      return Get<T>().Vector_EqualsValue(left, right);
+    }
+
+    /// <summary>Does a value equality check with leniency.</summary>
+    /// <param name="left">The first matrix to check for equality.</param>
+    /// <param name="right">The second matrix to check for equality.</param>
+    /// <param name="leniency">How much the values can vary but still be considered equal.</param>
+    /// <returns>True if values are equal, false if not.</returns>
+    public static bool EqualsValue<T>(T[] left, T[] right, T leniency)
+    {
+      return Get<T>().Vector_EqualsValue_leniency(left, right, leniency);
+    }
+
+    #endregion
+
+    #region matrix
+
+    ///// <summary>Constructs a new identity-matrix of the given dimensions.</summary>
+    ///// <param name="rows">The number of rows of the matrix.</param>
+    ///// <param name="columns">The number of columns of the matrix.</param>
+    ///// <returns>The newly constructed identity-matrix.</returns>
+    //public static T[,] MatrixFactoryIdentity_T<T>(int rows, int columns)
+    //{
+    //  return Get<T>().Matrix_Add(left, right);
+    //}
+
+    ///// <summary>Determines if a matrix is symetric or not.</summary>
+    ///// <param name="matrix">The matrix to determine symetry of.</param>
+    ///// <returns>True if symetric; false if not.</returns>
+    //public static bool IsSymmetric<T>(T[,] matrix)
+    //{
+    //  return Get<T>().Matrix_IsSymetric(matrix);
+    //}
+
+    /// <summary>Negates all the values in a matrix.</summary>
+    /// <param name="matrix">The matrix to have its values negated.</param>
+    /// <returns>The resulting matrix after the negations.</returns>
+    public static T[,] Negate<T>(T[,] matrix)
+    {
+      return Get<T>().Matrix_Negate(matrix);
+    }
+
+    /// <summary>Does standard addition of two matrices.</summary>
+    /// <param name="left">The left matrix of the addition.</param>
+    /// <param name="right">The right matrix of the addition.</param>
+    /// <returns>The resulting matrix after the addition.</returns>
+    public static T[,] Add<T>(T[,] left, T[,] right)
+    {
+      return Get<T>().Matrix_Add(left, right);
+    }
+
+    /// <summary>Subtracts a scalar from all the values in a matrix.</summary>
+    /// <param name="left">The matrix to have the values subtracted from.</param>
+    /// <param name="right">The scalar to subtract from all the matrix values.</param>
+    /// <returns>The resulting matrix after the subtractions.</returns>
+    public static T[,] Subtract<T>(T[,] left, T[,] right)
+    {
+      return Get<T>().Matrix_Add(left, right);
+    }
+
+    /// <summary>Performs multiplication on two matrices.</summary>
+    /// <param name="left">The left matrix of the multiplication.</param>
+    /// <param name="right">The right matrix of the multiplication.</param>
+    /// <returns>The resulting matrix of the multiplication.</returns>
+    public static T[,] Multiply<T>(T[,] left, T[,] right)
+    {
+      return Get<T>().Matrix_Multiply(left, right);
+    }
+
+    /// <summary>Does a standard <T>(triple for looped) multiplication between matrices.</summary>
+    /// <param name="left">The left matrix of the multiplication.</param>
+    /// <param name="right">The right matrix of the multiplication.</param>
+    /// <returns>The resulting matrix of the multiplication.</returns>
+    public static T[] Multiply<T>(T[,] left, T[] right)
+    {
+      return Get<T>().Matrix_Multiply_vector(left, right);
+    }
+
+    /// <summary>Multiplies all the values in a matrix by a scalar.</summary>
+    /// <param name="left">The matrix to have the values multiplied.</param>
+    /// <param name="right">The scalar to multiply the values by.</param>
+    /// <returns>The resulting matrix after the multiplications.</returns>
+    public static T[,] Multiply<T>(T[,] left, T right)
+    {
+      return Get<T>().Matrix_Multiply_scalar(left, right);
+    }
+
+    /// <summary>Applies a power to a square matrix.</summary>
+    /// <param name="matrix">The matrix to be powered by.</param>
+    /// <param name="power">The power to apply to the matrix.</param>
+    /// <returns>The resulting matrix of the power operation.</returns>
+    public static T[,] Power<T>(T[,] matrix, int power)
+    {
+      return Get<T>().Matrix_Power(matrix, power);
+    }
+
+    /// <summary>Divides all the values in the matrix by a scalar.</summary>
+    /// <param name="matrix">The matrix to divide the values of.</param>
+    /// <param name="right">The scalar to divide all the matrix values by.</param>
+    /// <returns>The resulting matrix with the divided values.</returns>
+    public static T[,] Divide<T>(T[,] matrix, T right)
+    {
+      return Get<T>().Matrix_Divide(matrix, right);
+    }
+
+    /// <summary>Gets the minor of a matrix.</summary>
+    /// <param name="matrix">The matrix to get the minor of.</param>
+    /// <param name="row">The restricted row to form the minor.</param>
+    /// <param name="column">The restricted column to form the minor.</param>
+    /// <returns>The minor of the matrix.</returns>
+    public static T[,] Minor<T>(T[,] matrix, int row, int column)
+    {
+      return Get<T>().Matrix_Minor(matrix, row, column);
+    }
+
+    /// <summary>Combines two matrices from left to right 
+    /// <T>(result.Rows = left.Rows && result.Columns = left.Columns + right.Columns).</summary>
+    /// <param name="left">The left matrix of the concatenation.</param>
+    /// <param name="right">The right matrix of the concatenation.</param>
+    /// <returns>The resulting matrix of the concatenation.</returns>
+    public static T[,] ConcatenateRowWise<T>(T[,] left, T[,] right)
+    {
+      return Get<T>().Matrix_ConcatenateRowWise(left, right);
+    }
+
+    /// <summary>Calculates the echelon of a matrix <T>(aka REF).</summary>
+    /// <param name="matrix">The matrix to calculate the echelon of <T>(aka REF).</param>
+    /// <returns>The echelon of the matrix <T>(aka REF).</returns>
+    public static T[,] Echelon<T>(T[,] matrix)
+    {
+      return Get<T>().Matrix_Echelon(matrix);
+    }
+
+    /// <summary>Calculates the echelon of a matrix and reduces it <T>(aka RREF).</summary>
+    /// <param name="matrix">The matrix matrix to calculate the reduced echelon of <T>(aka RREF).</param>
+    /// <returns>The reduced echelon of the matrix <T>(aka RREF).</returns>
+    public static T[,] ReducedEchelon<T>(T[,] matrix)
+    {
+      return Get<T>().Matrix_ReducedEchelon(matrix);
+    }
+
+    /// <summary>Calculates the determinent of a square matrix.</summary>
+    /// <param name="matrix">The matrix to calculate the determinent of.</param>
+    /// <returns>The determinent of the matrix.</returns>
+    public static T Determinent<T>(T[,] matrix)
+    {
+      return Get<T>().Matrix_Determinent(matrix);
+    }
+
+    /// <summary>Calculates the inverse of a matrix.</summary>
+    /// <param name="matrix">The matrix to calculate the inverse of.</param>
+    /// <returns>The inverse of the matrix.</returns>
+    public static T[,] Inverse<T>(T[,] matrix)
+    {
+      return Get<T>().Matrix_Inverse(matrix);
+    }
+
+    /// <summary>Calculates the adjoint of a matrix.</summary>
+    /// <param name="matrix">The matrix to calculate the adjoint of.</param>
+    /// <returns>The adjoint of the matrix.</returns>
+    public static T[,] Adjoint<T>(T[,] matrix)
+    {
+      return Get<T>().Matrix_Adjoint(matrix);
+    }
+
+    /// <summary>Returns the transpose of a matrix.</summary>
+    /// <param name="matrix">The matrix to transpose.</param>
+    /// <returns>The transpose of the matrix.</returns>
+    public static T[,] Transpose<T>(T[,] matrix)
+    {
+      return Get<T>().Matrix_Transpose(matrix);
+    }
+
+    /// <summary>Decomposes a matrix into lower-upper reptresentation.</summary>
+    /// <param name="matrix">The matrix to decompose.</param>
+    /// <param name="Lower">The computed lower triangular matrix.</param>
+    /// <param name="Upper">The computed upper triangular matrix.</param>
+    public static void DecomposeLU<T>(T[,] matrix, out T[,] Lower, out T[,] Upper)
+    {
+      Get<T>().Matrix_DecomposeLU(matrix, out Lower, out Upper);
+    }
+
+    ///// <summary>Creates a copy of a matrix.</summary>
+    ///// <param name="matrix">The matrix to copy.</param>
+    ///// <returns>A copy of the matrix.</returns>
+    //public static T[,] Clone<T>(T[,] matrix)
+    //{
+    //  return Get<T>().Matrix_Clone(matrix);
+    //}
+
+    /// <summary>Does a value equality check.</summary>
+    /// <param name="left">The first matrix to check for equality.</param>
+    /// <param name="right">The second matrix to check for equality.</param>
+    /// <returns>True if values are equal, false if not.</returns>
+    public static bool EqualsValue<T>(T[,] left, T[,] right)
+    {
+      return Get<T>().Matrix_EqualsByValue(left, right);
+    }
+
+    /// <summary>Does a value equality check with leniency.</summary>
+    /// <param name="left">The first matrix to check for equality.</param>
+    /// <param name="right">The second matrix to check for equality.</param>
+    /// <param name="leniency">How much the values can vary but still be considered equal.</param>
+    /// <returns>True if values are equal, false if not.</returns>
+    public static bool EqualsValue<T>(T[,] left, T[,] right, T leniency)
+    {
+      return Get<T>().Matrix_EqualsByValue_leniency(left, right, leniency);
+    }
+
+    #endregion
+
+    #region quaterion
+
+    /// <summary>Computes the length of quaternion.</summary>
+    /// <param name="quaternion">The quaternion to compute the length of.</param>
+    /// <returns>The length of the given quaternion.</returns>
+    public static T Magnitude<T>(Quaternion<T> quaternion)
+    {
+      return Get<T>().Quaternion_Magnitude(quaternion);
+    }
+
+    /// <summary>Computes the length of a quaternion, but doesn't square root it
+    /// for optimization possibilities.</summary>
+    /// <param name="quaternion">The quaternion to compute the length squared of.</param>
+    /// <returns>The squared length of the given quaternion.</returns>
+    public static T MagnitudeSquared<T>(Quaternion<T> quaternion)
+    {
+      return Get<T>().Quaternion_MagnitudeSquared(quaternion);
+    }
+
+    /// <summary>Gets the conjugate of the quaternion.</summary>
+    /// <param name="quaternion">The quaternion to conjugate.</param>
+    /// <returns>The conjugate of teh given quaternion.</returns>
+    public static Quaternion<T> Conjugate<T>(Quaternion<T> quaternion)
+    {
+      return Get<T>().Quaternion_Conjugate(quaternion);
+    }
+
+    /// <summary>Adds two quaternions together.</summary>
+    /// <param name="left">The first quaternion of the addition.</param>
+    /// <param name="right">The second quaternion of the addition.</param>
+    /// <returns>The result of the addition.</returns>
+    public static Quaternion<T> Add<T>(Quaternion<T> left, Quaternion<T> right)
+    {
+      return Get<T>().Quaternion_Add(left, right);
+    }
+
+    /// <summary>Subtracts two quaternions.</summary>
+    /// <param name="left">The left quaternion of the subtraction.</param>
+    /// <param name="right">The right quaternion of the subtraction.</param>
+    /// <returns>The resulting quaternion after the subtraction.</returns>
+    public static Quaternion<T> Subtract<T>(Quaternion<T> left, Quaternion<T> right)
+    {
+      return Get<T>().Quaternion_Subtract(left, right);
+    }
+
+    /// <summary>Multiplies two quaternions together.</summary>
+    /// <param name="left">The first quaternion of the multiplication.</param>
+    /// <param name="right">The second quaternion of the multiplication.</param>
+    /// <returns>The resulting quaternion after the multiplication.</returns>
+    public static Quaternion<T> Multiply<T>(Quaternion<T> left, Quaternion<T> right)
+    {
+      return Get<T>().Quaternion_Multiply(left, right);
+    }
+
+    /// <summary>Multiplies all the values of the quaternion by a scalar value.</summary>
+    /// <param name="left">The quaternion of the multiplication.</param>
+    /// <param name="right">The scalar of the multiplication.</param>
+    /// <returns>The result of multiplying all the values in the quaternion by the scalar.</returns>
+    public static Quaternion<T> Multiply<T>(Quaternion<T> left, T right)
+    {
+      return Get<T>().Quaternion_Multiply_scalar(left, right);
+    }
+
+    /// <summary>Pre-multiplies a 3-component vector by a quaternion.</summary>
+    /// <param name="left">The quaternion to pre-multiply the vector by.</param>
+    /// <param name="right">The vector to be multiplied.</param>
+    /// <returns>The resulting quaternion of the multiplication.</returns>
+    public static Quaternion<T> Multiply<T>(Quaternion<T> left, Vector<T> right)
+    {
+      return Get<T>().Quaternion_Multiply_Vector(left, right);
+    }
+
+    /// <summary>Normalizes the quaternion.</summary>
+    /// <param name="quaternion">The quaternion to normalize.</param>
+    /// <returns>The normalization of the given quaternion.</returns>
+    public static Quaternion<T> Normalize<T>(Quaternion<T> quaternion)
+    {
+      return Get<T>().Quaternion_Normalize(quaternion);
+    }
+
+    /// <summary>Inverts a quaternion.</summary>
+    /// <param name="quaternion">The quaternion to find the inverse of.</param>
+    /// <returns>The inverse of the given quaternion.</returns>
+    public static Quaternion<T> Invert<T>(Quaternion<T> quaternion)
+    {
+      return Get<T>().Quaternion_Invert(quaternion);
+    }
+
+    /// <summary>Lenearly interpolates between two quaternions.</summary>
+    /// <param name="left">The starting point of the interpolation.</param>
+    /// <param name="right">The ending point of the interpolation.</param>
+    /// <param name="blend">The ratio 0.0-1.0 of how far to interpolate between the left and right quaternions.</param>
+    /// <returns>The result of the interpolation.</returns>
+    public static Quaternion<T> Lerp<T>(Quaternion<T> left, Quaternion<T> right, T blend)
+    {
+      return Get<T>().Quaternion_Lerp(left, right, blend);
+    }
+
+    /// <summary>Sphereically interpolates between two quaternions.</summary>
+    /// <param name="left">The starting point of the interpolation.</param>
+    /// <param name="right">The ending point of the interpolation.</param>
+    /// <param name="blend">The ratio of how far to interpolate between the left and right quaternions.</param>
+    /// <returns>The result of the interpolation.</returns>
+    public static Quaternion<T> Slerp<T>(Quaternion<T> left, Quaternion<T> right, T blend)
+    {
+      return Get<T>().Quaternion_Slerp(left, right, blend);
+    }
+
+    /// <summary>Rotates a vector by a quaternion [v' = qvq'].</summary>
+    /// <param name="rotation">The quaternion to rotate the vector by.</param>
+    /// <param name="vector">The vector to be rotated by.</param>
+    /// <returns>The result of the rotation.</returns>
+    public static Vector<T> Rotate<T>(Quaternion<T> rotation, Vector<T> vector)
+    {
+      return Get<T>().Quaternion_Rotate(rotation, vector);
+    }
+
+    /// <summary>Does a value equality check.</summary>
+    /// <param name="left">The first quaternion to check for equality.</param>
+    /// <param name="right">The second quaternion  to check for equality.</param>
+    /// <returns>True if values are equal, false if not.</returns>
+    public static bool EqualsValue<T>(Quaternion<T> left, Quaternion<T> right)
+    {
+      return Get<T>().Quaternion_EqualsValue(left, right);
+    }
+
+    /// <summary>Does a value equality check with leniency.</summary>
+    /// <param name="left">The first quaternion to check for equality.</param>
+    /// <param name="right">The second quaternion to check for equality.</param>
+    /// <param name="leniency">How much the values can vary but still be considered equal.</param>
+    /// <returns>True if values are equal, false if not.</returns>
+    public static bool EqualsValue<T>(Quaternion<T> left, Quaternion<T> right, T leniency)
+    {
+      return Get<T>().Quaternion_EqualsValue_leniency(left, right, leniency);
+    }
+
+    #endregion
+
+    #endregion
 
     #region Fraction128
 
@@ -12189,7 +12698,7 @@ namespace Seven.Mathematics
     #region runtime function mapping
 
     private static LinearAlgebra.delegates.Quaternion_Magnitude<T> _Quaternion_Magnitude;
-    private static LinearAlgebra.delegates.Quaternion_MagnitudeSquared<T> _Quaternion_MagnitudeSquared;
+    private static LinearAlgebra.delegates.Quaternion_MagnitudeSquared<T> Quaternion_MagnitudeSquared;
     private static LinearAlgebra.delegates.Quaternion_Conjugate<T> _Quaternion_Conjugate;
     private static LinearAlgebra.delegates.Quaternion_Add<T> _Quaternion_Add;
     private static LinearAlgebra.delegates.Quaternion_Subtract<T> _Quaternion_Subtract;
@@ -12218,13 +12727,13 @@ namespace Seven.Mathematics
 
       LinearAlgebra<T> linearAlgebra = LinearAlgebra.Get<T>();
       _Quaternion_Magnitude = linearAlgebra.Quaternion_Magnitude;
-      _Quaternion_MagnitudeSquared = linearAlgebra._Quaternion_MagnitudeSquared;
+      Quaternion_MagnitudeSquared = linearAlgebra.Quaternion_MagnitudeSquared;
       _Quaternion_Conjugate = linearAlgebra.Quaternion_Conjugate;
       _Quaternion_Add = linearAlgebra.Quaternion_Add;
       _Quaternion_Subtract = linearAlgebra.Quaternion_Subtract;
       _Quaternion_Multiply = linearAlgebra.Quaternion_Multiply;
       _Quaternion_Multiply_scalar = linearAlgebra.Quaternion_Multiply_scalar;
-      _Quaternion_Multiply_Vector = linearAlgebra.Multiply_Vector;
+      _Quaternion_Multiply_Vector = linearAlgebra.Quaternion_Multiply_Vector;
       _Quaternion_Normalize = linearAlgebra.Quaternion_Normalize;
       _Quaternion_Invert = linearAlgebra.Quaternion_Invert;
       _Quaternion_Lerp = linearAlgebra.Quaternion_Lerp;
@@ -12420,7 +12929,7 @@ namespace Seven.Mathematics
 		/// <param name="quaternion">The quaternion to compute the length squared of.</param>
 		/// <returns>The squared length of the given quaternion.</returns>
 		public static T MagnitudeSquared(Quaternion<T> quaternion)
-		{ return _Quaternion_MagnitudeSquared(quaternion); }
+		{ return Quaternion_MagnitudeSquared(quaternion); }
 		/// <summary>Gets the conjugate of the quaternion.</summary>
 		/// <param name="quaternion">The quaternion to conjugate.</param>
 		/// <returns>The conjugate of teh given quaternion.</returns>

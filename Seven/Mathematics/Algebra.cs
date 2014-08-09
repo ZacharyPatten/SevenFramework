@@ -116,8 +116,6 @@ namespace Seven.Mathematics
         return temp as Algebra<T>;
       else
         return Algebra_unsupported<T>.Get;
-      //return (Algebra<T>)_algebras[typeof(T)];
-      //catch { throw new Error("Could not load algebra for " + typeof(T)); }
 		}
 
     #region provided
@@ -391,6 +389,64 @@ namespace Seven.Mathematics
     #endregion
 
     #region Implementations
+
+    #region generic
+
+    public static T ln<T>(T value)
+    {
+      return Get<T>().ln(value);
+    }
+
+    public static T log<T>(T value, T _base)
+    {
+      return Get<T>().log(value, _base);
+    }
+
+    public static T root<T>(T _base, T root)
+    {
+      return Get<T>().root(_base, root);
+    }
+
+    public static T exp<T>(T value)
+    {
+      return Get<T>().exp(value);
+    }
+
+    public static T[] factorPrimes<T>(T value)
+    {
+      return Get<T>().factorPrimes(value);
+    }
+
+    public static T invert_mult<T>(T value)
+    {
+      return Get<T>().invert_mult(value);
+    }
+
+    //public static bool IsPrime<T>(T candidate)
+    //{
+    //  return Get<T>().(candidate);
+    //}
+
+    public static T sqrt<T>(T number)
+    {
+      return Get<T>().sqrt(number);
+    }
+
+    //private static T GreatestCommonDenominator<T>(T first, T second)
+    //{
+    //  return Get<T>().gdc(first, second);
+    //}
+
+    //static public T Lerp<T>(T x, T x0, T x1, T y0, T y1)
+    //{
+
+    //}
+
+    //public static T Lerp<T>(T x, T x0, T x1)
+    //{
+    //}
+
+    #endregion
 
     #region Fraction128
 

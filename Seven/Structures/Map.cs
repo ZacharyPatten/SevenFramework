@@ -3,20 +3,26 @@
 // LISCENSE: See "LISCENSE.md" in th root project directory.
 // SUPPORT: See "SUPPORT.md" in the root project directory.
 
-using System;
-using System.Threading;
-using Seven.Structures;
-
-using System.Collections;
-using System.Collections.Generic;
-
 namespace Seven.Structures
 {
-  public interface Map<V, K> : Structure<V>
+  /// <summary>A map between instances of two types. The polymorphism base for Map implementations in Seven.</summary>
+  /// <typeparam name="T"></typeparam>
+  /// <typeparam name="K"></typeparam>
+  public interface Map<T, K> : Structure<T>
   {
+    #region event
+
+    /// <summary>
+    /// Event for handling duplicate additions to the map. Asigning this event
+    /// will trigger the delegate instead of throwing an exception.
+    /// </summary>
+    event Foreach<T> HandleDuplicate;
+
+    #endregion
+
     #region property
 
-    V this[K key] { get; set; }
+    T this[K key] { get; set; }
     int Count { get; }
     bool IsEmpty { get; }
     Map.Hash<K> Hash { get; }
@@ -26,10 +32,10 @@ namespace Seven.Structures
 
     #region method
 
-    V Get(K get);
-    bool TryGet(K get, out V returnValue);
+    T Get(K get);
+    bool TryGet(K get, out T returnValue);
     bool Contains(K containsCheck);
-    void Add(K key, V value);
+    void Add(K key, T value);
     void Remove(K removalKey);
     void Clear();
 
@@ -46,7 +52,7 @@ namespace Seven.Structures
     #endregion
   }
 
-  [Serializable]
+  [System.Serializable]
   public class Map_Linked<T, K> : Map<T, K>
   {
     #region class
@@ -88,6 +94,12 @@ namespace Seven.Structures
     private Node[] _table;
     private int _count;
     private int _sizeIndex;
+
+    #endregion
+
+    #region event
+
+    public event Foreach<T> HandleDuplicate;
 
     #endregion
 
@@ -238,7 +250,10 @@ namespace Seven.Structures
         Add(p, location);
       }
       else
-        throw new Error("\nMember: \"Add(TKey key, TValue value)\"\nThe key is already in the table.");
+        if (this.HandleDuplicate == null)
+          throw new Error("\nMember: \"Add(TKey key, TValue value)\"\nThe key is already in the table.");
+        else
+          this.HandleDuplicate(Find(key, location).Value);
     }
 
     private Node RemoveFirst(Node[] t, int i)
@@ -295,7 +310,8 @@ namespace Seven.Structures
       return array;
     }
 
-    IEnumerator IEnumerable.GetEnumerator()
+    System.Collections.IEnumerator
+      System.Collections.IEnumerable.GetEnumerator()
     {
       Node node;
       for (int i = 0; i < _table.Length; i++)
@@ -306,7 +322,8 @@ namespace Seven.Structures
           } while ((node = node.Next) != null);
     }
 
-    IEnumerator<T> IEnumerable<T>.GetEnumerator()
+    System.Collections.Generic.IEnumerator<T>
+      System.Collections.Generic.IEnumerable<T>.GetEnumerator()
     {
       Node node;
       for (int i = 0; i < _table.Length; i++)
@@ -387,7 +404,7 @@ namespace Seven.Structures
     /// <returns>A shallow clone of this data structure.</returns>
     public Structure<T> Clone()
     {
-      throw new NotImplementedException();
+      throw new System.NotImplementedException();
     }
 
     #endregion

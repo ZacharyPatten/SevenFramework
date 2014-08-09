@@ -5,7 +5,7 @@
 
 namespace Seven.Structures
 {
-  /// <summary>A fixed sized data structure linear in memory.</summary>
+  /// <summary>Contiguous fixed-sized data structure.</summary>
   /// <typeparam name="Type">The type of the instances to store in this data structure.</typeparam>
   public interface Array<Type> : Structure<Type>
   {
@@ -22,7 +22,7 @@ namespace Seven.Structures
     #endregion
   }
 
-  /// <summary>Implements a standard array that inherits InterfaceTraversable.</summary>
+  /// <summary>Contiguous fixed-sized data structure.</summary>
   /// <typeparam name="Type">The generic type within the structure.</typeparam>
   [System.Serializable]
   public class Array_Array<Type> : Array<Type>
@@ -31,7 +31,9 @@ namespace Seven.Structures
 
     #region code
 
-    /// <summary>FOR COMPATIBILITY ONLY. AVOID IF POSSIBLE.</summary>
+    /// <summary>Implicitly converts a C# System array into a Seven array.</summary>
+    /// <param name="array">The array to be represented as a Seven array.</param>
+    /// <returns>The array wrapped in a Seven array.</returns>
     public static implicit operator Array_Array<Type>(Type[] array)
     {
       return new Array_Array<Type>(array);

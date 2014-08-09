@@ -181,8 +181,8 @@ namespace Testing
 
       Console.WriteLine("  Testing HashTable_Linked<int, int>---------");
       Map<int, int> hashTable_linked = new Map_Linked<int, int>(
-        (int left, int right) => { return left == right; },
-        (int integer) => { return integer; });
+        Logic.Equate, // Equality Function
+        (int integer) => { return integer.GetHashCode(); }); // Compute Hash Code Funcion
       for (int i = 0; i < test; i++)
         hashTable_linked.Add(i, i);
       Console.Write("    Look Ups: ");
@@ -202,19 +202,52 @@ namespace Testing
 
       #region Quad-Tree
 
-      Console.WriteLine("  Testing Quadtree_Linked<int, double>-------");
-      Quadtree<int> quadtree_linked = new Quadtree_Linked<int, double>(
+      Console.WriteLine("  Testing Quadtree_Array<int, double>-------");
+
+      // Construction
+      Quadtree<int, double> quadtree_array = new Quadtree_Array<int, double>(
         -test - 1, -test - 1, // minimum dimensions of the quadtree
         test + 1, test + 1, // maximum dimensions of the quadtree
-        test + 1, // load factor
-        (int i, out double x, out double y) => { x = i; y = i; },
-        Logic.Compare,
-        (double left, double right) => { return (left + right) * 0.5d; });
+        (int i, out double x, out double y) => { x = i; y = i; }, // 2D location function
+        Logic.Compare, // axis comparison function
+        Statistics.Mean); // axis average function
+
+      // Adding
+      for (int i = 0; i < test; i++)
+        quadtree_array.Add(i);
+
+      // Proper Traversal
+      Console.Write("    Delegate: ");
+      quadtree_array.Foreach((int current) => { Console.Write(current); });
+      Console.WriteLine();
+
+      // Improper Traversal (AVOID "foreach" KEYWORD)
+      Console.Write("    IEnumerator: ");
+      foreach (int current in quadtree_array)
+        Console.Write(current);
+      Console.WriteLine();
+      Console.WriteLine();
+
+      Console.WriteLine("  Testing Quadtree_Linked<int, double>-------");
+
+      // Construction
+      Quadtree<int, double> quadtree_linked = new Quadtree_Linked<int, double>(
+        -test - 1, -test - 1, // minimum dimensions of the quadtree
+        test + 1, test + 1, // maximum dimensions of the quadtree
+        (int i, out double x, out double y) => { x = i; y = i; }, // 2D location function
+        Logic.Compare, // axis comparison function
+        Statistics.Mean); // axis average function
+
+      // Adding
       for (int i = 0; i < test; i++)
         quadtree_linked.Add(i);
+
+      // Proper Traversal
       Console.Write("    Delegate: ");
       quadtree_linked.Foreach((int current) => { Console.Write(current); });
       Console.WriteLine();
+
+      // Improper Traversal (AVOID "foreach" KEYWORD)
       Console.Write("    IEnumerator: ");
       foreach (int current in quadtree_linked)
         Console.Write(current);
@@ -226,18 +259,25 @@ namespace Testing
       #region Oct-Tree
 
       Console.WriteLine("  Testing Octree_Linked<int, double>---------");
-      Octree<int> octree_linked = new Octree_Linked<int, double>(
+
+      // Construction
+      Octree<int, double> octree_linked = new Octree_Linked<int, double>(
         -test - 1, -test - 1, -test - 1, // minimum dimensions of the octree
         test + 1, test + 1, test + 1, // maximum dimensions of the octree
-        test + 1, // load factor
-        (int i, out double x, out double y, out double z) => { x = i; y = i; z = i; },
-        Logic.Compare,
-        (double left, double right) => { return (left + right) * 0.5d; });
+        (int i, out double x, out double y, out double z) => { x = i; y = i; z = i; }, // 3D location function
+        Logic.Compare, // axis comparison function
+        Statistics.Mean); // axis average function
+
+      // Addition
       for (int i = 0; i < test; i++)
         octree_linked.Add(i);
+
+      // Proper Traversal
       Console.Write("    Delegate: ");
       octree_linked.Foreach((int current) => { Console.Write(current); });
       Console.WriteLine();
+
+      // Improper Traversal (AVOID "foreach" KEYWORD)
       Console.Write("    IEnumerator: ");
       foreach (int current in octree_linked)
         Console.Write(current);
@@ -248,19 +288,26 @@ namespace Testing
 
       #region Omni-Tree
 
-      // The octree has a minor bug. I'm already working on it.
       Console.WriteLine("  Testing Omnitree_Linked<int, double>-------");
+
+      // Construction
       Omnitree<int, double> omnitree_linked = new Omnitree_Linked<int, double>(
         new double[] { -test - 1, -test - 1, -test - 1 }, // minimum dimensions of the omnitree
         new double[] { test + 1, test + 1, test + 1 }, // maximum dimensions of the omnitree
-        (int i, out double[] location) => { location = new double[] { i, i, i }; },
-        Logic.Compare, // comparison function
-        (double left, double right) => { return (left + right) * 0.5d; }); // average function
+        (int i, out double[] location) => { location = new double[] { i, i, i }; }, // "N-D" location function
+        Logic.Compare, // axis comparison function
+        Statistics.Mean); // axis average function
+
+      // Addition
       for (int i = 0; i < test; i++)
         omnitree_linked.Add(i);
+
+      // Proper Traversal
       Console.Write("    Delegate: ");
       omnitree_linked.Foreach((int current) => { Console.Write(current); });
       Console.WriteLine();
+
+      // Improper Traversal (AVOID "foreach" KEYWORD)
       Console.Write("    IEnumerator: ");
       foreach (int current in omnitree_linked)
         Console.Write(current);
@@ -271,9 +318,9 @@ namespace Testing
 			Omnitree<int, double> omnitree_array = new Omnitree_Array<int, double>(
 				new double[] { -test - 1, -test - 1, -test - 1 }, // minimum dimensions of the omnitree
 				new double[] { test + 1, test + 1, test + 1 }, // maximum dimensions of the omnitree
-				(int i, out double[] location) => { location = new double[] { i, i, i }; },
+        (int i, out double[] location) => { location = new double[] { i, i, i }; }, // "N-D" location function
         Logic.Compare, // comparison function
-				(double left, double right) => { return (left + right) * 0.5d; }); // average function
+				Statistics.Mean); // average function
 			Console.WriteLine("      Origin: [" + omnitree_array.Origin[0] + ", " + omnitree_array.Origin[1] + ", " + omnitree_array.Origin[2] + "]");
 			Console.WriteLine("      Minimum: [" + omnitree_array.Min[0] + ", " + omnitree_array.Min[1] + ", " + omnitree_array.Min[2] + "]");
 			Console.WriteLine("      Maximum: [" + omnitree_array.Max[0] + ", " + omnitree_array.Max[1] + ", " + omnitree_array.Max[2] + "]");
@@ -285,10 +332,10 @@ namespace Testing
 			omnitree_array.Foreach((int current) => { Console.Write(current); });
 			Console.WriteLine();
 			Console.WriteLine("      Count: " + omnitree_array.Count);
-			Console.Write("    Foreach (delegate) [ALL]: ");
+			Console.Write("    Foreach [ALL]: ");
 			omnitree_array.Foreach((int current) => { Console.Write(current); });
 			Console.WriteLine();
-			Console.Write("    Foreach (delegate) [" + (test / 2) + "-" + test + "]: ");
+			Console.Write("    Foreach [" + (test / 2) + "-" + test + "]: ");
 			omnitree_array.Foreach((int current) => { Console.Write(current); },
 				new double[] { test / 2, test / 2, test / 2 },
 				new double[] { test, test, test });

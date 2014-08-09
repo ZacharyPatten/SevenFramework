@@ -45,6 +45,7 @@
     <Compile Include="Error.cs" />
     <Compile Include="Mathematics\Arithmetic.cs" />
     <Compile Include="Mathematics\Functions.cs" />
+    <Compile Include="Mathematics\Statistics.cs" />
     <Compile Include="Mathematics\Symbolics\ComputerAlgebra.cs" />
     <Compile Include="Mathematics\Symbolics\Regression\ConsoleGui.cs" />
     <Compile Include="Mathematics\Symbolics\Regression\RegressionAlgorithm.cs" />
