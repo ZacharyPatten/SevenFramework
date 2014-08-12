@@ -245,7 +245,21 @@ namespace Seven.Mathematics
       if (_arithmetics.TryGet(typeof(T), out temp))
         return temp as Arithmetic<T>;
       else
+      {
+        #region builder
+        
+        // The goal of this code is to build an Arithmetic library automatically if the
+        // type has the appropiate operators. However, it is not finished.
+
+        //System.Reflection.MethodInfo add = typeof(Error).GetMethod("op_Addition", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public);
+        //System.Reflection.MethodInfo subtract = typeof(Error).GetMethod("op_Subtraction", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public);
+        //System.Reflection.MethodInfo multiply = typeof(Error).GetMethod("op_Multiplication", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public);
+        //System.Reflection.MethodInfo divide = typeof(Error).GetMethod("op_Division", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public);
+
+        #endregion
+
         return new Arithmetic_unsupported<T>();
+      }
     }
 
     #region provided
@@ -490,6 +504,47 @@ namespace Seven.Mathematics
       public Arithmetic.delegates.Subtract<T> Subtract { get { return (T a, T b) => { throw new Error("Arithmetic is undefined for type: " + typeof(T)); }; } }
       /// <summary>Takes one operand to the power of the other.</summary>
       public Arithmetic.delegates.Power<T> Power { get { return (T a, T b) => { throw new Error("Arithmetic is undefined for type: " + typeof(T)); }; } }
+    }
+
+    /// <summary>Creates an arithmetic library given the necessary delegates.</summary>
+    /// <typeparam name="T">The generic type of the arithmetic.</typeparam>
+    public class Arithmetic_generic<T> : Arithmetic<T>
+    {
+      Arithmetic.delegates.Negate<T> Arithmetic_Negate;
+      Arithmetic.delegates.Divide<T> Arithmetic_Divide;
+      Arithmetic.delegates.Multiply<T> Arithmetic_Multiply;
+      Arithmetic.delegates.Add<T> Arithmetic_Add;
+      Arithmetic.delegates.Subtract<T> Arithmetic_Subtract;
+      Arithmetic.delegates.Power<T> Arithmetic_Power;
+
+      public Arithmetic_generic(
+        Arithmetic.delegates.Negate<T> Negate,
+        Arithmetic.delegates.Divide<T> Divide,
+        Arithmetic.delegates.Multiply<T> Multiply,
+        Arithmetic.delegates.Add<T> Add,
+        Arithmetic.delegates.Subtract<T> Subtract,
+        Arithmetic.delegates.Power<T> Power)
+      {
+        this.Arithmetic_Negate = Negate;
+        this.Arithmetic_Divide = Divide;
+        this.Arithmetic_Multiply = Multiply;
+        this.Arithmetic_Add = Add;
+        this.Arithmetic_Subtract = Subtract;
+        this.Arithmetic_Power = Power;
+      }
+
+      /// <summary>Negates a value.</summary>
+      public Arithmetic.delegates.Negate<T> Negate { get { return this.Arithmetic_Negate; } }
+      /// <summary>Divides two operands.</summary>
+      public Arithmetic.delegates.Divide<T> Divide { get { return this.Arithmetic_Divide; } }
+      /// <summary>Multiplies two operands.</summary>
+      public Arithmetic.delegates.Multiply<T> Multiply { get { return this.Arithmetic_Multiply; } }
+      /// <summary>Adds two operands.</summary>
+      public Arithmetic.delegates.Add<T> Add { get { return this.Arithmetic_Add; } }
+      /// <summary>Subtracts two operands.</summary>
+      public Arithmetic.delegates.Subtract<T> Subtract { get { return this.Arithmetic_Subtract; } }
+      /// <summary>Takes one operand to the power of the other.</summary>
+      public Arithmetic.delegates.Power<T> Power { get { return this.Arithmetic_Power; } }
     }
 
     #endregion

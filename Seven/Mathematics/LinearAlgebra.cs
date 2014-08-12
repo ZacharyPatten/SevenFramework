@@ -1550,6 +1550,31 @@ namespace Seven.Mathematics
       #region construct
 
       private LinearAlgebra_generic(
+        Constants<T> constants,
+        Logic<T> logic,
+        Arithmetic<T> arithmetic,
+        Algebra<T> algebra,
+        Trigonometry<T> trigonometry)
+      {
+        this._zero = constants.factory(0);
+        this._one = constants.factory(1);
+        this._two = constants.factory(2);
+        this._abs = logic.abs;
+        this._equate = logic.equ;
+        this._compare = logic.comp;
+        this._negate = arithmetic.Negate;
+        this._add = arithmetic.Add;
+        this._subtract = arithmetic.Subtract;
+        this._multiply = arithmetic.Multiply;
+        this._divide = arithmetic.Divide;
+        this._sqrt = algebra.sqrt;
+        this._Invert_Multiplicative = algebra.invert_mult;
+        this._sin = trigonometry.sin;
+        this._cos = trigonometry.cos;
+        this._acos = trigonometry.acos;
+      }
+
+      private LinearAlgebra_generic(
         T zero,
         T one,
         T two,
@@ -1562,27 +1587,27 @@ namespace Seven.Mathematics
         Arithmetic.delegates.Multiply<T> multiply,
         Arithmetic.delegates.Divide<T> divide,
         Algebra.delegates.sqrt<T> sqrt,
-        Algebra.delegates.invert<T> invert_mult,
+        Algebra.delegates.invert<T> invert,
         Trigonometry.delegates.sin<T> sin,
         Trigonometry.delegates.cos<T> cos,
         Trigonometry.delegates.acos<T> arccos)
       {
-        _zero = zero;
-        _one = one;
-        _two = two;
-        _abs = abs;
-        _equate = equate;
-        _compare = compare;
-        _negate = negate;
-        _add = add;
-        _subtract = subtract;
-        _multiply = multiply;
-        _divide = divide;
-        _sqrt = sqrt;
-        _Invert_Multiplicative = invert_mult;
-        _sin = sin;
-        _cos = cos;
-        _acos = arccos;
+        this._zero = zero;
+        this._one = one;
+        this._two = two;
+        this._abs = abs;
+        this._equate = equate;
+        this._compare = compare;
+        this._negate = negate;
+        this._add = add;
+        this._subtract = subtract;
+        this._multiply = multiply;
+        this._divide = divide;
+        this._sqrt = sqrt;
+        this._Invert_Multiplicative = invert;
+        this._sin = sin;
+        this._cos = cos;
+        this._acos = arccos;
       }
 
       #endregion
@@ -6809,6 +6834,139 @@ namespace Seven.Mathematics
 						result[i, j] += left[i, k] * right[k, j];
 			return result;
 		}
+
+    /// <summary>Performs multiplication on two matrices.</summary>
+    /// <param name="left">The left matrix of the multiplication.</param>
+    /// <param name="right">The right matrix of the multiplication.</param>
+    /// <returns>The resulting matrix of the multiplication.</returns>
+    public static Matrix_flat<double> Multiply(Matrix_flat<double> left, Matrix_flat<double> right)
+    {
+#if no_error_checking
+      // nothing
+#else
+      if (left.Columns != right.Rows)
+        throw new LinearAlgebra.Error("invalid multiplication (size miss-match).");
+#endif
+
+      double sum;
+      int result_rows = left.Rows;
+      int left_cols = left.Columns;
+      int result_cols = right.Columns;
+      Matrix_flat<double> result =
+        new Matrix_flat<double>(result_rows, result_cols);
+
+#if unsafe_code
+      unsafe
+      {
+        fixed (double*
+          result_flat = result._matrix,
+          left_flat = left._matrix,
+          right_flat = right._matrix)
+          for (int i = 0; i < result_rows; i++)
+            for (int j = 0; j < result_cols; j++)
+            {
+              sum = 0.0d;
+              for (int k = 0; k < left_cols; k++)
+                sum += left_flat[i * left_cols + k] * right_flat[k * result_cols + j];
+              result_flat[i * result_cols + j] = sum;
+            }
+      }
+#else
+      double[] result_flat = result._matrix;
+      double[] left_flat = left._matrix;
+      double[] right_flat = right._matrix;
+
+      for (int i = 0; i < result_rows; i++)
+        for (int j = 0; j < result_cols; j++)
+        {
+          sum = 0.0d;
+          for (int k = 0; k < left_cols; k++)
+            sum += left_flat[i * left_cols + k] * right_flat[k * result_cols + j];
+          result_flat[i * result_cols + j] = sum;
+        }
+#endif
+
+      return result;
+    }
+
+//    /// <summary>Performs multiplication on two matrices.</summary>
+//    /// <param name="left">The left matrix of the multiplication.</param>
+//    /// <param name="right">The right matrix of the multiplication.</param>
+//    /// <returns>The resulting matrix of the multiplication.</returns>
+//    public unsafe static Matrix_flat<double> Multiply_unsafe(Matrix_flat<double> left, Matrix_flat<double> right)
+//    {
+//#if no_error_checking
+//      // nothing
+//#else
+//      if (left.Columns != right.Rows)
+//        throw new LinearAlgebra.Error("invalid multiplication (size miss-match).");
+//#endif
+
+//      unsafe
+//      {
+//        int result_rows = left.Rows;
+//        int left_cols = left.Columns;
+//        int result_cols = right.Columns;
+//        Matrix_flat<double> result =
+//          new Matrix_flat<double>(result_rows, result_cols);
+
+//        Seven.Parallels.AutoParallel.Invoke(
+//          (int current, int max) =>
+//          {
+//            return () =>
+//              {
+//                double sum;
+//                int left_i_offest;
+//                int result_i_offset;
+
+//                fixed (double*
+//                  result_flat = result._matrix,
+//                  left_flat = left._matrix,
+//                  right_flat = right._matrix)
+//                  for (int i = current; i < result_rows; i += max)
+//                  {
+//                    left_i_offest = i * left_cols;
+//                    result_i_offset = i * result_cols;
+//                    for (int j = 0; j < result_cols; j++)
+//                    {
+//                      sum = 0.0d;
+//                      for (int k = 0; k < left_cols; k++)
+//                        sum += left_flat[left_i_offest + k] * right_flat[k * result_cols + j];
+//                      result_flat[result_i_offset + j] = sum;
+//                    }
+//                  }
+//              };
+//          });
+//      }
+
+//      //double sum;
+//      //int left_i_offest;
+//      //int result_i_offset;
+//      //int result_rows = left.Rows;
+//      //int left_cols = left.Columns;
+//      //int result_cols = right.Columns;
+//      //Matrix_flat<double> result =
+//      //  new Matrix_flat<double>(result_rows, result_cols);
+
+//      //fixed (double*
+//      //  result_flat = result._matrix,
+//      //  left_flat = left._matrix,
+//      //  right_flat = right._matrix)
+//      //  for (int i = 0; i < result_rows; i++)
+//      //  {
+//      //    left_i_offest = i * left_cols;
+//      //    result_i_offset = i * result_cols;
+//      //    for (int j = 0; j < result_cols; j++)
+//      //    {
+//      //      sum = 0.0d;
+//      //      for (int k = 0; k < left_cols; k++)
+//      //        sum += left_flat[left_i_offest + k] * right_flat[k * result_cols + j];
+//      //      result_flat[result_i_offset + j] = sum;
+//      //    }
+//      //  }
+
+//      return result;
+//    }
 
     /// <summary>Does a standard (triple for looped) multiplication between matrices.</summary>
     /// <param name="left">The left matrix of the multiplication.</param>
@@ -12697,21 +12855,21 @@ namespace Seven.Mathematics
 
     #region runtime function mapping
 
-    private static LinearAlgebra.delegates.Quaternion_Magnitude<T> _Quaternion_Magnitude;
+    private static LinearAlgebra.delegates.Quaternion_Magnitude<T> Quaternion_Magnitude;
     private static LinearAlgebra.delegates.Quaternion_MagnitudeSquared<T> Quaternion_MagnitudeSquared;
-    private static LinearAlgebra.delegates.Quaternion_Conjugate<T> _Quaternion_Conjugate;
-    private static LinearAlgebra.delegates.Quaternion_Add<T> _Quaternion_Add;
-    private static LinearAlgebra.delegates.Quaternion_Subtract<T> _Quaternion_Subtract;
-    private static LinearAlgebra.delegates.Quaternion_Multiply<T> _Quaternion_Multiply;
-    private static LinearAlgebra.delegates.Quaternion_Multiply_scalar<T> _Quaternion_Multiply_scalar;
-    private static LinearAlgebra.delegates.Quaternion_Multiply_Vector<T> _Quaternion_Multiply_Vector;
-    private static LinearAlgebra.delegates.Quaternion_Normalize<T> _Quaternion_Normalize;
-    private static LinearAlgebra.delegates.Quaternion_Invert<T> _Quaternion_Invert;
-    private static LinearAlgebra.delegates.Quaternion_Lerp<T> _Quaternion_Lerp;
-    private static LinearAlgebra.delegates.Quaternion_Slerp<T> _Quaternion_Slerp;
-    private static LinearAlgebra.delegates.Quaternion_Rotate<T> _Quaternion_Rotate;
-    private static LinearAlgebra.delegates.Quaternion_EqualsValue<T> _Quaternion_EqualsValue;
-    private static LinearAlgebra.delegates.Quaternion_EqualsValue_leniency<T> _Quaternion_EqualsValue_leniency;
+    private static LinearAlgebra.delegates.Quaternion_Conjugate<T> Quaternion_Conjugate;
+    private static LinearAlgebra.delegates.Quaternion_Add<T> Quaternion_Add;
+    private static LinearAlgebra.delegates.Quaternion_Subtract<T> Quaternion_Subtract;
+    private static LinearAlgebra.delegates.Quaternion_Multiply<T> Quaternion_Multiply;
+    private static LinearAlgebra.delegates.Quaternion_Multiply_scalar<T> Quaternion_Multiply_scalar;
+    private static LinearAlgebra.delegates.Quaternion_Multiply_Vector<T> Quaternion_Multiply_Vector;
+    private static LinearAlgebra.delegates.Quaternion_Normalize<T> Quaternion_Normalize;
+    private static LinearAlgebra.delegates.Quaternion_Invert<T> Quaternion_Invert;
+    private static LinearAlgebra.delegates.Quaternion_Lerp<T> Quaternion_Lerp;
+    private static LinearAlgebra.delegates.Quaternion_Slerp<T> Quaternion_Slerp;
+    private static LinearAlgebra.delegates.Quaternion_Rotate<T> Quaternion_Rotate;
+    private static LinearAlgebra.delegates.Quaternion_EqualsValue<T> Quaternion_EqualsValue;
+    private static LinearAlgebra.delegates.Quaternion_EqualsValue_leniency<T> Quaternion_EqualsValue_leniency;
 
     // Constants
     private static T _zero;
@@ -12720,27 +12878,27 @@ namespace Seven.Mathematics
 
     static Quaternion()
     {
-      // Constants
+      // Constants (this needs to be changed!!!)
 		  _zero = Constants.Get<T>().factory(0);
 		  _one = Constants.Get<T>().factory(1);
 		  _two = Constants.Get<T>().factory(2);
 
       LinearAlgebra<T> linearAlgebra = LinearAlgebra.Get<T>();
-      _Quaternion_Magnitude = linearAlgebra.Quaternion_Magnitude;
+      Quaternion_Magnitude = linearAlgebra.Quaternion_Magnitude;
       Quaternion_MagnitudeSquared = linearAlgebra.Quaternion_MagnitudeSquared;
-      _Quaternion_Conjugate = linearAlgebra.Quaternion_Conjugate;
-      _Quaternion_Add = linearAlgebra.Quaternion_Add;
-      _Quaternion_Subtract = linearAlgebra.Quaternion_Subtract;
-      _Quaternion_Multiply = linearAlgebra.Quaternion_Multiply;
-      _Quaternion_Multiply_scalar = linearAlgebra.Quaternion_Multiply_scalar;
-      _Quaternion_Multiply_Vector = linearAlgebra.Quaternion_Multiply_Vector;
-      _Quaternion_Normalize = linearAlgebra.Quaternion_Normalize;
-      _Quaternion_Invert = linearAlgebra.Quaternion_Invert;
-      _Quaternion_Lerp = linearAlgebra.Quaternion_Lerp;
-      _Quaternion_Slerp = linearAlgebra.Quaternion_Slerp;
-      _Quaternion_Rotate = linearAlgebra.Quaternion_Rotate;
-      _Quaternion_EqualsValue = linearAlgebra.Quaternion_EqualsValue;
-      _Quaternion_EqualsValue_leniency = linearAlgebra.Quaternion_EqualsValue_leniency;
+      Quaternion_Conjugate = linearAlgebra.Quaternion_Conjugate;
+      Quaternion_Add = linearAlgebra.Quaternion_Add;
+      Quaternion_Subtract = linearAlgebra.Quaternion_Subtract;
+      Quaternion_Multiply = linearAlgebra.Quaternion_Multiply;
+      Quaternion_Multiply_scalar = linearAlgebra.Quaternion_Multiply_scalar;
+      Quaternion_Multiply_Vector = linearAlgebra.Quaternion_Multiply_Vector;
+      Quaternion_Normalize = linearAlgebra.Quaternion_Normalize;
+      Quaternion_Invert = linearAlgebra.Quaternion_Invert;
+      Quaternion_Lerp = linearAlgebra.Quaternion_Lerp;
+      Quaternion_Slerp = linearAlgebra.Quaternion_Slerp;
+      Quaternion_Rotate = linearAlgebra.Quaternion_Rotate;
+      Quaternion_EqualsValue = linearAlgebra.Quaternion_EqualsValue;
+      Quaternion_EqualsValue_leniency = linearAlgebra.Quaternion_EqualsValue_leniency;
     }
 
     #endregion
@@ -12800,19 +12958,19 @@ namespace Seven.Mathematics
 		/// <param name="right">The second quaternion of the addition.</param>
 		/// <returns>The result of the addition.</returns>
 		public static Quaternion<T> operator +(Quaternion<T> left, Quaternion<T> right)
-    { return Quaternion<T>.Add(left, right); }
+    { return Quaternion_Add(left, right); }
 		/// <summary>Subtracts two quaternions.</summary>
 		/// <param name="left">The left quaternion of the subtraction.</param>
 		/// <param name="right">The right quaternion of the subtraction.</param>
 		/// <returns>The resulting quaternion after the subtraction.</returns>
 		public static Quaternion<T> operator -(Quaternion<T> left, Quaternion<T> right)
-    { return Quaternion<T>.Subtract(left, right); }
+    { return Quaternion_Subtract(left, right); }
 		/// <summary>Multiplies two quaternions together.</summary>
 		/// <param name="left">The first quaternion of the multiplication.</param>
 		/// <param name="right">The second quaternion of the multiplication.</param>
 		/// <returns>The resulting quaternion after the multiplication.</returns>
 		public static Quaternion<T> operator *(Quaternion<T> left, Quaternion<T> right)
-    { return Quaternion<T>.Multiply(left, right); }
+    { return Quaternion_Multiply(left, right); }
 		/// <summary>Pre-multiplies a 3-component vector by a quaternion.</summary>
 		/// <param name="left">The quaternion to pre-multiply the vector by.</param>
 		/// <param name="vector">The vector to be multiplied.</param>
@@ -12824,25 +12982,25 @@ namespace Seven.Mathematics
 		/// <param name="right">The scalar of the multiplication.</param>
 		/// <returns>The result of multiplying all the values in the quaternion by the scalar.</returns>
 		public static Quaternion<T> operator *(Quaternion<T> left, T right)
-    { return Quaternion<T>.Multiply(left, right); }
+    { return Quaternion_Multiply_scalar(left, right); }
 		/// <summary>Multiplies all the values of the quaternion by a scalar value.</summary>
 		/// <param name="left">The scalar of the multiplication.</param>
 		/// <param name="right">The quaternion of the multiplication.</param>
 		/// <returns>The result of multiplying all the values in the quaternion by the scalar.</returns>
 		public static Quaternion<T> operator *(T left, Quaternion<T> right)
-    { return Quaternion<T>.Multiply(right, left); }
+    { return Quaternion_Multiply_scalar(right, left); }
 		/// <summary>Checks for equality by value. (beware float errors)</summary>
 		/// <param name="left">The first quaternion of the equality check.</param>
 		/// <param name="right">The second quaternion of the equality check.</param>
 		/// <returns>true if the values were deemed equal, false if not.</returns>
 		public static bool operator ==(Quaternion<T> left, Quaternion<T> right)
-    { return Quaternion<T>.Equals(left, right); }
+    { return Quaternion_EqualsValue(left, right); }
 		/// <summary>Checks for anti-equality by value. (beware float errors)</summary>
 		/// <param name="left">The first quaternion of the anti-equality check.</param>
 		/// <param name="right">The second quaternion of the anti-equality check.</param>
 		/// <returns>false if the values were deemed equal, true if not.</returns>
 		public static bool operator !=(Quaternion<T> left, Quaternion<T> right)
-    { return !Quaternion<T>.Equals(left, right); }
+    { return !Quaternion_EqualsValue(left, right); }
 
     #endregion
 
@@ -12850,50 +13008,61 @@ namespace Seven.Mathematics
 
     /// <summary>Computes the length of quaternion.</summary>
 		/// <returns>The length of the given quaternion.</returns>
-		public T Magnitude() { return Quaternion<T>.Magnitude(this); }
+		public T Magnitude() 
+    { return Quaternion_Magnitude(this); }
 		/// <summary>Computes the length of a quaternion, but doesn't square root it
 		/// for optimization possibilities.</summary>
 		/// <returns>The squared length of the given quaternion.</returns>
-		public T MagnitudeSquared() { return Quaternion<T>.MagnitudeSquared(this); }
+		public T MagnitudeSquared() 
+    { return Quaternion_MagnitudeSquared(this); }
 		/// <summary>Gets the conjugate of the quaternion.</summary>
 		/// <returns>The conjugate of teh given quaternion.</returns>
-		public Quaternion<T> Conjugate() { return Quaternion<T>.Conjugate(this); }
+		public Quaternion<T> Conjugate() 
+    { return Quaternion_Conjugate(this); }
 		/// <summary>Adds two quaternions together.</summary>
 		/// <param name="right">The second quaternion of the addition.</param>
 		/// <returns>The result of the addition.</returns>
-		public Quaternion<T> Add(Quaternion<T> right) { return Quaternion<T>.Add(this, right); }
+		public Quaternion<T> Add(Quaternion<T> right) 
+    { return Quaternion_Add(this, right); }
 		/// <summary>Subtracts two quaternions.</summary>
 		/// <param name="right">The right quaternion of the subtraction.</param>
 		/// <returns>The resulting quaternion after the subtraction.</returns>
-		public Quaternion<T> Subtract(Quaternion<T> right) { return Quaternion<T>.Subtract(this, right); }
+		public Quaternion<T> Subtract(Quaternion<T> right) 
+    { return Quaternion_Subtract(this, right); }
 		/// <summary>Multiplies two quaternions together.</summary>
 		/// <param name="right">The second quaternion of the multiplication.</param>
 		/// <returns>The resulting quaternion after the multiplication.</returns>
-		public Quaternion<T> Multiply(Quaternion<T> right) { return Quaternion<T>.Multiply(this, right); }
+		public Quaternion<T> Multiply(Quaternion<T> right) 
+    { return Quaternion_Multiply(this, right); }
 		/// <summary>Multiplies all the values of the quaternion by a scalar value.</summary>
 		/// <param name="right">The scalar of the multiplication.</param>
 		/// <returns>The result of multiplying all the values in the quaternion by the scalar.</returns>
-		public Quaternion<T> Multiply(T right) { return Quaternion<T>.Multiply(this, right); }
+		public Quaternion<T> Multiply(T right) 
+    { return Quaternion_Multiply_scalar(this, right); }
 		/// <summary>Pre-multiplies a 3-component vector by a quaternion.</summary>
 		/// <param name="right">The vector to be multiplied.</param>
 		/// <returns>The resulting quaternion of the multiplication.</returns>
 		//public Quaternion<T> Multiply(Vector vector) { return Quaternion<T>.Multiply(this, vector); }
 		/// <summary>Normalizes the quaternion.</summary>
 		/// <returns>The normalization of the given quaternion.</returns>
-		public Quaternion<T> Normalize() { return Quaternion<T>.Normalize(this); }
+		public Quaternion<T> Normalize() 
+    { return Quaternion_Normalize(this); }
 		/// <summary>Inverts a quaternion.</summary>
 		/// <returns>The inverse of the given quaternion.</returns>
-		public Quaternion<T> Invert() { return Quaternion<T>.Invert(this); }
+		public Quaternion<T> Invert() 
+    { return Quaternion_Invert(this); }
 		/// <summary>Lenearly interpolates between two quaternions.</summary>
 		/// <param name="right">The ending point of the interpolation.</param>
 		/// <param name="blend">The ratio 0.0-1.0 of how far to interpolate between the left and right quaternions.</param>
 		/// <returns>The result of the interpolation.</returns>
-		public Quaternion<T> Lerp(Quaternion<T> right, T blend) { return Quaternion<T>.Lerp(this, right, blend); }
+		public Quaternion<T> Lerp(Quaternion<T> right, T blend) 
+    { return Quaternion<T>.Lerp(this, right, blend); }
 		/// <summary>Sphereically interpolates between two quaternions.</summary>
 		/// <param name="right">The ending point of the interpolation.</param>
 		/// <param name="blend">The ratio of how far to interpolate between the left and right quaternions.</param>
 		/// <returns>The result of the interpolation.</returns>
-		public Quaternion<T> Slerp(Quaternion<T> right, T blend) { return Quaternion<T>.Slerp(this, right, blend); }
+		public Quaternion<T> Slerp(Quaternion<T> right, T blend) 
+    { return Quaternion<T>.Slerp(this, right, blend); }
 		/// <summary>Rotates a vector by a quaternion.</summary>
 		/// <param name="vector">The vector to be rotated by.</param>
 		/// <returns>The result of the rotation.</returns>
@@ -12901,19 +13070,19 @@ namespace Seven.Mathematics
 		/// <summary>Does a value equality check.</summary>
 		/// <param name="right">The second quaternion  to check for equality.</param>
 		/// <returns>True if values are equal, false if not.</returns>
-		public bool EqualsValue(Quaternion<T> right) { return Quaternion<T>.EqualsValue(this, right); }
+		public bool EqualsValue(Quaternion<T> right) 
+    { return Quaternion_EqualsValue(this, right); }
 		/// <summary>Does a value equality check with leniency.</summary>
 		/// <param name="right">The second quaternion to check for equality.</param>
 		/// <param name="leniency">How much the values can vary but still be considered equal.</param>
 		/// <returns>True if values are equal, false if not.</returns>
-		public bool EqualsValue(Quaternion<T> right, T leniency) { return Quaternion<T>.EqualsValue(this, right, leniency); }
+		public bool EqualsValue(Quaternion<T> right, T leniency) 
+    { return Quaternion_EqualsValue_leniency(this, right, leniency); }
 		/// <summary>Checks if two matrices are equal by reverences.</summary>
 		/// <param name="right">The right quaternion of the equality check.</param>
 		/// <returns>True if the references are equal, false if not.</returns>
-		public bool EqualsReference(Quaternion<T> right) { return Quaternion<T>.EqualsReference(this, right); }
-		/// <summary>Converts a quaternion into a matrix.</summary>
-		/// <returns>The resulting matrix.</returns>
-    //public Matrix_Flattened ToMatrix() { return Quaternion<T>.ToMatrix(this); }
+		public bool EqualsReference(Quaternion<T> right) 
+    { return Quaternion<T>.EqualsReference(this, right); }
 
     #endregion
 
@@ -12923,7 +13092,7 @@ namespace Seven.Mathematics
 		/// <param name="quaternion">The quaternion to compute the length of.</param>
 		/// <returns>The length of the given quaternion.</returns>
 		public static T Magnitude(Quaternion<T> quaternion)
-    { return _Quaternion_Magnitude(quaternion); }
+    { return Quaternion_Magnitude(quaternion); }
 		/// <summary>Computes the length of a quaternion, but doesn't square root it
 		/// for optimization possibilities.</summary>
 		/// <param name="quaternion">The quaternion to compute the length squared of.</param>
@@ -12934,80 +13103,80 @@ namespace Seven.Mathematics
 		/// <param name="quaternion">The quaternion to conjugate.</param>
 		/// <returns>The conjugate of teh given quaternion.</returns>
 		public static Quaternion<T> Conjugate(Quaternion<T> quaternion)
-		{ return _Quaternion_Conjugate(quaternion); }
+		{ return Quaternion_Conjugate(quaternion); }
 		/// <summary>Adds two quaternions together.</summary>
 		/// <param name="left">The first quaternion of the addition.</param>
 		/// <param name="right">The second quaternion of the addition.</param>
 		/// <returns>The result of the addition.</returns>
 		public static Quaternion<T> Add(Quaternion<T> left, Quaternion<T> right)
-		{ return _Quaternion_Add(left, right); }
+		{ return Quaternion_Add(left, right); }
 		/// <summary>Subtracts two quaternions.</summary>
 		/// <param name="left">The left quaternion of the subtraction.</param>
 		/// <param name="right">The right quaternion of the subtraction.</param>
 		/// <returns>The resulting quaternion after the subtraction.</returns>
 		public static Quaternion<T> Subtract(Quaternion<T> left, Quaternion<T> right)
-		{ return _Quaternion_Subtract(left, right); }
+		{ return Quaternion_Subtract(left, right); }
 		/// <summary>Multiplies two quaternions together.</summary>
 		/// <param name="left">The first quaternion of the multiplication.</param>
 		/// <param name="right">The second quaternion of the multiplication.</param>
 		/// <returns>The resulting quaternion after the multiplication.</returns>
 		public static Quaternion<T> Multiply(Quaternion<T> left, Quaternion<T> right)
-		{ return _Quaternion_Multiply(left, right); }
+		{ return Quaternion_Multiply(left, right); }
 		/// <summary>Multiplies all the values of the quaternion by a scalar value.</summary>
 		/// <param name="left">The quaternion of the multiplication.</param>
 		/// <param name="right">The scalar of the multiplication.</param>
 		/// <returns>The result of multiplying all the values in the quaternion by the scalar.</returns>
 		public static Quaternion<T> Multiply(Quaternion<T> left, T right)
-    { return _Quaternion_Multiply_scalar(left, right); }
+    { return Quaternion_Multiply_scalar(left, right); }
     /// <summary>Pre-multiplies a 3-component vector by a quaternion.</summary>
     /// <param name="left">The quaternion to pre-multiply the vector by.</param>
     /// <param name="right">The vector to be multiplied.</param>
     /// <returns>The resulting quaternion of the multiplication.</returns>
     public static Quaternion<T> Multiply(Quaternion<T> left, Vector<T> right)
-    { return _Quaternion_Multiply_Vector(left, right); }
+    { return Quaternion_Multiply_Vector(left, right); }
 		/// <summary>Normalizes the quaternion.</summary>
 		/// <param name="quaternion">The quaternion to normalize.</param>
 		/// <returns>The normalization of the given quaternion.</returns>
 		public static Quaternion<T> Normalize(Quaternion<T> quaternion)
-    { return _Quaternion_Normalize(quaternion); }
+    { return Quaternion_Normalize(quaternion); }
 		/// <summary>Inverts a quaternion.</summary>
 		/// <param name="quaternion">The quaternion to find the inverse of.</param>
 		/// <returns>The inverse of the given quaternion.</returns>
 		public static Quaternion<T> Invert(Quaternion<T> quaternion)
-    { return _Quaternion_Invert(quaternion); }
+    { return Quaternion_Invert(quaternion); }
 		/// <summary>Lenearly interpolates between two quaternions.</summary>
 		/// <param name="left">The starting point of the interpolation.</param>
 		/// <param name="right">The ending point of the interpolation.</param>
 		/// <param name="blend">The ratio 0.0-1.0 of how far to interpolate between the left and right quaternions.</param>
 		/// <returns>The result of the interpolation.</returns>
 		public static Quaternion<T> Lerp(Quaternion<T> left, Quaternion<T> right, T blend)
-    { return _Quaternion_Lerp(left, right, blend); }
+    { return Quaternion_Lerp(left, right, blend); }
 		/// <summary>Sphereically interpolates between two quaternions.</summary>
 		/// <param name="left">The starting point of the interpolation.</param>
 		/// <param name="right">The ending point of the interpolation.</param>
 		/// <param name="blend">The ratio of how far to interpolate between the left and right quaternions.</param>
 		/// <returns>The result of the interpolation.</returns>
 		public static Quaternion<T> Slerp(Quaternion<T> left, Quaternion<T> right, T blend)
-    { return _Quaternion_Slerp(left, right, blend); }
+    { return Quaternion_Slerp(left, right, blend); }
     /// <summary>Rotates a vector by a quaternion [v' = qvq'].</summary>
     /// <param name="rotation">The quaternion to rotate the vector by.</param>
     /// <param name="vector">The vector to be rotated by.</param>
     /// <returns>The result of the rotation.</returns>
     public static Vector<T> Rotate(Quaternion<T> rotation, Vector<T> vector)
-    { return _Quaternion_Rotate(rotation, vector); }
+    { return Quaternion_Rotate(rotation, vector); }
 		/// <summary>Does a value equality check.</summary>
 		/// <param name="left">The first quaternion to check for equality.</param>
 		/// <param name="right">The second quaternion  to check for equality.</param>
 		/// <returns>True if values are equal, false if not.</returns>
 		public static bool EqualsValue(Quaternion<T> left, Quaternion<T> right)
-    { return _Quaternion_EqualsValue(left, right); }
+    { return Quaternion_EqualsValue(left, right); }
 		/// <summary>Does a value equality check with leniency.</summary>
 		/// <param name="left">The first quaternion to check for equality.</param>
 		/// <param name="right">The second quaternion to check for equality.</param>
 		/// <param name="leniency">How much the values can vary but still be considered equal.</param>
 		/// <returns>True if values are equal, false if not.</returns>
 		public static bool EqualsValue(Quaternion<T> left, Quaternion<T> right, T leniency)
-    { return _Quaternion_EqualsValue_leniency(left, right, leniency); }
+    { return Quaternion_EqualsValue_leniency(left, right, leniency); }
 		/// <summary>Checks if two matrices are equal by reverences.</summary>
 		/// <param name="left">The left quaternion of the equality check.</param>
 		/// <param name="right">The right quaternion of the equality check.</param>
@@ -13083,25 +13252,25 @@ namespace Seven.Mathematics
     private static T _one = Constants.Get<T>().factory(1);
     private static T _two = Constants.Get<T>().factory(2);
 
-    private static readonly LinearAlgebra.delegates.Matrix_Negate<T> _Matrix_Negate;
-    private static readonly LinearAlgebra.delegates.Matrix_Add<T> _Matrix_Add;
-    private static readonly LinearAlgebra.delegates.Matrix_Subtract<T> _Matrix_Subtract;
-    private static readonly LinearAlgebra.delegates.Matrix_Multiply<T> _Matrix_Multiply;
-    private static readonly LinearAlgebra.delegates.Matrix_Multiply_scalar<T> _Matrix_Multiply_scalar;
-    private static readonly LinearAlgebra.delegates.Matrix_Multiply_vector<T> _Matrix_Multiply_vector;
-    private static readonly LinearAlgebra.delegates.Matrix_Divide<T> _Matrix_Divide;
-    private static readonly LinearAlgebra.delegates.Matrix_Power<T> _Matrix_Power;
-    private static readonly LinearAlgebra.delegates.Matrix_Minor<T> _Matrix_Minor;
-    private static readonly LinearAlgebra.delegates.Matrix_ConcatenateRowWise<T> _Matrix_ConcatenateRowWise;
-    private static readonly LinearAlgebra.delegates.Matrix_Determinent<T> _Matrix_Determinent;
-    private static readonly LinearAlgebra.delegates.Matrix_Echelon<T> _Matrix_Echelon;
-    private static readonly LinearAlgebra.delegates.Matrix_ReducedEchelon<T> _Matrix_ReducedEchelon;
-    private static readonly LinearAlgebra.delegates.Matrix_Inverse<T> _Matrix_Inverse;
-    private static readonly LinearAlgebra.delegates.Matrix_Adjoint<T> _Matrix_Adjoint;
-    private static readonly LinearAlgebra.delegates.Matrix_Transpose<T> _Matrix_Transpose;
-    private static readonly LinearAlgebra.delegates.Matrix_DecomposeLU<T> _Matrix_DecomposeLU;
-    private static readonly LinearAlgebra.delegates.Matrix_EqualsByValue<T> _Matrix_EqualsByValue;
-    private static readonly LinearAlgebra.delegates.Matrix_EqualsByValue_leniency<T> _Matrix_EqualsByValue_leniency;
+    private static readonly LinearAlgebra.delegates.Matrix_Negate<T> Matrix_Negate;
+    private static readonly LinearAlgebra.delegates.Matrix_Add<T> Matrix_Add;
+    private static readonly LinearAlgebra.delegates.Matrix_Subtract<T> Matrix_Subtract;
+    private static readonly LinearAlgebra.delegates.Matrix_Multiply<T> Matrix_Multiply;
+    private static readonly LinearAlgebra.delegates.Matrix_Multiply_scalar<T> Matrix_Multiply_scalar;
+    private static readonly LinearAlgebra.delegates.Matrix_Multiply_vector<T> Matrix_Multiply_vector;
+    private static readonly LinearAlgebra.delegates.Matrix_Divide<T> Matrix_Divide;
+    private static readonly LinearAlgebra.delegates.Matrix_Power<T> Matrix_Power;
+    private static readonly LinearAlgebra.delegates.Matrix_Minor<T> Matrix_Minor;
+    private static readonly LinearAlgebra.delegates.Matrix_ConcatenateRowWise<T> Matrix_ConcatenateRowWise;
+    private static readonly LinearAlgebra.delegates.Matrix_Determinent<T> Matrix_Determinent;
+    private static readonly LinearAlgebra.delegates.Matrix_Echelon<T> Matrix_Echelon;
+    private static readonly LinearAlgebra.delegates.Matrix_ReducedEchelon<T> Matrix_ReducedEchelon;
+    private static readonly LinearAlgebra.delegates.Matrix_Inverse<T> Matrix_Inverse;
+    private static readonly LinearAlgebra.delegates.Matrix_Adjoint<T> Matrix_Adjoint;
+    private static readonly LinearAlgebra.delegates.Matrix_Transpose<T> Matrix_Transpose;
+    private static readonly LinearAlgebra.delegates.Matrix_DecomposeLU<T> Matrix_DecomposeLU;
+    private static readonly LinearAlgebra.delegates.Matrix_EqualsByValue<T> Matrix_EqualsByValue;
+    private static readonly LinearAlgebra.delegates.Matrix_EqualsByValue_leniency<T> Matrix_EqualsByValue_leniency;
 
     static Matrix()
     {
@@ -13111,25 +13280,25 @@ namespace Seven.Mathematics
       _two = Constants.Get<T>().factory(2);
 
       LinearAlgebra<T> linearAlgebra = LinearAlgebra.Get<T>();
-      _Matrix_Negate = linearAlgebra.Matrix_Negate;
-      _Matrix_Add = linearAlgebra.Matrix_Add;
-      _Matrix_Subtract = linearAlgebra.Matrix_Subtract;
-      _Matrix_Multiply = linearAlgebra.Matrix_Multiply;
-      _Matrix_Multiply_scalar = linearAlgebra.Matrix_Multiply_scalar;
-      _Matrix_Multiply_vector = linearAlgebra.Matrix_Multiply_vector;
-      _Matrix_Divide = linearAlgebra.Matrix_Divide;
-      _Matrix_Power = linearAlgebra.Matrix_Power;
-      _Matrix_Minor = linearAlgebra.Matrix_Minor;
-      _Matrix_ConcatenateRowWise = linearAlgebra.Matrix_ConcatenateRowWise;
-      _Matrix_Determinent = linearAlgebra.Matrix_Determinent;
-      _Matrix_Echelon = linearAlgebra.Matrix_Echelon;
-      _Matrix_ReducedEchelon = linearAlgebra.Matrix_ReducedEchelon;
-      _Matrix_Inverse = linearAlgebra.Matrix_Inverse;
-      _Matrix_Adjoint = linearAlgebra.Matrix_Adjoint;
-      _Matrix_Transpose = linearAlgebra.Matrix_Transpose;
-      _Matrix_DecomposeLU = linearAlgebra.Matrix_DecomposeLU;
-      _Matrix_EqualsByValue = linearAlgebra.Matrix_EqualsByValue;
-      _Matrix_EqualsByValue_leniency = linearAlgebra.Matrix_EqualsByValue_leniency;
+      Matrix_Negate = linearAlgebra.Matrix_Negate;
+      Matrix_Add = linearAlgebra.Matrix_Add;
+      Matrix_Subtract = linearAlgebra.Matrix_Subtract;
+      Matrix_Multiply = linearAlgebra.Matrix_Multiply;
+      Matrix_Multiply_scalar = linearAlgebra.Matrix_Multiply_scalar;
+      Matrix_Multiply_vector = linearAlgebra.Matrix_Multiply_vector;
+      Matrix_Divide = linearAlgebra.Matrix_Divide;
+      Matrix_Power = linearAlgebra.Matrix_Power;
+      Matrix_Minor = linearAlgebra.Matrix_Minor;
+      Matrix_ConcatenateRowWise = linearAlgebra.Matrix_ConcatenateRowWise;
+      Matrix_Determinent = linearAlgebra.Matrix_Determinent;
+      Matrix_Echelon = linearAlgebra.Matrix_Echelon;
+      Matrix_ReducedEchelon = linearAlgebra.Matrix_ReducedEchelon;
+      Matrix_Inverse = linearAlgebra.Matrix_Inverse;
+      Matrix_Adjoint = linearAlgebra.Matrix_Adjoint;
+      Matrix_Transpose = linearAlgebra.Matrix_Transpose;
+      Matrix_DecomposeLU = linearAlgebra.Matrix_DecomposeLU;
+      Matrix_EqualsByValue = linearAlgebra.Matrix_EqualsByValue;
+      Matrix_EqualsByValue_leniency = linearAlgebra.Matrix_EqualsByValue_leniency;
     }
 
     #endregion
@@ -13365,67 +13534,67 @@ namespace Seven.Mathematics
     /// <param name="matrix">The matrix to have its values negated.</param>
     /// <returns>The resulting matrix after the negations.</returns>
     public static Matrix<T> operator -(Matrix<T> matrix)
-    { return _Matrix_Negate(matrix); }
+    { return Matrix_Negate(matrix); }
     /// <summary>Does a standard matrix addition.</summary>
     /// <param name="left">The left matrix of the addition.</param>
     /// <param name="right">The right matrix of the addition.</param>
     /// <returns>The resulting matrix after teh addition.</returns>
     public static Matrix<T> operator +(Matrix<T> left, Matrix<T> right)
-    { return _Matrix_Add(left, right); }
+    { return Matrix_Add(left, right); }
     /// <summary>Does a standard matrix subtraction.</summary>
     /// <param name="left">The left matrix of the subtraction.</param>
     /// <param name="right">The right matrix of the subtraction.</param>
     /// <returns>The result of the matrix subtraction.</returns>
     public static Matrix<T> operator -(Matrix<T> left, Matrix<T> right)
-    { return _Matrix_Subtract(left, right); }
+    { return Matrix_Subtract(left, right); }
     /// <summary>Multiplies a vector by a matrix.</summary>
     /// <param name="left">The matrix of the multiplication.</param>
     /// <param name="right">The vector of the multiplication.</param>
     /// <returns>The resulting vector after the multiplication.</returns>
     public static Vector<T> operator *(Matrix<T> left, Vector<T> right)
-    { return _Matrix_Multiply_vector(left._matrix, right._vector); }
+    { return Matrix_Multiply_vector(left._matrix, right._vector); }
     /// <summary>Does a standard matrix multiplication.</summary>
     /// <param name="left">The left matrix of the multiplication.</param>
     /// <param name="right">The right matrix of the multiplication.</param>
     /// <returns>The resulting matrix after the multiplication.</returns>
     public static Matrix<T> operator *(Matrix<T> left, Matrix<T> right)
-    { return _Matrix_Multiply(left._matrix, right._matrix); }
+    { return Matrix_Multiply(left._matrix, right._matrix); }
     /// <summary>Multiplies all the values in a matrix by a scalar.</summary>
     /// <param name="left">The matrix to have its values multiplied.</param>
     /// <param name="right">The scalar to multiply the values by.</param>
     /// <returns>The resulting matrix after the multiplications.</returns>
     public static Matrix<T> operator *(Matrix<T> left, T right)
-    { return _Matrix_Multiply_scalar(left, right); }
+    { return Matrix_Multiply_scalar(left, right); }
     /// <summary>Multiplies all the values in a matrix by a scalar.</summary>
     /// <param name="left">The scalar to multiply the values by.</param>
     /// <param name="right">The matrix to have its values multiplied.</param>
     /// <returns>The resulting matrix after the multiplications.</returns>
     public static Matrix<T> operator *(T left, Matrix<T> right)
-    { return _Matrix_Multiply_scalar(right, left); }
+    { return Matrix_Multiply_scalar(right, left); }
     /// <summary>Divides all the values in a matrix by a scalar.</summary>
     /// <param name="left">The matrix to have its values divided.</param>
     /// <param name="right">The scalar to divide the values by.</param>
     /// <returns>The resulting matrix after the divisions.</returns>
     public static Matrix<T> operator /(Matrix<T> left, T right)
-    { return _Matrix_Divide(left, right); }
+    { return Matrix_Divide(left, right); }
     /// <summary>Applies a power to a matrix.</summary>
     /// <param name="left">The matrix to apply a power to.</param>
     /// <param name="right">The power to apply to the matrix.</param>
     /// <returns>The result of the power operation.</returns>
     public static Matrix<T> operator ^(Matrix<T> left, int right)
-    { return _Matrix_Power(left, right); }
+    { return Matrix_Power(left, right); }
     /// <summary>Checks for equality by value.</summary>
     /// <param name="left">The left matrix of the equality check.</param>
     /// <param name="right">The right matrix of the equality check.</param>
     /// <returns>True if the values of the matrices are equal, false if not.</returns>
     public static bool operator ==(Matrix<T> left, Matrix<T> right)
-    { return _Matrix_EqualsByValue(left, right); }
+    { return Matrix_EqualsByValue(left, right); }
     /// <summary>Checks for false-equality by value.</summary>
     /// <param name="left">The left matrix of the false-equality check.</param>
     /// <param name="right">The right matrix of the false-equality check.</param>
     /// <returns>True if the values of the matrices are not equal, false if they are.</returns>
     public static bool operator !=(Matrix<T> left, Matrix<T> right)
-    { return !_Matrix_EqualsByValue(left, right); }
+    { return !Matrix_EqualsByValue(left, right); }
     /// <summary>Automatically converts a matrix into a T[,] if necessary.</summary>
     /// <param name="matrix">The matrix to convert to a T[,].</param>
     /// <returns>The reference to the T[,] representing the matrix.</returns>
@@ -13444,63 +13613,63 @@ namespace Seven.Mathematics
     /// <summary>Negates all the values in this matrix.</summary>
     /// <returns>The resulting matrix after the negations.</returns>
     private Matrix<T> Negate()
-    { return _Matrix_Negate(this); }
+    { return Matrix_Negate(this); }
     /// <summary>Does a standard matrix addition.</summary>
     /// <param name="right">The matrix to add to this matrix.</param>
     /// <returns>The resulting matrix after the addition.</returns>
     private Matrix<T> Add(Matrix<T> right)
-    { return _Matrix_Add(this, right); }
+    { return Matrix_Add(this, right); }
     /// <summary>Does a standard matrix multiplication (triple for loop).</summary>
     /// <param name="right">The matrix to multiply this matrix by.</param>
     /// <returns>The resulting matrix after the multiplication.</returns>
     private Matrix<T> Multiply(Matrix<T> right)
-    { return _Matrix_Multiply(this, right); }
+    { return Matrix_Multiply(this, right); }
     /// <summary>Multiplies all the values in this matrix by a scalar.</summary>
     /// <param name="right">The scalar to multiply all the matrix values by.</param>
     /// <returns>The retulting matrix after the multiplications.</returns>
     private Matrix<T> Multiply(T right)
-    { return _Matrix_Multiply_scalar(this, right); }
+    { return Matrix_Multiply_scalar(this, right); }
     /// <summary>Divides all the values in this matrix by a scalar.</summary>
     /// <param name="right">The scalar to divide the matrix values by.</param>
     /// <returns>The resulting matrix after teh divisions.</returns>
     private Matrix<T> Divide(T right)
-    { return _Matrix_Divide(this, right); }
+    { return Matrix_Divide(this, right); }
     /// <summary>Gets the minor of a matrix.</summary>
     /// <param name="row">The restricted row of the minor.</param>
     /// <param name="column">The restricted column of the minor.</param>
     /// <returns>The minor from the row/column restrictions.</returns>
     public Matrix<T> Minor(int row, int column)
-    { return _Matrix_Minor(this, row, column); }
+    { return Matrix_Minor(this, row, column); }
     /// <summary>Combines two matrices from left to right 
     /// (result.Rows = left.Rows && result.Columns = left.Columns + right.Columns).</summary>
     /// <param name="right">The matrix to combine with on the right side.</param>
     /// <returns>The resulting row-wise concatination.</returns>
     public Matrix<T> ConcatenateRowWise(Matrix<T> right)
-    { return _Matrix_ConcatenateRowWise(this, right); }
+    { return Matrix_ConcatenateRowWise(this, right); }
     /// <summary>Computes the determinent if this matrix is square.</summary>
     /// <returns>The computed determinent if this matrix is square.</returns>
     public T Determinent()
-    { return _Matrix_Determinent(this); }
+    { return Matrix_Determinent(this); }
     /// <summary>Computes the echelon form of this matrix (aka REF).</summary>
     /// <returns>The computed echelon form of this matrix (aka REF).</returns>
     public Matrix<T> Echelon()
-    { return _Matrix_Echelon(this); }
+    { return Matrix_Echelon(this); }
     /// <summary>Computes the reduced echelon form of this matrix (aka RREF).</summary>
     /// <returns>The computed reduced echelon form of this matrix (aka RREF).</returns>
     public Matrix<T> ReducedEchelon()
-    { return _Matrix_ReducedEchelon(this); }
+    { return Matrix_ReducedEchelon(this); }
     /// <summary>Computes the inverse of this matrix.</summary>
     /// <returns>The inverse of this matrix.</returns>
     public Matrix<T> Inverse()
-    { return _Matrix_Inverse(this); }
+    { return Matrix_Inverse(this); }
     /// <summary>Gets the adjoint of this matrix.</summary>
     /// <returns>The adjoint of this matrix.</returns>
     public Matrix<T> Adjoint()
-    { return _Matrix_Adjoint(this); }
+    { return Matrix_Adjoint(this); }
     /// <summary>Transposes this matrix.</summary>
     /// <returns>The transpose of this matrix.</returns>
     public Matrix<T> Transpose()
-    { return _Matrix_Transpose(this); }
+    { return Matrix_Transpose(this); }
     /// <summary>Copies this matrix.</summary>
     /// <returns>The copy of this matrix.</returns>
     public Matrix<T> Clone()
@@ -13514,184 +13683,184 @@ namespace Seven.Mathematics
     /// <param name="matrix">The matrix to have its values negated.</param>
     /// <returns>The resulting matrix after the negations.</returns>
     public static T[,] Negate(T[,] matrix)
-    { return _Matrix_Negate(matrix); }
+    { return Matrix_Negate(matrix); }
     /// <summary>Negates all the values in a matrix.</summary>
     /// <param name="matrix">The matrix to have its values negated.</param>
     /// <returns>The resulting matrix after the negations.</returns>
     public static Matrix<T> Negate(Matrix<T> matrix)
-    { return _Matrix_Negate(matrix._matrix); }
+    { return Matrix_Negate(matrix._matrix); }
     /// <summary>Does standard addition of two matrices.</summary>
     /// <param name="left">The left matrix of the addition.</param>
     /// <param name="right">The right matrix of the addition.</param>
     /// <returns>The resulting matrix after the addition.</returns>
     public static T[,] Add(T[,] left, T[,] right)
-    { return _Matrix_Add(left, right); }
+    { return Matrix_Add(left, right); }
     /// <summary>Does standard addition of two matrices.</summary>
     /// <param name="left">The left matrix of the addition.</param>
     /// <param name="right">The right matrix of the addition.</param>
     /// <returns>The resulting matrix after the addition.</returns>
     public static Matrix<T> Add(Matrix<T> left, Matrix<T> right)
-    { return _Matrix_Add(left, right); }
+    { return Matrix_Add(left, right); }
     /// <summary>Subtracts a scalar from all the values in a matrix.</summary>
     /// <param name="left">The matrix to have the values subtracted from.</param>
     /// <param name="right">The scalar to subtract from all the matrix values.</param>
     /// <returns>The resulting matrix after the subtractions.</returns>
     public static T[,] Subtract(T[,] left, T[,] right)
-    { return _Matrix_Subtract(left, right); }
+    { return Matrix_Subtract(left, right); }
     /// <summary>Subtracts a scalar from all the values in a matrix.</summary>
     /// <param name="left">The matrix to have the values subtracted from.</param>
     /// <param name="right">The scalar to subtract from all the matrix values.</param>
     /// <returns>The resulting matrix after the subtractions.</returns>
     public static Matrix<T> Subtract(Matrix<T> left, Matrix<T> right)
-    { return _Matrix_Subtract(left._matrix, right._matrix); }
+    { return Matrix_Subtract(left._matrix, right._matrix); }
     /// <summary>Does a standard (triple for looped) multiplication between matrices.</summary>
     /// <param name="left">The left matrix of the multiplication.</param>
     /// <param name="right">The right matrix of the multiplication.</param>
     /// <returns>The resulting matrix of the multiplication.</returns>
     public static T[,] Multiply(T[,] left, T[,] right)
-    { return _Matrix_Multiply(left, right); }
+    { return Matrix_Multiply(left, right); }
     /// <summary>Does a standard (triple for looped) multiplication between matrices.</summary>
     /// <param name="left">The left matrix of the multiplication.</param>
     /// <param name="right">The right matrix of the multiplication.</param>
     /// <returns>The resulting matrix of the multiplication.</returns>
     public static Matrix<T> Multiply(Matrix<T> left, Matrix<T> right)
-    { return _Matrix_Multiply(left._matrix, right._matrix); }
+    { return Matrix_Multiply(left._matrix, right._matrix); }
     /// <summary>Does a standard (triple for looped) multiplication between matrices.</summary>
     /// <param name="left">The left matrix of the multiplication.</param>
     /// <param name="right">The right matrix of the multiplication.</param>
     /// <returns>The resulting matrix of the multiplication.</returns>
     public static T[] Multiply(T[,] left, T[] right)
-    { return _Matrix_Multiply_vector(left, right); }
+    { return Matrix_Multiply_vector(left, right); }
     /// <summary>Does a standard (triple for looped) multiplication between matrices.</summary>
     /// <param name="left">The left matrix of the multiplication.</param>
     /// <param name="right">The right matrix of the multiplication.</param>
     /// <returns>The resulting matrix of the multiplication.</returns>
     public static Vector<T> Multiply(Matrix<T> left, Vector<T> right)
-    { return _Matrix_Multiply_vector(left._matrix, right._vector); }
+    { return Matrix_Multiply_vector(left._matrix, right._vector); }
     /// <summary>Multiplies all the values in a matrix by a scalar.</summary>
     /// <param name="left">The matrix to have the values multiplied.</param>
     /// <param name="right">The scalar to multiply the values by.</param>
     /// <returns>The resulting matrix after the multiplications.</returns>
     public static T[,] Multiply(T[,] left, T right)
-    { return _Matrix_Multiply_scalar(left, right); }
+    { return Matrix_Multiply_scalar(left, right); }
     /// <summary>Multiplies all the values in a matrix by a scalar.</summary>
     /// <param name="left">The matrix to have the values multiplied.</param>
     /// <param name="right">The scalar to multiply the values by.</param>
     /// <returns>The resulting matrix after the multiplications.</returns>
     public static Matrix<T> Multiply(Matrix<T> left, T right)
-    { return _Matrix_Multiply_scalar(left._matrix, right); }
+    { return Matrix_Multiply_scalar(left._matrix, right); }
     /// <summary>Applies a power to a square matrix.</summary>
     /// <param name="matrix">The matrix to be powered by.</param>
     /// <param name="power">The power to apply to the matrix.</param>
     /// <returns>The resulting matrix of the power operation.</returns>
     public static T[,] Power(T[,] matrix, int power)
-    { return _Matrix_Power(matrix, power); }
+    { return Matrix_Power(matrix, power); }
     /// <summary>Applies a power to a square matrix.</summary>
     /// <param name="matrix">The matrix to be powered by.</param>
     /// <param name="power">The power to apply to the matrix.</param>
     /// <returns>The resulting matrix of the power operation.</returns>
     public static Matrix<T> Power(Matrix<T> matrix, int power)
-    { return _Matrix_Power(matrix._matrix, power); }
+    { return Matrix_Power(matrix._matrix, power); }
     /// <summary>Divides all the values in the matrix by a scalar.</summary>
     /// <param name="matrix">The matrix to divide the values of.</param>
     /// <param name="right">The scalar to divide all the matrix values by.</param>
     /// <returns>The resulting matrix with the divided values.</returns>
     public static T[,] Divide(T[,] matrix, T right)
-    { return _Matrix_Divide(matrix, right); }
+    { return Matrix_Divide(matrix, right); }
     /// <summary>Gets the minor of a matrix.</summary>
     /// <param name="matrix">The matrix to get the minor of.</param>
     /// <param name="row">The restricted row to form the minor.</param>
     /// <param name="column">The restricted column to form the minor.</param>
     /// <returns>The minor of the matrix.</returns>
     public static T[,] Minor(T[,] matrix, int row, int column)
-    { return _Matrix_Minor(matrix, row, column); }
+    { return Matrix_Minor(matrix, row, column); }
     /// <summary>Gets the minor of a matrix.</summary>
     /// <param name="matrix">The matrix to get the minor of.</param>
     /// <param name="row">The restricted row to form the minor.</param>
     /// <param name="column">The restricted column to form the minor.</param>
     /// <returns>The minor of the matrix.</returns>
     public static Matrix<T> Minor(Matrix<T> matrix, int row, int column)
-    { return _Matrix_Minor(matrix._matrix, row, column); }
+    { return Matrix_Minor(matrix._matrix, row, column); }
     /// <summary>Combines two matrices from left to right 
     /// (result.Rows = left.Rows && result.Columns = left.Columns + right.Columns).</summary>
     /// <param name="left">The left matrix of the concatenation.</param>
     /// <param name="right">The right matrix of the concatenation.</param>
     /// <returns>The resulting matrix of the concatenation.</returns>
     public static T[,] ConcatenateRowWise(T[,] left, T[,] right)
-    { return _Matrix_ConcatenateRowWise(left, right); }
+    { return Matrix_ConcatenateRowWise(left, right); }
     /// <summary>Combines two matrices from left to right 
     /// (result.Rows = left.Rows && result.Columns = left.Columns + right.Columns).</summary>
     /// <param name="left">The left matrix of the concatenation.</param>
     /// <param name="right">The right matrix of the concatenation.</param>
     /// <returns>The resulting matrix of the concatenation.</returns>
     public static Matrix<T> ConcatenateRowWise(Matrix<T> left, Matrix<T> right)
-    { return _Matrix_ConcatenateRowWise(left._matrix, right._matrix); }
+    { return Matrix_ConcatenateRowWise(left._matrix, right._matrix); }
     /// <summary>Calculates the determinent of a square matrix.</summary>
     /// <param name="matrix">The matrix to calculate the determinent of.</param>
     /// <returns>The determinent of the matrix.</returns>
     public static T Determinent(T[,] matrix)
-    { return _Matrix_Determinent(matrix); }
+    { return Matrix_Determinent(matrix); }
     /// <summary>Calculates the determinent of a square matrix.</summary>
     /// <param name="matrix">The matrix to calculate the determinent of.</param>
     /// <returns>The determinent of the matrix.</returns>
     public static T Determinent(Matrix<T> matrix)
-    { return _Matrix_Determinent(matrix._matrix); }
+    { return Matrix_Determinent(matrix._matrix); }
     /// <summary>Calculates the echelon of a matrix (aka REF).</summary>
     /// <param name="matrix">The matrix to calculate the echelon of (aka REF).</param>
     /// <returns>The echelon of the matrix (aka REF).</returns>
     public static T[,] Echelon(T[,] matrix)
-    { return _Matrix_Echelon(matrix); }
+    { return Matrix_Echelon(matrix); }
     /// <summary>Calculates the echelon of a matrix (aka REF).</summary>
     /// <param name="matrix">The matrix to calculate the echelon of (aka REF).</param>
     /// <returns>The echelon of the matrix (aka REF).</returns>
     public static Matrix<T> Echelon(Matrix<T> matrix)
-    { return _Matrix_Echelon(matrix._matrix); }
+    { return Matrix_Echelon(matrix._matrix); }
     /// <summary>Calculates the echelon of a matrix and reduces it (aka RREF).</summary>
     /// <param name="matrix">The matrix matrix to calculate the reduced echelon of (aka RREF).</param>
     /// <returns>The reduced echelon of the matrix (aka RREF).</returns>
     public static T[,] ReducedEchelon(T[,] matrix)
-    { return _Matrix_ReducedEchelon(matrix); }
+    { return Matrix_ReducedEchelon(matrix); }
     /// <summary>Calculates the echelon of a matrix and reduces it (aka RREF).</summary>
     /// <param name="matrix">The matrix matrix to calculate the reduced echelon of (aka RREF).</param>
     /// <returns>The reduced echelon of the matrix (aka RREF).</returns>
     public static Matrix<T> ReducedEchelon(Matrix<T> matrix)
-    { return _Matrix_ReducedEchelon(matrix._matrix); }
+    { return Matrix_ReducedEchelon(matrix._matrix); }
     /// <summary>Calculates the inverse of a matrix.</summary>
     /// <param name="matrix">The matrix to calculate the inverse of.</param>
     /// <returns>The inverse of the matrix.</returns>
     public static T[,] Inverse(T[,] matrix)
-    { return _Matrix_Inverse(matrix); }
+    { return Matrix_Inverse(matrix); }
     /// <summary>Calculates the inverse of a matrix.</summary>
     /// <param name="matrix">The matrix to calculate the inverse of.</param>
     /// <returns>The inverse of the matrix.</returns>
     public static Matrix<T> Inverse(Matrix<T> matrix)
-    { return _Matrix_Inverse(matrix._matrix); }
+    { return Matrix_Inverse(matrix._matrix); }
     /// <summary>Calculates the adjoint of a matrix.</summary>
     /// <param name="matrix">The matrix to calculate the adjoint of.</param>
     /// <returns>The adjoint of the matrix.</returns>
     public static T[,] Adjoint(T[,] matrix)
-    { return _Matrix_Adjoint(matrix); }
+    { return Matrix_Adjoint(matrix); }
     /// <summary>Calculates the adjoint of a matrix.</summary>
     /// <param name="matrix">The matrix to calculate the adjoint of.</param>
     /// <returns>The adjoint of the matrix.</returns>
     public static Matrix<T> Adjoint(Matrix<T> matrix)
-    { return _Matrix_Adjoint(matrix._matrix); }
+    { return Matrix_Adjoint(matrix._matrix); }
     /// <summary>Returns the transpose of a matrix.</summary>
     /// <param name="matrix">The matrix to transpose.</param>
     /// <returns>The transpose of the matrix.</returns>
     public static T[,] Transpose(T[,] matrix)
-    { return _Matrix_Transpose(matrix); }
+    { return Matrix_Transpose(matrix); }
     /// <summary>Returns the transpose of a matrix.</summary>
     /// <param name="matrix">The matrix to transpose.</param>
     /// <returns>The transpose of the matrix.</returns>
     public static Matrix<T> Transpose(Matrix<T> matrix)
-    { return _Matrix_Transpose(matrix._matrix); }
+    { return Matrix_Transpose(matrix._matrix); }
     /// <summary>Decomposes a matrix into lower-upper reptresentation.</summary>
     /// <param name="matrix">The matrix to decompose.</param>
     /// <param name="lower">The computed lower triangular matrix.</param>
     /// <param name="upper">The computed upper triangular matrix.</param>
     public static void DecomposeLU(T[,] matrix, out T[,] lower, out T[,] upper)
-    { _Matrix_DecomposeLU(matrix, out lower, out upper); }
+    { Matrix_DecomposeLU(matrix, out lower, out upper); }
     /// <summary>Decomposes a matrix into lower-upper reptresentation.</summary>
     /// <param name="matrix">The matrix to decompose.</param>
     /// <param name="lower">The computed lower triangular matrix.</param>
@@ -13699,7 +13868,7 @@ namespace Seven.Mathematics
     public static void DecomposeLU(Matrix<T> matrix, out Matrix<T> lower, out Matrix<T> upper)
     {
       T[,] lower_array, upper_array;
-      _Matrix_DecomposeLU(matrix, out lower_array, out upper_array);
+      Matrix_DecomposeLU(matrix, out lower_array, out upper_array);
       lower = new Matrix<T>(lower_array);
       upper = new Matrix<T>(upper_array);
     }
@@ -13713,14 +13882,14 @@ namespace Seven.Mathematics
     /// <param name="right">The second matrix to check for equality.</param>
     /// <returns>True if values are equal, false if not.</returns>
     public static bool EqualsByValue(T[,] left, T[,] right)
-    { return _Matrix_EqualsByValue(left, right);  }
+    { return Matrix_EqualsByValue(left, right);  }
     /// <summary>Does a value equality check with leniency.</summary>
     /// <param name="left">The first matrix to check for equality.</param>
     /// <param name="right">The second matrix to check for equality.</param>
     /// <param name="leniency">How much the values can vary but still be considered equal.</param>
     /// <returns>True if values are equal, false if not.</returns>
     public static bool EqualsByValue(T[,] left, T[,] right, T leniency)
-    { return _Matrix_EqualsByValue_leniency(left, right, leniency); }
+    { return Matrix_EqualsByValue_leniency(left, right, leniency); }
     /// <summary>Checks if two matrices are equal by reverences.</summary>
     /// <param name="left">The left matric of the equality check.</param>
     /// <param name="right">The right matrix of the equality check.</param>
@@ -13752,6 +13921,703 @@ namespace Seven.Mathematics
     public override bool Equals(object right)
     { if (!(right is Matrix<T>)) return false;
 			return Matrix<T>.EqualsByReference(this, (Matrix<T>)right); }
+    #endregion
+  }
+
+  /// <summary>A matrix wrapper for T[,] to perform matrix theory in row major order. Enjoy :)</summary>
+  /// <typeparam name="T">The numeric type of this Matrix.</typeparam>
+  public class Matrix_flat<T>
+  {
+    /// <summary>The 2-D array of this matrix.</summary>
+    public readonly T[] _matrix;
+    private int _rows;
+    private int _columns;
+
+    #region runtime function mapping
+
+    //private static T _zero = Constants.Get<T>().factory(0);
+    //private static T _one = Constants.Get<T>().factory(1);
+    //private static T _two = Constants.Get<T>().factory(2);
+
+    //private static readonly LinearAlgebra.delegates.Matrix_Negate<T> Matrix_Negate;
+    //private static readonly LinearAlgebra.delegates.Matrix_Add<T> Matrix_Add;
+    //private static readonly LinearAlgebra.delegates.Matrix_Subtract<T> Matrix_Subtract;
+    //private static readonly LinearAlgebra.delegates.Matrix_Multiply<T> Matrix_Multiply;
+    //private static readonly LinearAlgebra.delegates.Matrix_Multiply_scalar<T> Matrix_Multiply_scalar;
+    //private static readonly LinearAlgebra.delegates.Matrix_Multiply_vector<T> Matrix_Multiply_vector;
+    //private static readonly LinearAlgebra.delegates.Matrix_Divide<T> Matrix_Divide;
+    //private static readonly LinearAlgebra.delegates.Matrix_Power<T> Matrix_Power;
+    //private static readonly LinearAlgebra.delegates.Matrix_Minor<T> Matrix_Minor;
+    //private static readonly LinearAlgebra.delegates.Matrix_ConcatenateRowWise<T> Matrix_ConcatenateRowWise;
+    //private static readonly LinearAlgebra.delegates.Matrix_Determinent<T> Matrix_Determinent;
+    //private static readonly LinearAlgebra.delegates.Matrix_Echelon<T> Matrix_Echelon;
+    //private static readonly LinearAlgebra.delegates.Matrix_ReducedEchelon<T> Matrix_ReducedEchelon;
+    //private static readonly LinearAlgebra.delegates.Matrix_Inverse<T> Matrix_Inverse;
+    //private static readonly LinearAlgebra.delegates.Matrix_Adjoint<T> Matrix_Adjoint;
+    //private static readonly LinearAlgebra.delegates.Matrix_Transpose<T> Matrix_Transpose;
+    //private static readonly LinearAlgebra.delegates.Matrix_DecomposeLU<T> Matrix_DecomposeLU;
+    //private static readonly LinearAlgebra.delegates.Matrix_EqualsByValue<T> Matrix_EqualsByValue;
+    //private static readonly LinearAlgebra.delegates.Matrix_EqualsByValue_leniency<T> Matrix_EqualsByValue_leniency;
+
+    //static Matrix_flat()
+    //{
+    //  // Constants
+    //  _zero = Constants.Get<T>().factory(0);
+    //  _one = Constants.Get<T>().factory(1);
+    //  _two = Constants.Get<T>().factory(2);
+
+    //  LinearAlgebra<T> linearAlgebra = LinearAlgebra.Get<T>();
+    //  Matrix_Negate = linearAlgebra.Matrix_Negate;
+    //  Matrix_Add = linearAlgebra.Matrix_Add;
+    //  Matrix_Subtract = linearAlgebra.Matrix_Subtract;
+    //  Matrix_Multiply = linearAlgebra.Matrix_Multiply;
+    //  Matrix_Multiply_scalar = linearAlgebra.Matrix_Multiply_scalar;
+    //  Matrix_Multiply_vector = linearAlgebra.Matrix_Multiply_vector;
+    //  Matrix_Divide = linearAlgebra.Matrix_Divide;
+    //  Matrix_Power = linearAlgebra.Matrix_Power;
+    //  Matrix_Minor = linearAlgebra.Matrix_Minor;
+    //  Matrix_ConcatenateRowWise = linearAlgebra.Matrix_ConcatenateRowWise;
+    //  Matrix_Determinent = linearAlgebra.Matrix_Determinent;
+    //  Matrix_Echelon = linearAlgebra.Matrix_Echelon;
+    //  Matrix_ReducedEchelon = linearAlgebra.Matrix_ReducedEchelon;
+    //  Matrix_Inverse = linearAlgebra.Matrix_Inverse;
+    //  Matrix_Adjoint = linearAlgebra.Matrix_Adjoint;
+    //  Matrix_Transpose = linearAlgebra.Matrix_Transpose;
+    //  Matrix_DecomposeLU = linearAlgebra.Matrix_DecomposeLU;
+    //  Matrix_EqualsByValue = linearAlgebra.Matrix_EqualsByValue;
+    //  Matrix_EqualsByValue_leniency = linearAlgebra.Matrix_EqualsByValue_leniency;
+    //}
+
+    #endregion
+
+    #region properties
+
+    /// <summary>The number of rows in the matrix.</summary>
+    public int Rows { get { return this._rows; } }
+    /// <summary>The number of columns in the matrix.</summary>
+    public int Columns { get { return this._columns; } }
+    /// <summary>Determines if the matrix is square.</summary>
+    public bool IsSquare { get { return this._rows == this._columns; } }
+    /// <summary>Determines if the matrix is a vector.</summary>
+    public bool IsVector { get { return this._columns == 1; } }
+    /// <summary>Determines if the matrix is a 2 component vector.</summary>
+    public bool Is2x1 { get { return this._rows == 2 && this._columns == 1; } }
+    /// <summary>Determines if the matrix is a 3 component vector.</summary>
+    public bool Is3x1 { get { return this._rows == 3 && this._columns == 1; } }
+    /// <summary>Determines if the matrix is a 4 component vector.</summary>
+    public bool Is4x1 { get { return this._rows == 4 && this._columns == 1; } }
+    /// <summary>Determines if the matrix is a 2 square matrix.</summary>
+    public bool Is2x2 { get { return this._rows == 2 && this._columns == 2; } }
+    /// <summary>Determines if the matrix is a 3 square matrix.</summary>
+    public bool Is3x3 { get { return this._rows == 3 && this._columns == 3; } }
+    /// <summary>Determines if the matrix is a 4 square matrix.</summary>
+    public bool Is4x4 { get { return this._rows == 4 && this._columns == 4; } }
+
+    /// <summary>Standard row-major matrix indexing.</summary>
+    /// <param name="row">The row index.</param>
+    /// <param name="column">The column index.</param>
+    /// <returns>The value at the given indeces.</returns>
+    public T this[int row, int column]
+    {
+      get
+      {
+        try { return this._matrix[row * this._columns + column]; }
+        catch { throw new Error("index out of bounds."); }
+      }
+      set
+      {
+        try { this._matrix[row * this._columns + column] = value; }
+        catch { throw new Error("index out of bounds."); }
+      }
+    }
+
+    #endregion
+
+    #region constructors
+
+    /// <summary>Constructs a new zero-matrix of the given dimensions.</summary>
+    /// <param name="rows">The number of row dimensions.</param>
+    /// <param name="columns">The number of column dimensions.</param>
+    public Matrix_flat(int rows, int columns)
+    {
+      if (rows < 1)
+        throw new Error("Invalid rows on matrix contruction");
+      if (columns < 1)
+        throw new Error("Invalid columns on matrix contruction");
+
+      this._matrix = new T[rows * columns];
+    }
+
+    /// <summary>Constructs a matrix from a T[,].</summary>
+    /// <param name="matrix">The float[,] to wrap in a matrix class.</param>
+    public Matrix_flat(T[,] matrix)
+    {
+      this._rows = matrix.GetLength(0);
+      this._columns = matrix.GetLength(1);
+      this._matrix = new T[this._rows * this._columns];
+      for (int i = 0; i < this._matrix.Length; i++)
+        this._matrix[i] = matrix[i / this._rows, i % this._columns];
+    }
+
+    #endregion
+
+    #region factories
+
+    ///// <summary>Constructs a new zero-matrix of the given dimensions.</summary>
+    ///// <param name="rows">The number of rows of the matrix.</param>
+    ///// <param name="columns">The number of columns of the matrix.</param>
+    ///// <returns>The newly constructed zero-matrix.</returns>
+    //public static Matrix_flat<T> FactoryZero(int rows, int columns)
+    //{
+    //  try { return new Matrix_flat<T>(rows, columns); }
+    //  catch { throw new Error("invalid dimensions."); }
+    //}
+
+    ///// <summary>Constructs a new identity-matrix of the given dimensions.</summary>
+    ///// <param name="rows">The number of rows of the matrix.</param>
+    ///// <param name="columns">The number of columns of the matrix.</param>
+    ///// <returns>The newly constructed identity-matrix.</returns>
+    //public static Matrix_flat<T> FactoryIdentity(int rows, int columns)
+    //{
+    //  Matrix_flat<T> matrix;
+    //  try { matrix = new Matrix_flat<T>(rows, columns); }
+    //  catch { throw new Error("invalid dimensions."); }
+    //  if (rows <= columns)
+    //    for (int i = 0; i < rows; i++)
+    //      matrix[i, i] = _one;
+    //  else
+    //    for (int i = 0; i < columns; i++)
+    //      matrix[i, i] = _one;
+    //  return matrix;
+    //}
+
+    ///// <summary>Constructs a new matrix where every entry is 1.</summary>
+    ///// <param name="rows">The number of rows of the matrix.</param>
+    ///// <param name="columns">The number of columns of the matrix.</param>
+    ///// <returns>The newly constructed matrix filled with 1's.</returns>
+    //public static Matrix_flat<T> FactoryOne(int rows, int columns)
+    //{
+    //  Matrix_flat<T> matrix;
+    //  try { matrix = new Matrix_flat<T>(rows, columns); }
+    //  catch { throw new Error("invalid dimensions."); }
+    //  for (int i = 0; i < rows; i++)
+    //    for (int j = 0; j < columns; j++)
+    //      matrix[i, j] = _one;
+    //  return matrix;
+    //}
+
+    ///// <summary>Constructs a new matrix where every entry is the same uniform value.</summary>
+    ///// <param name="rows">The number of rows of the matrix.</param>
+    ///// <param name="columns">The number of columns of the matrix.</param>
+    ///// <param name="uniform">The value to assign every spot in the matrix.</param>
+    ///// <returns>The newly constructed matrix filled with the uniform value.</returns>
+    //public static Matrix_flat<T> FactoryUniform(int rows, int columns, T uniform)
+    //{
+    //  Matrix_flat<T> matrix;
+    //  try { matrix = new Matrix_flat<T>(rows, columns); }
+    //  catch { throw new Error("invalid dimensions."); }
+    //  for (int i = 0; i < rows; i++)
+    //    for (int j = 0; j < columns; j++)
+    //      matrix[i, j] = uniform;
+    //  return matrix;
+    //}
+
+    ///// <summary>Constructs a 2-component vector matrix with all values being 0.</summary>
+    ///// <returns>The constructed 2-component vector matrix.</returns>
+    //public static Matrix_flat<T> Factory2x1() { return new Matrix_flat<T>(2, 1); }
+    ///// <summary>Constructs a 3-component vector matrix with all values being 0.</summary>
+    ///// <returns>The constructed 3-component vector matrix.</returns>
+    //public static Matrix_flat<T> Factory3x1() { return new Matrix_flat<T>(3, 1); }
+    ///// <summary>Constructs a 4-component vector matrix with all values being 0.</summary>
+    ///// <returns>The constructed 4-component vector matrix.</returns>
+    //public static Matrix_flat<T> Factory4x1() { return new Matrix_flat<T>(4, 1); }
+
+    ///// <summary>Constructs a 2x2 matrix with all values being 0.</summary>
+    ///// <returns>The constructed 2x2 matrix.</returns>
+    //public static Matrix_flat<T> Factory2x2() { return new Matrix_flat<T>(2, 2); }
+    ///// <summary>Constructs a 3x3 matrix with all values being 0.</summary>
+    ///// <returns>The constructed 3x3 matrix.</returns>
+    //public static Matrix_flat<T> Factory3x3() { return new Matrix_flat<T>(3, 3); }
+    ///// <summary>Constructs a 4x4 matrix with all values being 0.</summary>
+    ///// <returns>The constructed 4x4 matrix.</returns>
+    //public static Matrix_flat<T> Factory4x4() { return new Matrix_flat<T>(4, 4); }
+
+    /////// <param name="angle">Angle of rotation in radians.</param>
+    ////public static Matrix_flat<T> Factory3x3RotationX(T angle)
+    ////{
+    ////  T cos = _cos(angle);
+    ////  T sin = _sin(angle);
+    ////  return new Matrix_flat<T>(new T[,] {
+    ////    { _one, _zero, _zero },
+    ////    { _zero, cos, sin },
+    ////    { _zero, _negate(sin), cos }});
+    ////}
+
+    /////// <param name="angle">Angle of rotation in radians.</param>
+    ////public static Matrix_flat<T> Factory3x3RotationY(T angle)
+    ////{
+    ////  T cos = _cos(angle);
+    ////  T sin = _sin(angle);
+    ////  return new Matrix_flat<T>(new T[,] {
+    ////    { cos, _zero, _negate(sin) },
+    ////    { _zero, _one, _zero },
+    ////    { sin, _zero, cos }});
+    ////}
+
+    /////// <param name="angle">Angle of rotation in radians.</param>
+    ////public static Matrix_flat<T> Factory3x3RotationZ(T angle)
+    ////{
+    ////  T cos = _cos(angle);
+    ////  T sin = _sin(angle);
+    ////  return new Matrix_flat<T>(new T[,] {
+    ////    { cos, _negate(sin), _zero },
+    ////    { sin, cos, _zero },
+    ////    { _zero, _zero, _zero }});
+    ////}
+
+    /////// <param name="angleX">Angle about the X-axis in radians.</param>
+    /////// <param name="angleY">Angle about the Y-axis in radians.</param>
+    /////// <param name="angleZ">Angle about the Z-axis in radians.</param>
+    ////public static Matrix_flat<T> Factory3x3RotationXthenYthenZ(T angleX, T angleY, T angleZ)
+    ////{
+    ////  T xCos = _cos(angleX), xSin = _sin(angleX),
+    ////    yCos = _cos(angleY), ySin = _sin(angleY),
+    ////    zCos = _cos(angleZ), zSin = _sin(angleZ);
+    ////  return new Matrix_flat<T>(new T[,] {
+    ////    { _multiply(yCos, zCos), _negate(_multiply(yCos, zSin)), ySin },
+    ////    { _add(_multiply(xCos, zSin), _multiply(_multiply(xSin, ySin), zCos)), _add(_multiply(xCos, zCos), _multiply(_multiply(xSin, ySin), zSin)), _negate(_multiply(xSin, yCos)) },
+    ////    { _subtract(_multiply(xSin, zSin), _multiply(_multiply(xCos, ySin), zCos)), _add(_multiply(xSin, zCos), _multiply(_multiply(xCos, ySin), zSin)), _multiply(xCos, yCos) }});
+    ////}
+
+    /////// <param name="angleX">Angle about the X-axis in radians.</param>
+    /////// <param name="angleY">Angle about the Y-axis in radians.</param>
+    /////// <param name="angleZ">Angle about the Z-axis in radians.</param>
+    ////public static Matrix_flat<T> Factory3x3RotationZthenYthenX(T angleX, T angleY, T angleZ)
+    ////{
+    ////  T xCos = _cos(angleX), xSin = _sin(angleX),
+    ////    yCos = _cos(angleY), ySin = _sin(angleY),
+    ////    zCos = _cos(angleZ), zSin = _sin(angleZ);
+    ////  return new Matrix_flat<T>(new T[,] {
+    ////    { _multiply(yCos, zCos), _subtract(_multiply(_multiply(zCos, xSin), ySin), _multiply(xCos, zSin)), _add(_multiply(_multiply(xCos, zCos), ySin), _multiply(xSin, zSin)) },
+    ////    { _multiply(yCos, zSin), _add(_multiply(xCos, zCos), _multiply(_multiply(xSin, ySin), zSin)), _add(_multiply(_negate(zCos), xSin), _multiply(_multiply(xCos, ySin), zSin)) },
+    ////    { _negate(ySin), _multiply(yCos, xSin), _multiply(xCos, yCos) }});
+    ////}
+
+    ///// <summary>Creates a 3x3 matrix initialized with a shearing transformation.</summary>
+    ///// <param name="shearXbyY">The shear along the X-axis in the Y-direction.</param>
+    ///// <param name="shearXbyZ">The shear along the X-axis in the Z-direction.</param>
+    ///// <param name="shearYbyX">The shear along the Y-axis in the X-direction.</param>
+    ///// <param name="shearYbyZ">The shear along the Y-axis in the Z-direction.</param>
+    ///// <param name="shearZbyX">The shear along the Z-axis in the X-direction.</param>
+    ///// <param name="shearZbyY">The shear along the Z-axis in the Y-direction.</param>
+    ///// <returns>The constructed shearing matrix.</returns>
+    //public static Matrix_flat<T> Factory3x3Shear(
+    //  T shearXbyY, T shearXbyZ, T shearYbyX,
+    //  T shearYbyZ, T shearZbyX, T shearZbyY)
+    //{
+    //  return new Matrix_flat<T>(new T[,] {
+    //    { _one, shearYbyX, shearZbyX },
+    //    { shearXbyY, _one, shearYbyZ },
+    //    { shearXbyZ, shearYbyZ, _one }});
+    //}
+
+    #endregion
+
+    #region operators
+
+    ///// <summary>Negates all the values in a matrix.</summary>
+    ///// <param name="matrix">The matrix to have its values negated.</param>
+    ///// <returns>The resulting matrix after the negations.</returns>
+    //public static Matrix_flat<T> operator -(Matrix_flat<T> matrix)
+    //{ return Matrix_Negate(matrix); }
+    ///// <summary>Does a standard matrix addition.</summary>
+    ///// <param name="left">The left matrix of the addition.</param>
+    ///// <param name="right">The right matrix of the addition.</param>
+    ///// <returns>The resulting matrix after teh addition.</returns>
+    //public static Matrix_flat<T> operator +(Matrix_flat<T> left, Matrix_flat<T> right)
+    //{ return Matrix_Add(left, right); }
+    ///// <summary>Does a standard matrix subtraction.</summary>
+    ///// <param name="left">The left matrix of the subtraction.</param>
+    ///// <param name="right">The right matrix of the subtraction.</param>
+    ///// <returns>The result of the matrix subtraction.</returns>
+    //public static Matrix_flat<T> operator -(Matrix_flat<T> left, Matrix_flat<T> right)
+    //{ return Matrix_Subtract(left, right); }
+    ///// <summary>Multiplies a vector by a matrix.</summary>
+    ///// <param name="left">The matrix of the multiplication.</param>
+    ///// <param name="right">The vector of the multiplication.</param>
+    ///// <returns>The resulting vector after the multiplication.</returns>
+    //public static Vector<T> operator *(Matrix_flat<T> left, Vector<T> right)
+    //{ return Matrix_Multiply_vector(left._matrix, right._vector); }
+    ///// <summary>Does a standard matrix multiplication.</summary>
+    ///// <param name="left">The left matrix of the multiplication.</param>
+    ///// <param name="right">The right matrix of the multiplication.</param>
+    ///// <returns>The resulting matrix after the multiplication.</returns>
+    //public static Matrix_flat<T> operator *(Matrix_flat<T> left, Matrix_flat<T> right)
+    //{ return Matrix_Multiply(left._matrix, right._matrix); }
+    ///// <summary>Multiplies all the values in a matrix by a scalar.</summary>
+    ///// <param name="left">The matrix to have its values multiplied.</param>
+    ///// <param name="right">The scalar to multiply the values by.</param>
+    ///// <returns>The resulting matrix after the multiplications.</returns>
+    //public static Matrix_flat<T> operator *(Matrix_flat<T> left, T right)
+    //{ return Matrix_Multiply_scalar(left, right); }
+    ///// <summary>Multiplies all the values in a matrix by a scalar.</summary>
+    ///// <param name="left">The scalar to multiply the values by.</param>
+    ///// <param name="right">The matrix to have its values multiplied.</param>
+    ///// <returns>The resulting matrix after the multiplications.</returns>
+    //public static Matrix_flat<T> operator *(T left, Matrix_flat<T> right)
+    //{ return Matrix_Multiply_scalar(right, left); }
+    ///// <summary>Divides all the values in a matrix by a scalar.</summary>
+    ///// <param name="left">The matrix to have its values divided.</param>
+    ///// <param name="right">The scalar to divide the values by.</param>
+    ///// <returns>The resulting matrix after the divisions.</returns>
+    //public static Matrix_flat<T> operator /(Matrix_flat<T> left, T right)
+    //{ return Matrix_Divide(left, right); }
+    ///// <summary>Applies a power to a matrix.</summary>
+    ///// <param name="left">The matrix to apply a power to.</param>
+    ///// <param name="right">The power to apply to the matrix.</param>
+    ///// <returns>The result of the power operation.</returns>
+    //public static Matrix_flat<T> operator ^(Matrix_flat<T> left, int right)
+    //{ return Matrix_Power(left, right); }
+    ///// <summary>Checks for equality by value.</summary>
+    ///// <param name="left">The left matrix of the equality check.</param>
+    ///// <param name="right">The right matrix of the equality check.</param>
+    ///// <returns>True if the values of the matrices are equal, false if not.</returns>
+    //public static bool operator ==(Matrix_flat<T> left, Matrix_flat<T> right)
+    //{ return Matrix_EqualsByValue(left, right); }
+    ///// <summary>Checks for false-equality by value.</summary>
+    ///// <param name="left">The left matrix of the false-equality check.</param>
+    ///// <param name="right">The right matrix of the false-equality check.</param>
+    ///// <returns>True if the values of the matrices are not equal, false if they are.</returns>
+    //public static bool operator !=(Matrix_flat<T> left, Matrix_flat<T> right)
+    //{ return !Matrix_EqualsByValue(left, right); }
+    ///// <summary>Automatically converts a matrix into a T[,] if necessary.</summary>
+    ///// <param name="matrix">The matrix to convert to a T[,].</param>
+    ///// <returns>The reference to the T[,] representing the matrix.</returns>
+    //public static implicit operator T[,](Matrix_flat<T> matrix)
+    //{ return matrix._matrix; }
+    ///// <summary>Automatically converts a float[,] into a matrix if necessary.</summary>
+    ///// <param name="matrix">The float[,] to convert to a matrix.</param>
+    ///// <returns>The reference to the matrix representing the T[,].</returns>
+    //public static implicit operator Matrix_flat<T>(T[,] matrix)
+    //{ return new Matrix_flat<T>(matrix); }
+
+    #endregion
+
+    #region instance
+
+    ///// <summary>Negates all the values in this matrix.</summary>
+    ///// <returns>The resulting matrix after the negations.</returns>
+    //private Matrix_flat<T> Negate()
+    //{ return Matrix_Negate(this); }
+    ///// <summary>Does a standard matrix addition.</summary>
+    ///// <param name="right">The matrix to add to this matrix.</param>
+    ///// <returns>The resulting matrix after the addition.</returns>
+    //private Matrix_flat<T> Add(Matrix_flat<T> right)
+    //{ return Matrix_Add(this, right); }
+    ///// <summary>Does a standard matrix multiplication (triple for loop).</summary>
+    ///// <param name="right">The matrix to multiply this matrix by.</param>
+    ///// <returns>The resulting matrix after the multiplication.</returns>
+    //private Matrix_flat<T> Multiply(Matrix_flat<T> right)
+    //{ return Matrix_Multiply(this, right); }
+    ///// <summary>Multiplies all the values in this matrix by a scalar.</summary>
+    ///// <param name="right">The scalar to multiply all the matrix values by.</param>
+    ///// <returns>The retulting matrix after the multiplications.</returns>
+    //private Matrix_flat<T> Multiply(T right)
+    //{ return Matrix_Multiply_scalar(this, right); }
+    ///// <summary>Divides all the values in this matrix by a scalar.</summary>
+    ///// <param name="right">The scalar to divide the matrix values by.</param>
+    ///// <returns>The resulting matrix after teh divisions.</returns>
+    //private Matrix_flat<T> Divide(T right)
+    //{ return Matrix_Divide(this, right); }
+    ///// <summary>Gets the minor of a matrix.</summary>
+    ///// <param name="row">The restricted row of the minor.</param>
+    ///// <param name="column">The restricted column of the minor.</param>
+    ///// <returns>The minor from the row/column restrictions.</returns>
+    //public Matrix_flat<T> Minor(int row, int column)
+    //{ return Matrix_Minor(this, row, column); }
+    ///// <summary>Combines two matrices from left to right 
+    ///// (result.Rows = left.Rows && result.Columns = left.Columns + right.Columns).</summary>
+    ///// <param name="right">The matrix to combine with on the right side.</param>
+    ///// <returns>The resulting row-wise concatination.</returns>
+    //public Matrix_flat<T> ConcatenateRowWise(Matrix_flat<T> right)
+    //{ return Matrix_ConcatenateRowWise(this, right); }
+    ///// <summary>Computes the determinent if this matrix is square.</summary>
+    ///// <returns>The computed determinent if this matrix is square.</returns>
+    //public T Determinent()
+    //{ return Matrix_Determinent(this); }
+    ///// <summary>Computes the echelon form of this matrix (aka REF).</summary>
+    ///// <returns>The computed echelon form of this matrix (aka REF).</returns>
+    //public Matrix_flat<T> Echelon()
+    //{ return Matrix_Echelon(this); }
+    ///// <summary>Computes the reduced echelon form of this matrix (aka RREF).</summary>
+    ///// <returns>The computed reduced echelon form of this matrix (aka RREF).</returns>
+    //public Matrix_flat<T> ReducedEchelon()
+    //{ return Matrix_ReducedEchelon(this); }
+    ///// <summary>Computes the inverse of this matrix.</summary>
+    ///// <returns>The inverse of this matrix.</returns>
+    //public Matrix_flat<T> Inverse()
+    //{ return Matrix_Inverse(this); }
+    ///// <summary>Gets the adjoint of this matrix.</summary>
+    ///// <returns>The adjoint of this matrix.</returns>
+    //public Matrix_flat<T> Adjoint()
+    //{ return Matrix_Adjoint(this); }
+    ///// <summary>Transposes this matrix.</summary>
+    ///// <returns>The transpose of this matrix.</returns>
+    //public Matrix_flat<T> Transpose()
+    //{ return Matrix_Transpose(this); }
+    ///// <summary>Copies this matrix.</summary>
+    ///// <returns>The copy of this matrix.</returns>
+    //public Matrix_flat<T> Clone()
+    //{ return Matrix_flat<T>.Clone(this); }
+
+    #endregion
+
+    #region static
+
+    ///// <summary>Negates all the values in a matrix.</summary>
+    ///// <param name="matrix">The matrix to have its values negated.</param>
+    ///// <returns>The resulting matrix after the negations.</returns>
+    //public static T[,] Negate(T[,] matrix)
+    //{ return Matrix_Negate(matrix); }
+    ///// <summary>Negates all the values in a matrix.</summary>
+    ///// <param name="matrix">The matrix to have its values negated.</param>
+    ///// <returns>The resulting matrix after the negations.</returns>
+    //public static Matrix_flat<T> Negate(Matrix_flat<T> matrix)
+    //{ return Matrix_Negate(matrix._matrix); }
+    ///// <summary>Does standard addition of two matrices.</summary>
+    ///// <param name="left">The left matrix of the addition.</param>
+    ///// <param name="right">The right matrix of the addition.</param>
+    ///// <returns>The resulting matrix after the addition.</returns>
+    //public static T[,] Add(T[,] left, T[,] right)
+    //{ return Matrix_Add(left, right); }
+    ///// <summary>Does standard addition of two matrices.</summary>
+    ///// <param name="left">The left matrix of the addition.</param>
+    ///// <param name="right">The right matrix of the addition.</param>
+    ///// <returns>The resulting matrix after the addition.</returns>
+    //public static Matrix_flat<T> Add(Matrix_flat<T> left, Matrix_flat<T> right)
+    //{ return Matrix_Add(left, right); }
+    ///// <summary>Subtracts a scalar from all the values in a matrix.</summary>
+    ///// <param name="left">The matrix to have the values subtracted from.</param>
+    ///// <param name="right">The scalar to subtract from all the matrix values.</param>
+    ///// <returns>The resulting matrix after the subtractions.</returns>
+    //public static T[,] Subtract(T[,] left, T[,] right)
+    //{ return Matrix_Subtract(left, right); }
+    ///// <summary>Subtracts a scalar from all the values in a matrix.</summary>
+    ///// <param name="left">The matrix to have the values subtracted from.</param>
+    ///// <param name="right">The scalar to subtract from all the matrix values.</param>
+    ///// <returns>The resulting matrix after the subtractions.</returns>
+    //public static Matrix_flat<T> Subtract(Matrix_flat<T> left, Matrix_flat<T> right)
+    //{ return Matrix_Subtract(left._matrix, right._matrix); }
+    ///// <summary>Does a standard (triple for looped) multiplication between matrices.</summary>
+    ///// <param name="left">The left matrix of the multiplication.</param>
+    ///// <param name="right">The right matrix of the multiplication.</param>
+    ///// <returns>The resulting matrix of the multiplication.</returns>
+    //public static T[,] Multiply(T[,] left, T[,] right)
+    //{ return Matrix_Multiply(left, right); }
+    ///// <summary>Does a standard (triple for looped) multiplication between matrices.</summary>
+    ///// <param name="left">The left matrix of the multiplication.</param>
+    ///// <param name="right">The right matrix of the multiplication.</param>
+    ///// <returns>The resulting matrix of the multiplication.</returns>
+    //public static Matrix_flat<T> Multiply(Matrix_flat<T> left, Matrix_flat<T> right)
+    //{ return Matrix_Multiply(left._matrix, right._matrix); }
+    ///// <summary>Does a standard (triple for looped) multiplication between matrices.</summary>
+    ///// <param name="left">The left matrix of the multiplication.</param>
+    ///// <param name="right">The right matrix of the multiplication.</param>
+    ///// <returns>The resulting matrix of the multiplication.</returns>
+    //public static T[] Multiply(T[,] left, T[] right)
+    //{ return Matrix_Multiply_vector(left, right); }
+    ///// <summary>Does a standard (triple for looped) multiplication between matrices.</summary>
+    ///// <param name="left">The left matrix of the multiplication.</param>
+    ///// <param name="right">The right matrix of the multiplication.</param>
+    ///// <returns>The resulting matrix of the multiplication.</returns>
+    //public static Vector<T> Multiply(Matrix_flat<T> left, Vector<T> right)
+    //{ return Matrix_Multiply_vector(left._matrix, right._vector); }
+    ///// <summary>Multiplies all the values in a matrix by a scalar.</summary>
+    ///// <param name="left">The matrix to have the values multiplied.</param>
+    ///// <param name="right">The scalar to multiply the values by.</param>
+    ///// <returns>The resulting matrix after the multiplications.</returns>
+    //public static T[,] Multiply(T[,] left, T right)
+    //{ return Matrix_Multiply_scalar(left, right); }
+    ///// <summary>Multiplies all the values in a matrix by a scalar.</summary>
+    ///// <param name="left">The matrix to have the values multiplied.</param>
+    ///// <param name="right">The scalar to multiply the values by.</param>
+    ///// <returns>The resulting matrix after the multiplications.</returns>
+    //public static Matrix_flat<T> Multiply(Matrix_flat<T> left, T right)
+    //{ return Matrix_Multiply_scalar(left._matrix, right); }
+    ///// <summary>Applies a power to a square matrix.</summary>
+    ///// <param name="matrix">The matrix to be powered by.</param>
+    ///// <param name="power">The power to apply to the matrix.</param>
+    ///// <returns>The resulting matrix of the power operation.</returns>
+    //public static T[,] Power(T[,] matrix, int power)
+    //{ return Matrix_Power(matrix, power); }
+    ///// <summary>Applies a power to a square matrix.</summary>
+    ///// <param name="matrix">The matrix to be powered by.</param>
+    ///// <param name="power">The power to apply to the matrix.</param>
+    ///// <returns>The resulting matrix of the power operation.</returns>
+    //public static Matrix_flat<T> Power(Matrix_flat<T> matrix, int power)
+    //{ return Matrix_Power(matrix._matrix, power); }
+    ///// <summary>Divides all the values in the matrix by a scalar.</summary>
+    ///// <param name="matrix">The matrix to divide the values of.</param>
+    ///// <param name="right">The scalar to divide all the matrix values by.</param>
+    ///// <returns>The resulting matrix with the divided values.</returns>
+    //public static T[,] Divide(T[,] matrix, T right)
+    //{ return Matrix_Divide(matrix, right); }
+    ///// <summary>Gets the minor of a matrix.</summary>
+    ///// <param name="matrix">The matrix to get the minor of.</param>
+    ///// <param name="row">The restricted row to form the minor.</param>
+    ///// <param name="column">The restricted column to form the minor.</param>
+    ///// <returns>The minor of the matrix.</returns>
+    //public static T[,] Minor(T[,] matrix, int row, int column)
+    //{ return Matrix_Minor(matrix, row, column); }
+    ///// <summary>Gets the minor of a matrix.</summary>
+    ///// <param name="matrix">The matrix to get the minor of.</param>
+    ///// <param name="row">The restricted row to form the minor.</param>
+    ///// <param name="column">The restricted column to form the minor.</param>
+    ///// <returns>The minor of the matrix.</returns>
+    //public static Matrix_flat<T> Minor(Matrix_flat<T> matrix, int row, int column)
+    //{ return Matrix_Minor(matrix._matrix, row, column); }
+    ///// <summary>Combines two matrices from left to right 
+    ///// (result.Rows = left.Rows && result.Columns = left.Columns + right.Columns).</summary>
+    ///// <param name="left">The left matrix of the concatenation.</param>
+    ///// <param name="right">The right matrix of the concatenation.</param>
+    ///// <returns>The resulting matrix of the concatenation.</returns>
+    //public static T[,] ConcatenateRowWise(T[,] left, T[,] right)
+    //{ return Matrix_ConcatenateRowWise(left, right); }
+    ///// <summary>Combines two matrices from left to right 
+    ///// (result.Rows = left.Rows && result.Columns = left.Columns + right.Columns).</summary>
+    ///// <param name="left">The left matrix of the concatenation.</param>
+    ///// <param name="right">The right matrix of the concatenation.</param>
+    ///// <returns>The resulting matrix of the concatenation.</returns>
+    //public static Matrix_flat<T> ConcatenateRowWise(Matrix_flat<T> left, Matrix_flat<T> right)
+    //{ return Matrix_ConcatenateRowWise(left._matrix, right._matrix); }
+    ///// <summary>Calculates the determinent of a square matrix.</summary>
+    ///// <param name="matrix">The matrix to calculate the determinent of.</param>
+    ///// <returns>The determinent of the matrix.</returns>
+    //public static T Determinent(T[,] matrix)
+    //{ return Matrix_Determinent(matrix); }
+    ///// <summary>Calculates the determinent of a square matrix.</summary>
+    ///// <param name="matrix">The matrix to calculate the determinent of.</param>
+    ///// <returns>The determinent of the matrix.</returns>
+    //public static T Determinent(Matrix_flat<T> matrix)
+    //{ return Matrix_Determinent(matrix._matrix); }
+    ///// <summary>Calculates the echelon of a matrix (aka REF).</summary>
+    ///// <param name="matrix">The matrix to calculate the echelon of (aka REF).</param>
+    ///// <returns>The echelon of the matrix (aka REF).</returns>
+    //public static T[,] Echelon(T[,] matrix)
+    //{ return Matrix_Echelon(matrix); }
+    ///// <summary>Calculates the echelon of a matrix (aka REF).</summary>
+    ///// <param name="matrix">The matrix to calculate the echelon of (aka REF).</param>
+    ///// <returns>The echelon of the matrix (aka REF).</returns>
+    //public static Matrix_flat<T> Echelon(Matrix_flat<T> matrix)
+    //{ return Matrix_Echelon(matrix._matrix); }
+    ///// <summary>Calculates the echelon of a matrix and reduces it (aka RREF).</summary>
+    ///// <param name="matrix">The matrix matrix to calculate the reduced echelon of (aka RREF).</param>
+    ///// <returns>The reduced echelon of the matrix (aka RREF).</returns>
+    //public static T[,] ReducedEchelon(T[,] matrix)
+    //{ return Matrix_ReducedEchelon(matrix); }
+    ///// <summary>Calculates the echelon of a matrix and reduces it (aka RREF).</summary>
+    ///// <param name="matrix">The matrix matrix to calculate the reduced echelon of (aka RREF).</param>
+    ///// <returns>The reduced echelon of the matrix (aka RREF).</returns>
+    //public static Matrix_flat<T> ReducedEchelon(Matrix_flat<T> matrix)
+    //{ return Matrix_ReducedEchelon(matrix._matrix); }
+    ///// <summary>Calculates the inverse of a matrix.</summary>
+    ///// <param name="matrix">The matrix to calculate the inverse of.</param>
+    ///// <returns>The inverse of the matrix.</returns>
+    //public static T[,] Inverse(T[,] matrix)
+    //{ return Matrix_Inverse(matrix); }
+    ///// <summary>Calculates the inverse of a matrix.</summary>
+    ///// <param name="matrix">The matrix to calculate the inverse of.</param>
+    ///// <returns>The inverse of the matrix.</returns>
+    //public static Matrix_flat<T> Inverse(Matrix_flat<T> matrix)
+    //{ return Matrix_Inverse(matrix._matrix); }
+    ///// <summary>Calculates the adjoint of a matrix.</summary>
+    ///// <param name="matrix">The matrix to calculate the adjoint of.</param>
+    ///// <returns>The adjoint of the matrix.</returns>
+    //public static T[,] Adjoint(T[,] matrix)
+    //{ return Matrix_Adjoint(matrix); }
+    ///// <summary>Calculates the adjoint of a matrix.</summary>
+    ///// <param name="matrix">The matrix to calculate the adjoint of.</param>
+    ///// <returns>The adjoint of the matrix.</returns>
+    //public static Matrix_flat<T> Adjoint(Matrix_flat<T> matrix)
+    //{ return Matrix_Adjoint(matrix._matrix); }
+    ///// <summary>Returns the transpose of a matrix.</summary>
+    ///// <param name="matrix">The matrix to transpose.</param>
+    ///// <returns>The transpose of the matrix.</returns>
+    //public static T[,] Transpose(T[,] matrix)
+    //{ return Matrix_Transpose(matrix); }
+    ///// <summary>Returns the transpose of a matrix.</summary>
+    ///// <param name="matrix">The matrix to transpose.</param>
+    ///// <returns>The transpose of the matrix.</returns>
+    //public static Matrix_flat<T> Transpose(Matrix_flat<T> matrix)
+    //{ return Matrix_Transpose(matrix._matrix); }
+    ///// <summary>Decomposes a matrix into lower-upper reptresentation.</summary>
+    ///// <param name="matrix">The matrix to decompose.</param>
+    ///// <param name="lower">The computed lower triangular matrix.</param>
+    ///// <param name="upper">The computed upper triangular matrix.</param>
+    //public static void DecomposeLU(T[,] matrix, out T[,] lower, out T[,] upper)
+    //{ Matrix_DecomposeLU(matrix, out lower, out upper); }
+    ///// <summary>Decomposes a matrix into lower-upper reptresentation.</summary>
+    ///// <param name="matrix">The matrix to decompose.</param>
+    ///// <param name="lower">The computed lower triangular matrix.</param>
+    ///// <param name="upper">The computed upper triangular matrix.</param>
+    //public static void DecomposeLU(Matrix_flat<T> matrix, out Matrix_flat<T> lower, out Matrix_flat<T> upper)
+    //{
+    //  T[,] lower_array, upper_array;
+    //  Matrix_DecomposeLU(matrix, out lower_array, out upper_array);
+    //  lower = new Matrix_flat<T>(lower_array);
+    //  upper = new Matrix_flat<T>(upper_array);
+    //}
+    ///// <summary>Creates a copy of a matrix.</summary>
+    ///// <param name="matrix">The matrix to copy.</param>
+    ///// <returns>A copy of the matrix.</returns>
+    //public static Matrix_flat<T> Clone(T[,] matrix)
+    //{ return new Matrix_flat<T>(matrix.Clone() as T[,]); }
+    ///// <summary>Does a value equality check.</summary>
+    ///// <param name="left">The first matrix to check for equality.</param>
+    ///// <param name="right">The second matrix to check for equality.</param>
+    ///// <returns>True if values are equal, false if not.</returns>
+    //public static bool EqualsByValue(T[,] left, T[,] right)
+    //{ return Matrix_EqualsByValue(left, right); }
+    ///// <summary>Does a value equality check with leniency.</summary>
+    ///// <param name="left">The first matrix to check for equality.</param>
+    ///// <param name="right">The second matrix to check for equality.</param>
+    ///// <param name="leniency">How much the values can vary but still be considered equal.</param>
+    ///// <returns>True if values are equal, false if not.</returns>
+    //public static bool EqualsByValue(T[,] left, T[,] right, T leniency)
+    //{ return Matrix_EqualsByValue_leniency(left, right, leniency); }
+    ///// <summary>Checks if two matrices are equal by reverences.</summary>
+    ///// <param name="left">The left matric of the equality check.</param>
+    ///// <param name="right">The right matrix of the equality check.</param>
+    ///// <returns>True if the references are equal, false if not.</returns>
+    //public static bool EqualsByReference(T[,] left, T[,] right)
+    //{ return object.ReferenceEquals(left, right); }
+    ///// <summary>Checks if two matrices are equal by reverences.</summary>
+    ///// <param name="left">The left matric of the equality check.</param>
+    ///// <param name="right">The right matrix of the equality check.</param>
+    ///// <returns>True if the references are equal, false if not.</returns>
+    //public static bool EqualsByReference(Matrix_flat<T> left, Matrix_flat<T> right)
+    //{ return Matrix_flat<T>.ReferenceEquals(left._matrix, right._matrix); }
+
+    #endregion
+
+    #region overrides
+
+    ///// <summary>Prints out a string representation of this matrix.</summary>
+    ///// <returns>A string representing this matrix.</returns>
+    //public override string ToString()
+    //{ return base.ToString(); }
+    ///// <summary>Computes a hash code from the values of this matrix.</summary>
+    ///// <returns>A hash code for the matrix.</returns>
+    //public override int GetHashCode()
+    //{ return this._matrix.GetHashCode(); }
+    ///// <summary>Does an equality check by reference.</summary>
+    ///// <param name="right">The object to compare to.</param>
+    ///// <returns>True if the references are equal, false if not.</returns>
+    //public override bool Equals(object right)
+    //{
+    //  if (!(right is Matrix_flat<T>)) return false;
+    //  return Matrix_flat<T>.EqualsByReference(this, (Matrix_flat<T>)right);
+    //}
     #endregion
   }
 }

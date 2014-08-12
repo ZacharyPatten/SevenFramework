@@ -7,6 +7,7 @@ using Seven.Mathematics;
 using Seven.Mathematics.Symbolics;
 using Seven.Mathematics.Syntax;
 using Seven.Mathematics.Symbolics.Tools;
+using System.Reflection;
 
 namespace Tutorial_Mathematics
 {
@@ -145,7 +146,6 @@ namespace Tutorial_Mathematics
 
       // Vector Dot Product
       Console.WriteLine("    V dot V: " + _.dot(V, V));
-
       Console.WriteLine();
 
       // Vector Cross Product
@@ -214,6 +214,8 @@ namespace Tutorial_Mathematics
 
       // Quaternion-Vector Rotation
       Console.WriteLine("    Q * V * Q':");
+      // Note: the vector should be normalized on the 4th component 
+      // for a proper rotation. (I did not do that)
       ConsoleWrite(V.RotateBy(Q));
 
       #endregion

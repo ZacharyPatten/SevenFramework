@@ -15,7 +15,7 @@
 ##### Navigation
 
 >- [Structures](https://github.com/53V3N1X/SevenFramework/wiki/Structures)<br />
->- Generalized Mathematics<br />
+>- [Mathematics](https://github.com/53V3N1X/SevenFramework/wiki/Mathematics)<br />
 >- Parallel Processing Utilities<br />
 
 >The structure of this wiki should follow closely to<br />

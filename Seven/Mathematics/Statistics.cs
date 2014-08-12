@@ -13,13 +13,10 @@ namespace Seven.Mathematics
 
     /// <summary>Finds the number of occurences for each item and sorts them into a heap.</summary>
     Statistics.delegates.Mode<T> Mode { get; }
-
     /// <summary>Computes the mean (or average) between multiple values.</summary>
     Statistics.delegates.Mean<T> Mean { get; }
-
     /// <summary>Computes the mean (or average) between two values.</summary>
     Statistics.delegates.Mean_2<T> Mean_2 { get; }
-
     /// <summary>Computes the median of a set of values.</summary>
     Statistics.delegates.Median<T> Median { get; }
 
@@ -353,6 +350,11 @@ namespace Seven.Mathematics
 
     #region generic
 
+    /// <summary>Computes the mean, or average, between two values.</summary>
+    /// <typeparam name="T">The generic type of this operation.</typeparam>
+    /// <param name="a">An operand of the average operation.</param>
+    /// <param name="b">An operand of the average operation.</param>
+    /// <returns>The mean of the provides values.</returns>
     public static T Mean<T>(T a, T b)
     {
       return Statistics.Get<T>().Mean_2(a, b);
@@ -377,6 +379,10 @@ namespace Seven.Mathematics
 
     #region Fraction128
 
+    /// <summary>Computes the mean, or average, between two values.</summary>
+    /// <param name="a">An operand of the average operation.</param>
+    /// <param name="b">An operand of the average operation.</param>
+    /// <returns>The mean of the provides values.</returns>
     public static Fraction128 Mean(Fraction128 a, Fraction128 b)
     {
       return (a + b) / 2;
@@ -430,6 +436,10 @@ namespace Seven.Mathematics
 
     #region Fraction64
 
+    /// <summary>Computes the mean, or average, between two values.</summary>
+    /// <param name="a">An operand of the average operation.</param>
+    /// <param name="b">An operand of the average operation.</param>
+    /// <returns>The mean of the provides values.</returns>
     public static Fraction64 Mean(Fraction64 a, Fraction64 b)
     {
       return (a + b) / 2;
@@ -483,6 +493,10 @@ namespace Seven.Mathematics
 
     #region string
 
+    /// <summary>Computes the mean, or average, between two values.</summary>
+    /// <param name="a">An operand of the average operation.</param>
+    /// <param name="b">An operand of the average operation.</param>
+    /// <returns>The mean of the provides values.</returns>
     public static string Mean(string a, string b)
     {
       char[] mean = new char[Logic.Max(a.Length, b.Length)];
@@ -562,6 +576,10 @@ namespace Seven.Mathematics
 
     #region decimal
 
+    /// <summary>Computes the mean, or average, between two values.</summary>
+    /// <param name="a">An operand of the average operation.</param>
+    /// <param name="b">An operand of the average operation.</param>
+    /// <returns>The mean of the provides values.</returns>
     public static decimal Mean(decimal a, decimal b)
     {
       return (a + b) * 0.5M;
@@ -615,6 +633,10 @@ namespace Seven.Mathematics
 
     #region float
 
+    /// <summary>Computes the mean, or average, between two values.</summary>
+    /// <param name="a">An operand of the average operation.</param>
+    /// <param name="b">An operand of the average operation.</param>
+    /// <returns>The mean of the provides values.</returns>
     public static float Mean(float a, float b)
     {
       return (a + b) * 0.5f;
@@ -668,6 +690,10 @@ namespace Seven.Mathematics
 
     #region double
 
+    /// <summary>Computes the mean, or average, between two values.</summary>
+    /// <param name="a">An operand of the average operation.</param>
+    /// <param name="b">An operand of the average operation.</param>
+    /// <returns>The mean of the provides values.</returns>
     public static double Mean(double a, double b)
     {
       return (a + b) * 0.5d;
@@ -718,6 +744,10 @@ namespace Seven.Mathematics
 
     #region long
 
+    /// <summary>Computes the mean, or average, between two values.</summary>
+    /// <param name="a">An operand of the average operation.</param>
+    /// <param name="b">An operand of the average operation.</param>
+    /// <returns>The mean of the provides values.</returns>
     public static long Mean(long a, long b)
     {
       return (a + b) / 2;
@@ -771,6 +801,10 @@ namespace Seven.Mathematics
 
     #region int
 
+    /// <summary>Computes the mean, or average, between two values.</summary>
+    /// <param name="a">An operand of the average operation.</param>
+    /// <param name="b">An operand of the average operation.</param>
+    /// <returns>The mean of the provides values.</returns>
     public static int Mean(int a, int b)
     {
       return (a + b) / 2;
@@ -824,6 +858,10 @@ namespace Seven.Mathematics
 
     #region short
 
+    /// <summary>Computes the mean, or average, between two values.</summary>
+    /// <param name="a">An operand of the average operation.</param>
+    /// <param name="b">An operand of the average operation.</param>
+    /// <returns>The mean of the provides values.</returns>
     public static short Mean(short a, short b)
     {
       return (short)((a + b) / 2);
@@ -877,6 +915,10 @@ namespace Seven.Mathematics
 
     #region byte
 
+    /// <summary>Computes the mean, or average, between two values.</summary>
+    /// <param name="a">An operand of the average operation.</param>
+    /// <param name="b">An operand of the average operation.</param>
+    /// <returns>The mean of the provides values.</returns>
     public static byte Mean(byte a, byte b)
     {
       return (byte)((a + b) / 2);
