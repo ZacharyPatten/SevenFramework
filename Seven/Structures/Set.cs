@@ -45,7 +45,7 @@ namespace Seven.Structures
     private const double _maxLoadFactor = 1.0d;
 
     private Equate<T> _equate;
-    private Map.Hash<T> _hash;
+    private Hash<T> _hash;
     private Node[] _table;
     private int _count;
     private int _sizeIndex;
@@ -55,7 +55,7 @@ namespace Seven.Structures
     #region property
 
     /// <summary>The function for calculating hash codes for this table.</summary>
-    public Map.Hash<T> Hash { get { return _hash; } }
+    public Hash<T> Hash { get { return _hash; } }
 
     /// <summary>The function for equating keys in this table.</summary>
     public Equate<T> Equate { get { return _equate; } }
@@ -79,7 +79,7 @@ namespace Seven.Structures
 
     /// <summary>Constructs a new hash table instance.</summary>
     /// <remarks>Runtime: O(1).</remarks>
-    public Set_Linked(Equate<T> equate, Map.Hash<T> hash)
+    public Set_Linked(Equate<T> equate, Hash<T> hash)
     {
       this._equate = equate;
       this._hash = hash;

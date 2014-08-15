@@ -58,7 +58,7 @@ namespace Seven.Mathematics
 
     #endregion
 
-    #region library
+    #region libraries
 
     public static Seven.Structures.Map<object, System.Type> _statistics =
       new Seven.Structures.Map_Linked<object, System.Type>(
@@ -73,6 +73,13 @@ namespace Seven.Mathematics
           { typeof(float), Statistics.Statistics_float.Get },
           { typeof(long), Statistics.Statistics_long.Get },
 					{ typeof(int), Statistics.Statistics_int.Get },
+          { typeof(Vector<Fraction128>), Statistics.Statistics_Vector_Fraction128.Get },
+          { typeof(Vector<Fraction64>), Statistics.Statistics_Vector_Fraction64.Get },
+          { typeof(Vector<decimal>), Statistics.Statistics_Vector_decimal.Get },
+          { typeof(Vector<double>), Statistics.Statistics_Vector_double.Get },
+          {typeof(Vector<float>), Statistics.Statistics_Vector_float.Get },
+          {typeof(Vector<long>), Statistics.Statistics_Vector_long.Get },
+          {typeof(Vector<int>), Statistics.Statistics_Vector_int.Get },
 				};
 
     /// <summary>Checks to see if a statistic implementaton exists for the given type.</summary>
@@ -103,6 +110,202 @@ namespace Seven.Mathematics
     }
 
     #region provided
+
+    private class Statistics_Vector_Fraction128 : Statistics<Vector<Fraction128>>
+    {
+      private Statistics_Vector_Fraction128() { _instance = this; }
+      private static Statistics_Vector_Fraction128 _instance;
+      private static Statistics_Vector_Fraction128 Instance
+      {
+        get
+        {
+          if (_instance == null)
+            return _instance = new Statistics_Vector_Fraction128();
+          else
+            return _instance;
+        }
+      }
+
+      /// <summary>Gets Statistics for "decimal" types.</summary>
+      public static Statistics_Vector_Fraction128 Get { get { return Instance; } }
+
+      /// <summary>Finds the number of occurences for each item and sorts them Fraction128o a heap.</summary>
+      public Statistics.delegates.Mode<Vector<Fraction128>> Mode { get { return Statistics.Mode; } }
+      /// <summary>Computes the mean (or average) between multiple values.</summary>
+      public Statistics.delegates.Mean<Vector<Fraction128>> Mean { get { return Statistics.Mean; } }
+      /// <summary>Computes the mean (or average) between two values.</summary>
+      public Statistics.delegates.Mean_2<Vector<Fraction128>> Mean_2 { get { return Statistics.Mean; } }
+      /// <summary>Computes the median of a set of values.</summary>
+      public Statistics.delegates.Median<Vector<Fraction128>> Median { get { return Statistics.Median; } }
+    }
+
+    private class Statistics_Vector_Fraction64 : Statistics<Vector<Fraction64>>
+    {
+      private Statistics_Vector_Fraction64() { _instance = this; }
+      private static Statistics_Vector_Fraction64 _instance;
+      private static Statistics_Vector_Fraction64 Instance
+      {
+        get
+        {
+          if (_instance == null)
+            return _instance = new Statistics_Vector_Fraction64();
+          else
+            return _instance;
+        }
+      }
+
+      /// <summary>Gets Statistics for "decimal" types.</summary>
+      public static Statistics_Vector_Fraction64 Get { get { return Instance; } }
+
+      /// <summary>Finds the number of occurences for each item and sorts them Fraction64o a heap.</summary>
+      public Statistics.delegates.Mode<Vector<Fraction64>> Mode { get { return Statistics.Mode; } }
+      /// <summary>Computes the mean (or average) between multiple values.</summary>
+      public Statistics.delegates.Mean<Vector<Fraction64>> Mean { get { return Statistics.Mean; } }
+      /// <summary>Computes the mean (or average) between two values.</summary>
+      public Statistics.delegates.Mean_2<Vector<Fraction64>> Mean_2 { get { return Statistics.Mean; } }
+      /// <summary>Computes the median of a set of values.</summary>
+      public Statistics.delegates.Median<Vector<Fraction64>> Median { get { return Statistics.Median; } }
+    }
+
+    private class Statistics_Vector_decimal : Statistics<Vector<decimal>>
+    {
+      private Statistics_Vector_decimal() { _instance = this; }
+      private static Statistics_Vector_decimal _instance;
+      private static Statistics_Vector_decimal Instance
+      {
+        get
+        {
+          if (_instance == null)
+            return _instance = new Statistics_Vector_decimal();
+          else
+            return _instance;
+        }
+      }
+
+      /// <summary>Gets Statistics for "decimal" types.</summary>
+      public static Statistics_Vector_decimal Get { get { return Instance; } }
+
+      /// <summary>Finds the number of occurences for each item and sorts them decimalo a heap.</summary>
+      public Statistics.delegates.Mode<Vector<decimal>> Mode { get { return Statistics.Mode; } }
+      /// <summary>Computes the mean (or average) between multiple values.</summary>
+      public Statistics.delegates.Mean<Vector<decimal>> Mean { get { return Statistics.Mean; } }
+      /// <summary>Computes the mean (or average) between two values.</summary>
+      public Statistics.delegates.Mean_2<Vector<decimal>> Mean_2 { get { return Statistics.Mean; } }
+      /// <summary>Computes the median of a set of values.</summary>
+      public Statistics.delegates.Median<Vector<decimal>> Median { get { return Statistics.Median; } }
+    }
+
+    private class Statistics_Vector_double : Statistics<Vector<double>>
+    {
+      private Statistics_Vector_double() { _instance = this; }
+      private static Statistics_Vector_double _instance;
+      private static Statistics_Vector_double Instance
+      {
+        get
+        {
+          if (_instance == null)
+            return _instance = new Statistics_Vector_double();
+          else
+            return _instance;
+        }
+      }
+
+      /// <summary>Gets Statistics for "decimal" types.</summary>
+      public static Statistics_Vector_double Get { get { return Instance; } }
+
+      /// <summary>Finds the number of occurences for each item and sorts them doubleo a heap.</summary>
+      public Statistics.delegates.Mode<Vector<double>> Mode { get { return Statistics.Mode; } }
+      /// <summary>Computes the mean (or average) between multiple values.</summary>
+      public Statistics.delegates.Mean<Vector<double>> Mean { get { return Statistics.Mean; } }
+      /// <summary>Computes the mean (or average) between two values.</summary>
+      public Statistics.delegates.Mean_2<Vector<double>> Mean_2 { get { return Statistics.Mean; } }
+      /// <summary>Computes the median of a set of values.</summary>
+      public Statistics.delegates.Median<Vector<double>> Median { get { return Statistics.Median; } }
+    }
+
+    private class Statistics_Vector_float : Statistics<Vector<float>>
+    {
+      private Statistics_Vector_float() { _instance = this; }
+      private static Statistics_Vector_float _instance;
+      private static Statistics_Vector_float Instance
+      {
+        get
+        {
+          if (_instance == null)
+            return _instance = new Statistics_Vector_float();
+          else
+            return _instance;
+        }
+      }
+
+      /// <summary>Gets Statistics for "decimal" types.</summary>
+      public static Statistics_Vector_float Get { get { return Instance; } }
+
+      /// <summary>Finds the number of occurences for each item and sorts them floato a heap.</summary>
+      public Statistics.delegates.Mode<Vector<float>> Mode { get { return Statistics.Mode; } }
+      /// <summary>Computes the mean (or average) between multiple values.</summary>
+      public Statistics.delegates.Mean<Vector<float>> Mean { get { return Statistics.Mean; } }
+      /// <summary>Computes the mean (or average) between two values.</summary>
+      public Statistics.delegates.Mean_2<Vector<float>> Mean_2 { get { return Statistics.Mean; } }
+      /// <summary>Computes the median of a set of values.</summary>
+      public Statistics.delegates.Median<Vector<float>> Median { get { return Statistics.Median; } }
+    }
+
+    private class Statistics_Vector_long : Statistics<Vector<long>>
+    {
+      private Statistics_Vector_long() { _instance = this; }
+      private static Statistics_Vector_long _instance;
+      private static Statistics_Vector_long Instance
+      {
+        get
+        {
+          if (_instance == null)
+            return _instance = new Statistics_Vector_long();
+          else
+            return _instance;
+        }
+      }
+
+      /// <summary>Gets Statistics for "decimal" types.</summary>
+      public static Statistics_Vector_long Get { get { return Instance; } }
+
+      /// <summary>Finds the number of occurences for each item and sorts them longo a heap.</summary>
+      public Statistics.delegates.Mode<Vector<long>> Mode { get { return Statistics.Mode; } }
+      /// <summary>Computes the mean (or average) between multiple values.</summary>
+      public Statistics.delegates.Mean<Vector<long>> Mean { get { return Statistics.Mean; } }
+      /// <summary>Computes the mean (or average) between two values.</summary>
+      public Statistics.delegates.Mean_2<Vector<long>> Mean_2 { get { return Statistics.Mean; } }
+      /// <summary>Computes the median of a set of values.</summary>
+      public Statistics.delegates.Median<Vector<long>> Median { get { return Statistics.Median; } }
+    }
+
+    private class Statistics_Vector_int : Statistics<Vector<int>>
+    {
+      private Statistics_Vector_int() { _instance = this; }
+      private static Statistics_Vector_int _instance;
+      private static Statistics_Vector_int Instance
+      {
+        get
+        {
+          if (_instance == null)
+            return _instance = new Statistics_Vector_int();
+          else
+            return _instance;
+        }
+      }
+
+      /// <summary>Gets Statistics for "decimal" types.</summary>
+      public static Statistics_Vector_int Get { get { return Instance; } }
+
+      /// <summary>Finds the number of occurences for each item and sorts them into a heap.</summary>
+      public Statistics.delegates.Mode<Vector<int>> Mode { get { return Statistics.Mode; } }
+      /// <summary>Computes the mean (or average) between multiple values.</summary>
+      public Statistics.delegates.Mean<Vector<int>> Mean { get { return Statistics.Mean; } }
+      /// <summary>Computes the mean (or average) between two values.</summary>
+      public Statistics.delegates.Mean_2<Vector<int>> Mean_2 { get { return Statistics.Mean; } }
+      /// <summary>Computes the median of a set of values.</summary>
+      public Statistics.delegates.Median<Vector<int>> Median { get { return Statistics.Median; } }
+    }
 
     private class Statistics_string : Statistics<string>
     {
@@ -373,6 +576,1378 @@ namespace Seven.Mathematics
     public static T Median<T>(params T[] values)
     {
       return Statistics.Get<T>().Median(values);
+    }
+
+    #endregion
+
+    #region Vector<Fraction128>
+
+    /// <summary>Computes the mean, or average, between two values.</summary>
+    /// <param name="a">An operand of the average operation.</param>
+    /// <param name="b">An operand of the average operation.</param>
+    /// <returns>The mean of the provides values.</returns>
+    public static Vector<Fraction128> Mean(Vector<Fraction128> a, Vector<Fraction128> b)
+    {
+#if no_error_checking
+      // nothing
+#else
+      if (object.ReferenceEquals(a, null))
+        throw new Error("null reference: a");
+      if (object.ReferenceEquals(b, null))
+        throw new Error("null reference: b");
+      if (a.Dimensions != b.Dimensions)
+        throw new Error("invalid vectors during mean (a.Dimensions != b.Dimensions)");
+#endif
+
+      return (a + b) / (Fraction128)2;
+    }
+
+    /// <summary>Computes the mean, or average, between multiple values.</summary>
+    /// <param name="traversal">A function for traversing a set.</param>
+    /// <returns>The mean of the provided values.</returns>
+    public static Vector<Fraction128> Mean(Traversal<Vector<Fraction128>> traversal)
+    {
+#if no_error_checking
+      // nothing
+#else
+      if (object.ReferenceEquals(traversal, null))
+        throw new Error("null reference: values");
+#endif
+
+      int count = 0;
+      Vector<Fraction128> sum = null;
+      traversal(
+        (Vector<Fraction128> current) =>
+        {
+          if (count == 0)
+            sum = new Vector<Fraction128>(current.Dimensions);
+
+#if no_error_checking
+          // nothing
+#else
+          if (current.Dimensions != sum.Dimensions)
+            throw new Error("invalid vector during mean: dimension mismatch");
+#endif
+
+          sum += current;
+          count++;
+        });
+
+#if no_error_checking
+          // nothing
+#else
+      if (count == 0)
+        throw new Error("invalid values during mean: (values.Count == 0)");
+#endif
+
+      return sum / (Fraction128)count;
+    }
+
+    /// <summary>Computes the mean, or average, between multiple values.</summary>
+    /// <param name="values">The values to compute the mean of/</param>
+    /// <returns>The mean of the provided values.</returns>
+    public static Vector<Fraction128> Mean(params Vector<Fraction128>[] values)
+    {
+#if no_error_checking
+      // nothing
+#else
+      if (object.ReferenceEquals(values, null))
+        throw new Error("null reference: values");
+      if (values.Length < 1)
+        throw new Error("invalid values during mean: (values.Length < 1)");
+#endif
+
+      Vector<Fraction128> sum =
+        new Vector<Fraction128>(values[0].Dimensions);
+      foreach (Vector<Fraction128> value in values)
+        sum += value;
+      return sum / (Fraction128)values.Length;
+    }
+
+    /// <summary>Computes the mode (most ocurring) value in a set.</summary>
+    /// <param name="traversal">A function for traversing a set.</param>
+    /// <returns>A heap sorted along the number of occurences for each item.</returns>
+    public static Heap<Link<Vector<Fraction128>, int>> Mode(Traversal<Vector<Fraction128>> traversal)
+    {
+      throw new System.NotImplementedException();
+
+      Heap<Link<Vector<Fraction128>, int>> heap =
+        new Heap_Array<Link<Vector<Fraction128>, int>>(
+          (Link<Vector<Fraction128>, int> left, Link<Vector<Fraction128>, int> right) =>
+          { return Logic.Compare(left.Two, right.Two); });
+
+      // Note: can be optimized when the dynamic heap is finished
+      Map<int, Vector<Fraction128>> map =
+        new Map_Linked<int, Vector<Fraction128>>(
+          Vector<Fraction128>.EqualsValue,
+          Hash.Compute);
+
+      traversal(
+        (Vector<Fraction128> vector) =>
+        {
+          if (map.Contains(vector))
+            map[vector]++;
+          else
+            map.Add(vector, 1);
+        });
+
+      traversal(
+        (Vector<Fraction128> vector) =>
+        {
+          if (map.Contains(vector))
+          {
+            heap.Enqueue(new Link<Vector<Fraction128>, int>(vector, map[vector]));
+            map.Remove(vector);
+          }
+        });
+
+      return heap;
+    }
+
+    /// <summary>Computes the mode (most ocurring) value in a set.</summary>
+    /// <param name="values">The values to compute the mode of.</param>
+    /// <returns>A heap sorted along the number of occurences for each item.</returns>
+    public static Heap<Link<Vector<Fraction128>, int>> Mode(params Vector<Fraction128>[] values)
+    {
+      throw new System.NotImplementedException();
+
+      Heap<Link<Vector<Fraction128>, int>> heap =
+        new Heap_Array<Link<Vector<Fraction128>, int>>(
+          (Link<Vector<Fraction128>, int> left, Link<Vector<Fraction128>, int> right) =>
+          { return Logic.Compare(left.Two, right.Two); });
+
+      // Note: can be optimized when the dynamic heap is finished
+      Map<int, Vector<Fraction128>> map =
+        new Map_Linked<int, Vector<Fraction128>>(
+          Vector<Fraction128>.EqualsValue,
+          Hash.Compute);
+
+      foreach (Vector<Fraction128> vector in values)
+        if (map.Contains(vector))
+          map[vector]++;
+        else
+          map.Add(vector, 1);
+
+      foreach (Vector<Fraction128> vector in values)
+        if (map.Contains(vector))
+        {
+          heap.Enqueue(new Link<Vector<Fraction128>,int>(vector, map[vector]));
+          map.Remove(vector);
+        }
+
+      return heap;
+    }
+
+    /// <summary>Computes the median value in a set.</summary>
+    /// <param name="traversal">A traversal function for a set.</param>
+    /// <returns>The computed median of the values.</returns>
+    public static Vector<Fraction128> Median(Traversal<Vector<Fraction128>> traversal)
+    {
+      throw new Error("requires a comparable type");
+
+      //if (values.Length == 1)
+      //  return values[0];
+
+      //Fraction128[] sorted = values.Clone() as Fraction128[];
+      //Sort.Quick<Fraction128>(Logic.Compare, sorted);
+      //if (sorted.Length % 2 == 1)
+      //  return sorted[sorted.Length / 2 + 1];
+      //else
+      //  return Statistics.Mean(sorted[sorted.Length / 2], sorted[sorted.Length / 2 + 1]);
+    }
+
+    /// <summary>Computes the median value in a set.</summary>
+    /// <param name="traversal">The values to compute the median of.</param>
+    /// <returns>The computed median of the values.</returns>
+    public static Vector<Fraction128> Median(params Vector<Fraction128>[] values)
+    {
+      throw new Error("requires a comparable type");
+
+      //if (values.Length == 1)
+      //  return values[0];
+
+      //Fraction128[] sorted = values.Clone() as Fraction128[];
+      //Sort.Quick<Fraction128>(Logic.Compare, sorted);
+      //if (sorted.Length % 2 == 1)
+      //  return sorted[sorted.Length / 2 + 1];
+      //else
+      //  return Statistics.Mean(sorted[sorted.Length / 2], sorted[sorted.Length / 2 + 1]);
+    }
+
+    #endregion
+
+    #region Vector<Fraction64>
+
+    /// <summary>Computes the mean, or average, between two values.</summary>
+    /// <param name="a">An operand of the average operation.</param>
+    /// <param name="b">An operand of the average operation.</param>
+    /// <returns>The mean of the provides values.</returns>
+    public static Vector<Fraction64> Mean(Vector<Fraction64> a, Vector<Fraction64> b)
+    {
+#if no_error_checking
+      // nothing
+#else
+      if (object.ReferenceEquals(a, null))
+        throw new Error("null reference: a");
+      if (object.ReferenceEquals(b, null))
+        throw new Error("null reference: b");
+      if (a.Dimensions != b.Dimensions)
+        throw new Error("invalid vectors during mean (a.Dimensions != b.Dimensions)");
+#endif
+
+      return (a + b) / (Fraction64)2;
+    }
+
+    /// <summary>Computes the mean, or average, between multiple values.</summary>
+    /// <param name="traversal">A function for traversing a set.</param>
+    /// <returns>The mean of the provided values.</returns>
+    public static Vector<Fraction64> Mean(Traversal<Vector<Fraction64>> traversal)
+    {
+#if no_error_checking
+      // nothing
+#else
+      if (object.ReferenceEquals(traversal, null))
+        throw new Error("null reference: values");
+#endif
+
+      int count = 0;
+      Vector<Fraction64> sum = null;
+      traversal(
+        (Vector<Fraction64> current) =>
+        {
+          if (count == 0)
+            sum = new Vector<Fraction64>(current.Dimensions);
+
+#if no_error_checking
+          // nothing
+#else
+          if (current.Dimensions != sum.Dimensions)
+            throw new Error("invalid vector during mean: dimension mismatch");
+#endif
+
+          sum += current;
+          count++;
+        });
+
+#if no_error_checking
+          // nothing
+#else
+      if (count == 0)
+        throw new Error("invalid values during mean: (values.Count == 0)");
+#endif
+
+      return sum / (Fraction64)count;
+    }
+
+    /// <summary>Computes the mean, or average, between multiple values.</summary>
+    /// <param name="values">The values to compute the mean of/</param>
+    /// <returns>The mean of the provided values.</returns>
+    public static Vector<Fraction64> Mean(params Vector<Fraction64>[] values)
+    {
+#if no_error_checking
+      // nothing
+#else
+      if (object.ReferenceEquals(values, null))
+        throw new Error("null reference: values");
+      if (values.Length < 1)
+        throw new Error("invalid values during mean: (values.Length < 1)");
+#endif
+
+      Vector<Fraction64> sum =
+        new Vector<Fraction64>(values[0].Dimensions);
+      foreach (Vector<Fraction64> value in values)
+        sum += value;
+      return sum / (Fraction64)values.Length;
+    }
+
+    /// <summary>Computes the mode (most ocurring) value in a set.</summary>
+    /// <param name="traversal">A function for traversing a set.</param>
+    /// <returns>A heap sorted along the number of occurences for each item.</returns>
+    public static Heap<Link<Vector<Fraction64>, int>> Mode(Traversal<Vector<Fraction64>> traversal)
+    {
+      throw new System.NotImplementedException();
+
+      Heap<Link<Vector<Fraction64>, int>> heap =
+        new Heap_Array<Link<Vector<Fraction64>, int>>(
+          (Link<Vector<Fraction64>, int> left, Link<Vector<Fraction64>, int> right) =>
+          { return Logic.Compare(left.Two, right.Two); });
+
+      // Note: can be optimized when the dynamic heap is finished
+      Map<int, Vector<Fraction64>> map =
+        new Map_Linked<int, Vector<Fraction64>>(
+          Vector<Fraction64>.EqualsValue,
+          Hash.Compute);
+
+      traversal(
+        (Vector<Fraction64> vector) =>
+        {
+          if (map.Contains(vector))
+            map[vector]++;
+          else
+            map.Add(vector, 1);
+        });
+
+      traversal(
+        (Vector<Fraction64> vector) =>
+        {
+          if (map.Contains(vector))
+          {
+            heap.Enqueue(new Link<Vector<Fraction64>, int>(vector, map[vector]));
+            map.Remove(vector);
+          }
+        });
+
+      return heap;
+    }
+
+    /// <summary>Computes the mode (most ocurring) value in a set.</summary>
+    /// <param name="values">The values to compute the mode of.</param>
+    /// <returns>A heap sorted along the number of occurences for each item.</returns>
+    public static Heap<Link<Vector<Fraction64>, int>> Mode(params Vector<Fraction64>[] values)
+    {
+      throw new System.NotImplementedException();
+
+      Heap<Link<Vector<Fraction64>, int>> heap =
+        new Heap_Array<Link<Vector<Fraction64>, int>>(
+          (Link<Vector<Fraction64>, int> left, Link<Vector<Fraction64>, int> right) =>
+          { return Logic.Compare(left.Two, right.Two); });
+
+      // Note: can be optimized when the dynamic heap is finished
+      Map<int, Vector<Fraction64>> map =
+        new Map_Linked<int, Vector<Fraction64>>(
+          Vector<Fraction64>.EqualsValue,
+          Hash.Compute);
+
+      foreach (Vector<Fraction64> vector in values)
+        if (map.Contains(vector))
+          map[vector]++;
+        else
+          map.Add(vector, 1);
+
+      foreach (Vector<Fraction64> vector in values)
+        if (map.Contains(vector))
+        {
+          heap.Enqueue(new Link<Vector<Fraction64>, int>(vector, map[vector]));
+          map.Remove(vector);
+        }
+
+      return heap;
+    }
+
+    /// <summary>Computes the median value in a set.</summary>
+    /// <param name="traversal">A traversal function for a set.</param>
+    /// <returns>The computed median of the values.</returns>
+    public static Vector<Fraction64> Median(Traversal<Vector<Fraction64>> traversal)
+    {
+      throw new Error("requires a comparable type");
+
+      //if (values.Length == 1)
+      //  return values[0];
+
+      //Fraction64[] sorted = values.Clone() as Fraction64[];
+      //Sort.Quick<Fraction64>(Logic.Compare, sorted);
+      //if (sorted.Length % 2 == 1)
+      //  return sorted[sorted.Length / 2 + 1];
+      //else
+      //  return Statistics.Mean(sorted[sorted.Length / 2], sorted[sorted.Length / 2 + 1]);
+    }
+
+    /// <summary>Computes the median value in a set.</summary>
+    /// <param name="traversal">The values to compute the median of.</param>
+    /// <returns>The computed median of the values.</returns>
+    public static Vector<Fraction64> Median(params Vector<Fraction64>[] values)
+    {
+      throw new Error("requires a comparable type");
+
+      //if (values.Length == 1)
+      //  return values[0];
+
+      //Fraction64[] sorted = values.Clone() as Fraction64[];
+      //Sort.Quick<Fraction64>(Logic.Compare, sorted);
+      //if (sorted.Length % 2 == 1)
+      //  return sorted[sorted.Length / 2 + 1];
+      //else
+      //  return Statistics.Mean(sorted[sorted.Length / 2], sorted[sorted.Length / 2 + 1]);
+    }
+
+    #endregion
+
+    #region Vector<decimal>
+
+    /// <summary>Computes the mean, or average, between two values.</summary>
+    /// <param name="a">An operand of the average operation.</param>
+    /// <param name="b">An operand of the average operation.</param>
+    /// <returns>The mean of the provides values.</returns>
+    public static Vector<decimal> Mean(Vector<decimal> a, Vector<decimal> b)
+    {
+#if no_error_checking
+      // nothing
+#else
+      if (object.ReferenceEquals(a, null))
+        throw new Error("null reference: a");
+      if (object.ReferenceEquals(b, null))
+        throw new Error("null reference: b");
+      if (a.Dimensions != b.Dimensions)
+        throw new Error("invalid vectors during mean (a.Dimensions != b.Dimensions)");
+#endif
+
+      return (a + b) / (decimal)2;
+    }
+
+    /// <summary>Computes the mean, or average, between multiple values.</summary>
+    /// <param name="traversal">A function for traversing a set.</param>
+    /// <returns>The mean of the provided values.</returns>
+    public static Vector<decimal> Mean(Traversal<Vector<decimal>> traversal)
+    {
+#if no_error_checking
+      // nothing
+#else
+      if (object.ReferenceEquals(traversal, null))
+        throw new Error("null reference: values");
+#endif
+
+      int count = 0;
+      Vector<decimal> sum = null;
+      traversal(
+        (Vector<decimal> current) =>
+        {
+          if (count == 0)
+            sum = new Vector<decimal>(current.Dimensions);
+
+#if no_error_checking
+          // nothing
+#else
+          if (current.Dimensions != sum.Dimensions)
+            throw new Error("invalid vector during mean: dimension mismatch");
+#endif
+
+          sum += current;
+          count++;
+        });
+
+#if no_error_checking
+          // nothing
+#else
+      if (count == 0)
+        throw new Error("invalid values during mean: (values.Count == 0)");
+#endif
+
+      return sum / (decimal)count;
+    }
+
+    /// <summary>Computes the mean, or average, between multiple values.</summary>
+    /// <param name="values">The values to compute the mean of/</param>
+    /// <returns>The mean of the provided values.</returns>
+    public static Vector<decimal> Mean(params Vector<decimal>[] values)
+    {
+#if no_error_checking
+      // nothing
+#else
+      if (object.ReferenceEquals(values, null))
+        throw new Error("null reference: values");
+      if (values.Length < 1)
+        throw new Error("invalid values during mean: (values.Length < 1)");
+#endif
+
+      Vector<decimal> sum =
+        new Vector<decimal>(values[0].Dimensions);
+      foreach (Vector<decimal> value in values)
+        sum += value;
+      return sum / (decimal)values.Length;
+    }
+
+    /// <summary>Computes the mode (most ocurring) value in a set.</summary>
+    /// <param name="traversal">A function for traversing a set.</param>
+    /// <returns>A heap sorted along the number of occurences for each item.</returns>
+    public static Heap<Link<Vector<decimal>, int>> Mode(Traversal<Vector<decimal>> traversal)
+    {
+      throw new System.NotImplementedException();
+
+      Heap<Link<Vector<decimal>, int>> heap =
+        new Heap_Array<Link<Vector<decimal>, int>>(
+          (Link<Vector<decimal>, int> left, Link<Vector<decimal>, int> right) =>
+          { return Logic.Compare(left.Two, right.Two); });
+
+      // Note: can be optimized when the dynamic heap is finished
+      Map<int, Vector<decimal>> map =
+        new Map_Linked<int, Vector<decimal>>(
+          Vector<decimal>.EqualsValue,
+          Hash.Compute);
+
+      traversal(
+        (Vector<decimal> vector) =>
+        {
+          if (map.Contains(vector))
+            map[vector]++;
+          else
+            map.Add(vector, 1);
+        });
+
+      traversal(
+        (Vector<decimal> vector) =>
+        {
+          if (map.Contains(vector))
+          {
+            heap.Enqueue(new Link<Vector<decimal>, int>(vector, map[vector]));
+            map.Remove(vector);
+          }
+        });
+
+      return heap;
+    }
+
+    /// <summary>Computes the mode (most ocurring) value in a set.</summary>
+    /// <param name="values">The values to compute the mode of.</param>
+    /// <returns>A heap sorted along the number of occurences for each item.</returns>
+    public static Heap<Link<Vector<decimal>, int>> Mode(params Vector<decimal>[] values)
+    {
+      throw new System.NotImplementedException();
+
+      Heap<Link<Vector<decimal>, int>> heap =
+        new Heap_Array<Link<Vector<decimal>, int>>(
+          (Link<Vector<decimal>, int> left, Link<Vector<decimal>, int> right) =>
+          { return Logic.Compare(left.Two, right.Two); });
+
+      // Note: can be optimized when the dynamic heap is finished
+      Map<int, Vector<decimal>> map =
+        new Map_Linked<int, Vector<decimal>>(
+          Vector<decimal>.EqualsValue,
+          Hash.Compute);
+
+      foreach (Vector<decimal> vector in values)
+        if (map.Contains(vector))
+          map[vector]++;
+        else
+          map.Add(vector, 1);
+
+      foreach (Vector<decimal> vector in values)
+        if (map.Contains(vector))
+        {
+          heap.Enqueue(new Link<Vector<decimal>, int>(vector, map[vector]));
+          map.Remove(vector);
+        }
+
+      return heap;
+    }
+
+    /// <summary>Computes the median value in a set.</summary>
+    /// <param name="traversal">A traversal function for a set.</param>
+    /// <returns>The computed median of the values.</returns>
+    public static Vector<decimal> Median(Traversal<Vector<decimal>> traversal)
+    {
+      throw new Error("requires a comparable type");
+
+      //if (values.Length == 1)
+      //  return values[0];
+
+      //decimal[] sorted = values.Clone() as decimal[];
+      //Sort.Quick<decimal>(Logic.Compare, sorted);
+      //if (sorted.Length % 2 == 1)
+      //  return sorted[sorted.Length / 2 + 1];
+      //else
+      //  return Statistics.Mean(sorted[sorted.Length / 2], sorted[sorted.Length / 2 + 1]);
+    }
+
+    /// <summary>Computes the median value in a set.</summary>
+    /// <param name="traversal">The values to compute the median of.</param>
+    /// <returns>The computed median of the values.</returns>
+    public static Vector<decimal> Median(params Vector<decimal>[] values)
+    {
+      throw new Error("requires a comparable type");
+
+      //if (values.Length == 1)
+      //  return values[0];
+
+      //decimal[] sorted = values.Clone() as decimal[];
+      //Sort.Quick<decimal>(Logic.Compare, sorted);
+      //if (sorted.Length % 2 == 1)
+      //  return sorted[sorted.Length / 2 + 1];
+      //else
+      //  return Statistics.Mean(sorted[sorted.Length / 2], sorted[sorted.Length / 2 + 1]);
+    }
+
+    #endregion
+
+    #region Vector<double>
+
+    /// <summary>Computes the mean, or average, between two values.</summary>
+    /// <param name="a">An operand of the average operation.</param>
+    /// <param name="b">An operand of the average operation.</param>
+    /// <returns>The mean of the provides values.</returns>
+    public static Vector<double> Mean(Vector<double> a, Vector<double> b)
+    {
+#if no_error_checking
+      // nothing
+#else
+      if (object.ReferenceEquals(a, null))
+        throw new Error("null reference: a");
+      if (object.ReferenceEquals(b, null))
+        throw new Error("null reference: b");
+      if (a.Dimensions != b.Dimensions)
+        throw new Error("invalid vectors during mean (a.Dimensions != b.Dimensions)");
+#endif
+
+      return (a + b) / (double)2;
+    }
+
+    /// <summary>Computes the mean, or average, between multiple values.</summary>
+    /// <param name="traversal">A function for traversing a set.</param>
+    /// <returns>The mean of the provided values.</returns>
+    public static Vector<double> Mean(Traversal<Vector<double>> traversal)
+    {
+#if no_error_checking
+      // nothing
+#else
+      if (object.ReferenceEquals(traversal, null))
+        throw new Error("null reference: values");
+#endif
+
+      int count = 0;
+      Vector<double> sum = null;
+      traversal(
+        (Vector<double> current) =>
+        {
+          if (count == 0)
+            sum = new Vector<double>(current.Dimensions);
+
+#if no_error_checking
+          // nothing
+#else
+          if (current.Dimensions != sum.Dimensions)
+            throw new Error("invalid vector during mean: dimension mismatch");
+#endif
+
+          sum += current;
+          count++;
+        });
+
+#if no_error_checking
+          // nothing
+#else
+      if (count == 0)
+        throw new Error("invalid values during mean: (values.Count == 0)");
+#endif
+
+      return sum / (double)count;
+    }
+
+    /// <summary>Computes the mean, or average, between multiple values.</summary>
+    /// <param name="values">The values to compute the mean of/</param>
+    /// <returns>The mean of the provided values.</returns>
+    public static Vector<double> Mean(params Vector<double>[] values)
+    {
+#if no_error_checking
+      // nothing
+#else
+      if (object.ReferenceEquals(values, null))
+        throw new Error("null reference: values");
+      if (values.Length < 1)
+        throw new Error("invalid values during mean: (values.Length < 1)");
+#endif
+
+      Vector<double> sum =
+        new Vector<double>(values[0].Dimensions);
+      foreach (Vector<double> value in values)
+        sum += value;
+      return sum / (double)values.Length;
+    }
+
+    /// <summary>Computes the mode (most ocurring) value in a set.</summary>
+    /// <param name="traversal">A function for traversing a set.</param>
+    /// <returns>A heap sorted along the number of occurences for each item.</returns>
+    public static Heap<Link<Vector<double>, int>> Mode(Traversal<Vector<double>> traversal)
+    {
+      throw new System.NotImplementedException();
+
+      Heap<Link<Vector<double>, int>> heap =
+        new Heap_Array<Link<Vector<double>, int>>(
+          (Link<Vector<double>, int> left, Link<Vector<double>, int> right) =>
+          { return Logic.Compare(left.Two, right.Two); });
+
+      // Note: can be optimized when the dynamic heap is finished
+      Map<int, Vector<double>> map =
+        new Map_Linked<int, Vector<double>>(
+          Vector<double>.EqualsValue,
+          Hash.Compute);
+
+      traversal(
+        (Vector<double> vector) =>
+        {
+          if (map.Contains(vector))
+            map[vector]++;
+          else
+            map.Add(vector, 1);
+        });
+
+      traversal(
+        (Vector<double> vector) =>
+        {
+          if (map.Contains(vector))
+          {
+            heap.Enqueue(new Link<Vector<double>, int>(vector, map[vector]));
+            map.Remove(vector);
+          }
+        });
+
+      return heap;
+    }
+
+    /// <summary>Computes the mode (most ocurring) value in a set.</summary>
+    /// <param name="values">The values to compute the mode of.</param>
+    /// <returns>A heap sorted along the number of occurences for each item.</returns>
+    public static Heap<Link<Vector<double>, int>> Mode(params Vector<double>[] values)
+    {
+      throw new System.NotImplementedException();
+
+      Heap<Link<Vector<double>, int>> heap =
+        new Heap_Array<Link<Vector<double>, int>>(
+          (Link<Vector<double>, int> left, Link<Vector<double>, int> right) =>
+          { return Logic.Compare(left.Two, right.Two); });
+
+      // Note: can be optimized when the dynamic heap is finished
+      Map<int, Vector<double>> map =
+        new Map_Linked<int, Vector<double>>(
+          Vector<double>.EqualsValue,
+          Hash.Compute);
+
+      foreach (Vector<double> vector in values)
+        if (map.Contains(vector))
+          map[vector]++;
+        else
+          map.Add(vector, 1);
+
+      foreach (Vector<double> vector in values)
+        if (map.Contains(vector))
+        {
+          heap.Enqueue(new Link<Vector<double>, int>(vector, map[vector]));
+          map.Remove(vector);
+        }
+
+      return heap;
+    }
+
+    /// <summary>Computes the median value in a set.</summary>
+    /// <param name="traversal">A traversal function for a set.</param>
+    /// <returns>The computed median of the values.</returns>
+    public static Vector<double> Median(Traversal<Vector<double>> traversal)
+    {
+      throw new Error("requires a comparable type");
+
+      //if (values.Length == 1)
+      //  return values[0];
+
+      //double[] sorted = values.Clone() as double[];
+      //Sort.Quick<double>(Logic.Compare, sorted);
+      //if (sorted.Length % 2 == 1)
+      //  return sorted[sorted.Length / 2 + 1];
+      //else
+      //  return Statistics.Mean(sorted[sorted.Length / 2], sorted[sorted.Length / 2 + 1]);
+    }
+
+    /// <summary>Computes the median value in a set.</summary>
+    /// <param name="traversal">The values to compute the median of.</param>
+    /// <returns>The computed median of the values.</returns>
+    public static Vector<double> Median(params Vector<double>[] values)
+    {
+      throw new Error("requires a comparable type");
+
+      //if (values.Length == 1)
+      //  return values[0];
+
+      //double[] sorted = values.Clone() as double[];
+      //Sort.Quick<double>(Logic.Compare, sorted);
+      //if (sorted.Length % 2 == 1)
+      //  return sorted[sorted.Length / 2 + 1];
+      //else
+      //  return Statistics.Mean(sorted[sorted.Length / 2], sorted[sorted.Length / 2 + 1]);
+    }
+
+    #endregion
+
+    #region Vector<float>
+
+    /// <summary>Computes the mean, or average, between two values.</summary>
+    /// <param name="a">An operand of the average operation.</param>
+    /// <param name="b">An operand of the average operation.</param>
+    /// <returns>The mean of the provides values.</returns>
+    public static Vector<float> Mean(Vector<float> a, Vector<float> b)
+    {
+#if no_error_checking
+      // nothing
+#else
+      if (object.ReferenceEquals(a, null))
+        throw new Error("null reference: a");
+      if (object.ReferenceEquals(b, null))
+        throw new Error("null reference: b");
+      if (a.Dimensions != b.Dimensions)
+        throw new Error("invalid vectors during mean (a.Dimensions != b.Dimensions)");
+#endif
+
+      return (a + b) / (float)2;
+    }
+
+    /// <summary>Computes the mean, or average, between multiple values.</summary>
+    /// <param name="traversal">A function for traversing a set.</param>
+    /// <returns>The mean of the provided values.</returns>
+    public static Vector<float> Mean(Traversal<Vector<float>> traversal)
+    {
+#if no_error_checking
+      // nothing
+#else
+      if (object.ReferenceEquals(traversal, null))
+        throw new Error("null reference: values");
+#endif
+
+      int count = 0;
+      Vector<float> sum = null;
+      traversal(
+        (Vector<float> current) =>
+        {
+          if (count == 0)
+            sum = new Vector<float>(current.Dimensions);
+
+#if no_error_checking
+          // nothing
+#else
+          if (current.Dimensions != sum.Dimensions)
+            throw new Error("invalid vector during mean: dimension mismatch");
+#endif
+
+          sum += current;
+          count++;
+        });
+
+#if no_error_checking
+          // nothing
+#else
+      if (count == 0)
+        throw new Error("invalid values during mean: (values.Count == 0)");
+#endif
+
+      return sum / (float)count;
+    }
+
+    /// <summary>Computes the mean, or average, between multiple values.</summary>
+    /// <param name="values">The values to compute the mean of/</param>
+    /// <returns>The mean of the provided values.</returns>
+    public static Vector<float> Mean(params Vector<float>[] values)
+    {
+#if no_error_checking
+      // nothing
+#else
+      if (object.ReferenceEquals(values, null))
+        throw new Error("null reference: values");
+      if (values.Length < 1)
+        throw new Error("invalid values during mean: (values.Length < 1)");
+#endif
+
+      Vector<float> sum =
+        new Vector<float>(values[0].Dimensions);
+      foreach (Vector<float> value in values)
+        sum += value;
+      return sum / (float)values.Length;
+    }
+
+    /// <summary>Computes the mode (most ocurring) value in a set.</summary>
+    /// <param name="traversal">A function for traversing a set.</param>
+    /// <returns>A heap sorted along the number of occurences for each item.</returns>
+    public static Heap<Link<Vector<float>, int>> Mode(Traversal<Vector<float>> traversal)
+    {
+      throw new System.NotImplementedException();
+
+      Heap<Link<Vector<float>, int>> heap =
+        new Heap_Array<Link<Vector<float>, int>>(
+          (Link<Vector<float>, int> left, Link<Vector<float>, int> right) =>
+          { return Logic.Compare(left.Two, right.Two); });
+
+      // Note: can be optimized when the dynamic heap is finished
+      Map<int, Vector<float>> map =
+        new Map_Linked<int, Vector<float>>(
+          Vector<float>.EqualsValue,
+          Hash.Compute);
+
+      traversal(
+        (Vector<float> vector) =>
+        {
+          if (map.Contains(vector))
+            map[vector]++;
+          else
+            map.Add(vector, 1);
+        });
+
+      traversal(
+        (Vector<float> vector) =>
+        {
+          if (map.Contains(vector))
+          {
+            heap.Enqueue(new Link<Vector<float>, int>(vector, map[vector]));
+            map.Remove(vector);
+          }
+        });
+
+      return heap;
+    }
+
+    /// <summary>Computes the mode (most ocurring) value in a set.</summary>
+    /// <param name="values">The values to compute the mode of.</param>
+    /// <returns>A heap sorted along the number of occurences for each item.</returns>
+    public static Heap<Link<Vector<float>, int>> Mode(params Vector<float>[] values)
+    {
+      throw new System.NotImplementedException();
+
+      Heap<Link<Vector<float>, int>> heap =
+        new Heap_Array<Link<Vector<float>, int>>(
+          (Link<Vector<float>, int> left, Link<Vector<float>, int> right) =>
+          { return Logic.Compare(left.Two, right.Two); });
+
+      // Note: can be optimized when the dynamic heap is finished
+      Map<int, Vector<float>> map =
+        new Map_Linked<int, Vector<float>>(
+          Vector<float>.EqualsValue,
+          Hash.Compute);
+
+      foreach (Vector<float> vector in values)
+        if (map.Contains(vector))
+          map[vector]++;
+        else
+          map.Add(vector, 1);
+
+      foreach (Vector<float> vector in values)
+        if (map.Contains(vector))
+        {
+          heap.Enqueue(new Link<Vector<float>, int>(vector, map[vector]));
+          map.Remove(vector);
+        }
+
+      return heap;
+    }
+
+    /// <summary>Computes the median value in a set.</summary>
+    /// <param name="traversal">A traversal function for a set.</param>
+    /// <returns>The computed median of the values.</returns>
+    public static Vector<float> Median(Traversal<Vector<float>> traversal)
+    {
+      throw new Error("requires a comparable type");
+
+      //if (values.Length == 1)
+      //  return values[0];
+
+      //float[] sorted = values.Clone() as float[];
+      //Sort.Quick<float>(Logic.Compare, sorted);
+      //if (sorted.Length % 2 == 1)
+      //  return sorted[sorted.Length / 2 + 1];
+      //else
+      //  return Statistics.Mean(sorted[sorted.Length / 2], sorted[sorted.Length / 2 + 1]);
+    }
+
+    /// <summary>Computes the median value in a set.</summary>
+    /// <param name="traversal">The values to compute the median of.</param>
+    /// <returns>The computed median of the values.</returns>
+    public static Vector<float> Median(params Vector<float>[] values)
+    {
+      throw new Error("requires a comparable type");
+
+      //if (values.Length == 1)
+      //  return values[0];
+
+      //float[] sorted = values.Clone() as float[];
+      //Sort.Quick<float>(Logic.Compare, sorted);
+      //if (sorted.Length % 2 == 1)
+      //  return sorted[sorted.Length / 2 + 1];
+      //else
+      //  return Statistics.Mean(sorted[sorted.Length / 2], sorted[sorted.Length / 2 + 1]);
+    }
+
+    #endregion
+
+    #region Vector<long>
+
+    /// <summary>Computes the mean, or average, between two values.</summary>
+    /// <param name="a">An operand of the average operation.</param>
+    /// <param name="b">An operand of the average operation.</param>
+    /// <returns>The mean of the provides values.</returns>
+    public static Vector<long> Mean(Vector<long> a, Vector<long> b)
+    {
+#if no_error_checking
+      // nothing
+#else
+      if (object.ReferenceEquals(a, null))
+        throw new Error("null reference: a");
+      if (object.ReferenceEquals(b, null))
+        throw new Error("null reference: b");
+      if (a.Dimensions != b.Dimensions)
+        throw new Error("invalid vectors during mean (a.Dimensions != b.Dimensions)");
+#endif
+
+      return (a + b) / (long)2;
+    }
+
+    /// <summary>Computes the mean, or average, between multiple values.</summary>
+    /// <param name="traversal">A function for traversing a set.</param>
+    /// <returns>The mean of the provided values.</returns>
+    public static Vector<long> Mean(Traversal<Vector<long>> traversal)
+    {
+#if no_error_checking
+      // nothing
+#else
+      if (object.ReferenceEquals(traversal, null))
+        throw new Error("null reference: values");
+#endif
+
+      int count = 0;
+      Vector<long> sum = null;
+      traversal(
+        (Vector<long> current) =>
+        {
+          if (count == 0)
+            sum = new Vector<long>(current.Dimensions);
+
+#if no_error_checking
+          // nothing
+#else
+          if (current.Dimensions != sum.Dimensions)
+            throw new Error("invalid vector during mean: dimension mismatch");
+#endif
+
+          sum += current;
+          count++;
+        });
+
+#if no_error_checking
+          // nothing
+#else
+      if (count == 0)
+        throw new Error("invalid values during mean: (values.Count == 0)");
+#endif
+
+      return sum / (long)count;
+    }
+
+    /// <summary>Computes the mean, or average, between multiple values.</summary>
+    /// <param name="values">The values to compute the mean of/</param>
+    /// <returns>The mean of the provided values.</returns>
+    public static Vector<long> Mean(params Vector<long>[] values)
+    {
+#if no_error_checking
+      // nothing
+#else
+      if (object.ReferenceEquals(values, null))
+        throw new Error("null reference: values");
+      if (values.Length < 1)
+        throw new Error("invalid values during mean: (values.Length < 1)");
+#endif
+
+      Vector<long> sum =
+        new Vector<long>(values[0].Dimensions);
+      foreach (Vector<long> value in values)
+        sum += value;
+      return sum / (long)values.Length;
+    }
+
+    /// <summary>Computes the mode (most ocurring) value in a set.</summary>
+    /// <param name="traversal">A function for traversing a set.</param>
+    /// <returns>A heap sorted along the number of occurences for each item.</returns>
+    public static Heap<Link<Vector<long>, int>> Mode(Traversal<Vector<long>> traversal)
+    {
+      throw new System.NotImplementedException();
+
+      Heap<Link<Vector<long>, int>> heap =
+        new Heap_Array<Link<Vector<long>, int>>(
+          (Link<Vector<long>, int> left, Link<Vector<long>, int> right) =>
+          { return Logic.Compare(left.Two, right.Two); });
+
+      // Note: can be optimized when the dynamic heap is finished
+      Map<int, Vector<long>> map =
+        new Map_Linked<int, Vector<long>>(
+          Vector<long>.EqualsValue,
+          Hash.Compute);
+
+      traversal(
+        (Vector<long> vector) =>
+        {
+          if (map.Contains(vector))
+            map[vector]++;
+          else
+            map.Add(vector, 1);
+        });
+
+      traversal(
+        (Vector<long> vector) =>
+        {
+          if (map.Contains(vector))
+          {
+            heap.Enqueue(new Link<Vector<long>, int>(vector, map[vector]));
+            map.Remove(vector);
+          }
+        });
+
+      return heap;
+    }
+
+    /// <summary>Computes the mode (most ocurring) value in a set.</summary>
+    /// <param name="values">The values to compute the mode of.</param>
+    /// <returns>A heap sorted along the number of occurences for each item.</returns>
+    public static Heap<Link<Vector<long>, int>> Mode(params Vector<long>[] values)
+    {
+      throw new System.NotImplementedException();
+
+      Heap<Link<Vector<long>, int>> heap =
+        new Heap_Array<Link<Vector<long>, int>>(
+          (Link<Vector<long>, int> left, Link<Vector<long>, int> right) =>
+          { return Logic.Compare(left.Two, right.Two); });
+
+      // Note: can be optimized when the dynamic heap is finished
+      Map<int, Vector<long>> map =
+        new Map_Linked<int, Vector<long>>(
+          Vector<long>.EqualsValue,
+          Hash.Compute);
+
+      foreach (Vector<long> vector in values)
+        if (map.Contains(vector))
+          map[vector]++;
+        else
+          map.Add(vector, 1);
+
+      foreach (Vector<long> vector in values)
+        if (map.Contains(vector))
+        {
+          heap.Enqueue(new Link<Vector<long>, int>(vector, map[vector]));
+          map.Remove(vector);
+        }
+
+      return heap;
+    }
+
+    /// <summary>Computes the median value in a set.</summary>
+    /// <param name="traversal">A traversal function for a set.</param>
+    /// <returns>The computed median of the values.</returns>
+    public static Vector<long> Median(Traversal<Vector<long>> traversal)
+    {
+      throw new Error("requires a comparable type");
+
+      //if (values.Length == 1)
+      //  return values[0];
+
+      //long[] sorted = values.Clone() as long[];
+      //Sort.Quick<long>(Logic.Compare, sorted);
+      //if (sorted.Length % 2 == 1)
+      //  return sorted[sorted.Length / 2 + 1];
+      //else
+      //  return Statistics.Mean(sorted[sorted.Length / 2], sorted[sorted.Length / 2 + 1]);
+    }
+
+    /// <summary>Computes the median value in a set.</summary>
+    /// <param name="traversal">The values to compute the median of.</param>
+    /// <returns>The computed median of the values.</returns>
+    public static Vector<long> Median(params Vector<long>[] values)
+    {
+      throw new Error("requires a comparable type");
+
+      //if (values.Length == 1)
+      //  return values[0];
+
+      //long[] sorted = values.Clone() as long[];
+      //Sort.Quick<long>(Logic.Compare, sorted);
+      //if (sorted.Length % 2 == 1)
+      //  return sorted[sorted.Length / 2 + 1];
+      //else
+      //  return Statistics.Mean(sorted[sorted.Length / 2], sorted[sorted.Length / 2 + 1]);
+    }
+
+    #endregion
+
+    #region Vector<int>
+
+    /// <summary>Computes the mean, or average, between two values.</summary>
+    /// <param name="a">An operand of the average operation.</param>
+    /// <param name="b">An operand of the average operation.</param>
+    /// <returns>The mean of the provides values.</returns>
+    public static Vector<int> Mean(Vector<int> a, Vector<int> b)
+    {
+#if no_error_checking
+      // nothing
+#else
+      if (object.ReferenceEquals(a, null))
+        throw new Error("null reference: a");
+      if (object.ReferenceEquals(b, null))
+        throw new Error("null reference: b");
+      if (a.Dimensions != b.Dimensions)
+        throw new Error("invalid vectors during mean (a.Dimensions != b.Dimensions)");
+#endif
+
+      return (a + b) / (int)2;
+    }
+
+    /// <summary>Computes the mean, or average, between multiple values.</summary>
+    /// <param name="traversal">A function for traversing a set.</param>
+    /// <returns>The mean of the provided values.</returns>
+    public static Vector<int> Mean(Traversal<Vector<int>> traversal)
+    {
+#if no_error_checking
+      // nothing
+#else
+      if (object.ReferenceEquals(traversal, null))
+        throw new Error("null reference: values");
+#endif
+
+      int count = 0;
+      Vector<int> sum = null;
+      traversal(
+        (Vector<int> current) =>
+        {
+          if (count == 0)
+            sum = new Vector<int>(current.Dimensions);
+
+#if no_error_checking
+          // nothing
+#else
+          if (current.Dimensions != sum.Dimensions)
+            throw new Error("invalid vector during mean: dimension mismatch");
+#endif
+
+          sum += current;
+          count++;
+        });
+
+#if no_error_checking
+          // nothing
+#else
+      if (count == 0)
+        throw new Error("invalid values during mean: (values.Count == 0)");
+#endif
+
+      return sum / (int)count;
+    }
+
+    /// <summary>Computes the mean, or average, between multiple values.</summary>
+    /// <param name="values">The values to compute the mean of/</param>
+    /// <returns>The mean of the provided values.</returns>
+    public static Vector<int> Mean(params Vector<int>[] values)
+    {
+#if no_error_checking
+      // nothing
+#else
+      if (object.ReferenceEquals(values, null))
+        throw new Error("null reference: values");
+      if (values.Length < 1)
+        throw new Error("invalid values during mean: (values.Length < 1)");
+#endif
+
+      Vector<int> sum =
+        new Vector<int>(values[0].Dimensions);
+      foreach (Vector<int> value in values)
+        sum += value;
+      return sum / (int)values.Length;
+    }
+
+    /// <summary>Computes the mode (most ocurring) value in a set.</summary>
+    /// <param name="traversal">A function for traversing a set.</param>
+    /// <returns>A heap sorted along the number of occurences for each item.</returns>
+    public static Heap<Link<Vector<int>, int>> Mode(Traversal<Vector<int>> traversal)
+    {
+      throw new System.NotImplementedException();
+
+      Heap<Link<Vector<int>, int>> heap =
+        new Heap_Array<Link<Vector<int>, int>>(
+          (Link<Vector<int>, int> left, Link<Vector<int>, int> right) =>
+          { return Logic.Compare(left.Two, right.Two); });
+
+      // Note: can be optimized when the dynamic heap is finished
+      Map<int, Vector<int>> map =
+        new Map_Linked<int, Vector<int>>(
+          Vector<int>.EqualsValue,
+          Hash.Compute);
+
+      traversal(
+        (Vector<int> vector) =>
+        {
+          if (map.Contains(vector))
+            map[vector]++;
+          else
+            map.Add(vector, 1);
+        });
+
+      traversal(
+        (Vector<int> vector) =>
+        {
+          if (map.Contains(vector))
+          {
+            heap.Enqueue(new Link<Vector<int>, int>(vector, map[vector]));
+            map.Remove(vector);
+          }
+        });
+
+      return heap;
+    }
+
+    /// <summary>Computes the mode (most ocurring) value in a set.</summary>
+    /// <param name="values">The values to compute the mode of.</param>
+    /// <returns>A heap sorted along the number of occurences for each item.</returns>
+    public static Heap<Link<Vector<int>, int>> Mode(params Vector<int>[] values)
+    {
+      throw new System.NotImplementedException();
+
+      Heap<Link<Vector<int>, int>> heap =
+        new Heap_Array<Link<Vector<int>, int>>(
+          (Link<Vector<int>, int> left, Link<Vector<int>, int> right) =>
+          { return Logic.Compare(left.Two, right.Two); });
+
+      // Note: can be optimized when the dynamic heap is finished
+      Map<int, Vector<int>> map =
+        new Map_Linked<int, Vector<int>>(
+          Vector<int>.EqualsValue,
+          Hash.Compute);
+
+      foreach (Vector<int> vector in values)
+        if (map.Contains(vector))
+          map[vector]++;
+        else
+          map.Add(vector, 1);
+
+      foreach (Vector<int> vector in values)
+        if (map.Contains(vector))
+        {
+          heap.Enqueue(new Link<Vector<int>, int>(vector, map[vector]));
+          map.Remove(vector);
+        }
+
+      return heap;
+    }
+
+    /// <summary>Computes the median value in a set.</summary>
+    /// <param name="traversal">A traversal function for a set.</param>
+    /// <returns>The computed median of the values.</returns>
+    public static Vector<int> Median(Traversal<Vector<int>> traversal)
+    {
+      throw new Error("requires a comparable type");
+
+      //if (values.Length == 1)
+      //  return values[0];
+
+      //int[] sorted = values.Clone() as int[];
+      //Sort.Quick<int>(Logic.Compare, sorted);
+      //if (sorted.Length % 2 == 1)
+      //  return sorted[sorted.Length / 2 + 1];
+      //else
+      //  return Statistics.Mean(sorted[sorted.Length / 2], sorted[sorted.Length / 2 + 1]);
+    }
+
+    /// <summary>Computes the median value in a set.</summary>
+    /// <param name="traversal">The values to compute the median of.</param>
+    /// <returns>The computed median of the values.</returns>
+    public static Vector<int> Median(params Vector<int>[] values)
+    {
+      throw new Error("requires a comparable type");
+
+      //if (values.Length == 1)
+      //  return values[0];
+
+      //int[] sorted = values.Clone() as int[];
+      //Sort.Quick<int>(Logic.Compare, sorted);
+      //if (sorted.Length % 2 == 1)
+      //  return sorted[sorted.Length / 2 + 1];
+      //else
+      //  return Statistics.Mean(sorted[sorted.Length / 2], sorted[sorted.Length / 2 + 1]);
     }
 
     #endregion

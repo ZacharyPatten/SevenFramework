@@ -1,13 +1,16 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 
 using SevenMath = Seven.Mathematics;
 // SevenFramework
 
 using MathDotNet = MathNet.Numerics.LinearAlgebra;
-using System.Runtime.InteropServices;
 // Math.Net
 // Link: https://github.com/mathnet/mathnet-numerics
+
+// Matrix3d and Vector3d from OpenTK
+// Link: https://opentk.com
 
 namespace ConsoleApplication
 {

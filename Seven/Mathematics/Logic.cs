@@ -93,11 +93,20 @@ namespace Seven.Mathematics
 				(System.Type left, System.Type right) => { return left == right; },
 				(System.Type type) => { return type.GetHashCode(); })
 				{
-					{ typeof(int), Logic_int.Get },
+          { typeof(Vector<Fraction128>), Logic_Vector_Fraction128.Get },
+          { typeof(Vector<Fraction64>), Logic_Vector_Fraction64.Get },
+          { typeof(Vector<decimal>), Logic_Vector_decimal.Get },
+					{ typeof(Vector<double>), Logic_Vector_double.Get },
+          { typeof(Vector<float>), Logic_Vector_float.Get },
+          { typeof(Vector<long>), Logic_Vector_long.Get },
+					{ typeof(Vector<int>), Logic_Vector_int.Get },
+          { typeof(Fraction128), Logic_Fraction128.Get },
+          { typeof(Fraction64), Logic_Fraction64.Get },
+          { typeof(decimal), Logic_decimal.Get },
 					{ typeof(double), Logic_double.Get },
-					{ typeof(float), Logic_float.Get },
-					{ typeof(decimal), Logic_decimal.Get },
-					{ typeof(long), Logic_long.Get },
+          { typeof(float), Logic_float.Get },
+          { typeof(long), Logic_long.Get },
+					{ typeof(int), Logic_int.Get },
 					{ typeof(short), Logic_short.Get },
 					{ typeof(byte), Logic_byte.Get },
           { typeof(string), Logic_string.Get }
@@ -132,6 +141,209 @@ namespace Seven.Mathematics
 
     #region provided
 
+    private class Logic_Vector_Fraction128 : Logic<Vector<Fraction128>>
+    {
+      private Logic_Vector_Fraction128() { _instance = this; }
+      private static Logic_Vector_Fraction128 _instance;
+      private static Logic_Vector_Fraction128 Instance
+      {
+        get
+        {
+          if (_instance == null)
+            return _instance = new Logic_Vector_Fraction128();
+          else
+            return _instance;
+        }
+      }
+
+      public static Logic_Vector_Fraction128 Get { get { return Instance; } }
+
+      public Logic.delegates.abs<Vector<Fraction128>> abs { get { return Logic.Abs; } }
+      public Logic.delegates.max_params<Vector<Fraction128>> max_params { get { return Logic.Max; } }
+      public Logic.delegates.max<Vector<Fraction128>> max { get { return Logic.Max; } }
+      public Logic.delegates.min_params<Vector<Fraction128>> min_params { get { return Logic.Min; } }
+      public Logic.delegates.min<Vector<Fraction128>> min { get { return Logic.Min; } }
+      public Logic.delegates.clamp<Vector<Fraction128>> clamp { get { return Logic.Clamp; } }
+      public Logic.delegates.equ_len<Vector<Fraction128>> equ_len { get { return Logic.Equate; } }
+      public Equate<Vector<Fraction128>> equ { get { return Logic.Equate; } }
+      public Equate_params<Vector<Fraction128>> equ_params { get { return Logic.Equate; } }
+      public Compare<Vector<Fraction128>> comp { get { return Logic.Compare; } }
+    }
+
+    private class Logic_Vector_Fraction64 : Logic<Vector<Fraction64>>
+    {
+      private Logic_Vector_Fraction64() { _instance = this; }
+      private static Logic_Vector_Fraction64 _instance;
+      private static Logic_Vector_Fraction64 Instance
+      {
+        get
+        {
+          if (_instance == null)
+            return _instance = new Logic_Vector_Fraction64();
+          else
+            return _instance;
+        }
+      }
+
+      public static Logic_Vector_Fraction64 Get { get { return Instance; } }
+
+      public Logic.delegates.abs<Vector<Fraction64>> abs { get { return Logic.Abs; } }
+      public Logic.delegates.max_params<Vector<Fraction64>> max_params { get { return Logic.Max; } }
+      public Logic.delegates.max<Vector<Fraction64>> max { get { return Logic.Max; } }
+      public Logic.delegates.min_params<Vector<Fraction64>> min_params { get { return Logic.Min; } }
+      public Logic.delegates.min<Vector<Fraction64>> min { get { return Logic.Min; } }
+      public Logic.delegates.clamp<Vector<Fraction64>> clamp { get { return Logic.Clamp; } }
+      public Logic.delegates.equ_len<Vector<Fraction64>> equ_len { get { return Logic.Equate; } }
+      public Equate<Vector<Fraction64>> equ { get { return Logic.Equate; } }
+      public Equate_params<Vector<Fraction64>> equ_params { get { return Logic.Equate; } }
+      public Compare<Vector<Fraction64>> comp { get { return Logic.Compare; } }
+    }
+
+    private class Logic_Vector_decimal : Logic<Vector<decimal>>
+    {
+      private Logic_Vector_decimal() { _instance = this; }
+      private static Logic_Vector_decimal _instance;
+      private static Logic_Vector_decimal Instance
+      {
+        get
+        {
+          if (_instance == null)
+            return _instance = new Logic_Vector_decimal();
+          else
+            return _instance;
+        }
+      }
+
+      public static Logic_Vector_decimal Get { get { return Instance; } }
+
+      public Logic.delegates.abs<Vector<decimal>> abs { get { return Logic.Abs; } }
+      public Logic.delegates.max_params<Vector<decimal>> max_params { get { return Logic.Max; } }
+      public Logic.delegates.max<Vector<decimal>> max { get { return Logic.Max; } }
+      public Logic.delegates.min_params<Vector<decimal>> min_params { get { return Logic.Min; } }
+      public Logic.delegates.min<Vector<decimal>> min { get { return Logic.Min; } }
+      public Logic.delegates.clamp<Vector<decimal>> clamp { get { return Logic.Clamp; } }
+      public Logic.delegates.equ_len<Vector<decimal>> equ_len { get { return Logic.Equate; } }
+      public Equate<Vector<decimal>> equ { get { return Logic.Equate; } }
+      public Equate_params<Vector<decimal>> equ_params { get { return Logic.Equate; } }
+      public Compare<Vector<decimal>> comp { get { return Logic.Compare; } }
+    }
+
+    private class Logic_Vector_double : Logic<Vector<double>>
+    {
+      private Logic_Vector_double() { _instance = this; }
+      private static Logic_Vector_double _instance;
+      private static Logic_Vector_double Instance
+      {
+        get
+        {
+          if (_instance == null)
+            return _instance = new Logic_Vector_double();
+          else
+            return _instance;
+        }
+      }
+
+      public static Logic_Vector_double Get { get { return Instance; } }
+
+      public Logic.delegates.abs<Vector<double>> abs { get { return Logic.Abs; } }
+      public Logic.delegates.max_params<Vector<double>> max_params { get { return Logic.Max; } }
+      public Logic.delegates.max<Vector<double>> max { get { return Logic.Max; } }
+      public Logic.delegates.min_params<Vector<double>> min_params { get { return Logic.Min; } }
+      public Logic.delegates.min<Vector<double>> min { get { return Logic.Min; } }
+      public Logic.delegates.clamp<Vector<double>> clamp { get { return Logic.Clamp; } }
+      public Logic.delegates.equ_len<Vector<double>> equ_len { get { return Logic.Equate; } }
+      public Equate<Vector<double>> equ { get { return Logic.Equate; } }
+      public Equate_params<Vector<double>> equ_params { get { return Logic.Equate; } }
+      public Compare<Vector<double>> comp { get { return Logic.Compare; } }
+    }
+
+    private class Logic_Vector_float : Logic<Vector<float>>
+    {
+      private Logic_Vector_float() { _instance = this; }
+      private static Logic_Vector_float _instance;
+      private static Logic_Vector_float Instance
+      {
+        get
+        {
+          if (_instance == null)
+            return _instance = new Logic_Vector_float();
+          else
+            return _instance;
+        }
+      }
+
+      public static Logic_Vector_float Get { get { return Instance; } }
+
+      public Logic.delegates.abs<Vector<float>> abs { get { return Logic.Abs; } }
+      public Logic.delegates.max_params<Vector<float>> max_params { get { return Logic.Max; } }
+      public Logic.delegates.max<Vector<float>> max { get { return Logic.Max; } }
+      public Logic.delegates.min_params<Vector<float>> min_params { get { return Logic.Min; } }
+      public Logic.delegates.min<Vector<float>> min { get { return Logic.Min; } }
+      public Logic.delegates.clamp<Vector<float>> clamp { get { return Logic.Clamp; } }
+      public Logic.delegates.equ_len<Vector<float>> equ_len { get { return Logic.Equate; } }
+      public Equate<Vector<float>> equ { get { return Logic.Equate; } }
+      public Equate_params<Vector<float>> equ_params { get { return Logic.Equate; } }
+      public Compare<Vector<float>> comp { get { return Logic.Compare; } }
+    }
+
+    private class Logic_Vector_long : Logic<Vector<long>>
+    {
+      private Logic_Vector_long() { _instance = this; }
+      private static Logic_Vector_long _instance;
+      private static Logic_Vector_long Instance
+      {
+        get
+        {
+          if (_instance == null)
+            return _instance = new Logic_Vector_long();
+          else
+            return _instance;
+        }
+      }
+
+      public static Logic_Vector_long Get { get { return Instance; } }
+
+      public Logic.delegates.abs<Vector<long>> abs { get { return Logic.Abs; } }
+      public Logic.delegates.max_params<Vector<long>> max_params { get { return Logic.Max; } }
+      public Logic.delegates.max<Vector<long>> max { get { return Logic.Max; } }
+      public Logic.delegates.min_params<Vector<long>> min_params { get { return Logic.Min; } }
+      public Logic.delegates.min<Vector<long>> min { get { return Logic.Min; } }
+      public Logic.delegates.clamp<Vector<long>> clamp { get { return Logic.Clamp; } }
+      public Logic.delegates.equ_len<Vector<long>> equ_len { get { return Logic.Equate; } }
+      public Equate<Vector<long>> equ { get { return Logic.Equate; } }
+      public Equate_params<Vector<long>> equ_params { get { return Logic.Equate; } }
+      public Compare<Vector<long>> comp { get { return Logic.Compare; } }
+    }
+
+    private class Logic_Vector_int : Logic<Vector<int>>
+    {
+      private Logic_Vector_int() { _instance = this; }
+      private static Logic_Vector_int _instance;
+      private static Logic_Vector_int Instance
+      {
+        get
+        {
+          if (_instance == null)
+            return _instance = new Logic_Vector_int();
+          else
+            return _instance;
+        }
+      }
+
+      public static Logic_Vector_int Get { get { return Instance; } }
+
+      public Logic.delegates.abs<Vector<int>> abs { get { return Logic.Abs; } }
+      public Logic.delegates.max_params<Vector<int>> max_params { get { return Logic.Max; } }
+      public Logic.delegates.max<Vector<int>> max { get { return Logic.Max; } }
+      public Logic.delegates.min_params<Vector<int>> min_params { get { return Logic.Min; } }
+      public Logic.delegates.min<Vector<int>> min { get { return Logic.Min; } }
+      public Logic.delegates.clamp<Vector<int>> clamp { get { return Logic.Clamp; } }
+      public Logic.delegates.equ_len<Vector<int>> equ_len { get { return Logic.Equate; } }
+      public Equate<Vector<int>> equ { get { return Logic.Equate; } }
+      public Equate_params<Vector<int>> equ_params { get { return Logic.Equate; } }
+      public Compare<Vector<int>> comp { get { return Logic.Compare; } }
+    }
+
     private class Logic_string : Logic<string>
     {
       private Logic_string() { _instance = this; }
@@ -159,6 +371,64 @@ namespace Seven.Mathematics
       public Equate<string> equ { get { return Logic.Equate; } }
       public Equate_params<string> equ_params { get { return Logic.Equate; } }
       public Compare<string> comp { get { return Logic.Compare; } }
+    }
+
+    private class Logic_Fraction128 : Logic<Fraction128>
+    {
+      private Logic_Fraction128() { _instance = this; }
+      private static Logic_Fraction128 _instance;
+      private static Logic_Fraction128 Instance
+      {
+        get
+        {
+          if (_instance == null)
+            return _instance = new Logic_Fraction128();
+          else
+            return _instance;
+        }
+      }
+
+      public static Logic_Fraction128 Get { get { return Instance; } }
+
+      public Logic.delegates.abs<Fraction128> abs { get { return Logic.Abs; } }
+      public Logic.delegates.max_params<Fraction128> max_params { get { return Logic.Max; } }
+      public Logic.delegates.max<Fraction128> max { get { return Logic.Max; } }
+      public Logic.delegates.min_params<Fraction128> min_params { get { return Logic.Min; } }
+      public Logic.delegates.min<Fraction128> min { get { return Logic.Min; } }
+      public Logic.delegates.clamp<Fraction128> clamp { get { return Logic.Clamp; } }
+      public Logic.delegates.equ_len<Fraction128> equ_len { get { return Logic.Equate; } }
+      public Equate<Fraction128> equ { get { return Logic.Equate; } }
+      public Equate_params<Fraction128> equ_params { get { return Logic.Equate; } }
+      public Compare<Fraction128> comp { get { return Logic.Compare; } }
+    }
+
+    private class Logic_Fraction64 : Logic<Fraction64>
+    {
+      private Logic_Fraction64() { _instance = this; }
+      private static Logic_Fraction64 _instance;
+      private static Logic_Fraction64 Instance
+      {
+        get
+        {
+          if (_instance == null)
+            return _instance = new Logic_Fraction64();
+          else
+            return _instance;
+        }
+      }
+
+      public static Logic_Fraction64 Get { get { return Instance; } }
+
+      public Logic.delegates.abs<Fraction64> abs { get { return Logic.Abs; } }
+      public Logic.delegates.max_params<Fraction64> max_params { get { return Logic.Max; } }
+      public Logic.delegates.max<Fraction64> max { get { return Logic.Max; } }
+      public Logic.delegates.min_params<Fraction64> min_params { get { return Logic.Min; } }
+      public Logic.delegates.min<Fraction64> min { get { return Logic.Min; } }
+      public Logic.delegates.clamp<Fraction64> clamp { get { return Logic.Clamp; } }
+      public Logic.delegates.equ_len<Fraction64> equ_len { get { return Logic.Equate; } }
+      public Equate<Fraction64> equ { get { return Logic.Equate; } }
+      public Equate_params<Fraction64> equ_params { get { return Logic.Equate; } }
+      public Compare<Fraction64> comp { get { return Logic.Compare; } }
     }
 
     private class Logic_decimal : Logic<decimal>
@@ -364,7 +634,7 @@ namespace Seven.Mathematics
       public Compare<byte> comp { get { return Logic.Compare; } }
     }
 
-    public class Logic_unsupported<T> : Logic<T>
+    private class Logic_unsupported<T> : Logic<T>
     {
       public Logic_unsupported() {  }
 
@@ -385,6 +655,1084 @@ namespace Seven.Mathematics
     #endregion
 
     #region Implementations
+
+    #region Vector<Fraction128>
+
+    /// <summary>Returns a less/greater/equal comparison.</summary>
+    public static Comparison Compare(Vector<Fraction128> left, Vector<Fraction128> right)
+    {
+      throw new System.NotImplementedException();
+
+      //int result = left.CompareTo(right);
+      //if (result > 0)
+      //  return Comparison.Greater;
+      //else if (result < 0)
+      //  return Comparison.Less;
+      //else
+      //  return Comparison.Equal;
+    }
+
+    /// <summary>Returns true if all values are equal.</summary>
+    public static bool Equate(params Vector<Fraction128>[] values)
+    {
+      for (int i = 0; i < values.Length - 1; i++)
+        if (!Logic.Equate(values[i], values[i + 1]))
+          return false;
+      return true;
+    }
+
+    /// <summary>Returns left == right.</summary>
+    public static bool Equate(Vector<Fraction128> left, Vector<Fraction128> right)
+    {
+      if (object.ReferenceEquals(left, null) && object.ReferenceEquals(right, null))
+        return true;
+      if (object.ReferenceEquals(left, null))
+        return false;
+      if (object.ReferenceEquals(right, null))
+        return false;
+      if (left.Dimensions != right.Dimensions)
+        return false;
+      for (int i = 0; i < left.Dimensions; i++)
+        if (left[i] != right[i])
+          return false;
+      return true;
+    }
+
+    /// <summary>Returns Abs(left - right) < leniency.</summary>
+    public static bool Equate(Vector<Fraction128> left, Vector<Fraction128> right, Vector<Fraction128> leniency)
+    {
+      if (object.ReferenceEquals(left, null) && object.ReferenceEquals(right, null))
+        return true;
+      if (object.ReferenceEquals(left, null))
+        return false;
+      if (object.ReferenceEquals(right, null))
+        return false;
+      if (left.Dimensions != right.Dimensions)
+        return false;
+      for (int i = 0; i < left.Dimensions; i++)
+        if (Logic.Abs(left[i] - right[i]) >= leniency[i])
+          return false;
+      return true;
+    }
+
+    /// <summary>Returns the maximum value.</summary>
+    public static Vector<Fraction128> Max(params Vector<Fraction128>[] values)
+    {
+      throw new System.NotImplementedException();
+
+      //Vector<Fraction128> max = values[0];
+      //for (int i = 0; i < values.Length; i++)
+      //  if (values[i].CompareTo(max) > 0)
+      //    max = values[i];
+      //return max;
+    }
+
+    /// <summary>Returns the maximum value.</summary>
+    public static Vector<Fraction128> Max(Vector<Fraction128> first, Vector<Fraction128> second)
+    {
+      throw new System.NotImplementedException();
+
+      //if (second.CompareTo(first) > 0)
+      //  return second;
+      //return first;
+    }
+
+    /// <summary>Returns the minimum value.</summary>
+    public static Vector<Fraction128> Min(params Vector<Fraction128>[] values)
+    {
+      throw new System.NotImplementedException();
+
+      //Vector<Fraction128> max = values[0];
+      //for (int i = 0; i < values.Length; i++)
+      //  if (values[i].CompareTo(max) < 0)
+      //    max = values[i];
+      //return max;
+    }
+
+    /// <summary>Returns the minimum value.</summary>
+    public static Vector<Fraction128> Min(Vector<Fraction128> first, Vector<Fraction128> second)
+    {
+      throw new System.NotImplementedException();
+
+      //if (second.CompareTo(first) < 0)
+      //  return second;
+      //return first;
+    }
+
+    /// <summary>Returns the absolute value of the provided value.</summary>
+    public static Vector<Fraction128> Abs(Vector<Fraction128> number)
+    {
+      throw new Error("Abs is undefined for type Vector<Fraction128>");
+    }
+
+    /// <summary>Returns left < right.</summary>
+    public static bool LessThan(Vector<Fraction128> left, Vector<Fraction128> right)
+    {
+      throw new System.NotImplementedException();
+
+      //return left.CompareTo(right) < 0;
+    }
+
+    /// <summary>Returns left > right.</summary>
+    public static bool GreaterThan(Vector<Fraction128> left, Vector<Fraction128> right)
+    {
+      throw new System.NotImplementedException();
+
+      //return left.CompareTo(right) > 0;
+    }
+
+    /// <summary>Clamps a value to be within a given minimum and maximum range.</summary>
+    public static Vector<Fraction128> Clamp(Vector<Fraction128> value, Vector<Fraction128> minimum, Vector<Fraction128> maximum)
+    {
+      if (object.ReferenceEquals(value, null))
+        throw new Error("null reference: value");
+      if (object.ReferenceEquals(minimum, null))
+        throw new Error("null reference: minimum");
+      if (object.ReferenceEquals(maximum, null))
+        throw new Error("null reference: maximum");
+      if ((value.Dimensions != minimum.Dimensions) ||
+        (minimum.Dimensions != maximum.Dimensions))
+        throw new Error("invalid clamp on vector: dimension mismatch");
+
+      Vector<Fraction128> result =
+        new Vector<Fraction128>(value.Dimensions);
+      for (int i = 0; i < value.Dimensions; i++)
+
+        if (value[i] < minimum[i])
+          result[i] = minimum[i];
+        else if (value[i] < maximum[i])
+          result[i] = maximum[i];
+        else
+          result[i] = value[i];
+
+      return result;
+    }
+
+    #endregion
+
+    #region Vector<Fraction64>
+
+    /// <summary>Returns a less/greater/equal comparison.</summary>
+    public static Comparison Compare(Vector<Fraction64> left, Vector<Fraction64> right)
+    {
+      throw new System.NotImplementedException();
+
+      //int result = left.CompareTo(right);
+      //if (result > 0)
+      //  return Comparison.Greater;
+      //else if (result < 0)
+      //  return Comparison.Less;
+      //else
+      //  return Comparison.Equal;
+    }
+
+    /// <summary>Returns true if all values are equal.</summary>
+    public static bool Equate(params Vector<Fraction64>[] values)
+    {
+      for (int i = 0; i < values.Length - 1; i++)
+        if (!Logic.Equate(values[i], values[i + 1]))
+          return false;
+      return true;
+    }
+
+    /// <summary>Returns left == right.</summary>
+    public static bool Equate(Vector<Fraction64> left, Vector<Fraction64> right)
+    {
+      if (object.ReferenceEquals(left, null) && object.ReferenceEquals(right, null))
+        return true;
+      if (object.ReferenceEquals(left, null))
+        return false;
+      if (object.ReferenceEquals(right, null))
+        return false;
+      if (left.Dimensions != right.Dimensions)
+        return false;
+      for (int i = 0; i < left.Dimensions; i++)
+        if (left[i] != right[i])
+          return false;
+      return true;
+    }
+
+    /// <summary>Returns Abs(left - right) < leniency.</summary>
+    public static bool Equate(Vector<Fraction64> left, Vector<Fraction64> right, Vector<Fraction64> leniency)
+    {
+      if (object.ReferenceEquals(left, null) && object.ReferenceEquals(right, null))
+        return true;
+      if (object.ReferenceEquals(left, null))
+        return false;
+      if (object.ReferenceEquals(right, null))
+        return false;
+      if (left.Dimensions != right.Dimensions)
+        return false;
+      for (int i = 0; i < left.Dimensions; i++)
+        if (Logic.Abs(left[i] - right[i]) >= leniency[i])
+          return false;
+      return true;
+    }
+
+    /// <summary>Returns the maximum value.</summary>
+    public static Vector<Fraction64> Max(params Vector<Fraction64>[] values)
+    {
+      throw new System.NotImplementedException();
+
+      //Vector<Fraction64> max = values[0];
+      //for (int i = 0; i < values.Length; i++)
+      //  if (values[i].CompareTo(max) > 0)
+      //    max = values[i];
+      //return max;
+    }
+
+    /// <summary>Returns the maximum value.</summary>
+    public static Vector<Fraction64> Max(Vector<Fraction64> first, Vector<Fraction64> second)
+    {
+      throw new System.NotImplementedException();
+
+      //if (second.CompareTo(first) > 0)
+      //  return second;
+      //return first;
+    }
+
+    /// <summary>Returns the minimum value.</summary>
+    public static Vector<Fraction64> Min(params Vector<Fraction64>[] values)
+    {
+      throw new System.NotImplementedException();
+
+      //Vector<Fraction64> max = values[0];
+      //for (int i = 0; i < values.Length; i++)
+      //  if (values[i].CompareTo(max) < 0)
+      //    max = values[i];
+      //return max;
+    }
+
+    /// <summary>Returns the minimum value.</summary>
+    public static Vector<Fraction64> Min(Vector<Fraction64> first, Vector<Fraction64> second)
+    {
+      throw new System.NotImplementedException();
+
+      //if (second.CompareTo(first) < 0)
+      //  return second;
+      //return first;
+    }
+
+    /// <summary>Returns the absolute value of the provided value.</summary>
+    public static Vector<Fraction64> Abs(Vector<Fraction64> number)
+    {
+      throw new Error("Abs is undefined for type Vector<Fraction64>");
+    }
+
+    /// <summary>Returns left < right.</summary>
+    public static bool LessThan(Vector<Fraction64> left, Vector<Fraction64> right)
+    {
+      throw new System.NotImplementedException();
+
+      //return left.CompareTo(right) < 0;
+    }
+
+    /// <summary>Returns left > right.</summary>
+    public static bool GreaterThan(Vector<Fraction64> left, Vector<Fraction64> right)
+    {
+      throw new System.NotImplementedException();
+
+      //return left.CompareTo(right) > 0;
+    }
+
+    /// <summary>Clamps a value to be within a given minimum and maximum range.</summary>
+    public static Vector<Fraction64> Clamp(Vector<Fraction64> value, Vector<Fraction64> minimum, Vector<Fraction64> maximum)
+    {
+      if (object.ReferenceEquals(value, null))
+        throw new Error("null reference: value");
+      if (object.ReferenceEquals(minimum, null))
+        throw new Error("null reference: minimum");
+      if (object.ReferenceEquals(maximum, null))
+        throw new Error("null reference: maximum");
+      if ((value.Dimensions != minimum.Dimensions) ||
+        (minimum.Dimensions != maximum.Dimensions))
+        throw new Error("invalid clamp on vector: dimension mismatch");
+
+      Vector<Fraction64> result =
+        new Vector<Fraction64>(value.Dimensions);
+      for (int i = 0; i < value.Dimensions; i++)
+
+        if (value[i] < minimum[i])
+          result[i] = minimum[i];
+        else if (value[i] < maximum[i])
+          result[i] = maximum[i];
+        else
+          result[i] = value[i];
+
+      return result;
+    }
+
+    #endregion
+
+    #region Vector<decimal>
+
+    /// <summary>Returns a less/greater/equal comparison.</summary>
+    public static Comparison Compare(Vector<decimal> left, Vector<decimal> right)
+    {
+      throw new System.NotImplementedException();
+
+      //int result = left.CompareTo(right);
+      //if (result > 0)
+      //  return Comparison.Greater;
+      //else if (result < 0)
+      //  return Comparison.Less;
+      //else
+      //  return Comparison.Equal;
+    }
+
+    /// <summary>Returns true if all values are equal.</summary>
+    public static bool Equate(params Vector<decimal>[] values)
+    {
+      for (int i = 0; i < values.Length - 1; i++)
+        if (!Logic.Equate(values[i], values[i + 1]))
+          return false;
+      return true;
+    }
+
+    /// <summary>Returns left == right.</summary>
+    public static bool Equate(Vector<decimal> left, Vector<decimal> right)
+    {
+      if (object.ReferenceEquals(left, null) && object.ReferenceEquals(right, null))
+        return true;
+      if (object.ReferenceEquals(left, null))
+        return false;
+      if (object.ReferenceEquals(right, null))
+        return false;
+      if (left.Dimensions != right.Dimensions)
+        return false;
+      for (int i = 0; i < left.Dimensions; i++)
+        if (left[i] != right[i])
+          return false;
+      return true;
+    }
+
+    /// <summary>Returns Abs(left - right) < leniency.</summary>
+    public static bool Equate(Vector<decimal> left, Vector<decimal> right, Vector<decimal> leniency)
+    {
+      if (object.ReferenceEquals(left, null) && object.ReferenceEquals(right, null))
+        return true;
+      if (object.ReferenceEquals(left, null))
+        return false;
+      if (object.ReferenceEquals(right, null))
+        return false;
+      if (left.Dimensions != right.Dimensions)
+        return false;
+      for (int i = 0; i < left.Dimensions; i++)
+        if (Logic.Abs(left[i] - right[i]) >= leniency[i])
+          return false;
+      return true;
+    }
+
+    /// <summary>Returns the maximum value.</summary>
+    public static Vector<decimal> Max(params Vector<decimal>[] values)
+    {
+      throw new System.NotImplementedException();
+
+      //Vector<decimal> max = values[0];
+      //for (int i = 0; i < values.Length; i++)
+      //  if (values[i].CompareTo(max) > 0)
+      //    max = values[i];
+      //return max;
+    }
+
+    /// <summary>Returns the maximum value.</summary>
+    public static Vector<decimal> Max(Vector<decimal> first, Vector<decimal> second)
+    {
+      throw new System.NotImplementedException();
+
+      //if (second.CompareTo(first) > 0)
+      //  return second;
+      //return first;
+    }
+
+    /// <summary>Returns the minimum value.</summary>
+    public static Vector<decimal> Min(params Vector<decimal>[] values)
+    {
+      throw new System.NotImplementedException();
+
+      //Vector<decimal> max = values[0];
+      //for (int i = 0; i < values.Length; i++)
+      //  if (values[i].CompareTo(max) < 0)
+      //    max = values[i];
+      //return max;
+    }
+
+    /// <summary>Returns the minimum value.</summary>
+    public static Vector<decimal> Min(Vector<decimal> first, Vector<decimal> second)
+    {
+      throw new System.NotImplementedException();
+
+      //if (second.CompareTo(first) < 0)
+      //  return second;
+      //return first;
+    }
+
+    /// <summary>Returns the absolute value of the provided value.</summary>
+    public static Vector<decimal> Abs(Vector<decimal> number)
+    {
+      throw new Error("Abs is undefined for type Vector<decimal>");
+    }
+
+    /// <summary>Returns left < right.</summary>
+    public static bool LessThan(Vector<decimal> left, Vector<decimal> right)
+    {
+      throw new System.NotImplementedException();
+
+      //return left.CompareTo(right) < 0;
+    }
+
+    /// <summary>Returns left > right.</summary>
+    public static bool GreaterThan(Vector<decimal> left, Vector<decimal> right)
+    {
+      throw new System.NotImplementedException();
+
+      //return left.CompareTo(right) > 0;
+    }
+
+    /// <summary>Clamps a value to be within a given minimum and maximum range.</summary>
+    public static Vector<decimal> Clamp(Vector<decimal> value, Vector<decimal> minimum, Vector<decimal> maximum)
+    {
+      if (object.ReferenceEquals(value, null))
+        throw new Error("null reference: value");
+      if (object.ReferenceEquals(minimum, null))
+        throw new Error("null reference: minimum");
+      if (object.ReferenceEquals(maximum, null))
+        throw new Error("null reference: maximum");
+      if ((value.Dimensions != minimum.Dimensions) ||
+        (minimum.Dimensions != maximum.Dimensions))
+        throw new Error("invalid clamp on vector: dimension mismatch");
+
+      Vector<decimal> result =
+        new Vector<decimal>(value.Dimensions);
+      for (int i = 0; i < value.Dimensions; i++)
+
+        if (value[i] < minimum[i])
+          result[i] = minimum[i];
+        else if (value[i] < maximum[i])
+          result[i] = maximum[i];
+        else
+          result[i] = value[i];
+
+      return result;
+    }
+
+    #endregion
+
+    #region Vector<double>
+
+    /// <summary>Returns a less/greater/equal comparison.</summary>
+    public static Comparison Compare(Vector<double> left, Vector<double> right)
+    {
+      throw new System.NotImplementedException();
+
+      //int result = left.CompareTo(right);
+      //if (result > 0)
+      //  return Comparison.Greater;
+      //else if (result < 0)
+      //  return Comparison.Less;
+      //else
+      //  return Comparison.Equal;
+    }
+
+    /// <summary>Returns true if all values are equal.</summary>
+    public static bool Equate(params Vector<double>[] values)
+    {
+      for (int i = 0; i < values.Length - 1; i++)
+        if (!Logic.Equate(values[i], values[i + 1]))
+          return false;
+      return true;
+    }
+
+    /// <summary>Returns left == right.</summary>
+    public static bool Equate(Vector<double> left, Vector<double> right)
+    {
+      if (object.ReferenceEquals(left, null) && object.ReferenceEquals(right, null))
+        return true;
+      if (object.ReferenceEquals(left, null))
+        return false;
+      if (object.ReferenceEquals(right, null))
+        return false;
+      if (left.Dimensions != right.Dimensions)
+        return false;
+      for (int i = 0; i < left.Dimensions; i++)
+        if (left[i] != right[i])
+          return false;
+      return true;
+    }
+
+    /// <summary>Returns Abs(left - right) < leniency.</summary>
+    public static bool Equate(Vector<double> left, Vector<double> right, Vector<double> leniency)
+    {
+      if (object.ReferenceEquals(left, null) && object.ReferenceEquals(right, null))
+        return true;
+      if (object.ReferenceEquals(left, null))
+        return false;
+      if (object.ReferenceEquals(right, null))
+        return false;
+      if (left.Dimensions != right.Dimensions)
+        return false;
+      for (int i = 0; i < left.Dimensions; i++)
+        if (Logic.Abs(left[i] - right[i]) >= leniency[i])
+          return false;
+      return true;
+    }
+
+    /// <summary>Returns the maximum value.</summary>
+    public static Vector<double> Max(params Vector<double>[] values)
+    {
+      throw new System.NotImplementedException();
+
+      //Vector<double> max = values[0];
+      //for (int i = 0; i < values.Length; i++)
+      //  if (values[i].CompareTo(max) > 0)
+      //    max = values[i];
+      //return max;
+    }
+
+    /// <summary>Returns the maximum value.</summary>
+    public static Vector<double> Max(Vector<double> first, Vector<double> second)
+    {
+      throw new System.NotImplementedException();
+
+      //if (second.CompareTo(first) > 0)
+      //  return second;
+      //return first;
+    }
+
+    /// <summary>Returns the minimum value.</summary>
+    public static Vector<double> Min(params Vector<double>[] values)
+    {
+      throw new System.NotImplementedException();
+
+      //Vector<double> max = values[0];
+      //for (int i = 0; i < values.Length; i++)
+      //  if (values[i].CompareTo(max) < 0)
+      //    max = values[i];
+      //return max;
+    }
+
+    /// <summary>Returns the minimum value.</summary>
+    public static Vector<double> Min(Vector<double> first, Vector<double> second)
+    {
+      throw new System.NotImplementedException();
+
+      //if (second.CompareTo(first) < 0)
+      //  return second;
+      //return first;
+    }
+
+    /// <summary>Returns the absolute value of the provided value.</summary>
+    public static Vector<double> Abs(Vector<double> number)
+    {
+      throw new Error("Abs is undefined for type Vector<double>");
+    }
+
+    /// <summary>Returns left < right.</summary>
+    public static bool LessThan(Vector<double> left, Vector<double> right)
+    {
+      throw new System.NotImplementedException();
+
+      //return left.CompareTo(right) < 0;
+    }
+
+    /// <summary>Returns left > right.</summary>
+    public static bool GreaterThan(Vector<double> left, Vector<double> right)
+    {
+      throw new System.NotImplementedException();
+
+      //return left.CompareTo(right) > 0;
+    }
+
+    /// <summary>Clamps a value to be within a given minimum and maximum range.</summary>
+    public static Vector<double> Clamp(Vector<double> value, Vector<double> minimum, Vector<double> maximum)
+    {
+      if (object.ReferenceEquals(value, null))
+        throw new Error("null reference: value");
+      if (object.ReferenceEquals(minimum, null))
+        throw new Error("null reference: minimum");
+      if (object.ReferenceEquals(maximum, null))
+        throw new Error("null reference: maximum");
+      if ((value.Dimensions != minimum.Dimensions) ||
+        (minimum.Dimensions != maximum.Dimensions))
+        throw new Error("invalid clamp on vector: dimension mismatch");
+
+      Vector<double> result =
+        new Vector<double>(value.Dimensions);
+      for (int i = 0; i < value.Dimensions; i++)
+
+        if (value[i] < minimum[i])
+          result[i] = minimum[i];
+        else if (value[i] < maximum[i])
+          result[i] = maximum[i];
+        else
+          result[i] = value[i];
+
+      return result;
+    }
+
+    #endregion
+
+    #region Vector<float>
+
+    /// <summary>Returns a less/greater/equal comparison.</summary>
+    public static Comparison Compare(Vector<float> left, Vector<float> right)
+    {
+      throw new System.NotImplementedException();
+
+      //int result = left.CompareTo(right);
+      //if (result > 0)
+      //  return Comparison.Greater;
+      //else if (result < 0)
+      //  return Comparison.Less;
+      //else
+      //  return Comparison.Equal;
+    }
+
+    /// <summary>Returns true if all values are equal.</summary>
+    public static bool Equate(params Vector<float>[] values)
+    {
+      for (int i = 0; i < values.Length - 1; i++)
+        if (!Logic.Equate(values[i], values[i + 1]))
+          return false;
+      return true;
+    }
+
+    /// <summary>Returns left == right.</summary>
+    public static bool Equate(Vector<float> left, Vector<float> right)
+    {
+      if (object.ReferenceEquals(left, null) && object.ReferenceEquals(right, null))
+        return true;
+      if (object.ReferenceEquals(left, null))
+        return false;
+      if (object.ReferenceEquals(right, null))
+        return false;
+      if (left.Dimensions != right.Dimensions)
+        return false;
+      for (int i = 0; i < left.Dimensions; i++)
+        if (left[i] != right[i])
+          return false;
+      return true;
+    }
+
+    /// <summary>Returns Abs(left - right) < leniency.</summary>
+    public static bool Equate(Vector<float> left, Vector<float> right, Vector<float> leniency)
+    {
+      if (object.ReferenceEquals(left, null) && object.ReferenceEquals(right, null))
+        return true;
+      if (object.ReferenceEquals(left, null))
+        return false;
+      if (object.ReferenceEquals(right, null))
+        return false;
+      if (left.Dimensions != right.Dimensions)
+        return false;
+      for (int i = 0; i < left.Dimensions; i++)
+        if (Logic.Abs(left[i] - right[i]) >= leniency[i])
+          return false;
+      return true;
+    }
+
+    /// <summary>Returns the maximum value.</summary>
+    public static Vector<float> Max(params Vector<float>[] values)
+    {
+      throw new System.NotImplementedException();
+
+      //Vector<float> max = values[0];
+      //for (int i = 0; i < values.Length; i++)
+      //  if (values[i].CompareTo(max) > 0)
+      //    max = values[i];
+      //return max;
+    }
+
+    /// <summary>Returns the maximum value.</summary>
+    public static Vector<float> Max(Vector<float> first, Vector<float> second)
+    {
+      throw new System.NotImplementedException();
+
+      //if (second.CompareTo(first) > 0)
+      //  return second;
+      //return first;
+    }
+
+    /// <summary>Returns the minimum value.</summary>
+    public static Vector<float> Min(params Vector<float>[] values)
+    {
+      throw new System.NotImplementedException();
+
+      //Vector<float> max = values[0];
+      //for (int i = 0; i < values.Length; i++)
+      //  if (values[i].CompareTo(max) < 0)
+      //    max = values[i];
+      //return max;
+    }
+
+    /// <summary>Returns the minimum value.</summary>
+    public static Vector<float> Min(Vector<float> first, Vector<float> second)
+    {
+      throw new System.NotImplementedException();
+
+      //if (second.CompareTo(first) < 0)
+      //  return second;
+      //return first;
+    }
+
+    /// <summary>Returns the absolute value of the provided value.</summary>
+    public static Vector<float> Abs(Vector<float> number)
+    {
+      throw new Error("Abs is undefined for type Vector<float>");
+    }
+
+    /// <summary>Returns left < right.</summary>
+    public static bool LessThan(Vector<float> left, Vector<float> right)
+    {
+      throw new System.NotImplementedException();
+
+      //return left.CompareTo(right) < 0;
+    }
+
+    /// <summary>Returns left > right.</summary>
+    public static bool GreaterThan(Vector<float> left, Vector<float> right)
+    {
+      throw new System.NotImplementedException();
+
+      //return left.CompareTo(right) > 0;
+    }
+
+    /// <summary>Clamps a value to be within a given minimum and maximum range.</summary>
+    public static Vector<float> Clamp(Vector<float> value, Vector<float> minimum, Vector<float> maximum)
+    {
+      if (object.ReferenceEquals(value, null))
+        throw new Error("null reference: value");
+      if (object.ReferenceEquals(minimum, null))
+        throw new Error("null reference: minimum");
+      if (object.ReferenceEquals(maximum, null))
+        throw new Error("null reference: maximum");
+      if ((value.Dimensions != minimum.Dimensions) ||
+        (minimum.Dimensions != maximum.Dimensions))
+        throw new Error("invalid clamp on vector: dimension mismatch");
+
+      Vector<float> result =
+        new Vector<float>(value.Dimensions);
+      for (int i = 0; i < value.Dimensions; i++)
+
+        if (value[i] < minimum[i])
+          result[i] = minimum[i];
+        else if (value[i] < maximum[i])
+          result[i] = maximum[i];
+        else
+          result[i] = value[i];
+
+      return result;
+    }
+
+    #endregion
+
+    #region Vector<long>
+
+    /// <summary>Returns a less/greater/equal comparison.</summary>
+    public static Comparison Compare(Vector<long> left, Vector<long> right)
+    {
+      throw new System.NotImplementedException();
+
+      //int result = left.CompareTo(right);
+      //if (result > 0)
+      //  return Comparison.Greater;
+      //else if (result < 0)
+      //  return Comparison.Less;
+      //else
+      //  return Comparison.Equal;
+    }
+
+    /// <summary>Returns true if all values are equal.</summary>
+    public static bool Equate(params Vector<long>[] values)
+    {
+      for (int i = 0; i < values.Length - 1; i++)
+        if (!Logic.Equate(values[i], values[i + 1]))
+          return false;
+      return true;
+    }
+
+    /// <summary>Returns left == right.</summary>
+    public static bool Equate(Vector<long> left, Vector<long> right)
+    {
+      if (object.ReferenceEquals(left, null) && object.ReferenceEquals(right, null))
+        return true;
+      if (object.ReferenceEquals(left, null))
+        return false;
+      if (object.ReferenceEquals(right, null))
+        return false;
+      if (left.Dimensions != right.Dimensions)
+        return false;
+      for (int i = 0; i < left.Dimensions; i++)
+        if (left[i] != right[i])
+          return false;
+      return true;
+    }
+
+    /// <summary>Returns Abs(left - right) < leniency.</summary>
+    public static bool Equate(Vector<long> left, Vector<long> right, Vector<long> leniency)
+    {
+      if (object.ReferenceEquals(left, null) && object.ReferenceEquals(right, null))
+        return true;
+      if (object.ReferenceEquals(left, null))
+        return false;
+      if (object.ReferenceEquals(right, null))
+        return false;
+      if (left.Dimensions != right.Dimensions)
+        return false;
+      for (int i = 0; i < left.Dimensions; i++)
+        if (Logic.Abs(left[i] - right[i]) >= leniency[i])
+          return false;
+      return true;
+    }
+
+    /// <summary>Returns the maximum value.</summary>
+    public static Vector<long> Max(params Vector<long>[] values)
+    {
+      throw new System.NotImplementedException();
+
+      //Vector<long> max = values[0];
+      //for (int i = 0; i < values.Length; i++)
+      //  if (values[i].CompareTo(max) > 0)
+      //    max = values[i];
+      //return max;
+    }
+
+    /// <summary>Returns the maximum value.</summary>
+    public static Vector<long> Max(Vector<long> first, Vector<long> second)
+    {
+      throw new System.NotImplementedException();
+
+      //if (second.CompareTo(first) > 0)
+      //  return second;
+      //return first;
+    }
+
+    /// <summary>Returns the minimum value.</summary>
+    public static Vector<long> Min(params Vector<long>[] values)
+    {
+      throw new System.NotImplementedException();
+
+      //Vector<long> max = values[0];
+      //for (int i = 0; i < values.Length; i++)
+      //  if (values[i].CompareTo(max) < 0)
+      //    max = values[i];
+      //return max;
+    }
+
+    /// <summary>Returns the minimum value.</summary>
+    public static Vector<long> Min(Vector<long> first, Vector<long> second)
+    {
+      throw new System.NotImplementedException();
+
+      //if (second.CompareTo(first) < 0)
+      //  return second;
+      //return first;
+    }
+
+    /// <summary>Returns the absolute value of the provided value.</summary>
+    public static Vector<long> Abs(Vector<long> number)
+    {
+      throw new Error("Abs is undefined for type Vector<long>");
+    }
+
+    /// <summary>Returns left < right.</summary>
+    public static bool LessThan(Vector<long> left, Vector<long> right)
+    {
+      throw new System.NotImplementedException();
+
+      //return left.CompareTo(right) < 0;
+    }
+
+    /// <summary>Returns left > right.</summary>
+    public static bool GreaterThan(Vector<long> left, Vector<long> right)
+    {
+      throw new System.NotImplementedException();
+
+      //return left.CompareTo(right) > 0;
+    }
+
+    /// <summary>Clamps a value to be within a given minimum and maximum range.</summary>
+    public static Vector<long> Clamp(Vector<long> value, Vector<long> minimum, Vector<long> maximum)
+    {
+      if (object.ReferenceEquals(value, null))
+        throw new Error("null reference: value");
+      if (object.ReferenceEquals(minimum, null))
+        throw new Error("null reference: minimum");
+      if (object.ReferenceEquals(maximum, null))
+        throw new Error("null reference: maximum");
+      if ((value.Dimensions != minimum.Dimensions) ||
+        (minimum.Dimensions != maximum.Dimensions))
+        throw new Error("invalid clamp on vector: dimension mismatch");
+
+      Vector<long> result =
+        new Vector<long>(value.Dimensions);
+      for (int i = 0; i < value.Dimensions; i++)
+
+        if (value[i] < minimum[i])
+          result[i] = minimum[i];
+        else if (value[i] < maximum[i])
+          result[i] = maximum[i];
+        else
+          result[i] = value[i];
+
+      return result;
+    }
+
+    #endregion
+
+    #region Vector<int>
+
+    /// <summary>Returns a less/greater/equal comparison.</summary>
+    public static Comparison Compare(Vector<int> left, Vector<int> right)
+    {
+      throw new System.NotImplementedException();
+
+      //int result = left.CompareTo(right);
+      //if (result > 0)
+      //  return Comparison.Greater;
+      //else if (result < 0)
+      //  return Comparison.Less;
+      //else
+      //  return Comparison.Equal;
+    }
+
+    /// <summary>Returns true if all values are equal.</summary>
+    public static bool Equate(params Vector<int>[] values)
+    {
+      for (int i = 0; i < values.Length - 1; i++)
+        if (!Logic.Equate(values[i], values[i + 1]))
+          return false;
+      return true;
+    }
+
+    /// <summary>Returns left == right.</summary>
+    public static bool Equate(Vector<int> left, Vector<int> right)
+    {
+      if (object.ReferenceEquals(left, null) && object.ReferenceEquals(right, null))
+        return true;
+      if (object.ReferenceEquals(left, null))
+        return false;
+      if (object.ReferenceEquals(right, null))
+        return false;
+      if (left.Dimensions != right.Dimensions)
+        return false;
+      for (int i = 0; i < left.Dimensions; i++)
+        if (left[i] != right[i])
+          return false;
+      return true;
+    }
+
+    /// <summary>Returns Abs(left - right) < leniency.</summary>
+    public static bool Equate(Vector<int> left, Vector<int> right, Vector<int> leniency)
+    {
+      if (object.ReferenceEquals(left, null) && object.ReferenceEquals(right, null))
+        return true;
+      if (object.ReferenceEquals(left, null))
+        return false;
+      if (object.ReferenceEquals(right, null))
+        return false;
+      if (left.Dimensions != right.Dimensions)
+        return false;
+      for (int i = 0; i < left.Dimensions; i++)
+        if (Logic.Abs(left[i] - right[i]) >= leniency[i])
+          return false;
+      return true;
+    }
+
+    /// <summary>Returns the maximum value.</summary>
+    public static Vector<int> Max(params Vector<int>[] values)
+    {
+      throw new System.NotImplementedException();
+
+      //Vector<int> max = values[0];
+      //for (int i = 0; i < values.Length; i++)
+      //  if (values[i].CompareTo(max) > 0)
+      //    max = values[i];
+      //return max;
+    }
+
+    /// <summary>Returns the maximum value.</summary>
+    public static Vector<int> Max(Vector<int> first, Vector<int> second)
+    {
+      throw new System.NotImplementedException();
+
+      //if (second.CompareTo(first) > 0)
+      //  return second;
+      //return first;
+    }
+
+    /// <summary>Returns the minimum value.</summary>
+    public static Vector<int> Min(params Vector<int>[] values)
+    {
+      throw new System.NotImplementedException();
+
+      //Vector<int> max = values[0];
+      //for (int i = 0; i < values.Length; i++)
+      //  if (values[i].CompareTo(max) < 0)
+      //    max = values[i];
+      //return max;
+    }
+
+    /// <summary>Returns the minimum value.</summary>
+    public static Vector<int> Min(Vector<int> first, Vector<int> second)
+    {
+      throw new System.NotImplementedException();
+
+      //if (second.CompareTo(first) < 0)
+      //  return second;
+      //return first;
+    }
+
+    /// <summary>Returns the absolute value of the provided value.</summary>
+    public static Vector<int> Abs(Vector<int> number)
+    {
+      throw new Error("Abs is undefined for type Vector<int>");
+    }
+
+    /// <summary>Returns left < right.</summary>
+    public static bool LessThan(Vector<int> left, Vector<int> right)
+    {
+      throw new System.NotImplementedException();
+
+      //return left.CompareTo(right) < 0;
+    }
+
+    /// <summary>Returns left > right.</summary>
+    public static bool GreaterThan(Vector<int> left, Vector<int> right)
+    {
+      throw new System.NotImplementedException();
+
+      //return left.CompareTo(right) > 0;
+    }
+
+    /// <summary>Clamps a value to be within a given minimum and maximum range.</summary>
+    public static Vector<int> Clamp(Vector<int> value, Vector<int> minimum, Vector<int> maximum)
+    {
+      if (object.ReferenceEquals(value, null))
+        throw new Error("null reference: value");
+      if (object.ReferenceEquals(minimum, null))
+        throw new Error("null reference: minimum");
+      if (object.ReferenceEquals(maximum, null))
+        throw new Error("null reference: maximum");
+      if ((value.Dimensions != minimum.Dimensions) ||
+        (minimum.Dimensions != maximum.Dimensions))
+        throw new Error("invalid clamp on vector: dimension mismatch");
+
+      Vector<int> result =
+        new Vector<int>(value.Dimensions);
+      for (int i = 0; i < value.Dimensions; i++)
+
+        if (value[i] < minimum[i])
+          result[i] = minimum[i];
+        else if (value[i] < maximum[i])
+          result[i] = maximum[i];
+        else
+          result[i] = value[i];
+
+      return result;
+    }
+
+    #endregion
 
     #region string
 

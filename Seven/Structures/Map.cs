@@ -25,7 +25,7 @@ namespace Seven.Structures
     T this[K key] { get; set; }
     int Count { get; }
     bool IsEmpty { get; }
-    Map.Hash<K> Hash { get; }
+    Hash<K> Hash { get; }
     Equate<K> Equate { get; }
 
     #endregion
@@ -45,11 +45,7 @@ namespace Seven.Structures
   /// <summary>Contains extensions for the Map interface.</summary>
   public class Map
   {
-    #region delegate
-
-    public delegate int Hash<K>(K key);
-
-    #endregion
+    // nothing
   }
 
   [System.Serializable]
@@ -90,7 +86,7 @@ namespace Seven.Structures
     private const double _maxLoadFactor = 1.0d;
 
     private Equate<K> _equate;
-    private Map.Hash<K> _hash;
+    private Hash<K> _hash;
     private Node[] _table;
     private int _count;
     private int _sizeIndex;
@@ -106,7 +102,7 @@ namespace Seven.Structures
     #region property
 
     /// <summary>The function for calculating hash codes for this table.</summary>
-    public Map.Hash<K> Hash { get { return _hash; } }
+    public Hash<K> Hash { get { return _hash; } }
 
     /// <summary>The function for equating keys in this table.</summary>
     public Equate<K> Equate { get { return _equate; } }
@@ -154,7 +150,7 @@ namespace Seven.Structures
 
     /// <summary>Constructs a new hash table instance.</summary>
     /// <remarks>Runtime: O(1).</remarks>
-    public Map_Linked(Equate<K> equate, Map.Hash<K> hash)
+    public Map_Linked(Equate<K> equate, Hash<K> hash)
     {
       this._equate = equate;
       this._hash = hash;

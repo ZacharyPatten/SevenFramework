@@ -37,4 +37,9 @@ namespace Seven.Structures
   /// <param name="current">The current instance of iteration through the data structure.</param>
   /// <returns>The status of the iteration. Allows breaking functionality.</returns>
   public delegate ForeachStatus ForeachRefBreak<Type>(ref Type current);
+
+  /// <summary>Delegate for a traversal function on a data structure.</summary>
+  /// <typeparam name="T">The type of instances the will be traversed.</typeparam>
+  /// <param name="function">The foreach function to perform on each iteration.</param>
+  public delegate void Traversal<T>(Foreach<T> function);
 }

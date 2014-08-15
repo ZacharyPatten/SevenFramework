@@ -501,7 +501,7 @@ namespace Seven.Mathematics
     /// <summary>Checks to see if a linear algebra implementaton exists for the given type.</summary>
     /// <typeparam name="T">The type to check for a linear algebra implementation.</typeparam>
     /// <returns>True is an implementation exists; false if not.</returns>
-    public static bool Check<T>()
+    public static bool Contains<T>()
     {
       return _linearAlgebras.Contains(typeof(T));
     }
