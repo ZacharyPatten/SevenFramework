@@ -149,11 +149,20 @@ namespace Tutorial_Mathematics
       Console.WriteLine();
 
       // Vector Cross Product
-      Console.WriteLine("    V cross V: ");
-      ConsoleWrite(_.cros(V, V));
+      Vector<double> V3 = new double[]
+      {
+        random.NextDouble(),
+        random.NextDouble(),
+        random.NextDouble(),
+      };
+
+      Console.WriteLine("    Vector<double> V3: ");
+      ConsoleWrite(V3);
+      Console.WriteLine("    V3 cross V3: ");
+      ConsoleWrite(_.cros(V3, V3));
 
       // Matrix Construction
-      Matrix<double> M = new double[,]
+      Matrix<double> M = (Matrix<double>)new double[,]
       {
         { random.NextDouble(), random.NextDouble(), random.NextDouble(), random.NextDouble() },
         { random.NextDouble(), random.NextDouble(), random.NextDouble(), random.NextDouble() },
@@ -164,17 +173,34 @@ namespace Tutorial_Mathematics
       Console.WriteLine("    Matrix<double> M: ");
       ConsoleWrite(M);
 
+      // Matrix Negation
+      Console.WriteLine("    -M: ");
+      ConsoleWrite(-M);
+
       // Matrix Addition
       Console.WriteLine("    M + M (aka 2M): ");
       ConsoleWrite(M + M);
+
+      // Matrix Subtraction
+      Console.WriteLine("    M - M: ");
+      ConsoleWrite(M - M);
 
       // Matrix Multiplication
       Console.WriteLine("    M * M (aka M ^ 2): ");
       ConsoleWrite(M * M);
 
+      // If you have a large matrix that you want to multi-thread the multiplication,
+      // use the function: "LinearAlgebra.Multiply_parallel". This function will
+      // automatically parrallel the multiplication to the number of cores on your
+      // personal computer.
+
       // Matrix Power
       Console.WriteLine("    M ^ 3: ");
       ConsoleWrite(M ^ 3);
+
+      // Matrix Multiplication
+      Console.WriteLine("    minor(M, 1, 1): ");
+      ConsoleWrite(M.Minor(1, 1));
 
       // Matrix Reduced Row Echelon
       Console.WriteLine("    rref(M): ");
@@ -189,7 +215,7 @@ namespace Tutorial_Mathematics
       ConsoleWrite(M * V);
 
       // Matrix Lower-Upper Decomposition
-      double[,] l, u;
+      Matrix<double> l, u;
       LinearAlgebra.DecomposeLU(M, out l, out u);
       Console.WriteLine("    Lower-Upper Decomposition:");
       Console.WriteLine();
@@ -213,10 +239,10 @@ namespace Tutorial_Mathematics
       ConsoleWrite(Q + Q);
 
       // Quaternion-Vector Rotation
-      Console.WriteLine("    Q * V * Q':");
+      Console.WriteLine("    Q * V3 * Q':");
       // Note: the vector should be normalized on the 4th component 
       // for a proper rotation. (I did not do that)
-      ConsoleWrite(V.RotateBy(Q));
+      ConsoleWrite(V3.RotateBy(Q));
 
       #endregion
 
@@ -309,6 +335,18 @@ namespace Tutorial_Mathematics
       {
         Console.Write("      [ ");
         for (int j = 0; j < matrix.Columns; j++)
+          Console.Write(string.Format("{0:0.00}", matrix[i, j]) + " ");
+        Console.WriteLine("]");
+      }
+      Console.WriteLine();
+    }
+
+    public static void ConsoleWrite(double[,] matrix)
+    {
+      for (int i = 0; i < matrix.GetLength(0); i++)
+      {
+        Console.Write("      [ ");
+        for (int j = 0; j < matrix.GetLength(1); j++)
           Console.Write(string.Format("{0:0.00}", matrix[i, j]) + " ");
         Console.WriteLine("]");
       }

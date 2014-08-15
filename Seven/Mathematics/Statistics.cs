@@ -714,6 +714,7 @@ namespace Seven.Mathematics
           (Link<double, int> left, Link<double, int> right) =>
             { return Logic.Compare(left.Two, right.Two); });
 
+      // Can be improved when the dictionary heap is finished (no clone-sort necessary)
       double[] sorted = values.Clone() as double[];
       Sort.Quick<double>(Logic.Compare, sorted);
 

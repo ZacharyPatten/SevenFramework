@@ -1284,7 +1284,6 @@ namespace Seven.Structures
 #if no_error_checking
       // nothing
 #else
-
       // check the locate and compare delegates
       if (locate == null)
         throw new Error("null reference on location delegate during Omnitree construction");
@@ -1305,14 +1304,12 @@ namespace Seven.Structures
       // Check the average delegate
       if (average == null)
         throw new Error("null reference on average delegate during Omnitree construction");
+#endif
+      #endregion
+
       M[] origin = new M[min.Length];
       for (int i = 0; i < min.Length; i++)
         origin[i] = average(min[i], max[i]);
-      for (int i = 0; i < min.Length; i++)
-        if (compare(min[i], origin[i]) != Comparison.Less || compare(origin[i], max[i]) != Comparison.Less)
-          throw new Error("invalid average function. not all average values were computed to be between the min/max values.");
-#endif
-      #endregion
 
       this._locate = locate;
       this._average = average;
@@ -1393,7 +1390,7 @@ namespace Seven.Structures
 #if no_error_checking
       // this check is still required
       if (!EncapsulationCheck(this._top.Min, this._top.Max, ms))
-          this.HandleOutOfBounds(list.Value);
+        this.HandleOutOfBounds(addition);
 #else
       if (!EncapsulationCheck(this._top.Min, this._top.Max, ms))
         if (HandleOutOfBounds == null)
@@ -2109,7 +2106,7 @@ namespace Seven.Structures
               this._count--;
               #region error
 #if no_error_checking
-              this.HandleOutOfBounds(leaf.Contents[i]);
+              this.HandleOutOfBounds(leaf.Head.Value);
 #else
               if (HandleOutOfBounds == null)
                 throw new Error("a node was updated to be out of bounds (found in an update)");
@@ -2162,7 +2159,7 @@ namespace Seven.Structures
 
                 #region error
 #if no_error_checking
-                this.HandleOutOfBounds(leaf.Contents[i]);
+                this.HandleOutOfBounds(list.Next.Value);
 #else
                 if (HandleOutOfBounds == null)
                   throw new Error("a node was updated to be out of bounds (found in an update)");
@@ -2253,7 +2250,7 @@ namespace Seven.Structures
 
               #region error
 #if no_error_checking
-              this.HandleOutOfBounds(leaf.Contents[i]);
+              this.HandleOutOfBounds(leaf.Head.Value);
 #else
               if (HandleOutOfBounds == null)
                 throw new Error("a node was updated to be out of bounds (found in an update)");
@@ -2306,7 +2303,7 @@ namespace Seven.Structures
 
                 #region error
 #if no_error_checking
-                this.HandleOutOfBounds(leaf.Contents[i]);
+                this.HandleOutOfBounds(list.Next.Value);
 #else
                 if (HandleOutOfBounds == null)
                   throw new Error("a node was updated to be out of bounds (found in an update)");

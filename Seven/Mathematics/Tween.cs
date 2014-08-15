@@ -75,24 +75,24 @@ namespace Seven.Mathematics
     {
       if (timePassed == duration)
         return start + distance;
-      return (float)(distance * (-System.Math.Pow(2, -10 * timePassed / duration) + 1) + start);
+      return (float)(distance * (-Arithmetic.Power(2, -10 * timePassed / duration) + 1) + start);
     }
 
     private static double EaseInExpo(double timePassed, double start, double distance, double duration)
     {
       if (timePassed == 0)
         return start;
-      return (float)(distance * System.Math.Pow(2, 10 * (timePassed / duration - 1)) + start);
+      return (float)(distance * Arithmetic.Power(2, 10 * (timePassed / duration - 1)) + start);
     }
 
     private static double EaseOutCirc(double timePassed, double start, double distance, double duration)
     {
-      return (float)(distance * System.Math.Sqrt(1 - (timePassed = timePassed / duration - 1) * timePassed) + start);
+      return (float)(distance * Algebra.sqrt(1 - (timePassed = timePassed / duration - 1) * timePassed) + start);
     }
 
     private static double EaseInCirc(double timePassed, double start, double distance, double duration)
     {
-      return (float)(-distance * (System.Math.Sqrt(1 - (timePassed /= duration) * timePassed) - 1) + start);
+      return (float)(-distance * (Algebra.sqrt(1 - (timePassed /= duration) * timePassed) - 1) + start);
     }
   }
 }
