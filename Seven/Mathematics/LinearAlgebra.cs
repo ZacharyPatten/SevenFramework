@@ -3,6 +3,8 @@
 // LISCENSE: See "LISCENSE.md" in th root project directory.
 // SUPPORT: See "SUPPORT.md" in the root project directory.
 
+using Seven.Structures;
+
 namespace Seven.Mathematics
 {
 	/// <summary>Supplies linear algebra mathematics for generic types.</summary>
@@ -136,7 +138,10 @@ namespace Seven.Mathematics
 
     // The minimum size (rows x columns) that will trigger multithreading 
     // of matrix operations. Example: "A.Multiply_parallel(B)"
-    public static int _parallelMinimum = 49;
+    const int _parallelMinimum = 49;
+    // The maximum size (rows x columns) that will trigger unsafe code
+    // if compiling with the unsafe directive.
+    const int _unsafeMaximum = 49;
 
     #endregion
 
@@ -4166,32 +4171,60 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error checking
+
 #if no_errorchecking
       //nothing
 #else
       if (object.ReferenceEquals(matrix, null))
         throw new Error("null reference: matrix");
+#endif
+
+      #endregion
+
       if (matrix.Rows != matrix.Columns)
         return false;
-#endif
-      int size = matrix.Columns;
-#if unsafe_code
-      unsafe
+
+      #region flattened arrays
+
+      if (matrix.CurrentFormat == Matrix<Fraction128>.Format.FlattenedArray)
       {
-        fixed (Fraction128* matrix_flat = matrix._matrix)
-          for (var row = 0; row < size; row++)
-            for (var column = row + 1; column < size; column++)
-              if (matrix_flat[row * size + column] != matrix_flat[column * size + row])
-                return false;
-      }
+
+        int size = matrix.Columns;
+
+#if unsafe_code
+        unsafe
+        {
+          fixed (Fraction128* matrix_flat = matrix._matrix as Fraction128[])
+            for (var row = 0; row < size; row++)
+              for (var column = row + 1; column < size; column++)
+                if (matrix_flat[row * size + column] != matrix_flat[column * size + row])
+                  return false;
+        }
 #else
-      Fraction128[] matrix_flat = matrix._matrix;
+      Fraction128[] matrix_flat = matrix._matrix as Fraction128[];
       for (var row = 0; row < size; row++)
         for (var column = row + 1; column < size; column++)
           if (matrix_flat[row * size + column] != matrix_flat[column * size + row])
             return false;
 #endif
-      return true;
+        return true;
+      }
+
+      #endregion
+
+      #region default
+
+      else
+      {
+        for (int i = 0; i < matrix.Rows; i++)
+          for (int j = 0; j < matrix.Columns; j++)
+            if (matrix[i, j] != matrix[j, i])
+              return false;
+        return true;
+      }
+
+      #endregion
     }
 
     /// <summary>Constructs a new identity-matrix of the given dimensions.</summary>
@@ -4210,6 +4243,8 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error checking
+
 #if no_error_checking
       //nothing
 #else
@@ -4219,12 +4254,10 @@ namespace Seven.Mathematics
         throw new Error("invalid column count on matrix creation");
 #endif
 
+      #endregion
+
       Matrix<Fraction128> matrix = new Matrix<Fraction128>(rows, columns);
-      if (rows <= columns)
-        for (int i = 0; i < rows; i++)
-          matrix[i, i] = 1;
-      else
-        for (int i = 0; i < columns; i++)
+      for (int i = 0, i_max = Logic.Min(rows, columns); i < i_max; i++)
           matrix[i, i] = 1;
       return matrix;
     }
@@ -4245,34 +4278,61 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error checking
+
 #if no_error_checking
       // nothing
 #else
-        if (object.ReferenceEquals(matrix, null))
+      if (object.ReferenceEquals(matrix, null))
           throw new Error("null reference: matirx");
 #endif
 
-      Matrix<Fraction128> result =
-        new Matrix<Fraction128>(matrix.Rows, matrix.Columns);
-      int size = matrix.Rows * matrix.Columns;
+      #endregion
+
+      #region flattened arrays
+
+      if (matrix.CurrentFormat == Matrix<Fraction128>.Format.FlattenedArray)
+        {
+
+          Matrix<Fraction128> result =
+            new Matrix<Fraction128>(matrix.Rows, matrix.Columns);
+          int size = matrix.Rows * matrix.Columns;
 
 #if unsafe_code
-      unsafe
-      {
-        fixed (Fraction128*
-          result_flat = result._matrix,
-          matrix_flat = matrix._matrix)
-          for (int i = 0; i < size; i++)
-            result_flat[i] = -matrix_flat[i];
-        return result;
-      }
+          unsafe
+          {
+            fixed (Fraction128*
+              result_flat = result._matrix as Fraction128[],
+              matrix_flat = matrix._matrix as Fraction128[])
+              for (int i = 0; i < size; i++)
+                result_flat[i] = -matrix_flat[i];
+            return result;
+          }
 #else
-      Fraction128[] result_flat = result._matrix;
-      Fraction128[] matrix_flat = matrix._matrix;
+      Fraction128[] result_flat = result._matrix as Fraction128[];
+      Fraction128[] matrix_flat = matrix._matrix as Fraction128[];
       for (int i = 0; i < size; i++)
         result_flat[i] = -matrix_flat[i];
       return result;
 #endif
+
+        }
+
+      #endregion
+
+      #region default
+
+      else
+        {
+          Matrix<Fraction128> result =
+            new Matrix<Fraction128>(matrix.Rows, matrix.Columns);
+          for (int i = 0; i < matrix.Rows; i++)
+            for (int j = 0; j < matrix.Rows; j++)
+              result[i, j] = -matrix[i, j];
+          return result;
+        }
+
+      #endregion
     }
 
     /// <summary>Negates all the values in a matrix.</summary>
@@ -4280,6 +4340,8 @@ namespace Seven.Mathematics
     /// <returns>The resulting matrix after the negations.</returns>
     public static Matrix<Fraction128> Negate_parallel(Matrix<Fraction128> matrix)
     {
+      #region error checking
+
 #if no_error_checking
       // nothing
 #else
@@ -4287,45 +4349,56 @@ namespace Seven.Mathematics
         throw new Error("null reference: matirx");
 #endif
 
-      if (matrix.Rows * matrix.Columns > _parallelMinimum)
+      #endregion
+
+      // At the moment, negation does not benefit from multithreading.
+      if (false) //matrix.Rows * matrix.Columns > _parallelMinimum)
       {
-        Matrix<Fraction128> result =
-        new Matrix<Fraction128>(matrix.Rows, matrix.Columns);
-        int size = matrix.Rows * matrix.Columns;
+        #region flattened array
+
+        if (matrix.CurrentFormat == Matrix<Fraction128>.Format.FlattenedArray)
+        {
+
+          Matrix<Fraction128> result =
+          new Matrix<Fraction128>(matrix.Rows, matrix.Columns);
+          int size = matrix.Rows * matrix.Columns;
 
 #if unsafe_code
-        unsafe
-        {
-          Seven.Parallels.AutoParallel.Divide(
-            (int current, int max) =>
-            {
-              return () =>
+          unsafe
+          {
+            Seven.Parallels.AutoParallel.Divide(
+              (int current, int max) =>
               {
-                fixed (Fraction128*
-                  result_flat = result._matrix,
-                  matrix_flat = matrix._matrix)
-                  for (int i = current; i < size; i += max)
-                    result_flat[i] = -matrix_flat[i];
-              };
-            }, Logic.Max(matrix.Rows, matrix.Columns));
-        }
+                return () =>
+                {
+                  fixed (Fraction128*
+                    result_flat = result._matrix as Fraction128[],
+                    matrix_flat = matrix._matrix as Fraction128[])
+                    for (int i = current; i < size; i += max)
+                      result_flat[i] = -matrix_flat[i];
+                };
+              }, Logic.Max(matrix.Rows, matrix.Columns));
+          }
 #else
           Seven.Parallels.AutoParallel.Divide(
             (int current, int max) =>
             {
               return () =>
               {
-                Fraction128[] matrix_flat = matrix._matrix;
-                Fraction128[] result_flat = result._matrix;
+                Fraction128[] matrix_flat = matrix._matrix as Fraction128[];
+                Fraction128[] result_flat = result._matrix as Fraction128[];
                 for (int i = current; i < size; i += max)
                   result_flat[i] = -matrix_flat[i];
               };
-            }, Logic.Max(left.Rows, left.Columns));
+            }, Logic.Max(matrix.Rows, matrix.Columns));
 #endif
-        return result;
+          return result;
+
+        }
+
+        #endregion
       }
-      else
-        return LinearAlgebra.Negate(matrix);
+      return LinearAlgebra.Negate(matrix);
     }
 
     /// <summary>Does standard addition of two matrices.</summary>
@@ -4345,6 +4418,8 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error checking
+
 #if no_error_checking
       // nothing
 #else
@@ -4356,29 +4431,66 @@ namespace Seven.Mathematics
         throw new Error("invalid matrix addition (dimension miss-match).");
 #endif
 
-      Matrix<Fraction128> result =
-        new Matrix<Fraction128>(left.Rows, left.Columns);
-      int size = left.Rows * left.Columns;
+      #endregion
+
+      #region flattened arrays
+
+      if (left.CurrentFormat == Matrix<Fraction128>.Format.FlattenedArray &&
+        right.CurrentFormat == Matrix<Fraction128>.Format.FlattenedArray)
+      {
+
+        Matrix<Fraction128> result =
+          new Matrix<Fraction128>(left.Rows, left.Columns);
+        int size = left.Rows * left.Columns;
 
 #if unsafe_code
-      unsafe
-      {
-        fixed (Fraction128*
-          left_flat = left._matrix,
-          right_flat = right._matrix,
-          result_flat = result._matrix)
+        if (size < _unsafeMaximum)
+        {
+          unsafe
+          {
+            fixed (Fraction128*
+              left_flat = left._matrix as Fraction128[],
+              right_flat = right._matrix as Fraction128[],
+              result_flat = result._matrix as Fraction128[])
+              for (int i = 0; i < size; i++)
+                result_flat[i] = left_flat[i] + right_flat[i];
+          }
+        }
+        else
+        {
+          Fraction128[] left_flat = left._matrix as Fraction128[];
+          Fraction128[] right_flat = right._matrix as Fraction128[];
+          Fraction128[] result_flat = result._matrix as Fraction128[];
           for (int i = 0; i < size; i++)
             result_flat[i] = left_flat[i] + right_flat[i];
-      }
+        }
 #else
-      Fraction128[] left_flat = left._matrix;
-      Fraction128[] right_flat = right._matrix;
-      Fraction128[] result_flat = result._matrix;
+      Fraction128[] left_flat = left._matrix as Fraction128[];
+      Fraction128[] right_flat = right._matrix as Fraction128[];
+      Fraction128[] result_flat = result._matrix as Fraction128[];
       for (int i = 0; i < size; i++)
         result_flat[i] = left_flat[i] + right_flat[i];
 #endif
 
-      return result;
+        return result;
+
+      }
+
+      #endregion
+
+      #region default
+
+      else
+      {
+        Matrix<Fraction128> result =
+          new Matrix<Fraction128>(left.Rows, left.Columns);
+        for (int i = 0; i < left.Rows; i++)
+          for (int j = 0; j < left.Columns; j++)
+            result[i, j] = left[i, j] + right[i, j];
+        return result;
+      }
+
+      #endregion
     }
 
     /// <summary>Does standard addition of two matrices.</summary>
@@ -4387,6 +4499,8 @@ namespace Seven.Mathematics
     /// <returns>The resulting matrix after the addition.</returns>
     public static Matrix<Fraction128> Add_parallel(Matrix<Fraction128> left, Matrix<Fraction128> right)
     {
+      #region error checking
+
 #if no_error_checking
       // nothing
 #else
@@ -4398,47 +4512,58 @@ namespace Seven.Mathematics
         throw new Error("invalid matrix addition (dimension miss-match).");
 #endif
 
-      if (left.Rows * left.Columns > _parallelMinimum)
+      #endregion
+
+      // At the moment, addition does not benefit from multithreading.
+      if (false) //matrix.Rows * matrix.Columns > _parallelMinimum)
       {
-        Matrix<Fraction128> result =
-        new Matrix<Fraction128>(left.Rows, left.Columns);
-        int size = left.Rows * left.Columns;
+        #region flattened array
+
+        if (left.CurrentFormat == Matrix<Fraction128>.Format.FlattenedArray)
+        {
+
+          Matrix<Fraction128> result =
+          new Matrix<Fraction128>(left.Rows, left.Columns);
+          int size = left.Rows * left.Columns;
 
 #if unsafe_code
-        unsafe
-        {
-          Seven.Parallels.AutoParallel.Divide(
-            (int current, int max) =>
-            {
-              return () =>
+          unsafe
+          {
+            Seven.Parallels.AutoParallel.Divide(
+              (int current, int max) =>
               {
-                fixed (Fraction128*
-                  left_flat = left._matrix,
-                  right_flat = right._matrix,
-                  result_flat = result._matrix)
-                  for (int i = current; i < size; i += max)
-                    result_flat[i] = left_flat[i] + right_flat[i];
-              };
-            }, Logic.Max(left.Rows, left.Columns));
-        }
+                return () =>
+                {
+                  fixed (Fraction128*
+                    left_flat = left._matrix as Fraction128[],
+                    right_flat = right._matrix as Fraction128[],
+                    result_flat = result._matrix as Fraction128[])
+                    for (int i = current; i < size; i += max)
+                      result_flat[i] = left_flat[i] + right_flat[i];
+                };
+              }, Logic.Max(left.Rows, left.Columns));
+          }
 #else
           Seven.Parallels.AutoParallel.Divide(
             (int current, int max) =>
             {
               return () =>
               {
-                Fraction128[] left_flat = left._matrix;
-                Fraction128[] right_flat = right._matrix;
-                Fraction128[] result_flat = result._matrix;
+                Fraction128[] left_flat = left._matrix as Fraction128[];
+                Fraction128[] right_flat = right._matrix as Fraction128[];
+                Fraction128[] result_flat = result._matrix as Fraction128[];
                 for (int i = current; i < size; i += max)
                   result_flat[i] = left_flat[i] + right_flat[i];
               };
             }, Logic.Max(left.Rows, left.Columns));
 #endif
-        return result;
+          return result;
+
+        }
+
+        #endregion
       }
-      else
-        return LinearAlgebra.Add(left, right);
+      return LinearAlgebra.Add(left, right);
     }
 
     /// <summary>Subtracts a scalar from all the values in a matrix.</summary>
@@ -4458,6 +4583,8 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error checking
+
 #if no_error_checking
       // nothing
 #else
@@ -4469,29 +4596,65 @@ namespace Seven.Mathematics
         throw new Error("invalid matrix subtraction (dimension miss-match).");
 #endif
 
-      Matrix<Fraction128> result =
-        new Matrix<Fraction128>(left.Rows, left.Columns);
-      int size = left.Rows * left.Columns;
+      #endregion
+
+      #region flattened arrays
+
+      if (left.CurrentFormat == Matrix<Fraction128>.Format.FlattenedArray &&
+        right.CurrentFormat == Matrix<Fraction128>.Format.FlattenedArray)
+      {
+
+        Matrix<Fraction128> result =
+          new Matrix<Fraction128>(left.Rows, left.Columns);
+        int size = left.Rows * left.Columns;
 
 #if unsafe_code
-      unsafe
-      {
-        fixed (Fraction128*
-          left_flat = left._matrix,
-          right_flat = right._matrix,
-          result_flat = result._matrix)
+        if (size < _unsafeMaximum)
+        {
+          unsafe
+          {
+            fixed (Fraction128*
+              left_flat = left._matrix as Fraction128[],
+              right_flat = right._matrix as Fraction128[],
+              result_flat = result._matrix as Fraction128[])
+              for (int i = 0; i < size; i++)
+                result_flat[i] = left_flat[i] - right_flat[i];
+          }
+        }
+        else
+        {
+          Fraction128[] left_flat = left._matrix as Fraction128[];
+          Fraction128[] right_flat = right._matrix as Fraction128[];
+          Fraction128[] result_flat = result._matrix as Fraction128[];
           for (int i = 0; i < size; i++)
             result_flat[i] = left_flat[i] - right_flat[i];
-      }
+        }
 #else
-      Fraction128[] left_flat = left._matrix;
-      Fraction128[] right_flat = right._matrix;
-      Fraction128[] result_flat = result._matrix;
+      Fraction128[] left_flat = left._matrix as Fraction128[];
+      Fraction128[] right_flat = right._matrix as Fraction128[];
+      Fraction128[] result_flat = result._matrix as Fraction128[];
       for (int i = 0; i < size; i++)
         result_flat[i] = left_flat[i] - right_flat[i];
 #endif
 
-      return result;
+        return result;
+      }
+
+      #endregion
+
+      #region default
+
+      else
+      {
+        Matrix<Fraction128> result =
+          new Matrix<Fraction128>(left.Rows, left.Columns);
+        for (int i = 0; i < left.Rows; i++)
+          for (int j = 0; j < left.Columns; j++)
+            result[i, j] = left[i, j] - right[i, j];
+        return result;
+      }
+
+      #endregion
     }
 
     /// <summary>Subtracts a scalar from all the values in a matrix.</summary>
@@ -4500,6 +4663,8 @@ namespace Seven.Mathematics
     /// <returns>The resulting matrix after the subtractions.</returns>
     public static Matrix<Fraction128> Subtract_parallel(Matrix<Fraction128> left, Matrix<Fraction128> right)
     {
+      #region error checking
+
 #if no_error_checking
       // nothing
 #else
@@ -4511,47 +4676,58 @@ namespace Seven.Mathematics
         throw new Error("invalid matrix subtraction (dimension miss-match).");
 #endif
 
-      if (left.Rows * left.Columns > _parallelMinimum)
+      #endregion
+
+      // At the moment, subtraction does not benefit from multithreading.
+      if (false) //matrix.Rows * matrix.Columns > _parallelMinimum)
       {
-        Matrix<Fraction128> result =
-        new Matrix<Fraction128>(left.Rows, left.Columns);
-        int size = left.Rows * left.Columns;
+        #region flattened arrays
+
+        if (left.CurrentFormat == Matrix<Fraction128>.Format.FlattenedArray &&
+          right.CurrentFormat == Matrix<Fraction128>.Format.FlattenedArray)
+        {
+
+          Matrix<Fraction128> result =
+          new Matrix<Fraction128>(left.Rows, left.Columns);
+          int size = left.Rows * left.Columns;
 
 #if unsafe_code
-        unsafe
-        {
-          Seven.Parallels.AutoParallel.Divide(
-            (int current, int max) =>
-            {
-              return () =>
+          unsafe
+          {
+            Seven.Parallels.AutoParallel.Divide(
+              (int current, int max) =>
               {
-                fixed (Fraction128*
-                  left_flat = left._matrix,
-                  right_flat = right._matrix,
-                  result_flat = result._matrix)
-                  for (int i = current; i < size; i += max)
-                    result_flat[i] = left_flat[i] - right_flat[i];
-              };
-            }, Logic.Max(left.Rows, left.Columns));
-        }
+                return () =>
+                {
+                  fixed (Fraction128*
+                    left_flat = left._matrix as Fraction128[],
+                    right_flat = right._matrix as Fraction128[],
+                    result_flat = result._matrix as Fraction128[])
+                    for (int i = current; i < size; i += max)
+                      result_flat[i] = left_flat[i] - right_flat[i];
+                };
+              }, Logic.Max(left.Rows, left.Columns));
+          }
 #else
           Seven.Parallels.AutoParallel.Divide(
           (int current, int max) =>
           {
             return () =>
             {
-              Fraction128[] left_flat = left._matrix;
-              Fraction128[] right_flat = right._matrix;
-              Fraction128[] result_flat = result._matrix;
+              Fraction128[] left_flat = left._matrix as Fraction128[];
+              Fraction128[] right_flat = right._matrix as Fraction128[];
+              Fraction128[] result_flat = result._matrix as Fraction128[];
                 for (int i = current; i < size; i += max)
                   result_flat[i] = left_flat[i] - right_flat[i];
             };
           }, Logic.Max(left.Rows, left.Columns));
 #endif
-        return result;
+          return result;
+        }
+
+        #endregion
       }
-      else
-        return LinearAlgebra.Subtract(left, right);
+      return LinearAlgebra.Subtract(left, right);
     }
 
     /// <summary>Performs multiplication on two matrices.</summary>
@@ -4572,6 +4748,8 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error checking
+
 #if no_error_checking
       // nothing
 #else
@@ -4583,20 +4761,46 @@ namespace Seven.Mathematics
         throw new LinearAlgebra.Error("invalid multiplication (size miss-match).");
 #endif
 
-      Fraction128 sum;
-      int result_rows = left.Rows;
-      int left_cols = left.Columns;
-      int result_cols = right.Columns;
-      Matrix<Fraction128> result =
-        new Matrix<Fraction128>(result_rows, result_cols);
+      #endregion
+
+      #region flattened arrays
+
+      if (left.CurrentFormat == Matrix<Fraction128>.Format.FlattenedArray &&
+        right.CurrentFormat == Matrix<Fraction128>.Format.FlattenedArray)
+      {
+
+        Fraction128 sum;
+        int result_rows = left.Rows;
+        int left_cols = left.Columns;
+        int result_cols = right.Columns;
+        Matrix<Fraction128> result =
+          new Matrix<Fraction128>(result_rows, result_cols);
 
 #if unsafe_code
-      unsafe
-      {
-        fixed (Fraction128*
-          result_flat = result._matrix,
-          left_flat = left._matrix,
-          right_flat = right._matrix)
+        if (result_rows * result_cols < _unsafeMaximum)
+        {
+          unsafe
+          {
+            fixed (Fraction128*
+              result_flat = result._matrix as Fraction128[],
+              left_flat = left._matrix as Fraction128[],
+              right_flat = right._matrix as Fraction128[])
+              for (int i = 0; i < result_rows; i++)
+                for (int j = 0; j < result_cols; j++)
+                {
+                  sum = 0;
+                  for (int k = 0; k < left_cols; k++)
+                    sum += left_flat[i * left_cols + k] * right_flat[k * result_cols + j];
+                  result_flat[i * result_cols + j] = sum;
+                }
+          }
+        }
+        else
+        {
+          Fraction128[] result_flat = result._matrix as Fraction128[];
+          Fraction128[] left_flat = left._matrix as Fraction128[];
+          Fraction128[] right_flat = right._matrix as Fraction128[];
+
           for (int i = 0; i < result_rows; i++)
             for (int j = 0; j < result_cols; j++)
             {
@@ -4605,11 +4809,11 @@ namespace Seven.Mathematics
                 sum += left_flat[i * left_cols + k] * right_flat[k * result_cols + j];
               result_flat[i * result_cols + j] = sum;
             }
-      }
+        }
 #else
-      Fraction128[] result_flat = result._matrix;
-      Fraction128[] left_flat = left._matrix;
-      Fraction128[] right_flat = right._matrix;
+      Fraction128[] result_flat = result._matrix as Fraction128[];
+      Fraction128[] left_flat = left._matrix as Fraction128[];
+      Fraction128[] right_flat = right._matrix as Fraction128[];
 
       for (int i = 0; i < result_rows; i++)
         for (int j = 0; j < result_cols; j++)
@@ -4621,7 +4825,25 @@ namespace Seven.Mathematics
         }
 #endif
 
-      return result;
+        return result;
+      }
+
+      #endregion
+
+      #region default
+
+      else
+      {
+        Matrix<Fraction128> result = 
+          new Matrix<Fraction128>(left.Rows, right.Columns);
+        for (int i = 0; i < left.Rows; i++)
+          for (int j = 0; j < right.Columns; j++)
+            for (int k = 0; k < left.Columns; k++)
+              result[i, j] += left[i, k] * right[k, j];
+        return result;
+      }
+
+      #endregion
     }
 
     /// <summary>Performs multiplication on two matrices using multi-threading.</summary>
@@ -4630,6 +4852,8 @@ namespace Seven.Mathematics
     /// <returns>The resulting matrix of the multiplication.</returns>
     public static Matrix<Fraction128> Multiply_parrallel(Matrix<Fraction128> left, Matrix<Fraction128> right)
     {
+      #region error checking
+
 #if no_error_checking
       // nothing
 #else
@@ -4641,6 +4865,8 @@ namespace Seven.Mathematics
         throw new LinearAlgebra.Error("invalid multiplication (dimension miss-match).");
 #endif
 
+      #endregion
+      
       int result_rows = left.Rows;
       int left_cols = left.Columns;
       int result_cols = right.Columns;
@@ -4650,12 +4876,52 @@ namespace Seven.Mathematics
       if (result_rows * result_cols > _parallelMinimum &&
         result_rows >= result_cols)
       {
-        Matrix<Fraction128> result =
-          new Matrix<Fraction128>(result_rows, result_cols);
-#if unsafe_code
-        unsafe
+        #region flattened arrays
+
+        if (left.CurrentFormat == Matrix<Fraction128>.Format.FlattenedArray &&
+          right.CurrentFormat == Matrix<Fraction128>.Format.FlattenedArray)
         {
-          Seven.Parallels.AutoParallel.Divide(
+
+          Matrix<Fraction128> result =
+            new Matrix<Fraction128>(result_rows, result_cols);
+
+#if unsafe_code
+          unsafe
+          {
+            Seven.Parallels.AutoParallel.Divide(
+              (int current, int max) =>
+              {
+                return () =>
+                {
+                  Fraction128 sum;
+                  int left_i_offest;
+                  int result_i_offset;
+
+                  fixed (Fraction128*
+                    result_flat = result._matrix as Fraction128[],
+                    left_flat = left._matrix as Fraction128[],
+                    right_flat = right._matrix as Fraction128[])
+                    for (int i = current; i < result_rows; i += max)
+                    {
+                      left_i_offest = i * left_cols;
+                      result_i_offset = i * result_cols;
+                      for (int j = 0; j < result_cols; j++)
+                      {
+                        sum = 0;
+                        for (int k = 0; k < left_cols; k++)
+                          sum += left_flat[left_i_offest + k] * right_flat[k * result_cols + j];
+                        result_flat[result_i_offset + j] = sum;
+                      }
+                    }
+                };
+              }, result_rows);
+          }
+#else
+        Fraction128[] result_flat = result._matrix as Fraction128[];
+        Fraction128[] left_flat = left._matrix as Fraction128[];
+        Fraction128[] right_flat = right._matrix as Fraction128[];
+
+        Seven.Parallels.AutoParallel.Divide(
             (int current, int max) =>
             {
               return () =>
@@ -4664,68 +4930,78 @@ namespace Seven.Mathematics
                 int left_i_offest;
                 int result_i_offset;
 
-                fixed (Fraction128*
-                  result_flat = result._matrix,
-                  left_flat = left._matrix,
-                  right_flat = right._matrix)
-                  for (int i = current; i < result_rows; i += max)
+                for (int i = current; i < result_rows; i += max)
+                {
+                  left_i_offest = i * left_cols;
+                  result_i_offset = i * result_cols;
+                  for (int j = 0; j < result_cols; j++)
                   {
-                    left_i_offest = i * left_cols;
-                    result_i_offset = i * result_cols;
-                    for (int j = 0; j < result_cols; j++)
-                    {
-                      sum = 0;
-                      for (int k = 0; k < left_cols; k++)
-                        sum += left_flat[left_i_offest + k] * right_flat[k * result_cols + j];
-                      result_flat[result_i_offset + j] = sum;
-                    }
+                    sum = 0;
+                    for (int k = 0; k < left_cols; k++)
+                      sum += left_flat[left_i_offest + k] * right_flat[k * result_cols + j];
+                    result_flat[result_i_offset + j] = sum;
                   }
+                }
               };
             }, result_rows);
-        }
-#else
-              Fraction128[] result_flat = result._matrix;
-              Fraction128[] left_flat = left._matrix;
-              Fraction128[] right_flat = right._matrix;
-
-              Seven.Parallels.AutoParallel.Divide(
-                  (int current, int max) =>
-                  {
-                    return () =>
-                    {
-                      Fraction128 sum;
-                      int left_i_offest;
-                      int result_i_offset;
-
-                      for (int i = current; i < result_rows; i += max)
-                      {
-                        left_i_offest = i * left_cols;
-                        result_i_offset = i * result_cols;
-                        for (int j = 0; j < result_cols; j++)
-                        {
-                          sum = 0;
-                          for (int k = 0; k < left_cols; k++)
-                            sum += left_flat[left_i_offest + k] * right_flat[k * result_cols + j];
-                          result_flat[result_i_offset + j] = sum;
-                        }
-                      }
-                    };
-                  }, result_rows);
 
 #endif
-        return result;
+
+          return result;
+        }
+
+        #endregion
       }
       // If there are enough columns to warrant multi-threading,
       // then multithread the column for-loop.
       else if (result_rows * result_cols > _parallelMinimum &&
         result_rows < result_cols)
       {
-        Matrix<Fraction128> result =
-          new Matrix<Fraction128>(result_rows, result_cols);
-#if unsafe_code
-        unsafe
+        #region flattened arrays
+
+        if (left.CurrentFormat == Matrix<Fraction128>.Format.FlattenedArray &&
+          right.CurrentFormat == Matrix<Fraction128>.Format.FlattenedArray)
         {
-          Seven.Parallels.AutoParallel.Divide(
+
+          Matrix<Fraction128> result =
+            new Matrix<Fraction128>(result_rows, result_cols);
+#if unsafe_code
+          unsafe
+          {
+            Seven.Parallels.AutoParallel.Divide(
+              (int current, int max) =>
+              {
+                return () =>
+                {
+                  Fraction128 sum;
+                  int left_i_offest;
+                  int result_i_offset;
+
+                  fixed (Fraction128*
+                    result_flat = result._matrix as Fraction128[],
+                    left_flat = left._matrix as Fraction128[],
+                    right_flat = right._matrix as Fraction128[])
+                    for (int i = 0; i < result_rows; i++)
+                    {
+                      left_i_offest = i * left_cols;
+                      result_i_offset = i * result_cols;
+                      for (int j = current; j < result_cols; j += max)
+                      {
+                        sum = 0;
+                        for (int k = 0; k < left_cols; k++)
+                          sum += left_flat[left_i_offest + k] * right_flat[k * result_cols + j];
+                        result_flat[result_i_offset + j] = sum;
+                      }
+                    }
+                };
+              }, result_cols);
+          }
+#else
+        Fraction128[] result_flat = result._matrix as Fraction128[];
+        Fraction128[] left_flat = left._matrix as Fraction128[];
+        Fraction128[] right_flat = right._matrix as Fraction128[];
+
+        Seven.Parallels.AutoParallel.Divide(
             (int current, int max) =>
             {
               return () =>
@@ -4734,59 +5010,29 @@ namespace Seven.Mathematics
                 int left_i_offest;
                 int result_i_offset;
 
-                fixed (Fraction128*
-                  result_flat = result._matrix,
-                  left_flat = left._matrix,
-                  right_flat = right._matrix)
-                  for (int i = 0; i < result_rows; i++)
+                for (int i = 0; i < result_rows; i++)
+                {
+                  left_i_offest = i * left_cols;
+                  result_i_offset = i * result_cols;
+                  for (int j = current; j < result_cols; j += max)
                   {
-                    left_i_offest = i * left_cols;
-                    result_i_offset = i * result_cols;
-                    for (int j = current; j < result_cols; j += max)
-                    {
-                      sum = 0;
-                      for (int k = 0; k < left_cols; k++)
-                        sum += left_flat[left_i_offest + k] * right_flat[k * result_cols + j];
-                      result_flat[result_i_offset + j] = sum;
-                    }
+                    sum = 0;
+                    for (int k = 0; k < left_cols; k++)
+                      sum += left_flat[left_i_offest + k] * right_flat[k * result_cols + j];
+                    result_flat[result_i_offset + j] = sum;
                   }
+                }
               };
             }, result_cols);
-        }
-#else
-              Fraction128[] result_flat = result._matrix;
-              Fraction128[] left_flat = left._matrix;
-              Fraction128[] right_flat = right._matrix;
-
-              Seven.Parallels.AutoParallel.Divide(
-                  (int current, int max) =>
-                  {
-                    return () =>
-                    {
-                      Fraction128 sum;
-                      int left_i_offest;
-                      int result_i_offset;
-
-                      for (int i = 0; i < result_rows; i++)
-                      {
-                        left_i_offest = i * left_cols;
-                        result_i_offset = i * result_cols;
-                        for (int j = current; j < result_cols; j += max)
-                        {
-                          sum = 0;
-                          for (int k = 0; k < left_cols; k++)
-                            sum += left_flat[left_i_offest + k] * right_flat[k * result_cols + j];
-                          result_flat[result_i_offset + j] = sum;
-                        }
-                      }
-                    };
-                  }, result_cols);
 #endif
-        return result;
+          return result;
+
+        }
+
+        #endregion
       }
       // Multi-threading is not necessary.
-      else
-        return LinearAlgebra.Multiply(left, right);
+      return LinearAlgebra.Multiply(left, right);
     }
 
     /// <summary>Does a standard (triple for looped) multiplication between matrices.</summary>
@@ -4806,40 +5052,62 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error
+
 #if no_error_checking
-      int left_row = left.Rows;
-      int left_col = left.Columns;
+      // nothing
 #else
-      int left_row = left.Rows;
-      int left_col = left.Columns;
       if (left.Columns != right.Dimensions)
         throw new Error("invalid multiplication (size miss-match).");
 #endif
 
-      Vector<Fraction128> result = new Vector<Fraction128>(right.Dimensions);
+      #endregion
+
+      #region flattened array
+
+      if (left.CurrentFormat == Matrix<Fraction128>.Format.FlattenedArray)
+      {
+        int left_row = left.Rows;
+        int left_col = left.Columns;
+        Vector<Fraction128> result = new Vector<Fraction128>(right.Dimensions);
 
 #if unsafe_code
-      unsafe
-      {
-        fixed (Fraction128*
-          left_flat = left._matrix,
-          right_flat = right._vector,
-          result_flat = result._vector)
-          for (int i = 0; i < left_row; i++)
-            for (int j = 0; j < left_col; j++)
-              result_flat[i] += left_flat[i * left_col + j] * right_flat[j];
-        return result;
-      }
+        unsafe
+        {
+          fixed (Fraction128*
+            left_flat = left._matrix as Fraction128[],
+            right_flat = right._vector as Fraction128[],
+            result_flat = result._vector as Fraction128[])
+            for (int i = 0; i < left_row; i++)
+              for (int j = 0; j < left_col; j++)
+                result_flat[i] += left_flat[i * left_col + j] * right_flat[j];
+        }
 #else
-      Fraction128[] left_flat = left._matrix;
-      Fraction128[] right_flat = right._vector;
-      Fraction128[] result_flat = result._vector;
+      Fraction128[] left_flat = left._matrix as Fraction128[];
+      Fraction128[] right_flat = right._vector as Fraction128[];
+      Fraction128[] result_flat = result._vector as Fraction128[];
       for (int i = 0; i < left_row; i++)
         for (int j = 0; j < left_col; j++)
           result_flat[i] += left_flat[i * left_col + j] * right_flat[j];
-      return result;
 #endif
-      return result;
+        return result;
+      }
+
+      #endregion
+
+      #region defualt
+
+      else
+      {
+        Vector<Fraction128> result =
+          new Vector<Fraction128>(right.Dimensions);
+        for (int i = 0; i < left.Rows; i++)
+          for (int j = 0; j < left.Columns; j++)
+            result[i] += left[i, j] * right[j];
+        return result;
+      }
+
+      #endregion
     }
 
     /// <summary>Multiplies all the values in a matrix by a scalar.</summary>
@@ -4858,6 +5126,8 @@ namespace Seven.Mathematics
       //return result;
 
       #endregion
+      
+      #region error checking
 
 #if no_error_checking
       // nothing
@@ -4866,27 +5136,51 @@ namespace Seven.Mathematics
         throw new Error("null reference: left");
 #endif
 
-      int rows = left.Rows;
-      int columns = left.Columns;
-      Matrix<Fraction128> result = new Matrix<Fraction128>(rows, columns);
+      #endregion
+
+      #region flattened array
+
+      if (left.CurrentFormat == Matrix<Fraction128>.Format.FlattenedArray)
+      {
+
+        int rows = left.Rows;
+        int columns = left.Columns;
+        Matrix<Fraction128> result = new Matrix<Fraction128>(rows, columns);
 
 #if unsafe_code
-      unsafe
-      {
-        fixed (Fraction128*
-          left_flat = left._matrix,
-          result_flat = result._matrix)
-          for (int i = 0; i < rows; i++)
-            for (int j = 0; j < columns; j++)
-              result_flat[i * columns + j] = left_flat[i * columns + j] * right;
-      }
+        unsafe
+        {
+          fixed (Fraction128*
+            left_flat = left._matrix as Fraction128[],
+            result_flat = result._matrix as Fraction128[])
+            for (int i = 0; i < rows; i++)
+              for (int j = 0; j < columns; j++)
+                result_flat[i * columns + j] = left_flat[i * columns + j] * right;
+        }
 #else
       for (int i = 0; i < rows; i++)
         for (int j = 0; j < columns; j++)
           result[i, j] = left[i, j] * right;
 #endif
 
-      return result;
+        return result;
+      }
+
+      #endregion
+
+      #region default
+
+      else
+      {
+        Matrix<Fraction128> result =
+          new Matrix<Fraction128>(left.Rows, left.Columns);
+        for (int i = 0; i < left.Rows; i++)
+          for (int j = 0; j < left.Columns; j++)
+            result[i, j] = left[i, j] * right;
+        return result;
+      }
+
+      #endregion
     }
 
     /// <summary>Applies a power to a square matrix.</summary>
@@ -4899,10 +5193,12 @@ namespace Seven.Mathematics
 
       //Matrix<Fraction128> result = matrix.Clone();
       //for (int i = 0; i < power; i++)
-      //  result = LinearAlgebra.Multiply(result, result);
+      //  result = LinearAlgebra.Multiply(result, matrix);
       //return result;
 
       #endregion
+
+      #region error checking
 
 #if no_error_checking
       // nothing
@@ -4912,6 +5208,9 @@ namespace Seven.Mathematics
       if (!(power >= 0))
         throw new Error("invalid power !(power > -1)");
 #endif
+
+      #endregion
+
       // this is not optimized...
       if (power == 0)
         return LinearAlgebra.MatrixFactoryIdentity_Fraction128(matrix.Rows, matrix.Columns);
@@ -4938,6 +5237,8 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error checking
+
 #if no_error_checking
       // nothing
 #else
@@ -4945,32 +5246,60 @@ namespace Seven.Mathematics
         throw new Error("null reference: matrix");
 #endif
 
-      int matrix_row = matrix.Rows;
-      int matrix_col = matrix.Columns;
-      Matrix<Fraction128> result =
-        new Matrix<Fraction128>(matrix_row, matrix_col);
+      #endregion
+
+      #region flattened array
+
+      if (matrix.CurrentFormat == Matrix<Fraction128>.Format.FlattenedArray)
+      {
+
+        Matrix<Fraction128> result =
+          new Matrix<Fraction128>(matrix.Rows, matrix.Columns);
+        int size = matrix.Rows * matrix.Columns;
 
 #if unsafe_code
-      unsafe
-      {
-        fixed (Fraction128*
-          matrix_flat = matrix._matrix,
-          result_flat = result._matrix)
-          for (int i = 0; i < matrix_row; i++)
-            for (int j = 0; j < matrix_col; j++)
-              result_flat[i * matrix_col + j] =
-                matrix_flat[i * matrix_col + j] / right;
-      }
+        if (size < _unsafeMaximum)
+        {
+          unsafe
+          {
+            fixed (Fraction128*
+              matrix_flat = matrix._matrix as Fraction128[],
+              result_flat = result._matrix as Fraction128[])
+              for (int i = 0; i < size; i++)
+                result_flat[i] = matrix_flat[i] / right;
+          }
+        }
+        else
+        {
+          Fraction128[] matrix_flat = matrix._matrix as Fraction128[];
+          Fraction128[] result_flat = result._matrix as Fraction128[];
+          for (int i = 0; i < size; i++)
+            result_flat[i] = matrix_flat[i] / right;
+        }
 #else
-      Fraction128[] matrix_flat = matrix._matrix;
-      Fraction128[] result_flat = result._matrix;
-      for (int i = 0; i < matrix_row; i++)
-        for (int j = 0; j < matrix_col; j++)
-          result_flat[i * matrix_col + j] = 
-            matrix_flat[i * matrix_col + j] / right;
-
+      Fraction128[] matrix_flat = matrix._matrix as Fraction128[];
+      Fraction128[] result_flat = result._matrix as Fraction128[];
+      for (int i = 0; i < size; i++)
+          result_flat[i] = matrix_flat[i] / right;
 #endif
-      return result;
+        return result;
+      }
+
+      #endregion
+
+      #region default
+
+      else
+      {
+        Matrix<Fraction128> result =
+          new Matrix<Fraction128>(matrix.Rows, matrix.Columns);
+        for (int i = 0; i < matrix.Rows; i++)
+          for (int j = 0; j < matrix.Columns; j++)
+            result[i, j] = matrix[i, j] / right;
+        return result;
+      }
+
+      #endregion
     }
 
     /// <summary>Gets the minor of a matrix.</summary>
@@ -5001,6 +5330,8 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error checking
+
 #if no_error_checking
       // nothing
 #else
@@ -5014,34 +5345,60 @@ namespace Seven.Mathematics
         throw new Error("invalid column on matrix minor: !(0 <= column < matrix.Columns)");
 #endif
 
-      Matrix<Fraction128> minor =
-        new Matrix<Fraction128>(matrix.Rows - 1, matrix.Columns - 1);
-      int matrix_rows = matrix.Rows;
-      int matrix_cols = matrix.Columns;
+      #endregion
+
+      #region flattened array
+
+      if (matrix.CurrentFormat == Matrix<Fraction128>.Format.FlattenedArray)
+      {
+
+        Matrix<Fraction128> minor =
+          new Matrix<Fraction128>(matrix.Rows - 1, matrix.Columns - 1);
+        int matrix_rows = matrix.Rows;
+        int matrix_cols = matrix.Columns;
 
 #if unsafe_code
-      unsafe
-      {
-        fixed (Fraction128*
-          matrix_flat = matrix._matrix,
-          minor_flat = minor._matrix)
+        if (matrix_rows * matrix_cols < _unsafeMaximum)
+        {
+          unsafe
+          {
+            fixed (Fraction128*
+              matrix_flat = matrix._matrix as Fraction128[],
+              minor_flat = minor._matrix as Fraction128[])
+            {
+              int m = 0, n = 0;
+              for (int i = 0; i < matrix_rows; i++)
+              {
+                if (i == row) continue;
+                n = 0;
+                for (int j = 0; j < matrix_cols; j++)
+                {
+                  if (j == column) continue;
+                  minor_flat[m * matrix_cols + n] =
+                    matrix_flat[i * matrix_cols + j];
+                  n++;
+                }
+                m++;
+              }
+            }
+          }
+        }
+        else
         {
           int m = 0, n = 0;
-          for (int i = 0; i < matrix_rows; i++)
+          for (int i = 0; i < matrix.Rows; i++)
           {
             if (i == row) continue;
             n = 0;
-            for (int j = 0; j < matrix_cols; j++)
+            for (int j = 0; j < matrix.Columns; j++)
             {
               if (j == column) continue;
-              minor_flat[m * matrix_cols + n] =
-                matrix_flat[i * matrix_cols + j];
+              minor[m, n] = matrix[i, j];
               n++;
             }
             m++;
           }
         }
-      }
 #else
       int m = 0, n = 0;
       for (int i = 0; i < matrix.Rows; i++)
@@ -5057,7 +5414,34 @@ namespace Seven.Mathematics
         m++;
       }
 #endif
-      return minor;
+        return minor;
+      }
+
+      #endregion
+
+      #region default
+
+      else
+      {
+        Matrix<Fraction128> minor =
+          new Matrix<Fraction128>(matrix.Rows - 1, matrix.Columns - 1);
+        int m = 0, n = 0;
+        for (int i = 0; i < matrix.Rows; i++)
+        {
+          if (i == row) continue;
+          n = 0;
+          for (int j = 0; j < matrix.Columns; j++)
+          {
+            if (j == column) continue;
+            minor[m, n] = matrix[i, j];
+            n++;
+          }
+          m++;
+        }
+        return minor;
+      }
+
+      #endregion
     }
 
     /// <summary>Combines two matrices from left to right 
@@ -5081,6 +5465,8 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error checking
+
 #if no_errorChecking
       // nothing
 #else
@@ -5092,43 +5478,85 @@ namespace Seven.Mathematics
         throw new Error("invalid row-wise concatenation !(left.Rows == right.Rows).");
 #endif
 
-      Matrix<Fraction128> result =
-        new Matrix<Fraction128>(left.Rows, left.Columns + right.Columns);
-      int result_rows = result.Rows;
-      int result_cols = result.Columns;
+      #endregion
 
-      int left_cols = left.Columns;
-      int right_cols = right.Columns;
+      #region flattened arrays
+
+      if (left.CurrentFormat == Matrix<Fraction128>.Format.FlattenedArray &&
+        right.CurrentFormat == Matrix<Fraction128>.Format.FlattenedArray)
+      {
+
+        Matrix<Fraction128> result =
+          new Matrix<Fraction128>(left.Rows, left.Columns + right.Columns);
+        int result_rows = result.Rows;
+        int result_cols = result.Columns;
+
+        int left_cols = left.Columns;
+        int right_cols = right.Columns;
 
 #if unsafe_code
-      unsafe
-      {
-        // OptimizeMe (jump statement)
-        fixed (Fraction128*
-          left_flat = left._matrix,
-          right_flat = right._matrix,
-          result_flat = result._matrix)
+        if (result_rows * result_cols < _unsafeMaximum)
+        {
+          unsafe
+          {
+            // OptimizeMe (jump statement)
+            fixed (Fraction128*
+              left_flat = left._matrix as Fraction128[],
+              right_flat = right._matrix as Fraction128[],
+              result_flat = result._matrix as Fraction128[])
+              for (int i = 0; i < result_rows; i++)
+                for (int j = 0; j < result_cols; j++)
+                  if (j < left_cols)
+                    result_flat[i * result_cols + j] =
+                      left_flat[i * left_cols + j];
+                  else
+                    result_flat[i * result_cols + j] =
+                      right_flat[i * right_cols + j - left_cols];
+          }
+        }
+        else
+        {
           for (int i = 0; i < result_rows; i++)
             for (int j = 0; j < result_cols; j++)
+            {
               if (j < left_cols)
-                result_flat[i * result_cols + j] =
-                  left_flat[i * left_cols + j];
+                result[i, j] = left[i, j];
               else
-                result_flat[i * result_cols + j] =
-                  right_flat[i * right_cols + j - left_cols];
-      }
+                result[i, j] = right[i, j - left_cols];
+            }
+        }
 #else
       for (int i = 0; i < result_rows; i++)
         for (int j = 0; j < result_cols; j++)
         {
-          if (j < left.Columns)
+          if (j < left_cols)
             result[i, j] = left[i, j];
           else
-            result[i, j] = right[i, j - left.Columns];
+            result[i, j] = right[i, j - left_cols];
         }
 #endif
 
-      return result;
+        return result;
+      }
+
+      #endregion
+
+      #region default
+
+      else
+      {
+        Matrix<Fraction128> result =
+          new Matrix<Fraction128>(left.Rows, left.Columns + right.Columns);
+        for (int i = 0; i < result.Rows; i++)
+          for (int j = 0; j < result.Columns; j++)
+            if (j < left.Columns)
+              result[i, j] = left[i, j];
+            else
+              result[i, j] = right[i, j - left.Columns];
+        return result;
+      }
+
+      #endregion
     }
 
     /// <summary>Calculates the echelon of a matrix (aka REF).</summary>
@@ -5157,12 +5585,16 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error checking
+
 #if no_error_checking
       // nothing
 #else
       if (object.ReferenceEquals(matrix, null))
         throw new Error("null reference: matrix");
 #endif
+
+      #endregion
 
       Matrix<Fraction128> result = matrix.Clone();
       for (int i = 0; i < matrix.Rows; i++)
@@ -5211,12 +5643,16 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error checking
+
 #if no_error_checking
       // nothing
 #else
       if (object.ReferenceEquals(matrix, null))
         throw new Error("null reference: matrix");
 #endif
+
+      #endregion
 
       Matrix<Fraction128> result = matrix.Clone();
       for (int i = 0; i < matrix.Rows; i++)
@@ -5268,6 +5704,8 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error checking
+
 #if no_error_checking
       // nothing
 #else
@@ -5276,6 +5714,8 @@ namespace Seven.Mathematics
       if (matrix.Rows != matrix.Columns)
         throw new Error("invalid matrix determinent: !(matrix.IsSquare)");
 #endif
+
+      #endregion
 
       Fraction128 det = 1;
       Matrix<Fraction128> rref = matrix.Clone();
@@ -5334,6 +5774,8 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error checking
+
 #if no_error_checking
       // nothing
 #else
@@ -5342,6 +5784,8 @@ namespace Seven.Mathematics
       if (LinearAlgebra.Determinent(matrix) == 0)
         throw new Error("inverse calculation failed.");
 #endif
+
+      #endregion
 
       Matrix<Fraction128> identity = LinearAlgebra.MatrixFactoryIdentity_Fraction128(matrix.Rows, matrix.Columns);
       Matrix<Fraction128> rref = matrix.Clone();
@@ -5388,6 +5832,8 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error checking
+
 #if no_error_checking
       // nothing
 #else
@@ -5396,6 +5842,8 @@ namespace Seven.Mathematics
       if (!(matrix.Rows == matrix.Columns))
         throw new Error("Adjoint of a non-square matrix does not exists");
 #endif
+
+      #endregion
 
       Matrix<Fraction128> AdjointMatrix = new Matrix<Fraction128>(matrix.Rows, matrix.Columns);
       for (int i = 0; i < matrix.Rows; i++)
@@ -5423,12 +5871,16 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error checking
+
 #if no_error_checking
       // nothing
 #else
       if (object.ReferenceEquals(matrix, null))
         throw new Error("null reference: matrix");
 #endif
+
+      #endregion
 
       Matrix<Fraction128> transpose =
         new Matrix<Fraction128>(matrix.Columns, matrix.Rows);
@@ -5490,6 +5942,8 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error checking
+
 #if no_error_checking
 #else
       if (object.ReferenceEquals(matrix, null))
@@ -5497,6 +5951,8 @@ namespace Seven.Mathematics
       if (matrix.Rows != matrix.Columns)
         throw new Error("non-square matrix during DecomposeLU function");
 #endif
+
+      #endregion
 
       Lower = LinearAlgebra.MatrixFactoryIdentity_Fraction128(matrix.Rows, matrix.Columns);
       Upper = matrix.Clone();
@@ -7031,32 +7487,60 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error checking
+
 #if no_errorchecking
       //nothing
 #else
       if (object.ReferenceEquals(matrix, null))
         throw new Error("null reference: matrix");
+#endif
+
+      #endregion
+
       if (matrix.Rows != matrix.Columns)
         return false;
-#endif
-      int size = matrix.Columns;
-#if unsafe_code
-      unsafe
+
+      #region flattened arrays
+
+      if (matrix.CurrentFormat == Matrix<Fraction64>.Format.FlattenedArray)
       {
-        fixed (Fraction64* matrix_flat = matrix._matrix)
-          for (var row = 0; row < size; row++)
-            for (var column = row + 1; column < size; column++)
-              if (matrix_flat[row * size + column] != matrix_flat[column * size + row])
-                return false;
-      }
+
+        int size = matrix.Columns;
+
+#if unsafe_code
+        unsafe
+        {
+          fixed (Fraction64* matrix_flat = matrix._matrix as Fraction64[])
+            for (var row = 0; row < size; row++)
+              for (var column = row + 1; column < size; column++)
+                if (matrix_flat[row * size + column] != matrix_flat[column * size + row])
+                  return false;
+        }
 #else
-      Fraction64[] matrix_flat = matrix._matrix;
+      Fraction64[] matrix_flat = matrix._matrix as Fraction64[];
       for (var row = 0; row < size; row++)
         for (var column = row + 1; column < size; column++)
           if (matrix_flat[row * size + column] != matrix_flat[column * size + row])
             return false;
 #endif
-      return true;
+        return true;
+      }
+
+      #endregion
+
+      #region default
+
+      else
+      {
+        for (int i = 0; i < matrix.Rows; i++)
+          for (int j = 0; j < matrix.Columns; j++)
+            if (matrix[i, j] != matrix[j, i])
+              return false;
+        return true;
+      }
+
+      #endregion
     }
 
     /// <summary>Constructs a new identity-matrix of the given dimensions.</summary>
@@ -7075,6 +7559,8 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error checking
+
 #if no_error_checking
       //nothing
 #else
@@ -7084,13 +7570,11 @@ namespace Seven.Mathematics
         throw new Error("invalid column count on matrix creation");
 #endif
 
+      #endregion
+
       Matrix<Fraction64> matrix = new Matrix<Fraction64>(rows, columns);
-      if (rows <= columns)
-        for (int i = 0; i < rows; i++)
-          matrix[i, i] = 1;
-      else
-        for (int i = 0; i < columns; i++)
-          matrix[i, i] = 1;
+      for (int i = 0, i_max = Logic.Min(rows, columns); i < i_max; i++)
+        matrix[i, i] = 1;
       return matrix;
     }
 
@@ -7110,41 +7594,8 @@ namespace Seven.Mathematics
 
       #endregion
 
-#if no_error_checking
-      // nothing
-#else
-        if (object.ReferenceEquals(matrix, null))
-          throw new Error("null reference: matirx");
-#endif
+      #region error checking
 
-      Matrix<Fraction64> result =
-        new Matrix<Fraction64>(matrix.Rows, matrix.Columns);
-      int size = matrix.Rows * matrix.Columns;
-
-#if unsafe_code
-      unsafe
-      {
-        fixed (Fraction64*
-          result_flat = result._matrix,
-          matrix_flat = matrix._matrix)
-          for (int i = 0; i < size; i++)
-            result_flat[i] = -matrix_flat[i];
-        return result;
-      }
-#else
-      Fraction64[] result_flat = result._matrix;
-      Fraction64[] matrix_flat = matrix._matrix;
-      for (int i = 0; i < size; i++)
-        result_flat[i] = -matrix_flat[i];
-      return result;
-#endif
-    }
-
-    /// <summary>Negates all the values in a matrix.</summary>
-    /// <param name="matrix">The matrix to have its values negated.</param>
-    /// <returns>The resulting matrix after the negations.</returns>
-    public static Matrix<Fraction64> Negate_parallel(Matrix<Fraction64> matrix)
-    {
 #if no_error_checking
       // nothing
 #else
@@ -7152,45 +7603,118 @@ namespace Seven.Mathematics
         throw new Error("null reference: matirx");
 #endif
 
-      if (matrix.Rows * matrix.Columns > _parallelMinimum)
+      #endregion
+
+      #region flattened arrays
+
+      if (matrix.CurrentFormat == Matrix<Fraction64>.Format.FlattenedArray)
       {
+
         Matrix<Fraction64> result =
-        new Matrix<Fraction64>(matrix.Rows, matrix.Columns);
+          new Matrix<Fraction64>(matrix.Rows, matrix.Columns);
         int size = matrix.Rows * matrix.Columns;
 
 #if unsafe_code
         unsafe
         {
-          Seven.Parallels.AutoParallel.Divide(
-            (int current, int max) =>
-            {
-              return () =>
-              {
-                fixed (Fraction64*
-                  result_flat = result._matrix,
-                  matrix_flat = matrix._matrix)
-                  for (int i = current; i < size; i += max)
-                    result_flat[i] = -matrix_flat[i];
-              };
-            }, Logic.Max(matrix.Rows, matrix.Columns));
+          fixed (Fraction64*
+            result_flat = result._matrix as Fraction64[],
+            matrix_flat = matrix._matrix as Fraction64[])
+            for (int i = 0; i < size; i++)
+              result_flat[i] = -matrix_flat[i];
+          return result;
         }
+#else
+      Fraction64[] result_flat = result._matrix as Fraction64[];
+      Fraction64[] matrix_flat = matrix._matrix as Fraction64[];
+      for (int i = 0; i < size; i++)
+        result_flat[i] = -matrix_flat[i];
+      return result;
+#endif
+
+      }
+
+      #endregion
+
+      #region default
+
+      else
+      {
+        Matrix<Fraction64> result =
+          new Matrix<Fraction64>(matrix.Rows, matrix.Columns);
+        for (int i = 0; i < matrix.Rows; i++)
+          for (int j = 0; j < matrix.Rows; j++)
+            result[i, j] = -matrix[i, j];
+        return result;
+      }
+
+      #endregion
+    }
+
+    /// <summary>Negates all the values in a matrix.</summary>
+    /// <param name="matrix">The matrix to have its values negated.</param>
+    /// <returns>The resulting matrix after the negations.</returns>
+    public static Matrix<Fraction64> Negate_parallel(Matrix<Fraction64> matrix)
+    {
+      #region error checking
+
+#if no_error_checking
+      // nothing
+#else
+      if (object.ReferenceEquals(matrix, null))
+        throw new Error("null reference: matirx");
+#endif
+
+      #endregion
+
+      // At the moment, negation does not benefit from multithreading.
+      if (false) //matrix.Rows * matrix.Columns > _parallelMinimum)
+      {
+        #region flattened array
+
+        if (matrix.CurrentFormat == Matrix<Fraction64>.Format.FlattenedArray)
+        {
+
+          Matrix<Fraction64> result =
+          new Matrix<Fraction64>(matrix.Rows, matrix.Columns);
+          int size = matrix.Rows * matrix.Columns;
+
+#if unsafe_code
+          unsafe
+          {
+            Seven.Parallels.AutoParallel.Divide(
+              (int current, int max) =>
+              {
+                return () =>
+                {
+                  fixed (Fraction64*
+                    result_flat = result._matrix as Fraction64[],
+                    matrix_flat = matrix._matrix as Fraction64[])
+                    for (int i = current; i < size; i += max)
+                      result_flat[i] = -matrix_flat[i];
+                };
+              }, Logic.Max(matrix.Rows, matrix.Columns));
+          }
 #else
           Seven.Parallels.AutoParallel.Divide(
             (int current, int max) =>
             {
               return () =>
               {
-                Fraction64[] matrix_flat = matrix._matrix;
-                Fraction64[] result_flat = result._matrix;
+                Fraction64[] matrix_flat = matrix._matrix as Fraction64[];
+                Fraction64[] result_flat = result._matrix as Fraction64[];
                 for (int i = current; i < size; i += max)
                   result_flat[i] = -matrix_flat[i];
               };
-            }, Logic.Max(left.Rows, left.Columns));
+            }, Logic.Max(matrix.Rows, matrix.Columns));
 #endif
-        return result;
+          return result;
+
+        }
+
+        #endregion
       }
-      else
-        return LinearAlgebra.Negate(matrix);
+      return LinearAlgebra.Negate(matrix);
     }
 
     /// <summary>Does standard addition of two matrices.</summary>
@@ -7210,48 +7734,8 @@ namespace Seven.Mathematics
 
       #endregion
 
-#if no_error_checking
-      // nothing
-#else
-      if (object.ReferenceEquals(left, null))
-          throw new Error("null reference: left");
-      if (object.ReferenceEquals(right, null))
-        throw new Error("null reference: right");
-      if (left.Rows != right.Rows || left.Columns != right.Columns)
-        throw new Error("invalid matrix addition (dimension miss-match).");
-#endif
+      #region error checking
 
-      Matrix<Fraction64> result =
-        new Matrix<Fraction64>(left.Rows, left.Columns);
-      int size = left.Rows * left.Columns;
-
-#if unsafe_code
-      unsafe
-      {
-        fixed (Fraction64*
-          left_flat = left._matrix,
-          right_flat = right._matrix,
-          result_flat = result._matrix)
-          for (int i = 0; i < size; i++)
-            result_flat[i] = left_flat[i] + right_flat[i];
-      }
-#else
-      Fraction64[] left_flat = left._matrix;
-      Fraction64[] right_flat = right._matrix;
-      Fraction64[] result_flat = result._matrix;
-      for (int i = 0; i < size; i++)
-        result_flat[i] = left_flat[i] + right_flat[i];
-#endif
-
-      return result;
-    }
-
-    /// <summary>Does standard addition of two matrices.</summary>
-    /// <param name="left">The left matrix of the addition.</param>
-    /// <param name="right">The right matrix of the addition.</param>
-    /// <returns>The resulting matrix after the addition.</returns>
-    public static Matrix<Fraction64> Add_parallel(Matrix<Fraction64> left, Matrix<Fraction64> right)
-    {
 #if no_error_checking
       // nothing
 #else
@@ -7263,47 +7747,128 @@ namespace Seven.Mathematics
         throw new Error("invalid matrix addition (dimension miss-match).");
 #endif
 
-      if (left.Rows * left.Columns > _parallelMinimum)
+      #endregion
+
+      #region flattened arrays
+
+      if (left.CurrentFormat == Matrix<Fraction64>.Format.FlattenedArray &&
+        right.CurrentFormat == Matrix<Fraction64>.Format.FlattenedArray)
       {
+
         Matrix<Fraction64> result =
-        new Matrix<Fraction64>(left.Rows, left.Columns);
+          new Matrix<Fraction64>(left.Rows, left.Columns);
         int size = left.Rows * left.Columns;
 
 #if unsafe_code
         unsafe
         {
-          Seven.Parallels.AutoParallel.Divide(
-            (int current, int max) =>
-            {
-              return () =>
-              {
-                fixed (Fraction64*
-                  left_flat = left._matrix,
-                  right_flat = right._matrix,
-                  result_flat = result._matrix)
-                  for (int i = current; i < size; i += max)
-                    result_flat[i] = left_flat[i] + right_flat[i];
-              };
-            }, Logic.Max(left.Rows, left.Columns));
+          fixed (Fraction64*
+            left_flat = left._matrix as Fraction64[],
+            right_flat = right._matrix as Fraction64[],
+            result_flat = result._matrix as Fraction64[])
+            for (int i = 0; i < size; i++)
+              result_flat[i] = left_flat[i] + right_flat[i];
         }
+#else
+      Fraction64[] left_flat = left._matrix as Fraction64[];
+      Fraction64[] right_flat = right._matrix as Fraction64[];
+      Fraction64[] result_flat = result._matrix as Fraction64[];
+      for (int i = 0; i < size; i++)
+        result_flat[i] = left_flat[i] + right_flat[i];
+#endif
+
+        return result;
+
+      }
+
+      #endregion
+
+      #region default
+
+      else
+      {
+        Matrix<Fraction64> result =
+          new Matrix<Fraction64>(left.Rows, left.Columns);
+        for (int i = 0; i < left.Rows; i++)
+          for (int j = 0; j < left.Columns; j++)
+            result[i, j] = left[i, j] + right[i, j];
+        return result;
+      }
+
+      #endregion
+    }
+
+    /// <summary>Does standard addition of two matrices.</summary>
+    /// <param name="left">The left matrix of the addition.</param>
+    /// <param name="right">The right matrix of the addition.</param>
+    /// <returns>The resulting matrix after the addition.</returns>
+    public static Matrix<Fraction64> Add_parallel(Matrix<Fraction64> left, Matrix<Fraction64> right)
+    {
+      #region error checking
+
+#if no_error_checking
+      // nothing
+#else
+      if (object.ReferenceEquals(left, null))
+        throw new Error("null reference: left");
+      if (object.ReferenceEquals(right, null))
+        throw new Error("null reference: right");
+      if (left.Rows != right.Rows || left.Columns != right.Columns)
+        throw new Error("invalid matrix addition (dimension miss-match).");
+#endif
+
+      #endregion
+
+      // At the moment, addition does not benefit from multithreading.
+      if (false) //matrix.Rows * matrix.Columns > _parallelMinimum)
+      {
+        #region flattened array
+
+        if (left.CurrentFormat == Matrix<Fraction64>.Format.FlattenedArray)
+        {
+
+          Matrix<Fraction64> result =
+          new Matrix<Fraction64>(left.Rows, left.Columns);
+          int size = left.Rows * left.Columns;
+
+#if unsafe_code
+          unsafe
+          {
+            Seven.Parallels.AutoParallel.Divide(
+              (int current, int max) =>
+              {
+                return () =>
+                {
+                  fixed (Fraction64*
+                    left_flat = left._matrix as Fraction64[],
+                    right_flat = right._matrix as Fraction64[],
+                    result_flat = result._matrix as Fraction64[])
+                    for (int i = current; i < size; i += max)
+                      result_flat[i] = left_flat[i] + right_flat[i];
+                };
+              }, Logic.Max(left.Rows, left.Columns));
+          }
 #else
           Seven.Parallels.AutoParallel.Divide(
             (int current, int max) =>
             {
               return () =>
               {
-                Fraction64[] left_flat = left._matrix;
-                Fraction64[] right_flat = right._matrix;
-                Fraction64[] result_flat = result._matrix;
+                Fraction64[] left_flat = left._matrix as Fraction64[];
+                Fraction64[] right_flat = right._matrix as Fraction64[];
+                Fraction64[] result_flat = result._matrix as Fraction64[];
                 for (int i = current; i < size; i += max)
                   result_flat[i] = left_flat[i] + right_flat[i];
               };
             }, Logic.Max(left.Rows, left.Columns));
 #endif
-        return result;
+          return result;
+
+        }
+
+        #endregion
       }
-      else
-        return LinearAlgebra.Add(left, right);
+      return LinearAlgebra.Add(left, right);
     }
 
     /// <summary>Subtracts a scalar from all the values in a matrix.</summary>
@@ -7323,6 +7888,8 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error checking
+
 #if no_error_checking
       // nothing
 #else
@@ -7334,29 +7901,54 @@ namespace Seven.Mathematics
         throw new Error("invalid matrix subtraction (dimension miss-match).");
 #endif
 
-      Matrix<Fraction64> result =
-        new Matrix<Fraction64>(left.Rows, left.Columns);
-      int size = left.Rows * left.Columns;
+      #endregion
+
+      #region flattened arrays
+
+      if (left.CurrentFormat == Matrix<Fraction64>.Format.FlattenedArray &&
+        right.CurrentFormat == Matrix<Fraction64>.Format.FlattenedArray)
+      {
+
+        Matrix<Fraction64> result =
+          new Matrix<Fraction64>(left.Rows, left.Columns);
+        int size = left.Rows * left.Columns;
 
 #if unsafe_code
-      unsafe
-      {
-        fixed (Fraction64*
-          left_flat = left._matrix,
-          right_flat = right._matrix,
-          result_flat = result._matrix)
-          for (int i = 0; i < size; i++)
-            result_flat[i] = left_flat[i] - right_flat[i];
-      }
+        unsafe
+        {
+          fixed (Fraction64*
+            left_flat = left._matrix as Fraction64[],
+            right_flat = right._matrix as Fraction64[],
+            result_flat = result._matrix as Fraction64[])
+            for (int i = 0; i < size; i++)
+              result_flat[i] = left_flat[i] - right_flat[i];
+        }
 #else
-      Fraction64[] left_flat = left._matrix;
-      Fraction64[] right_flat = right._matrix;
-      Fraction64[] result_flat = result._matrix;
+      Fraction64[] left_flat = left._matrix as Fraction64[];
+      Fraction64[] right_flat = right._matrix as Fraction64[];
+      Fraction64[] result_flat = result._matrix as Fraction64[];
       for (int i = 0; i < size; i++)
         result_flat[i] = left_flat[i] - right_flat[i];
 #endif
 
-      return result;
+        return result;
+      }
+
+      #endregion
+
+      #region default
+
+      else
+      {
+        Matrix<Fraction64> result =
+          new Matrix<Fraction64>(left.Rows, left.Columns);
+        for (int i = 0; i < left.Rows; i++)
+          for (int j = 0; j < left.Columns; j++)
+            result[i, j] = left[i, j] - right[i, j];
+        return result;
+      }
+
+      #endregion
     }
 
     /// <summary>Subtracts a scalar from all the values in a matrix.</summary>
@@ -7365,6 +7957,8 @@ namespace Seven.Mathematics
     /// <returns>The resulting matrix after the subtractions.</returns>
     public static Matrix<Fraction64> Subtract_parallel(Matrix<Fraction64> left, Matrix<Fraction64> right)
     {
+      #region error checking
+
 #if no_error_checking
       // nothing
 #else
@@ -7376,47 +7970,58 @@ namespace Seven.Mathematics
         throw new Error("invalid matrix subtraction (dimension miss-match).");
 #endif
 
-      if (left.Rows * left.Columns > _parallelMinimum)
+      #endregion
+
+      // At the moment, subtraction does not benefit from multithreading.
+      if (false) //matrix.Rows * matrix.Columns > _parallelMinimum)
       {
-        Matrix<Fraction64> result =
-        new Matrix<Fraction64>(left.Rows, left.Columns);
-        int size = left.Rows * left.Columns;
+        #region flattened arrays
+
+        if (left.CurrentFormat == Matrix<Fraction64>.Format.FlattenedArray &&
+          right.CurrentFormat == Matrix<Fraction64>.Format.FlattenedArray)
+        {
+
+          Matrix<Fraction64> result =
+          new Matrix<Fraction64>(left.Rows, left.Columns);
+          int size = left.Rows * left.Columns;
 
 #if unsafe_code
-        unsafe
-        {
-          Seven.Parallels.AutoParallel.Divide(
-            (int current, int max) =>
-            {
-              return () =>
+          unsafe
+          {
+            Seven.Parallels.AutoParallel.Divide(
+              (int current, int max) =>
               {
-                fixed (Fraction64*
-                  left_flat = left._matrix,
-                  right_flat = right._matrix,
-                  result_flat = result._matrix)
-                  for (int i = current; i < size; i += max)
-                    result_flat[i] = left_flat[i] - right_flat[i];
-              };
-            }, Logic.Max(left.Rows, left.Columns));
-        }
+                return () =>
+                {
+                  fixed (Fraction64*
+                    left_flat = left._matrix as Fraction64[],
+                    right_flat = right._matrix as Fraction64[],
+                    result_flat = result._matrix as Fraction64[])
+                    for (int i = current; i < size; i += max)
+                      result_flat[i] = left_flat[i] - right_flat[i];
+                };
+              }, Logic.Max(left.Rows, left.Columns));
+          }
 #else
           Seven.Parallels.AutoParallel.Divide(
           (int current, int max) =>
           {
             return () =>
             {
-              Fraction64[] left_flat = left._matrix;
-              Fraction64[] right_flat = right._matrix;
-              Fraction64[] result_flat = result._matrix;
+              Fraction64[] left_flat = left._matrix as Fraction64[];
+              Fraction64[] right_flat = right._matrix as Fraction64[];
+              Fraction64[] result_flat = result._matrix as Fraction64[];
                 for (int i = current; i < size; i += max)
                   result_flat[i] = left_flat[i] - right_flat[i];
             };
           }, Logic.Max(left.Rows, left.Columns));
 #endif
-        return result;
+          return result;
+        }
+
+        #endregion
       }
-      else
-        return LinearAlgebra.Subtract(left, right);
+      return LinearAlgebra.Subtract(left, right);
     }
 
     /// <summary>Performs multiplication on two matrices.</summary>
@@ -7437,6 +8042,8 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error checking
+
 #if no_error_checking
       // nothing
 #else
@@ -7448,33 +8055,41 @@ namespace Seven.Mathematics
         throw new LinearAlgebra.Error("invalid multiplication (size miss-match).");
 #endif
 
-      Fraction64 sum;
-      int result_rows = left.Rows;
-      int left_cols = left.Columns;
-      int result_cols = right.Columns;
-      Matrix<Fraction64> result =
-        new Matrix<Fraction64>(result_rows, result_cols);
+      #endregion
+
+      #region flattened arrays
+
+      if (left.CurrentFormat == Matrix<Fraction64>.Format.FlattenedArray &&
+        right.CurrentFormat == Matrix<Fraction64>.Format.FlattenedArray)
+      {
+
+        Fraction64 sum;
+        int result_rows = left.Rows;
+        int left_cols = left.Columns;
+        int result_cols = right.Columns;
+        Matrix<Fraction64> result =
+          new Matrix<Fraction64>(result_rows, result_cols);
 
 #if unsafe_code
-      unsafe
-      {
-        fixed (Fraction64*
-          result_flat = result._matrix,
-          left_flat = left._matrix,
-          right_flat = right._matrix)
-          for (int i = 0; i < result_rows; i++)
-            for (int j = 0; j < result_cols; j++)
-            {
-              sum = 0;
-              for (int k = 0; k < left_cols; k++)
-                sum += left_flat[i * left_cols + k] * right_flat[k * result_cols + j];
-              result_flat[i * result_cols + j] = sum;
-            }
-      }
+        unsafe
+        {
+          fixed (Fraction64*
+            result_flat = result._matrix as Fraction64[],
+            left_flat = left._matrix as Fraction64[],
+            right_flat = right._matrix as Fraction64[])
+            for (int i = 0; i < result_rows; i++)
+              for (int j = 0; j < result_cols; j++)
+              {
+                sum = 0;
+                for (int k = 0; k < left_cols; k++)
+                  sum += left_flat[i * left_cols + k] * right_flat[k * result_cols + j];
+                result_flat[i * result_cols + j] = sum;
+              }
+        }
 #else
-      Fraction64[] result_flat = result._matrix;
-      Fraction64[] left_flat = left._matrix;
-      Fraction64[] right_flat = right._matrix;
+      Fraction64[] result_flat = result._matrix as Fraction64[];
+      Fraction64[] left_flat = left._matrix as Fraction64[];
+      Fraction64[] right_flat = right._matrix as Fraction64[];
 
       for (int i = 0; i < result_rows; i++)
         for (int j = 0; j < result_cols; j++)
@@ -7486,7 +8101,25 @@ namespace Seven.Mathematics
         }
 #endif
 
-      return result;
+        return result;
+      }
+
+      #endregion
+
+      #region default
+
+      else
+      {
+        Matrix<Fraction64> result =
+          new Matrix<Fraction64>(left.Rows, right.Columns);
+        for (int i = 0; i < left.Rows; i++)
+          for (int j = 0; j < right.Columns; j++)
+            for (int k = 0; k < left.Columns; k++)
+              result[i, j] += left[i, k] * right[k, j];
+        return result;
+      }
+
+      #endregion
     }
 
     /// <summary>Performs multiplication on two matrices using multi-threading.</summary>
@@ -7495,6 +8128,8 @@ namespace Seven.Mathematics
     /// <returns>The resulting matrix of the multiplication.</returns>
     public static Matrix<Fraction64> Multiply_parrallel(Matrix<Fraction64> left, Matrix<Fraction64> right)
     {
+      #region error checking
+
 #if no_error_checking
       // nothing
 #else
@@ -7506,6 +8141,8 @@ namespace Seven.Mathematics
         throw new LinearAlgebra.Error("invalid multiplication (dimension miss-match).");
 #endif
 
+      #endregion
+
       int result_rows = left.Rows;
       int left_cols = left.Columns;
       int result_cols = right.Columns;
@@ -7515,12 +8152,52 @@ namespace Seven.Mathematics
       if (result_rows * result_cols > _parallelMinimum &&
         result_rows >= result_cols)
       {
-        Matrix<Fraction64> result =
-          new Matrix<Fraction64>(result_rows, result_cols);
-#if unsafe_code
-        unsafe
+        #region flattened arrays
+
+        if (left.CurrentFormat == Matrix<Fraction64>.Format.FlattenedArray &&
+          right.CurrentFormat == Matrix<Fraction64>.Format.FlattenedArray)
         {
-          Seven.Parallels.AutoParallel.Divide(
+
+          Matrix<Fraction64> result =
+            new Matrix<Fraction64>(result_rows, result_cols);
+
+#if unsafe_code
+          unsafe
+          {
+            Seven.Parallels.AutoParallel.Divide(
+              (int current, int max) =>
+              {
+                return () =>
+                {
+                  Fraction64 sum;
+                  int left_i_offest;
+                  int result_i_offset;
+
+                  fixed (Fraction64*
+                    result_flat = result._matrix as Fraction64[],
+                    left_flat = left._matrix as Fraction64[],
+                    right_flat = right._matrix as Fraction64[])
+                    for (int i = current; i < result_rows; i += max)
+                    {
+                      left_i_offest = i * left_cols;
+                      result_i_offset = i * result_cols;
+                      for (int j = 0; j < result_cols; j++)
+                      {
+                        sum = 0;
+                        for (int k = 0; k < left_cols; k++)
+                          sum += left_flat[left_i_offest + k] * right_flat[k * result_cols + j];
+                        result_flat[result_i_offset + j] = sum;
+                      }
+                    }
+                };
+              }, result_rows);
+          }
+#else
+        Fraction64[] result_flat = result._matrix as Fraction64[];
+        Fraction64[] left_flat = left._matrix as Fraction64[];
+        Fraction64[] right_flat = right._matrix as Fraction64[];
+
+        Seven.Parallels.AutoParallel.Divide(
             (int current, int max) =>
             {
               return () =>
@@ -7529,68 +8206,78 @@ namespace Seven.Mathematics
                 int left_i_offest;
                 int result_i_offset;
 
-                fixed (Fraction64*
-                  result_flat = result._matrix,
-                  left_flat = left._matrix,
-                  right_flat = right._matrix)
-                  for (int i = current; i < result_rows; i += max)
+                for (int i = current; i < result_rows; i += max)
+                {
+                  left_i_offest = i * left_cols;
+                  result_i_offset = i * result_cols;
+                  for (int j = 0; j < result_cols; j++)
                   {
-                    left_i_offest = i * left_cols;
-                    result_i_offset = i * result_cols;
-                    for (int j = 0; j < result_cols; j++)
-                    {
-                      sum = 0;
-                      for (int k = 0; k < left_cols; k++)
-                        sum += left_flat[left_i_offest + k] * right_flat[k * result_cols + j];
-                      result_flat[result_i_offset + j] = sum;
-                    }
+                    sum = 0;
+                    for (int k = 0; k < left_cols; k++)
+                      sum += left_flat[left_i_offest + k] * right_flat[k * result_cols + j];
+                    result_flat[result_i_offset + j] = sum;
                   }
+                }
               };
             }, result_rows);
-        }
-#else
-              Fraction64[] result_flat = result._matrix;
-              Fraction64[] left_flat = left._matrix;
-              Fraction64[] right_flat = right._matrix;
-
-              Seven.Parallels.AutoParallel.Divide(
-                  (int current, int max) =>
-                  {
-                    return () =>
-                    {
-                      Fraction64 sum;
-                      int left_i_offest;
-                      int result_i_offset;
-
-                      for (int i = current; i < result_rows; i += max)
-                      {
-                        left_i_offest = i * left_cols;
-                        result_i_offset = i * result_cols;
-                        for (int j = 0; j < result_cols; j++)
-                        {
-                          sum = 0;
-                          for (int k = 0; k < left_cols; k++)
-                            sum += left_flat[left_i_offest + k] * right_flat[k * result_cols + j];
-                          result_flat[result_i_offset + j] = sum;
-                        }
-                      }
-                    };
-                  }, result_rows);
 
 #endif
-        return result;
+
+          return result;
+        }
+
+        #endregion
       }
       // If there are enough columns to warrant multi-threading,
       // then multithread the column for-loop.
       else if (result_rows * result_cols > _parallelMinimum &&
         result_rows < result_cols)
       {
-        Matrix<Fraction64> result =
-          new Matrix<Fraction64>(result_rows, result_cols);
-#if unsafe_code
-        unsafe
+        #region flattened arrays
+
+        if (left.CurrentFormat == Matrix<Fraction64>.Format.FlattenedArray &&
+          right.CurrentFormat == Matrix<Fraction64>.Format.FlattenedArray)
         {
-          Seven.Parallels.AutoParallel.Divide(
+
+          Matrix<Fraction64> result =
+            new Matrix<Fraction64>(result_rows, result_cols);
+#if unsafe_code
+          unsafe
+          {
+            Seven.Parallels.AutoParallel.Divide(
+              (int current, int max) =>
+              {
+                return () =>
+                {
+                  Fraction64 sum;
+                  int left_i_offest;
+                  int result_i_offset;
+
+                  fixed (Fraction64*
+                    result_flat = result._matrix as Fraction64[],
+                    left_flat = left._matrix as Fraction64[],
+                    right_flat = right._matrix as Fraction64[])
+                    for (int i = 0; i < result_rows; i++)
+                    {
+                      left_i_offest = i * left_cols;
+                      result_i_offset = i * result_cols;
+                      for (int j = current; j < result_cols; j += max)
+                      {
+                        sum = 0;
+                        for (int k = 0; k < left_cols; k++)
+                          sum += left_flat[left_i_offest + k] * right_flat[k * result_cols + j];
+                        result_flat[result_i_offset + j] = sum;
+                      }
+                    }
+                };
+              }, result_cols);
+          }
+#else
+        Fraction64[] result_flat = result._matrix as Fraction64[];
+        Fraction64[] left_flat = left._matrix as Fraction64[];
+        Fraction64[] right_flat = right._matrix as Fraction64[];
+
+        Seven.Parallels.AutoParallel.Divide(
             (int current, int max) =>
             {
               return () =>
@@ -7599,59 +8286,29 @@ namespace Seven.Mathematics
                 int left_i_offest;
                 int result_i_offset;
 
-                fixed (Fraction64*
-                  result_flat = result._matrix,
-                  left_flat = left._matrix,
-                  right_flat = right._matrix)
-                  for (int i = 0; i < result_rows; i++)
+                for (int i = 0; i < result_rows; i++)
+                {
+                  left_i_offest = i * left_cols;
+                  result_i_offset = i * result_cols;
+                  for (int j = current; j < result_cols; j += max)
                   {
-                    left_i_offest = i * left_cols;
-                    result_i_offset = i * result_cols;
-                    for (int j = current; j < result_cols; j += max)
-                    {
-                      sum = 0;
-                      for (int k = 0; k < left_cols; k++)
-                        sum += left_flat[left_i_offest + k] * right_flat[k * result_cols + j];
-                      result_flat[result_i_offset + j] = sum;
-                    }
+                    sum = 0;
+                    for (int k = 0; k < left_cols; k++)
+                      sum += left_flat[left_i_offest + k] * right_flat[k * result_cols + j];
+                    result_flat[result_i_offset + j] = sum;
                   }
+                }
               };
             }, result_cols);
-        }
-#else
-              Fraction64[] result_flat = result._matrix;
-              Fraction64[] left_flat = left._matrix;
-              Fraction64[] right_flat = right._matrix;
-
-              Seven.Parallels.AutoParallel.Divide(
-                  (int current, int max) =>
-                  {
-                    return () =>
-                    {
-                      Fraction64 sum;
-                      int left_i_offest;
-                      int result_i_offset;
-
-                      for (int i = 0; i < result_rows; i++)
-                      {
-                        left_i_offest = i * left_cols;
-                        result_i_offset = i * result_cols;
-                        for (int j = current; j < result_cols; j += max)
-                        {
-                          sum = 0;
-                          for (int k = 0; k < left_cols; k++)
-                            sum += left_flat[left_i_offest + k] * right_flat[k * result_cols + j];
-                          result_flat[result_i_offset + j] = sum;
-                        }
-                      }
-                    };
-                  }, result_cols);
 #endif
-        return result;
+          return result;
+
+        }
+
+        #endregion
       }
       // Multi-threading is not necessary.
-      else
-        return LinearAlgebra.Multiply(left, right);
+      return LinearAlgebra.Multiply(left, right);
     }
 
     /// <summary>Does a standard (triple for looped) multiplication between matrices.</summary>
@@ -7671,40 +8328,62 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error
+
 #if no_error_checking
-      int left_row = left.Rows;
-      int left_col = left.Columns;
+      // nothing
 #else
-      int left_row = left.Rows;
-      int left_col = left.Columns;
       if (left.Columns != right.Dimensions)
         throw new Error("invalid multiplication (size miss-match).");
 #endif
 
-      Vector<Fraction64> result = new Vector<Fraction64>(right.Dimensions);
+      #endregion
+
+      #region flattened array
+
+      if (left.CurrentFormat == Matrix<Fraction64>.Format.FlattenedArray)
+      {
+        int left_row = left.Rows;
+        int left_col = left.Columns;
+        Vector<Fraction64> result = new Vector<Fraction64>(right.Dimensions);
 
 #if unsafe_code
-      unsafe
-      {
-        fixed (Fraction64*
-          left_flat = left._matrix,
-          right_flat = right._vector,
-          result_flat = result._vector)
-          for (int i = 0; i < left_row; i++)
-            for (int j = 0; j < left_col; j++)
-              result_flat[i] += left_flat[i * left_col + j] * right_flat[j];
-        return result;
-      }
+        unsafe
+        {
+          fixed (Fraction64*
+            left_flat = left._matrix as Fraction64[],
+            right_flat = right._vector as Fraction64[],
+            result_flat = result._vector as Fraction64[])
+            for (int i = 0; i < left_row; i++)
+              for (int j = 0; j < left_col; j++)
+                result_flat[i] += left_flat[i * left_col + j] * right_flat[j];
+        }
 #else
-      Fraction64[] left_flat = left._matrix;
-      Fraction64[] right_flat = right._vector;
-      Fraction64[] result_flat = result._vector;
+      Fraction64[] left_flat = left._matrix as Fraction64[];
+      Fraction64[] right_flat = right._vector as Fraction64[];
+      Fraction64[] result_flat = result._vector as Fraction64[];
       for (int i = 0; i < left_row; i++)
         for (int j = 0; j < left_col; j++)
           result_flat[i] += left_flat[i * left_col + j] * right_flat[j];
-      return result;
 #endif
-      return result;
+        return result;
+      }
+
+      #endregion
+
+      #region defualt
+
+      else
+      {
+        Vector<Fraction64> result =
+          new Vector<Fraction64>(right.Dimensions);
+        for (int i = 0; i < left.Rows; i++)
+          for (int j = 0; j < left.Columns; j++)
+            result[i] += left[i, j] * right[j];
+        return result;
+      }
+
+      #endregion
     }
 
     /// <summary>Multiplies all the values in a matrix by a scalar.</summary>
@@ -7724,6 +8403,8 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error checking
+
 #if no_error_checking
       // nothing
 #else
@@ -7731,27 +8412,51 @@ namespace Seven.Mathematics
         throw new Error("null reference: left");
 #endif
 
-      int rows = left.Rows;
-      int columns = left.Columns;
-      Matrix<Fraction64> result = new Matrix<Fraction64>(rows, columns);
+      #endregion
+
+      #region flattened array
+
+      if (left.CurrentFormat == Matrix<Fraction64>.Format.FlattenedArray)
+      {
+
+        int rows = left.Rows;
+        int columns = left.Columns;
+        Matrix<Fraction64> result = new Matrix<Fraction64>(rows, columns);
 
 #if unsafe_code
-      unsafe
-      {
-        fixed (Fraction64*
-          left_flat = left._matrix,
-          result_flat = result._matrix)
-          for (int i = 0; i < rows; i++)
-            for (int j = 0; j < columns; j++)
-              result_flat[i * columns + j] = left_flat[i * columns + j] * right;
-      }
+        unsafe
+        {
+          fixed (Fraction64*
+            left_flat = left._matrix as Fraction64[],
+            result_flat = result._matrix as Fraction64[])
+            for (int i = 0; i < rows; i++)
+              for (int j = 0; j < columns; j++)
+                result_flat[i * columns + j] = left_flat[i * columns + j] * right;
+        }
 #else
       for (int i = 0; i < rows; i++)
         for (int j = 0; j < columns; j++)
           result[i, j] = left[i, j] * right;
 #endif
 
-      return result;
+        return result;
+      }
+
+      #endregion
+
+      #region default
+
+      else
+      {
+        Matrix<Fraction64> result =
+          new Matrix<Fraction64>(left.Rows, left.Columns);
+        for (int i = 0; i < left.Rows; i++)
+          for (int j = 0; j < left.Columns; j++)
+            result[i, j] = left[i, j] * right;
+        return result;
+      }
+
+      #endregion
     }
 
     /// <summary>Applies a power to a square matrix.</summary>
@@ -7764,10 +8469,12 @@ namespace Seven.Mathematics
 
       //Matrix<Fraction64> result = matrix.Clone();
       //for (int i = 0; i < power; i++)
-      //  result = LinearAlgebra.Multiply(result, result);
+      //  result = LinearAlgebra.Multiply(result, matrix);
       //return result;
 
       #endregion
+
+      #region error checking
 
 #if no_error_checking
       // nothing
@@ -7777,6 +8484,9 @@ namespace Seven.Mathematics
       if (!(power >= 0))
         throw new Error("invalid power !(power > -1)");
 #endif
+
+      #endregion
+
       // this is not optimized...
       if (power == 0)
         return LinearAlgebra.MatrixFactoryIdentity_Fraction64(matrix.Rows, matrix.Columns);
@@ -7803,6 +8513,8 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error checking
+
 #if no_error_checking
       // nothing
 #else
@@ -7810,32 +8522,56 @@ namespace Seven.Mathematics
         throw new Error("null reference: matrix");
 #endif
 
-      int matrix_row = matrix.Rows;
-      int matrix_col = matrix.Columns;
-      Matrix<Fraction64> result =
-        new Matrix<Fraction64>(matrix_row, matrix_col);
+      #endregion
+
+      #region flattened array
+
+      if (matrix.CurrentFormat == Matrix<Fraction64>.Format.FlattenedArray)
+      {
+
+        int matrix_row = matrix.Rows;
+        int matrix_col = matrix.Columns;
+        Matrix<Fraction64> result =
+          new Matrix<Fraction64>(matrix_row, matrix_col);
 
 #if unsafe_code
-      unsafe
-      {
-        fixed (Fraction64*
-          matrix_flat = matrix._matrix,
-          result_flat = result._matrix)
-          for (int i = 0; i < matrix_row; i++)
-            for (int j = 0; j < matrix_col; j++)
-              result_flat[i * matrix_col + j] =
-                matrix_flat[i * matrix_col + j] / right;
-      }
+        unsafe
+        {
+          fixed (Fraction64*
+            matrix_flat = matrix._matrix as Fraction64[],
+            result_flat = result._matrix as Fraction64[])
+            for (int i = 0; i < matrix_row; i++)
+              for (int j = 0; j < matrix_col; j++)
+                result_flat[i * matrix_col + j] =
+                  matrix_flat[i * matrix_col + j] / right;
+        }
 #else
-      Fraction64[] matrix_flat = matrix._matrix;
-      Fraction64[] result_flat = result._matrix;
+      Fraction64[] matrix_flat = matrix._matrix as Fraction64[];
+      Fraction64[] result_flat = result._matrix as Fraction64[];
       for (int i = 0; i < matrix_row; i++)
         for (int j = 0; j < matrix_col; j++)
           result_flat[i * matrix_col + j] = 
             matrix_flat[i * matrix_col + j] / right;
 
 #endif
-      return result;
+        return result;
+      }
+
+      #endregion
+
+      #region default
+
+      else
+      {
+        Matrix<Fraction64> result =
+          new Matrix<Fraction64>(matrix.Rows, matrix.Columns);
+        for (int i = 0; i < matrix.Rows; i++)
+          for (int j = 0; j < matrix.Columns; j++)
+            result[i, j] = matrix[i, j] / right;
+        return result;
+      }
+
+      #endregion
     }
 
     /// <summary>Gets the minor of a matrix.</summary>
@@ -7866,6 +8602,8 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error checking
+
 #if no_error_checking
       // nothing
 #else
@@ -7879,34 +8617,41 @@ namespace Seven.Mathematics
         throw new Error("invalid column on matrix minor: !(0 <= column < matrix.Columns)");
 #endif
 
-      Matrix<Fraction64> minor =
-        new Matrix<Fraction64>(matrix.Rows - 1, matrix.Columns - 1);
-      int matrix_rows = matrix.Rows;
-      int matrix_cols = matrix.Columns;
+      #endregion
+
+      #region flattened array
+
+      if (matrix.CurrentFormat == Matrix<Fraction64>.Format.FlattenedArray)
+      {
+
+        Matrix<Fraction64> minor =
+          new Matrix<Fraction64>(matrix.Rows - 1, matrix.Columns - 1);
+        int matrix_rows = matrix.Rows;
+        int matrix_cols = matrix.Columns;
 
 #if unsafe_code
-      unsafe
-      {
-        fixed (Fraction64*
-          matrix_flat = matrix._matrix,
-          minor_flat = minor._matrix)
+        unsafe
         {
-          int m = 0, n = 0;
-          for (int i = 0; i < matrix_rows; i++)
+          fixed (Fraction64*
+            matrix_flat = matrix._matrix as Fraction64[],
+            minor_flat = minor._matrix as Fraction64[])
           {
-            if (i == row) continue;
-            n = 0;
-            for (int j = 0; j < matrix_cols; j++)
+            int m = 0, n = 0;
+            for (int i = 0; i < matrix_rows; i++)
             {
-              if (j == column) continue;
-              minor_flat[m * matrix_cols + n] =
-                matrix_flat[i * matrix_cols + j];
-              n++;
+              if (i == row) continue;
+              n = 0;
+              for (int j = 0; j < matrix_cols; j++)
+              {
+                if (j == column) continue;
+                minor_flat[m * matrix_cols + n] =
+                  matrix_flat[i * matrix_cols + j];
+                n++;
+              }
+              m++;
             }
-            m++;
           }
         }
-      }
 #else
       int m = 0, n = 0;
       for (int i = 0; i < matrix.Rows; i++)
@@ -7922,7 +8667,34 @@ namespace Seven.Mathematics
         m++;
       }
 #endif
-      return minor;
+        return minor;
+      }
+
+      #endregion
+
+      #region default
+
+      else
+      {
+        Matrix<Fraction64> minor =
+          new Matrix<Fraction64>(matrix.Rows - 1, matrix.Columns - 1);
+        int m = 0, n = 0;
+        for (int i = 0; i < matrix.Rows; i++)
+        {
+          if (i == row) continue;
+          n = 0;
+          for (int j = 0; j < matrix.Columns; j++)
+          {
+            if (j == column) continue;
+            minor[m, n] = matrix[i, j];
+            n++;
+          }
+          m++;
+        }
+        return minor;
+      }
+
+      #endregion
     }
 
     /// <summary>Combines two matrices from left to right 
@@ -7946,6 +8718,8 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error checking
+
 #if no_errorChecking
       // nothing
 #else
@@ -7957,31 +8731,39 @@ namespace Seven.Mathematics
         throw new Error("invalid row-wise concatenation !(left.Rows == right.Rows).");
 #endif
 
-      Matrix<Fraction64> result =
-        new Matrix<Fraction64>(left.Rows, left.Columns + right.Columns);
-      int result_rows = result.Rows;
-      int result_cols = result.Columns;
+      #endregion
 
-      int left_cols = left.Columns;
-      int right_cols = right.Columns;
+      #region flattened arrays
+
+      if (left.CurrentFormat == Matrix<Fraction64>.Format.FlattenedArray &&
+        right.CurrentFormat == Matrix<Fraction64>.Format.FlattenedArray)
+      {
+
+        Matrix<Fraction64> result =
+          new Matrix<Fraction64>(left.Rows, left.Columns + right.Columns);
+        int result_rows = result.Rows;
+        int result_cols = result.Columns;
+
+        int left_cols = left.Columns;
+        int right_cols = right.Columns;
 
 #if unsafe_code
-      unsafe
-      {
-        // OptimizeMe (jump statement)
-        fixed (Fraction64*
-          left_flat = left._matrix,
-          right_flat = right._matrix,
-          result_flat = result._matrix)
-          for (int i = 0; i < result_rows; i++)
-            for (int j = 0; j < result_cols; j++)
-              if (j < left_cols)
-                result_flat[i * result_cols + j] =
-                  left_flat[i * left_cols + j];
-              else
-                result_flat[i * result_cols + j] =
-                  right_flat[i * right_cols + j - left_cols];
-      }
+        unsafe
+        {
+          // OptimizeMe (jump statement)
+          fixed (Fraction64*
+            left_flat = left._matrix as Fraction64[],
+            right_flat = right._matrix as Fraction64[],
+            result_flat = result._matrix as Fraction64[])
+            for (int i = 0; i < result_rows; i++)
+              for (int j = 0; j < result_cols; j++)
+                if (j < left_cols)
+                  result_flat[i * result_cols + j] =
+                    left_flat[i * left_cols + j];
+                else
+                  result_flat[i * result_cols + j] =
+                    right_flat[i * right_cols + j - left_cols];
+        }
 #else
       for (int i = 0; i < result_rows; i++)
         for (int j = 0; j < result_cols; j++)
@@ -7993,7 +8775,27 @@ namespace Seven.Mathematics
         }
 #endif
 
-      return result;
+        return result;
+      }
+
+      #endregion
+
+      #region default
+
+      else
+      {
+        Matrix<Fraction64> result =
+          new Matrix<Fraction64>(left.Rows, left.Columns + right.Columns);
+        for (int i = 0; i < result.Rows; i++)
+          for (int j = 0; j < result.Columns; j++)
+            if (j < left.Columns)
+              result[i, j] = left[i, j];
+            else
+              result[i, j] = right[i, j - left.Columns];
+        return result;
+      }
+
+      #endregion
     }
 
     /// <summary>Calculates the echelon of a matrix (aka REF).</summary>
@@ -8022,12 +8824,16 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error checking
+
 #if no_error_checking
       // nothing
 #else
       if (object.ReferenceEquals(matrix, null))
         throw new Error("null reference: matrix");
 #endif
+
+      #endregion
 
       Matrix<Fraction64> result = matrix.Clone();
       for (int i = 0; i < matrix.Rows; i++)
@@ -8076,12 +8882,16 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error checking
+
 #if no_error_checking
       // nothing
 #else
       if (object.ReferenceEquals(matrix, null))
         throw new Error("null reference: matrix");
 #endif
+
+      #endregion
 
       Matrix<Fraction64> result = matrix.Clone();
       for (int i = 0; i < matrix.Rows; i++)
@@ -8133,6 +8943,8 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error checking
+
 #if no_error_checking
       // nothing
 #else
@@ -8141,6 +8953,8 @@ namespace Seven.Mathematics
       if (matrix.Rows != matrix.Columns)
         throw new Error("invalid matrix determinent: !(matrix.IsSquare)");
 #endif
+
+      #endregion
 
       Fraction64 det = 1;
       Matrix<Fraction64> rref = matrix.Clone();
@@ -8199,6 +9013,8 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error checking
+
 #if no_error_checking
       // nothing
 #else
@@ -8207,6 +9023,8 @@ namespace Seven.Mathematics
       if (LinearAlgebra.Determinent(matrix) == 0)
         throw new Error("inverse calculation failed.");
 #endif
+
+      #endregion
 
       Matrix<Fraction64> identity = LinearAlgebra.MatrixFactoryIdentity_Fraction64(matrix.Rows, matrix.Columns);
       Matrix<Fraction64> rref = matrix.Clone();
@@ -8253,6 +9071,8 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error checking
+
 #if no_error_checking
       // nothing
 #else
@@ -8261,6 +9081,8 @@ namespace Seven.Mathematics
       if (!(matrix.Rows == matrix.Columns))
         throw new Error("Adjoint of a non-square matrix does not exists");
 #endif
+
+      #endregion
 
       Matrix<Fraction64> AdjointMatrix = new Matrix<Fraction64>(matrix.Rows, matrix.Columns);
       for (int i = 0; i < matrix.Rows; i++)
@@ -8288,12 +9110,16 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error checking
+
 #if no_error_checking
       // nothing
 #else
       if (object.ReferenceEquals(matrix, null))
         throw new Error("null reference: matrix");
 #endif
+
+      #endregion
 
       Matrix<Fraction64> transpose =
         new Matrix<Fraction64>(matrix.Columns, matrix.Rows);
@@ -8355,6 +9181,8 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error checking
+
 #if no_error_checking
 #else
       if (object.ReferenceEquals(matrix, null))
@@ -8362,6 +9190,8 @@ namespace Seven.Mathematics
       if (matrix.Rows != matrix.Columns)
         throw new Error("non-square matrix during DecomposeLU function");
 #endif
+
+      #endregion
 
       Lower = LinearAlgebra.MatrixFactoryIdentity_Fraction64(matrix.Rows, matrix.Columns);
       Upper = matrix.Clone();
@@ -9896,32 +10726,60 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error checking
+
 #if no_errorchecking
       //nothing
 #else
       if (object.ReferenceEquals(matrix, null))
         throw new Error("null reference: matrix");
+#endif
+
+      #endregion
+
       if (matrix.Rows != matrix.Columns)
         return false;
-#endif
-      int size = matrix.Columns;
-#if unsafe_code
-      unsafe
+
+      #region flattened arrays
+
+      if (matrix.CurrentFormat == Matrix<decimal>.Format.FlattenedArray)
       {
-        fixed (decimal* matrix_flat = matrix._matrix)
-          for (var row = 0; row < size; row++)
-            for (var column = row + 1; column < size; column++)
-              if (matrix_flat[row * size + column] != matrix_flat[column * size + row])
-                return false;
-      }
+
+        int size = matrix.Columns;
+
+#if unsafe_code
+        unsafe
+        {
+          fixed (decimal* matrix_flat = matrix._matrix as decimal[])
+            for (var row = 0; row < size; row++)
+              for (var column = row + 1; column < size; column++)
+                if (matrix_flat[row * size + column] != matrix_flat[column * size + row])
+                  return false;
+        }
 #else
-      decimal[] matrix_flat = matrix._matrix;
+      decimal[] matrix_flat = matrix._matrix as decimal[];
       for (var row = 0; row < size; row++)
         for (var column = row + 1; column < size; column++)
           if (matrix_flat[row * size + column] != matrix_flat[column * size + row])
             return false;
 #endif
-      return true;
+        return true;
+      }
+
+      #endregion
+
+      #region default
+
+      else
+      {
+        for (int i = 0; i < matrix.Rows; i++)
+          for (int j = 0; j < matrix.Columns; j++)
+            if (matrix[i, j] != matrix[j, i])
+              return false;
+        return true;
+      }
+
+      #endregion
     }
 
     /// <summary>Constructs a new identity-matrix of the given dimensions.</summary>
@@ -9940,6 +10798,8 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error checking
+
 #if no_error_checking
       //nothing
 #else
@@ -9949,13 +10809,11 @@ namespace Seven.Mathematics
         throw new Error("invalid column count on matrix creation");
 #endif
 
+      #endregion
+
       Matrix<decimal> matrix = new Matrix<decimal>(rows, columns);
-      if (rows <= columns)
-        for (int i = 0; i < rows; i++)
-          matrix[i, i] = 1;
-      else
-        for (int i = 0; i < columns; i++)
-          matrix[i, i] = 1;
+      for (int i = 0, i_max = Logic.Min(rows, columns); i < i_max; i++)
+        matrix[i, i] = 1;
       return matrix;
     }
 
@@ -9975,41 +10833,8 @@ namespace Seven.Mathematics
 
       #endregion
 
-#if no_error_checking
-      // nothing
-#else
-        if (object.ReferenceEquals(matrix, null))
-          throw new Error("null reference: matirx");
-#endif
+      #region error checking
 
-      Matrix<decimal> result =
-        new Matrix<decimal>(matrix.Rows, matrix.Columns);
-      int size = matrix.Rows * matrix.Columns;
-
-#if unsafe_code
-      unsafe
-      {
-        fixed (decimal*
-          result_flat = result._matrix,
-          matrix_flat = matrix._matrix)
-          for (int i = 0; i < size; i++)
-            result_flat[i] = -matrix_flat[i];
-        return result;
-      }
-#else
-      decimal[] result_flat = result._matrix;
-      decimal[] matrix_flat = matrix._matrix;
-      for (int i = 0; i < size; i++)
-        result_flat[i] = -matrix_flat[i];
-      return result;
-#endif
-    }
-
-    /// <summary>Negates all the values in a matrix.</summary>
-    /// <param name="matrix">The matrix to have its values negated.</param>
-    /// <returns>The resulting matrix after the negations.</returns>
-    public static Matrix<decimal> Negate_parallel(Matrix<decimal> matrix)
-    {
 #if no_error_checking
       // nothing
 #else
@@ -10017,45 +10842,118 @@ namespace Seven.Mathematics
         throw new Error("null reference: matirx");
 #endif
 
-      if (matrix.Rows * matrix.Columns > _parallelMinimum)
+      #endregion
+
+      #region flattened arrays
+
+      if (matrix.CurrentFormat == Matrix<decimal>.Format.FlattenedArray)
       {
+
         Matrix<decimal> result =
-        new Matrix<decimal>(matrix.Rows, matrix.Columns);
+          new Matrix<decimal>(matrix.Rows, matrix.Columns);
         int size = matrix.Rows * matrix.Columns;
 
 #if unsafe_code
         unsafe
         {
-          Seven.Parallels.AutoParallel.Divide(
-            (int current, int max) =>
-            {
-              return () =>
-              {
-                fixed (decimal*
-                  result_flat = result._matrix,
-                  matrix_flat = matrix._matrix)
-                  for (int i = current; i < size; i += max)
-                    result_flat[i] = -matrix_flat[i];
-              };
-            }, Logic.Max(matrix.Rows, matrix.Columns));
+          fixed (decimal*
+            result_flat = result._matrix as decimal[],
+            matrix_flat = matrix._matrix as decimal[])
+            for (int i = 0; i < size; i++)
+              result_flat[i] = -matrix_flat[i];
+          return result;
         }
+#else
+      decimal[] result_flat = result._matrix as decimal[];
+      decimal[] matrix_flat = matrix._matrix as decimal[];
+      for (int i = 0; i < size; i++)
+        result_flat[i] = -matrix_flat[i];
+      return result;
+#endif
+
+      }
+
+      #endregion
+
+      #region default
+
+      else
+      {
+        Matrix<decimal> result =
+          new Matrix<decimal>(matrix.Rows, matrix.Columns);
+        for (int i = 0; i < matrix.Rows; i++)
+          for (int j = 0; j < matrix.Rows; j++)
+            result[i, j] = -matrix[i, j];
+        return result;
+      }
+
+      #endregion
+    }
+
+    /// <summary>Negates all the values in a matrix.</summary>
+    /// <param name="matrix">The matrix to have its values negated.</param>
+    /// <returns>The resulting matrix after the negations.</returns>
+    public static Matrix<decimal> Negate_parallel(Matrix<decimal> matrix)
+    {
+      #region error checking
+
+#if no_error_checking
+      // nothing
+#else
+      if (object.ReferenceEquals(matrix, null))
+        throw new Error("null reference: matirx");
+#endif
+
+      #endregion
+
+      // At the moment, negation does not benefit from multithreading.
+      if (false) //matrix.Rows * matrix.Columns > _parallelMinimum)
+      {
+        #region flattened array
+
+        if (matrix.CurrentFormat == Matrix<decimal>.Format.FlattenedArray)
+        {
+
+          Matrix<decimal> result =
+          new Matrix<decimal>(matrix.Rows, matrix.Columns);
+          int size = matrix.Rows * matrix.Columns;
+
+#if unsafe_code
+          unsafe
+          {
+            Seven.Parallels.AutoParallel.Divide(
+              (int current, int max) =>
+              {
+                return () =>
+                {
+                  fixed (decimal*
+                    result_flat = result._matrix as decimal[],
+                    matrix_flat = matrix._matrix as decimal[])
+                    for (int i = current; i < size; i += max)
+                      result_flat[i] = -matrix_flat[i];
+                };
+              }, Logic.Max(matrix.Rows, matrix.Columns));
+          }
 #else
           Seven.Parallels.AutoParallel.Divide(
             (int current, int max) =>
             {
               return () =>
               {
-                decimal[] matrix_flat = matrix._matrix;
-                decimal[] result_flat = result._matrix;
+                decimal[] matrix_flat = matrix._matrix as decimal[];
+                decimal[] result_flat = result._matrix as decimal[];
                 for (int i = current; i < size; i += max)
                   result_flat[i] = -matrix_flat[i];
               };
-            }, Logic.Max(left.Rows, left.Columns));
+            }, Logic.Max(matrix.Rows, matrix.Columns));
 #endif
-        return result;
+          return result;
+
+        }
+
+        #endregion
       }
-      else
-        return LinearAlgebra.Negate(matrix);
+      return LinearAlgebra.Negate(matrix);
     }
 
     /// <summary>Does standard addition of two matrices.</summary>
@@ -10075,48 +10973,8 @@ namespace Seven.Mathematics
 
       #endregion
 
-#if no_error_checking
-      // nothing
-#else
-      if (object.ReferenceEquals(left, null))
-          throw new Error("null reference: left");
-      if (object.ReferenceEquals(right, null))
-        throw new Error("null reference: right");
-      if (left.Rows != right.Rows || left.Columns != right.Columns)
-        throw new Error("invalid matrix addition (dimension miss-match).");
-#endif
+      #region error checking
 
-      Matrix<decimal> result =
-        new Matrix<decimal>(left.Rows, left.Columns);
-      int size = left.Rows * left.Columns;
-
-#if unsafe_code
-      unsafe
-      {
-        fixed (decimal*
-          left_flat = left._matrix,
-          right_flat = right._matrix,
-          result_flat = result._matrix)
-          for (int i = 0; i < size; i++)
-            result_flat[i] = left_flat[i] + right_flat[i];
-      }
-#else
-      decimal[] left_flat = left._matrix;
-      decimal[] right_flat = right._matrix;
-      decimal[] result_flat = result._matrix;
-      for (int i = 0; i < size; i++)
-        result_flat[i] = left_flat[i] + right_flat[i];
-#endif
-
-      return result;
-    }
-
-    /// <summary>Does standard addition of two matrices.</summary>
-    /// <param name="left">The left matrix of the addition.</param>
-    /// <param name="right">The right matrix of the addition.</param>
-    /// <returns>The resulting matrix after the addition.</returns>
-    public static Matrix<decimal> Add_parallel(Matrix<decimal> left, Matrix<decimal> right)
-    {
 #if no_error_checking
       // nothing
 #else
@@ -10128,47 +10986,128 @@ namespace Seven.Mathematics
         throw new Error("invalid matrix addition (dimension miss-match).");
 #endif
 
-      if (left.Rows * left.Columns > _parallelMinimum)
+      #endregion
+
+      #region flattened arrays
+
+      if (left.CurrentFormat == Matrix<decimal>.Format.FlattenedArray &&
+        right.CurrentFormat == Matrix<decimal>.Format.FlattenedArray)
       {
+
         Matrix<decimal> result =
-        new Matrix<decimal>(left.Rows, left.Columns);
+          new Matrix<decimal>(left.Rows, left.Columns);
         int size = left.Rows * left.Columns;
 
 #if unsafe_code
         unsafe
         {
-          Seven.Parallels.AutoParallel.Divide(
-            (int current, int max) =>
-            {
-              return () =>
-              {
-                fixed (decimal*
-                  left_flat = left._matrix,
-                  right_flat = right._matrix,
-                  result_flat = result._matrix)
-                  for (int i = current; i < size; i += max)
-                    result_flat[i] = left_flat[i] + right_flat[i];
-              };
-            }, Logic.Max(left.Rows, left.Columns));
+          fixed (decimal*
+            left_flat = left._matrix as decimal[],
+            right_flat = right._matrix as decimal[],
+            result_flat = result._matrix as decimal[])
+            for (int i = 0; i < size; i++)
+              result_flat[i] = left_flat[i] + right_flat[i];
         }
+#else
+      decimal[] left_flat = left._matrix as decimal[];
+      decimal[] right_flat = right._matrix as decimal[];
+      decimal[] result_flat = result._matrix as decimal[];
+      for (int i = 0; i < size; i++)
+        result_flat[i] = left_flat[i] + right_flat[i];
+#endif
+
+        return result;
+
+      }
+
+      #endregion
+
+      #region default
+
+      else
+      {
+        Matrix<decimal> result =
+          new Matrix<decimal>(left.Rows, left.Columns);
+        for (int i = 0; i < left.Rows; i++)
+          for (int j = 0; j < left.Columns; j++)
+            result[i, j] = left[i, j] + right[i, j];
+        return result;
+      }
+
+      #endregion
+    }
+
+    /// <summary>Does standard addition of two matrices.</summary>
+    /// <param name="left">The left matrix of the addition.</param>
+    /// <param name="right">The right matrix of the addition.</param>
+    /// <returns>The resulting matrix after the addition.</returns>
+    public static Matrix<decimal> Add_parallel(Matrix<decimal> left, Matrix<decimal> right)
+    {
+      #region error checking
+
+#if no_error_checking
+      // nothing
+#else
+      if (object.ReferenceEquals(left, null))
+        throw new Error("null reference: left");
+      if (object.ReferenceEquals(right, null))
+        throw new Error("null reference: right");
+      if (left.Rows != right.Rows || left.Columns != right.Columns)
+        throw new Error("invalid matrix addition (dimension miss-match).");
+#endif
+
+      #endregion
+
+      // At the moment, addition does not benefit from multithreading.
+      if (false) //matrix.Rows * matrix.Columns > _parallelMinimum)
+      {
+        #region flattened array
+
+        if (left.CurrentFormat == Matrix<decimal>.Format.FlattenedArray)
+        {
+
+          Matrix<decimal> result =
+          new Matrix<decimal>(left.Rows, left.Columns);
+          int size = left.Rows * left.Columns;
+
+#if unsafe_code
+          unsafe
+          {
+            Seven.Parallels.AutoParallel.Divide(
+              (int current, int max) =>
+              {
+                return () =>
+                {
+                  fixed (decimal*
+                    left_flat = left._matrix as decimal[],
+                    right_flat = right._matrix as decimal[],
+                    result_flat = result._matrix as decimal[])
+                    for (int i = current; i < size; i += max)
+                      result_flat[i] = left_flat[i] + right_flat[i];
+                };
+              }, Logic.Max(left.Rows, left.Columns));
+          }
 #else
           Seven.Parallels.AutoParallel.Divide(
             (int current, int max) =>
             {
               return () =>
               {
-                decimal[] left_flat = left._matrix;
-                decimal[] right_flat = right._matrix;
-                decimal[] result_flat = result._matrix;
+                decimal[] left_flat = left._matrix as decimal[];
+                decimal[] right_flat = right._matrix as decimal[];
+                decimal[] result_flat = result._matrix as decimal[];
                 for (int i = current; i < size; i += max)
                   result_flat[i] = left_flat[i] + right_flat[i];
               };
             }, Logic.Max(left.Rows, left.Columns));
 #endif
-        return result;
+          return result;
+
+        }
+
+        #endregion
       }
-      else
-        return LinearAlgebra.Add(left, right);
+      return LinearAlgebra.Add(left, right);
     }
 
     /// <summary>Subtracts a scalar from all the values in a matrix.</summary>
@@ -10188,6 +11127,8 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error checking
+
 #if no_error_checking
       // nothing
 #else
@@ -10199,29 +11140,54 @@ namespace Seven.Mathematics
         throw new Error("invalid matrix subtraction (dimension miss-match).");
 #endif
 
-      Matrix<decimal> result =
-        new Matrix<decimal>(left.Rows, left.Columns);
-      int size = left.Rows * left.Columns;
+      #endregion
+
+      #region flattened arrays
+
+      if (left.CurrentFormat == Matrix<decimal>.Format.FlattenedArray &&
+        right.CurrentFormat == Matrix<decimal>.Format.FlattenedArray)
+      {
+
+        Matrix<decimal> result =
+          new Matrix<decimal>(left.Rows, left.Columns);
+        int size = left.Rows * left.Columns;
 
 #if unsafe_code
-      unsafe
-      {
-        fixed (decimal*
-          left_flat = left._matrix,
-          right_flat = right._matrix,
-          result_flat = result._matrix)
-          for (int i = 0; i < size; i++)
-            result_flat[i] = left_flat[i] - right_flat[i];
-      }
+        unsafe
+        {
+          fixed (decimal*
+            left_flat = left._matrix as decimal[],
+            right_flat = right._matrix as decimal[],
+            result_flat = result._matrix as decimal[])
+            for (int i = 0; i < size; i++)
+              result_flat[i] = left_flat[i] - right_flat[i];
+        }
 #else
-      decimal[] left_flat = left._matrix;
-      decimal[] right_flat = right._matrix;
-      decimal[] result_flat = result._matrix;
+      decimal[] left_flat = left._matrix as decimal[];
+      decimal[] right_flat = right._matrix as decimal[];
+      decimal[] result_flat = result._matrix as decimal[];
       for (int i = 0; i < size; i++)
         result_flat[i] = left_flat[i] - right_flat[i];
 #endif
 
-      return result;
+        return result;
+      }
+
+      #endregion
+
+      #region default
+
+      else
+      {
+        Matrix<decimal> result =
+          new Matrix<decimal>(left.Rows, left.Columns);
+        for (int i = 0; i < left.Rows; i++)
+          for (int j = 0; j < left.Columns; j++)
+            result[i, j] = left[i, j] - right[i, j];
+        return result;
+      }
+
+      #endregion
     }
 
     /// <summary>Subtracts a scalar from all the values in a matrix.</summary>
@@ -10230,6 +11196,8 @@ namespace Seven.Mathematics
     /// <returns>The resulting matrix after the subtractions.</returns>
     public static Matrix<decimal> Subtract_parallel(Matrix<decimal> left, Matrix<decimal> right)
     {
+      #region error checking
+
 #if no_error_checking
       // nothing
 #else
@@ -10241,47 +11209,58 @@ namespace Seven.Mathematics
         throw new Error("invalid matrix subtraction (dimension miss-match).");
 #endif
 
-      if (left.Rows * left.Columns > _parallelMinimum)
+      #endregion
+
+      // At the moment, subtraction does not benefit from multithreading.
+      if (false) //matrix.Rows * matrix.Columns > _parallelMinimum)
       {
-        Matrix<decimal> result =
-        new Matrix<decimal>(left.Rows, left.Columns);
-        int size = left.Rows * left.Columns;
+        #region flattened arrays
+
+        if (left.CurrentFormat == Matrix<decimal>.Format.FlattenedArray &&
+          right.CurrentFormat == Matrix<decimal>.Format.FlattenedArray)
+        {
+
+          Matrix<decimal> result =
+          new Matrix<decimal>(left.Rows, left.Columns);
+          int size = left.Rows * left.Columns;
 
 #if unsafe_code
-        unsafe
-        {
-          Seven.Parallels.AutoParallel.Divide(
-            (int current, int max) =>
-            {
-              return () =>
+          unsafe
+          {
+            Seven.Parallels.AutoParallel.Divide(
+              (int current, int max) =>
               {
-                fixed (decimal*
-                  left_flat = left._matrix,
-                  right_flat = right._matrix,
-                  result_flat = result._matrix)
-                  for (int i = current; i < size; i += max)
-                    result_flat[i] = left_flat[i] - right_flat[i];
-              };
-            }, Logic.Max(left.Rows, left.Columns));
-        }
+                return () =>
+                {
+                  fixed (decimal*
+                    left_flat = left._matrix as decimal[],
+                    right_flat = right._matrix as decimal[],
+                    result_flat = result._matrix as decimal[])
+                    for (int i = current; i < size; i += max)
+                      result_flat[i] = left_flat[i] - right_flat[i];
+                };
+              }, Logic.Max(left.Rows, left.Columns));
+          }
 #else
           Seven.Parallels.AutoParallel.Divide(
           (int current, int max) =>
           {
             return () =>
             {
-              decimal[] left_flat = left._matrix;
-              decimal[] right_flat = right._matrix;
-              decimal[] result_flat = result._matrix;
+              decimal[] left_flat = left._matrix as decimal[];
+              decimal[] right_flat = right._matrix as decimal[];
+              decimal[] result_flat = result._matrix as decimal[];
                 for (int i = current; i < size; i += max)
                   result_flat[i] = left_flat[i] - right_flat[i];
             };
           }, Logic.Max(left.Rows, left.Columns));
 #endif
-        return result;
+          return result;
+        }
+
+        #endregion
       }
-      else
-        return LinearAlgebra.Subtract(left, right);
+      return LinearAlgebra.Subtract(left, right);
     }
 
     /// <summary>Performs multiplication on two matrices.</summary>
@@ -10302,6 +11281,8 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error checking
+
 #if no_error_checking
       // nothing
 #else
@@ -10313,33 +11294,41 @@ namespace Seven.Mathematics
         throw new LinearAlgebra.Error("invalid multiplication (size miss-match).");
 #endif
 
-      decimal sum;
-      int result_rows = left.Rows;
-      int left_cols = left.Columns;
-      int result_cols = right.Columns;
-      Matrix<decimal> result =
-        new Matrix<decimal>(result_rows, result_cols);
+      #endregion
+
+      #region flattened arrays
+
+      if (left.CurrentFormat == Matrix<decimal>.Format.FlattenedArray &&
+        right.CurrentFormat == Matrix<decimal>.Format.FlattenedArray)
+      {
+
+        decimal sum;
+        int result_rows = left.Rows;
+        int left_cols = left.Columns;
+        int result_cols = right.Columns;
+        Matrix<decimal> result =
+          new Matrix<decimal>(result_rows, result_cols);
 
 #if unsafe_code
-      unsafe
-      {
-        fixed (decimal*
-          result_flat = result._matrix,
-          left_flat = left._matrix,
-          right_flat = right._matrix)
-          for (int i = 0; i < result_rows; i++)
-            for (int j = 0; j < result_cols; j++)
-            {
-              sum = 0;
-              for (int k = 0; k < left_cols; k++)
-                sum += left_flat[i * left_cols + k] * right_flat[k * result_cols + j];
-              result_flat[i * result_cols + j] = sum;
-            }
-      }
+        unsafe
+        {
+          fixed (decimal*
+            result_flat = result._matrix as decimal[],
+            left_flat = left._matrix as decimal[],
+            right_flat = right._matrix as decimal[])
+            for (int i = 0; i < result_rows; i++)
+              for (int j = 0; j < result_cols; j++)
+              {
+                sum = 0;
+                for (int k = 0; k < left_cols; k++)
+                  sum += left_flat[i * left_cols + k] * right_flat[k * result_cols + j];
+                result_flat[i * result_cols + j] = sum;
+              }
+        }
 #else
-      decimal[] result_flat = result._matrix;
-      decimal[] left_flat = left._matrix;
-      decimal[] right_flat = right._matrix;
+      decimal[] result_flat = result._matrix as decimal[];
+      decimal[] left_flat = left._matrix as decimal[];
+      decimal[] right_flat = right._matrix as decimal[];
 
       for (int i = 0; i < result_rows; i++)
         for (int j = 0; j < result_cols; j++)
@@ -10351,7 +11340,25 @@ namespace Seven.Mathematics
         }
 #endif
 
-      return result;
+        return result;
+      }
+
+      #endregion
+
+      #region default
+
+      else
+      {
+        Matrix<decimal> result =
+          new Matrix<decimal>(left.Rows, right.Columns);
+        for (int i = 0; i < left.Rows; i++)
+          for (int j = 0; j < right.Columns; j++)
+            for (int k = 0; k < left.Columns; k++)
+              result[i, j] += left[i, k] * right[k, j];
+        return result;
+      }
+
+      #endregion
     }
 
     /// <summary>Performs multiplication on two matrices using multi-threading.</summary>
@@ -10360,6 +11367,8 @@ namespace Seven.Mathematics
     /// <returns>The resulting matrix of the multiplication.</returns>
     public static Matrix<decimal> Multiply_parrallel(Matrix<decimal> left, Matrix<decimal> right)
     {
+      #region error checking
+
 #if no_error_checking
       // nothing
 #else
@@ -10371,6 +11380,8 @@ namespace Seven.Mathematics
         throw new LinearAlgebra.Error("invalid multiplication (dimension miss-match).");
 #endif
 
+      #endregion
+
       int result_rows = left.Rows;
       int left_cols = left.Columns;
       int result_cols = right.Columns;
@@ -10380,12 +11391,52 @@ namespace Seven.Mathematics
       if (result_rows * result_cols > _parallelMinimum &&
         result_rows >= result_cols)
       {
-        Matrix<decimal> result =
-          new Matrix<decimal>(result_rows, result_cols);
-#if unsafe_code
-        unsafe
+        #region flattened arrays
+
+        if (left.CurrentFormat == Matrix<decimal>.Format.FlattenedArray &&
+          right.CurrentFormat == Matrix<decimal>.Format.FlattenedArray)
         {
-          Seven.Parallels.AutoParallel.Divide(
+
+          Matrix<decimal> result =
+            new Matrix<decimal>(result_rows, result_cols);
+
+#if unsafe_code
+          unsafe
+          {
+            Seven.Parallels.AutoParallel.Divide(
+              (int current, int max) =>
+              {
+                return () =>
+                {
+                  decimal sum;
+                  int left_i_offest;
+                  int result_i_offset;
+
+                  fixed (decimal*
+                    result_flat = result._matrix as decimal[],
+                    left_flat = left._matrix as decimal[],
+                    right_flat = right._matrix as decimal[])
+                    for (int i = current; i < result_rows; i += max)
+                    {
+                      left_i_offest = i * left_cols;
+                      result_i_offset = i * result_cols;
+                      for (int j = 0; j < result_cols; j++)
+                      {
+                        sum = 0;
+                        for (int k = 0; k < left_cols; k++)
+                          sum += left_flat[left_i_offest + k] * right_flat[k * result_cols + j];
+                        result_flat[result_i_offset + j] = sum;
+                      }
+                    }
+                };
+              }, result_rows);
+          }
+#else
+        decimal[] result_flat = result._matrix as decimal[];
+        decimal[] left_flat = left._matrix as decimal[];
+        decimal[] right_flat = right._matrix as decimal[];
+
+        Seven.Parallels.AutoParallel.Divide(
             (int current, int max) =>
             {
               return () =>
@@ -10394,68 +11445,78 @@ namespace Seven.Mathematics
                 int left_i_offest;
                 int result_i_offset;
 
-                fixed (decimal*
-                  result_flat = result._matrix,
-                  left_flat = left._matrix,
-                  right_flat = right._matrix)
-                  for (int i = current; i < result_rows; i += max)
+                for (int i = current; i < result_rows; i += max)
+                {
+                  left_i_offest = i * left_cols;
+                  result_i_offset = i * result_cols;
+                  for (int j = 0; j < result_cols; j++)
                   {
-                    left_i_offest = i * left_cols;
-                    result_i_offset = i * result_cols;
-                    for (int j = 0; j < result_cols; j++)
-                    {
-                      sum = 0;
-                      for (int k = 0; k < left_cols; k++)
-                        sum += left_flat[left_i_offest + k] * right_flat[k * result_cols + j];
-                      result_flat[result_i_offset + j] = sum;
-                    }
+                    sum = 0;
+                    for (int k = 0; k < left_cols; k++)
+                      sum += left_flat[left_i_offest + k] * right_flat[k * result_cols + j];
+                    result_flat[result_i_offset + j] = sum;
                   }
+                }
               };
             }, result_rows);
-        }
-#else
-              decimal[] result_flat = result._matrix;
-              decimal[] left_flat = left._matrix;
-              decimal[] right_flat = right._matrix;
-
-              Seven.Parallels.AutoParallel.Divide(
-                  (int current, int max) =>
-                  {
-                    return () =>
-                    {
-                      decimal sum;
-                      int left_i_offest;
-                      int result_i_offset;
-
-                      for (int i = current; i < result_rows; i += max)
-                      {
-                        left_i_offest = i * left_cols;
-                        result_i_offset = i * result_cols;
-                        for (int j = 0; j < result_cols; j++)
-                        {
-                          sum = 0;
-                          for (int k = 0; k < left_cols; k++)
-                            sum += left_flat[left_i_offest + k] * right_flat[k * result_cols + j];
-                          result_flat[result_i_offset + j] = sum;
-                        }
-                      }
-                    };
-                  }, result_rows);
 
 #endif
-        return result;
+
+          return result;
+        }
+
+        #endregion
       }
       // If there are enough columns to warrant multi-threading,
       // then multithread the column for-loop.
       else if (result_rows * result_cols > _parallelMinimum &&
         result_rows < result_cols)
       {
-        Matrix<decimal> result =
-          new Matrix<decimal>(result_rows, result_cols);
-#if unsafe_code
-        unsafe
+        #region flattened arrays
+
+        if (left.CurrentFormat == Matrix<decimal>.Format.FlattenedArray &&
+          right.CurrentFormat == Matrix<decimal>.Format.FlattenedArray)
         {
-          Seven.Parallels.AutoParallel.Divide(
+
+          Matrix<decimal> result =
+            new Matrix<decimal>(result_rows, result_cols);
+#if unsafe_code
+          unsafe
+          {
+            Seven.Parallels.AutoParallel.Divide(
+              (int current, int max) =>
+              {
+                return () =>
+                {
+                  decimal sum;
+                  int left_i_offest;
+                  int result_i_offset;
+
+                  fixed (decimal*
+                    result_flat = result._matrix as decimal[],
+                    left_flat = left._matrix as decimal[],
+                    right_flat = right._matrix as decimal[])
+                    for (int i = 0; i < result_rows; i++)
+                    {
+                      left_i_offest = i * left_cols;
+                      result_i_offset = i * result_cols;
+                      for (int j = current; j < result_cols; j += max)
+                      {
+                        sum = 0;
+                        for (int k = 0; k < left_cols; k++)
+                          sum += left_flat[left_i_offest + k] * right_flat[k * result_cols + j];
+                        result_flat[result_i_offset + j] = sum;
+                      }
+                    }
+                };
+              }, result_cols);
+          }
+#else
+        decimal[] result_flat = result._matrix as decimal[];
+        decimal[] left_flat = left._matrix as decimal[];
+        decimal[] right_flat = right._matrix as decimal[];
+
+        Seven.Parallels.AutoParallel.Divide(
             (int current, int max) =>
             {
               return () =>
@@ -10464,59 +11525,29 @@ namespace Seven.Mathematics
                 int left_i_offest;
                 int result_i_offset;
 
-                fixed (decimal*
-                  result_flat = result._matrix,
-                  left_flat = left._matrix,
-                  right_flat = right._matrix)
-                  for (int i = 0; i < result_rows; i++)
+                for (int i = 0; i < result_rows; i++)
+                {
+                  left_i_offest = i * left_cols;
+                  result_i_offset = i * result_cols;
+                  for (int j = current; j < result_cols; j += max)
                   {
-                    left_i_offest = i * left_cols;
-                    result_i_offset = i * result_cols;
-                    for (int j = current; j < result_cols; j += max)
-                    {
-                      sum = 0;
-                      for (int k = 0; k < left_cols; k++)
-                        sum += left_flat[left_i_offest + k] * right_flat[k * result_cols + j];
-                      result_flat[result_i_offset + j] = sum;
-                    }
+                    sum = 0;
+                    for (int k = 0; k < left_cols; k++)
+                      sum += left_flat[left_i_offest + k] * right_flat[k * result_cols + j];
+                    result_flat[result_i_offset + j] = sum;
                   }
+                }
               };
             }, result_cols);
-        }
-#else
-              decimal[] result_flat = result._matrix;
-              decimal[] left_flat = left._matrix;
-              decimal[] right_flat = right._matrix;
-
-              Seven.Parallels.AutoParallel.Divide(
-                  (int current, int max) =>
-                  {
-                    return () =>
-                    {
-                      decimal sum;
-                      int left_i_offest;
-                      int result_i_offset;
-
-                      for (int i = 0; i < result_rows; i++)
-                      {
-                        left_i_offest = i * left_cols;
-                        result_i_offset = i * result_cols;
-                        for (int j = current; j < result_cols; j += max)
-                        {
-                          sum = 0;
-                          for (int k = 0; k < left_cols; k++)
-                            sum += left_flat[left_i_offest + k] * right_flat[k * result_cols + j];
-                          result_flat[result_i_offset + j] = sum;
-                        }
-                      }
-                    };
-                  }, result_cols);
 #endif
-        return result;
+          return result;
+
+        }
+
+        #endregion
       }
       // Multi-threading is not necessary.
-      else
-        return LinearAlgebra.Multiply(left, right);
+      return LinearAlgebra.Multiply(left, right);
     }
 
     /// <summary>Does a standard (triple for looped) multiplication between matrices.</summary>
@@ -10536,40 +11567,62 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error
+
 #if no_error_checking
-      int left_row = left.Rows;
-      int left_col = left.Columns;
+      // nothing
 #else
-      int left_row = left.Rows;
-      int left_col = left.Columns;
       if (left.Columns != right.Dimensions)
         throw new Error("invalid multiplication (size miss-match).");
 #endif
 
-      Vector<decimal> result = new Vector<decimal>(right.Dimensions);
+      #endregion
+
+      #region flattened array
+
+      if (left.CurrentFormat == Matrix<decimal>.Format.FlattenedArray)
+      {
+        int left_row = left.Rows;
+        int left_col = left.Columns;
+        Vector<decimal> result = new Vector<decimal>(right.Dimensions);
 
 #if unsafe_code
-      unsafe
-      {
-        fixed (decimal*
-          left_flat = left._matrix,
-          right_flat = right._vector,
-          result_flat = result._vector)
-          for (int i = 0; i < left_row; i++)
-            for (int j = 0; j < left_col; j++)
-              result_flat[i] += left_flat[i * left_col + j] * right_flat[j];
-        return result;
-      }
+        unsafe
+        {
+          fixed (decimal*
+            left_flat = left._matrix as decimal[],
+            right_flat = right._vector as decimal[],
+            result_flat = result._vector as decimal[])
+            for (int i = 0; i < left_row; i++)
+              for (int j = 0; j < left_col; j++)
+                result_flat[i] += left_flat[i * left_col + j] * right_flat[j];
+        }
 #else
-      decimal[] left_flat = left._matrix;
-      decimal[] right_flat = right._vector;
-      decimal[] result_flat = result._vector;
+      decimal[] left_flat = left._matrix as decimal[];
+      decimal[] right_flat = right._vector as decimal[];
+      decimal[] result_flat = result._vector as decimal[];
       for (int i = 0; i < left_row; i++)
         for (int j = 0; j < left_col; j++)
           result_flat[i] += left_flat[i * left_col + j] * right_flat[j];
-      return result;
 #endif
-      return result;
+        return result;
+      }
+
+      #endregion
+
+      #region defualt
+
+      else
+      {
+        Vector<decimal> result =
+          new Vector<decimal>(right.Dimensions);
+        for (int i = 0; i < left.Rows; i++)
+          for (int j = 0; j < left.Columns; j++)
+            result[i] += left[i, j] * right[j];
+        return result;
+      }
+
+      #endregion
     }
 
     /// <summary>Multiplies all the values in a matrix by a scalar.</summary>
@@ -10589,6 +11642,8 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error checking
+
 #if no_error_checking
       // nothing
 #else
@@ -10596,27 +11651,51 @@ namespace Seven.Mathematics
         throw new Error("null reference: left");
 #endif
 
-      int rows = left.Rows;
-      int columns = left.Columns;
-      Matrix<decimal> result = new Matrix<decimal>(rows, columns);
+      #endregion
+
+      #region flattened array
+
+      if (left.CurrentFormat == Matrix<decimal>.Format.FlattenedArray)
+      {
+
+        int rows = left.Rows;
+        int columns = left.Columns;
+        Matrix<decimal> result = new Matrix<decimal>(rows, columns);
 
 #if unsafe_code
-      unsafe
-      {
-        fixed (decimal*
-          left_flat = left._matrix,
-          result_flat = result._matrix)
-          for (int i = 0; i < rows; i++)
-            for (int j = 0; j < columns; j++)
-              result_flat[i * columns + j] = left_flat[i * columns + j] * right;
-      }
+        unsafe
+        {
+          fixed (decimal*
+            left_flat = left._matrix as decimal[],
+            result_flat = result._matrix as decimal[])
+            for (int i = 0; i < rows; i++)
+              for (int j = 0; j < columns; j++)
+                result_flat[i * columns + j] = left_flat[i * columns + j] * right;
+        }
 #else
       for (int i = 0; i < rows; i++)
         for (int j = 0; j < columns; j++)
           result[i, j] = left[i, j] * right;
 #endif
 
-      return result;
+        return result;
+      }
+
+      #endregion
+
+      #region default
+
+      else
+      {
+        Matrix<decimal> result =
+          new Matrix<decimal>(left.Rows, left.Columns);
+        for (int i = 0; i < left.Rows; i++)
+          for (int j = 0; j < left.Columns; j++)
+            result[i, j] = left[i, j] * right;
+        return result;
+      }
+
+      #endregion
     }
 
     /// <summary>Applies a power to a square matrix.</summary>
@@ -10629,10 +11708,12 @@ namespace Seven.Mathematics
 
       //Matrix<decimal> result = matrix.Clone();
       //for (int i = 0; i < power; i++)
-      //  result = LinearAlgebra.Multiply(result, result);
+      //  result = LinearAlgebra.Multiply(result, matrix);
       //return result;
 
       #endregion
+
+      #region error checking
 
 #if no_error_checking
       // nothing
@@ -10642,6 +11723,9 @@ namespace Seven.Mathematics
       if (!(power >= 0))
         throw new Error("invalid power !(power > -1)");
 #endif
+
+      #endregion
+
       // this is not optimized...
       if (power == 0)
         return LinearAlgebra.MatrixFactoryIdentity_decimal(matrix.Rows, matrix.Columns);
@@ -10668,6 +11752,8 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error checking
+
 #if no_error_checking
       // nothing
 #else
@@ -10675,32 +11761,56 @@ namespace Seven.Mathematics
         throw new Error("null reference: matrix");
 #endif
 
-      int matrix_row = matrix.Rows;
-      int matrix_col = matrix.Columns;
-      Matrix<decimal> result =
-        new Matrix<decimal>(matrix_row, matrix_col);
+      #endregion
+
+      #region flattened array
+
+      if (matrix.CurrentFormat == Matrix<decimal>.Format.FlattenedArray)
+      {
+
+        int matrix_row = matrix.Rows;
+        int matrix_col = matrix.Columns;
+        Matrix<decimal> result =
+          new Matrix<decimal>(matrix_row, matrix_col);
 
 #if unsafe_code
-      unsafe
-      {
-        fixed (decimal*
-          matrix_flat = matrix._matrix,
-          result_flat = result._matrix)
-          for (int i = 0; i < matrix_row; i++)
-            for (int j = 0; j < matrix_col; j++)
-              result_flat[i * matrix_col + j] =
-                matrix_flat[i * matrix_col + j] / right;
-      }
+        unsafe
+        {
+          fixed (decimal*
+            matrix_flat = matrix._matrix as decimal[],
+            result_flat = result._matrix as decimal[])
+            for (int i = 0; i < matrix_row; i++)
+              for (int j = 0; j < matrix_col; j++)
+                result_flat[i * matrix_col + j] =
+                  matrix_flat[i * matrix_col + j] / right;
+        }
 #else
-      decimal[] matrix_flat = matrix._matrix;
-      decimal[] result_flat = result._matrix;
+      decimal[] matrix_flat = matrix._matrix as decimal[];
+      decimal[] result_flat = result._matrix as decimal[];
       for (int i = 0; i < matrix_row; i++)
         for (int j = 0; j < matrix_col; j++)
           result_flat[i * matrix_col + j] = 
             matrix_flat[i * matrix_col + j] / right;
 
 #endif
-      return result;
+        return result;
+      }
+
+      #endregion
+
+      #region default
+
+      else
+      {
+        Matrix<decimal> result =
+          new Matrix<decimal>(matrix.Rows, matrix.Columns);
+        for (int i = 0; i < matrix.Rows; i++)
+          for (int j = 0; j < matrix.Columns; j++)
+            result[i, j] = matrix[i, j] / right;
+        return result;
+      }
+
+      #endregion
     }
 
     /// <summary>Gets the minor of a matrix.</summary>
@@ -10731,6 +11841,8 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error checking
+
 #if no_error_checking
       // nothing
 #else
@@ -10744,34 +11856,41 @@ namespace Seven.Mathematics
         throw new Error("invalid column on matrix minor: !(0 <= column < matrix.Columns)");
 #endif
 
-      Matrix<decimal> minor =
-        new Matrix<decimal>(matrix.Rows - 1, matrix.Columns - 1);
-      int matrix_rows = matrix.Rows;
-      int matrix_cols = matrix.Columns;
+      #endregion
+
+      #region flattened array
+
+      if (matrix.CurrentFormat == Matrix<decimal>.Format.FlattenedArray)
+      {
+
+        Matrix<decimal> minor =
+          new Matrix<decimal>(matrix.Rows - 1, matrix.Columns - 1);
+        int matrix_rows = matrix.Rows;
+        int matrix_cols = matrix.Columns;
 
 #if unsafe_code
-      unsafe
-      {
-        fixed (decimal*
-          matrix_flat = matrix._matrix,
-          minor_flat = minor._matrix)
+        unsafe
         {
-          int m = 0, n = 0;
-          for (int i = 0; i < matrix_rows; i++)
+          fixed (decimal*
+            matrix_flat = matrix._matrix as decimal[],
+            minor_flat = minor._matrix as decimal[])
           {
-            if (i == row) continue;
-            n = 0;
-            for (int j = 0; j < matrix_cols; j++)
+            int m = 0, n = 0;
+            for (int i = 0; i < matrix_rows; i++)
             {
-              if (j == column) continue;
-              minor_flat[m * matrix_cols + n] =
-                matrix_flat[i * matrix_cols + j];
-              n++;
+              if (i == row) continue;
+              n = 0;
+              for (int j = 0; j < matrix_cols; j++)
+              {
+                if (j == column) continue;
+                minor_flat[m * matrix_cols + n] =
+                  matrix_flat[i * matrix_cols + j];
+                n++;
+              }
+              m++;
             }
-            m++;
           }
         }
-      }
 #else
       int m = 0, n = 0;
       for (int i = 0; i < matrix.Rows; i++)
@@ -10787,7 +11906,34 @@ namespace Seven.Mathematics
         m++;
       }
 #endif
-      return minor;
+        return minor;
+      }
+
+      #endregion
+
+      #region default
+
+      else
+      {
+        Matrix<decimal> minor =
+          new Matrix<decimal>(matrix.Rows - 1, matrix.Columns - 1);
+        int m = 0, n = 0;
+        for (int i = 0; i < matrix.Rows; i++)
+        {
+          if (i == row) continue;
+          n = 0;
+          for (int j = 0; j < matrix.Columns; j++)
+          {
+            if (j == column) continue;
+            minor[m, n] = matrix[i, j];
+            n++;
+          }
+          m++;
+        }
+        return minor;
+      }
+
+      #endregion
     }
 
     /// <summary>Combines two matrices from left to right 
@@ -10811,6 +11957,8 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error checking
+
 #if no_errorChecking
       // nothing
 #else
@@ -10822,31 +11970,39 @@ namespace Seven.Mathematics
         throw new Error("invalid row-wise concatenation !(left.Rows == right.Rows).");
 #endif
 
-      Matrix<decimal> result =
-        new Matrix<decimal>(left.Rows, left.Columns + right.Columns);
-      int result_rows = result.Rows;
-      int result_cols = result.Columns;
+      #endregion
 
-      int left_cols = left.Columns;
-      int right_cols = right.Columns;
+      #region flattened arrays
+
+      if (left.CurrentFormat == Matrix<decimal>.Format.FlattenedArray &&
+        right.CurrentFormat == Matrix<decimal>.Format.FlattenedArray)
+      {
+
+        Matrix<decimal> result =
+          new Matrix<decimal>(left.Rows, left.Columns + right.Columns);
+        int result_rows = result.Rows;
+        int result_cols = result.Columns;
+
+        int left_cols = left.Columns;
+        int right_cols = right.Columns;
 
 #if unsafe_code
-      unsafe
-      {
-        // OptimizeMe (jump statement)
-        fixed (decimal*
-          left_flat = left._matrix,
-          right_flat = right._matrix,
-          result_flat = result._matrix)
-          for (int i = 0; i < result_rows; i++)
-            for (int j = 0; j < result_cols; j++)
-              if (j < left_cols)
-                result_flat[i * result_cols + j] =
-                  left_flat[i * left_cols + j];
-              else
-                result_flat[i * result_cols + j] =
-                  right_flat[i * right_cols + j - left_cols];
-      }
+        unsafe
+        {
+          // OptimizeMe (jump statement)
+          fixed (decimal*
+            left_flat = left._matrix as decimal[],
+            right_flat = right._matrix as decimal[],
+            result_flat = result._matrix as decimal[])
+            for (int i = 0; i < result_rows; i++)
+              for (int j = 0; j < result_cols; j++)
+                if (j < left_cols)
+                  result_flat[i * result_cols + j] =
+                    left_flat[i * left_cols + j];
+                else
+                  result_flat[i * result_cols + j] =
+                    right_flat[i * right_cols + j - left_cols];
+        }
 #else
       for (int i = 0; i < result_rows; i++)
         for (int j = 0; j < result_cols; j++)
@@ -10858,7 +12014,27 @@ namespace Seven.Mathematics
         }
 #endif
 
-      return result;
+        return result;
+      }
+
+      #endregion
+
+      #region default
+
+      else
+      {
+        Matrix<decimal> result =
+          new Matrix<decimal>(left.Rows, left.Columns + right.Columns);
+        for (int i = 0; i < result.Rows; i++)
+          for (int j = 0; j < result.Columns; j++)
+            if (j < left.Columns)
+              result[i, j] = left[i, j];
+            else
+              result[i, j] = right[i, j - left.Columns];
+        return result;
+      }
+
+      #endregion
     }
 
     /// <summary>Calculates the echelon of a matrix (aka REF).</summary>
@@ -10887,12 +12063,16 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error checking
+
 #if no_error_checking
       // nothing
 #else
       if (object.ReferenceEquals(matrix, null))
         throw new Error("null reference: matrix");
 #endif
+
+      #endregion
 
       Matrix<decimal> result = matrix.Clone();
       for (int i = 0; i < matrix.Rows; i++)
@@ -10941,12 +12121,16 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error checking
+
 #if no_error_checking
       // nothing
 #else
       if (object.ReferenceEquals(matrix, null))
         throw new Error("null reference: matrix");
 #endif
+
+      #endregion
 
       Matrix<decimal> result = matrix.Clone();
       for (int i = 0; i < matrix.Rows; i++)
@@ -10998,6 +12182,8 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error checking
+
 #if no_error_checking
       // nothing
 #else
@@ -11006,6 +12192,8 @@ namespace Seven.Mathematics
       if (matrix.Rows != matrix.Columns)
         throw new Error("invalid matrix determinent: !(matrix.IsSquare)");
 #endif
+
+      #endregion
 
       decimal det = 1;
       Matrix<decimal> rref = matrix.Clone();
@@ -11064,6 +12252,8 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error checking
+
 #if no_error_checking
       // nothing
 #else
@@ -11072,6 +12262,8 @@ namespace Seven.Mathematics
       if (LinearAlgebra.Determinent(matrix) == 0)
         throw new Error("inverse calculation failed.");
 #endif
+
+      #endregion
 
       Matrix<decimal> identity = LinearAlgebra.MatrixFactoryIdentity_decimal(matrix.Rows, matrix.Columns);
       Matrix<decimal> rref = matrix.Clone();
@@ -11118,6 +12310,8 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error checking
+
 #if no_error_checking
       // nothing
 #else
@@ -11126,6 +12320,8 @@ namespace Seven.Mathematics
       if (!(matrix.Rows == matrix.Columns))
         throw new Error("Adjoint of a non-square matrix does not exists");
 #endif
+
+      #endregion
 
       Matrix<decimal> AdjointMatrix = new Matrix<decimal>(matrix.Rows, matrix.Columns);
       for (int i = 0; i < matrix.Rows; i++)
@@ -11153,12 +12349,16 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error checking
+
 #if no_error_checking
       // nothing
 #else
       if (object.ReferenceEquals(matrix, null))
         throw new Error("null reference: matrix");
 #endif
+
+      #endregion
 
       Matrix<decimal> transpose =
         new Matrix<decimal>(matrix.Columns, matrix.Rows);
@@ -11220,6 +12420,8 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error checking
+
 #if no_error_checking
 #else
       if (object.ReferenceEquals(matrix, null))
@@ -11227,6 +12429,8 @@ namespace Seven.Mathematics
       if (matrix.Rows != matrix.Columns)
         throw new Error("non-square matrix during DecomposeLU function");
 #endif
+
+      #endregion
 
       Lower = LinearAlgebra.MatrixFactoryIdentity_decimal(matrix.Rows, matrix.Columns);
       Upper = matrix.Clone();
@@ -11966,7 +13170,7 @@ namespace Seven.Mathematics
 #endif
 
       int length = left.Dimensions;
-      Vector<double> result = 
+      Vector<double> result =
         new Vector<double>(left.Dimensions);
 
 #if unsafe_code
@@ -12255,7 +13459,7 @@ namespace Seven.Mathematics
         throw new Error("my cross product function is only defined for 3-component vectors.");
 #endif
 
-      Vector<double> result = 
+      Vector<double> result =
         new Vector<double>(3);
 
 #if unsafe_code
@@ -12335,7 +13539,7 @@ namespace Seven.Mathematics
 #endif
 
       return result;
-      
+
     }
 
     /// <summary>Computes the length of a vector.</summary>
@@ -12559,7 +13763,7 @@ namespace Seven.Mathematics
 #endif
 
       int length = left.Dimensions;
-      Vector<double> result = 
+      Vector<double> result =
         new Vector<double>(length);
 
 #if unsafe_code
@@ -12761,34 +13965,62 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error checking
+
 #if no_errorchecking
       //nothing
 #else
       if (object.ReferenceEquals(matrix, null))
         throw new Error("null reference: matrix");
+#endif
+
+      #endregion
+
       if (matrix.Rows != matrix.Columns)
         return false;
-#endif
-      int size = matrix.Columns;
-#if unsafe_code
-      unsafe
+
+      #region flattened arrays
+
+      if (matrix.CurrentFormat == Matrix<double>.Format.FlattenedArray)
       {
-        fixed (double* matrix_flat = matrix._matrix)
-          for (var row = 0; row < size; row++)
-            for (var column = row + 1; column < size; column++)
-              if (matrix_flat[row * size + column] != matrix_flat[column * size + row])
-                return false;
-      }
+
+        int size = matrix.Columns;
+
+#if unsafe_code
+        unsafe
+        {
+          fixed (double* matrix_flat = matrix._matrix as double[])
+            for (var row = 0; row < size; row++)
+              for (var column = row + 1; column < size; column++)
+                if (matrix_flat[row * size + column] != matrix_flat[column * size + row])
+                  return false;
+        }
 #else
-      double[] matrix_flat = matrix._matrix;
+      double[] matrix_flat = matrix._matrix as double[];
       for (var row = 0; row < size; row++)
         for (var column = row + 1; column < size; column++)
           if (matrix_flat[row * size + column] != matrix_flat[column * size + row])
             return false;
 #endif
-      return true;
+        return true;
+      }
+
+      #endregion
+
+      #region default
+
+      else
+      {
+        for (int i = 0; i < matrix.Rows; i++)
+          for (int j = 0; j < matrix.Columns; j++)
+            if (matrix[i, j] != matrix[j, i])
+              return false;
+        return true;
+      }
+
+      #endregion
     }
-    
+
     /// <summary>Constructs a new identity-matrix of the given dimensions.</summary>
     /// <param name="rows">The number of rows of the matrix.</param>
     /// <param name="columns">The number of columns of the matrix.</param>
@@ -12805,6 +14037,8 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error checking
+
 #if no_error_checking
       //nothing
 #else
@@ -12814,13 +14048,11 @@ namespace Seven.Mathematics
         throw new Error("invalid column count on matrix creation");
 #endif
 
+      #endregion
+
       Matrix<double> matrix = new Matrix<double>(rows, columns);
-      if (rows <= columns)
-        for (int i = 0; i < rows; i++)
-          matrix[i, i] = 1;
-      else
-        for (int i = 0; i < columns; i++)
-          matrix[i, i] = 1;
+      for (int i = 0, i_max = Logic.Min(rows, columns); i < i_max; i++)
+        matrix[i, i] = 1;
       return matrix;
     }
 
@@ -12840,41 +14072,8 @@ namespace Seven.Mathematics
 
       #endregion
 
-#if no_error_checking
-      // nothing
-#else
-        if (object.ReferenceEquals(matrix, null))
-          throw new Error("null reference: matirx");
-#endif
+      #region error checking
 
-      Matrix<double> result =
-        new Matrix<double>(matrix.Rows, matrix.Columns);
-      int size = matrix.Rows * matrix.Columns;
-
-#if unsafe_code
-      unsafe
-      {
-        fixed (double*
-          result_flat = result._matrix,
-          matrix_flat = matrix._matrix)
-          for (int i = 0; i < size; i++)
-            result_flat[i] = -matrix_flat[i];
-        return result;
-      }
-#else
-      double[] result_flat = result._matrix;
-      double[] matrix_flat = matrix._matrix;
-      for (int i = 0; i < size; i++)
-        result_flat[i] = -matrix_flat[i];
-      return result;
-#endif
-    }
-
-    /// <summary>Negates all the values in a matrix.</summary>
-    /// <param name="matrix">The matrix to have its values negated.</param>
-    /// <returns>The resulting matrix after the negations.</returns>
-    public static Matrix<double> Negate_parallel(Matrix<double> matrix)
-    {
 #if no_error_checking
       // nothing
 #else
@@ -12882,45 +14081,118 @@ namespace Seven.Mathematics
         throw new Error("null reference: matirx");
 #endif
 
-      if (matrix.Rows * matrix.Columns > _parallelMinimum)
+      #endregion
+
+      #region flattened arrays
+
+      if (matrix.CurrentFormat == Matrix<double>.Format.FlattenedArray)
       {
+
         Matrix<double> result =
-        new Matrix<double>(matrix.Rows, matrix.Columns);
+          new Matrix<double>(matrix.Rows, matrix.Columns);
         int size = matrix.Rows * matrix.Columns;
 
 #if unsafe_code
         unsafe
         {
-          Seven.Parallels.AutoParallel.Divide(
-            (int current, int max) =>
-            {
-              return () =>
-              {
-                fixed (double*
-                  result_flat = result._matrix,
-                  matrix_flat = matrix._matrix)
-                  for (int i = current; i < size; i += max)
-                    result_flat[i] = -matrix_flat[i];
-              };
-            }, Logic.Max(matrix.Rows, matrix.Columns));
+          fixed (double*
+            result_flat = result._matrix as double[],
+            matrix_flat = matrix._matrix as double[])
+            for (int i = 0; i < size; i++)
+              result_flat[i] = -matrix_flat[i];
+          return result;
         }
+#else
+      double[] result_flat = result._matrix as double[];
+      double[] matrix_flat = matrix._matrix as double[];
+      for (int i = 0; i < size; i++)
+        result_flat[i] = -matrix_flat[i];
+      return result;
+#endif
+
+      }
+
+      #endregion
+
+      #region default
+
+      else
+      {
+        Matrix<double> result =
+          new Matrix<double>(matrix.Rows, matrix.Columns);
+        for (int i = 0; i < matrix.Rows; i++)
+          for (int j = 0; j < matrix.Rows; j++)
+            result[i, j] = -matrix[i, j];
+        return result;
+      }
+
+      #endregion
+    }
+
+    /// <summary>Negates all the values in a matrix.</summary>
+    /// <param name="matrix">The matrix to have its values negated.</param>
+    /// <returns>The resulting matrix after the negations.</returns>
+    public static Matrix<double> Negate_parallel(Matrix<double> matrix)
+    {
+      #region error checking
+
+#if no_error_checking
+      // nothing
+#else
+      if (object.ReferenceEquals(matrix, null))
+        throw new Error("null reference: matirx");
+#endif
+
+      #endregion
+
+      // At the moment, negation does not benefit from multithreading.
+      if (false) //matrix.Rows * matrix.Columns > _parallelMinimum)
+      {
+        #region flattened array
+
+        if (matrix.CurrentFormat == Matrix<double>.Format.FlattenedArray)
+        {
+
+          Matrix<double> result =
+          new Matrix<double>(matrix.Rows, matrix.Columns);
+          int size = matrix.Rows * matrix.Columns;
+
+#if unsafe_code
+          unsafe
+          {
+            Seven.Parallels.AutoParallel.Divide(
+              (int current, int max) =>
+              {
+                return () =>
+                {
+                  fixed (double*
+                    result_flat = result._matrix as double[],
+                    matrix_flat = matrix._matrix as double[])
+                    for (int i = current; i < size; i += max)
+                      result_flat[i] = -matrix_flat[i];
+                };
+              }, Logic.Max(matrix.Rows, matrix.Columns));
+          }
 #else
           Seven.Parallels.AutoParallel.Divide(
             (int current, int max) =>
             {
               return () =>
               {
-                double[] matrix_flat = matrix._matrix;
-                double[] result_flat = result._matrix;
+                double[] matrix_flat = matrix._matrix as double[];
+                double[] result_flat = result._matrix as double[];
                 for (int i = current; i < size; i += max)
                   result_flat[i] = -matrix_flat[i];
               };
-            }, Logic.Max(left.Rows, left.Columns));
+            }, Logic.Max(matrix.Rows, matrix.Columns));
 #endif
-        return result;
+          return result;
+
+        }
+
+        #endregion
       }
-      else
-        return LinearAlgebra.Negate(matrix);
+      return LinearAlgebra.Negate(matrix);
     }
 
     /// <summary>Does standard addition of two matrices.</summary>
@@ -12940,48 +14212,8 @@ namespace Seven.Mathematics
 
       #endregion
 
-#if no_error_checking
-      // nothing
-#else
-      if (object.ReferenceEquals(left, null))
-          throw new Error("null reference: left");
-      if (object.ReferenceEquals(right, null))
-        throw new Error("null reference: right");
-      if (left.Rows != right.Rows || left.Columns != right.Columns)
-        throw new Error("invalid matrix addition (dimension miss-match).");
-#endif
+      #region error checking
 
-      Matrix<double> result =
-        new Matrix<double>(left.Rows, left.Columns);
-      int size = left.Rows * left.Columns;
-
-#if unsafe_code
-      unsafe
-      {
-        fixed (double*
-          left_flat = left._matrix,
-          right_flat = right._matrix,
-          result_flat = result._matrix)
-          for (int i = 0; i < size; i++)
-            result_flat[i] = left_flat[i] + right_flat[i];
-      }
-#else
-      double[] left_flat = left._matrix;
-      double[] right_flat = right._matrix;
-      double[] result_flat = result._matrix;
-      for (int i = 0; i < size; i++)
-        result_flat[i] = left_flat[i] + right_flat[i];
-#endif
-
-      return result;
-    }
-
-    /// <summary>Does standard addition of two matrices.</summary>
-    /// <param name="left">The left matrix of the addition.</param>
-    /// <param name="right">The right matrix of the addition.</param>
-    /// <returns>The resulting matrix after the addition.</returns>
-    public static Matrix<double> Add_parallel(Matrix<double> left, Matrix<double> right)
-    {
 #if no_error_checking
       // nothing
 #else
@@ -12993,47 +14225,128 @@ namespace Seven.Mathematics
         throw new Error("invalid matrix addition (dimension miss-match).");
 #endif
 
-      if (left.Rows * left.Columns > _parallelMinimum)
+      #endregion
+
+      #region flattened arrays
+
+      if (left.CurrentFormat == Matrix<double>.Format.FlattenedArray &&
+        right.CurrentFormat == Matrix<double>.Format.FlattenedArray)
       {
+
         Matrix<double> result =
-        new Matrix<double>(left.Rows, left.Columns);
+          new Matrix<double>(left.Rows, left.Columns);
         int size = left.Rows * left.Columns;
 
 #if unsafe_code
         unsafe
         {
-          Seven.Parallels.AutoParallel.Divide(
-            (int current, int max) =>
-            {
-              return () =>
-              {
-                fixed (double*
-                  left_flat = left._matrix,
-                  right_flat = right._matrix,
-                  result_flat = result._matrix)
-                  for (int i = current; i < size; i += max)
-                    result_flat[i] = left_flat[i] + right_flat[i];
-              };
-            }, Logic.Max(left.Rows, left.Columns));
+          fixed (double*
+            left_flat = left._matrix as double[],
+            right_flat = right._matrix as double[],
+            result_flat = result._matrix as double[])
+            for (int i = 0; i < size; i++)
+              result_flat[i] = left_flat[i] + right_flat[i];
         }
+#else
+      double[] left_flat = left._matrix as double[];
+      double[] right_flat = right._matrix as double[];
+      double[] result_flat = result._matrix as double[];
+      for (int i = 0; i < size; i++)
+        result_flat[i] = left_flat[i] + right_flat[i];
+#endif
+
+        return result;
+
+      }
+
+      #endregion
+
+      #region default
+
+      else
+      {
+        Matrix<double> result =
+          new Matrix<double>(left.Rows, left.Columns);
+        for (int i = 0; i < left.Rows; i++)
+          for (int j = 0; j < left.Columns; j++)
+            result[i, j] = left[i, j] + right[i, j];
+        return result;
+      }
+
+      #endregion
+    }
+
+    /// <summary>Does standard addition of two matrices.</summary>
+    /// <param name="left">The left matrix of the addition.</param>
+    /// <param name="right">The right matrix of the addition.</param>
+    /// <returns>The resulting matrix after the addition.</returns>
+    public static Matrix<double> Add_parallel(Matrix<double> left, Matrix<double> right)
+    {
+      #region error checking
+
+#if no_error_checking
+      // nothing
+#else
+      if (object.ReferenceEquals(left, null))
+        throw new Error("null reference: left");
+      if (object.ReferenceEquals(right, null))
+        throw new Error("null reference: right");
+      if (left.Rows != right.Rows || left.Columns != right.Columns)
+        throw new Error("invalid matrix addition (dimension miss-match).");
+#endif
+
+      #endregion
+
+      // At the moment, addition does not benefit from multithreading.
+      if (false) //matrix.Rows * matrix.Columns > _parallelMinimum)
+      {
+        #region flattened array
+
+        if (left.CurrentFormat == Matrix<double>.Format.FlattenedArray)
+        {
+
+          Matrix<double> result =
+          new Matrix<double>(left.Rows, left.Columns);
+          int size = left.Rows * left.Columns;
+
+#if unsafe_code
+          unsafe
+          {
+            Seven.Parallels.AutoParallel.Divide(
+              (int current, int max) =>
+              {
+                return () =>
+                {
+                  fixed (double*
+                    left_flat = left._matrix as double[],
+                    right_flat = right._matrix as double[],
+                    result_flat = result._matrix as double[])
+                    for (int i = current; i < size; i += max)
+                      result_flat[i] = left_flat[i] + right_flat[i];
+                };
+              }, Logic.Max(left.Rows, left.Columns));
+          }
 #else
           Seven.Parallels.AutoParallel.Divide(
             (int current, int max) =>
             {
               return () =>
               {
-                double[] left_flat = left._matrix;
-                double[] right_flat = right._matrix;
-                double[] result_flat = result._matrix;
+                double[] left_flat = left._matrix as double[];
+                double[] right_flat = right._matrix as double[];
+                double[] result_flat = result._matrix as double[];
                 for (int i = current; i < size; i += max)
                   result_flat[i] = left_flat[i] + right_flat[i];
               };
             }, Logic.Max(left.Rows, left.Columns));
 #endif
-        return result;
+          return result;
+
+        }
+
+        #endregion
       }
-      else
-        return LinearAlgebra.Add(left, right);
+      return LinearAlgebra.Add(left, right);
     }
 
     /// <summary>Subtracts a scalar from all the values in a matrix.</summary>
@@ -13053,6 +14366,8 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error checking
+
 #if no_error_checking
       // nothing
 #else
@@ -13064,29 +14379,54 @@ namespace Seven.Mathematics
         throw new Error("invalid matrix subtraction (dimension miss-match).");
 #endif
 
-      Matrix<double> result =
-        new Matrix<double>(left.Rows, left.Columns);
-      int size = left.Rows * left.Columns;
+      #endregion
+
+      #region flattened arrays
+
+      if (left.CurrentFormat == Matrix<double>.Format.FlattenedArray &&
+        right.CurrentFormat == Matrix<double>.Format.FlattenedArray)
+      {
+
+        Matrix<double> result =
+          new Matrix<double>(left.Rows, left.Columns);
+        int size = left.Rows * left.Columns;
 
 #if unsafe_code
-      unsafe
-      {
-        fixed (double*
-          left_flat = left._matrix,
-          right_flat = right._matrix,
-          result_flat = result._matrix)
-          for (int i = 0; i < size; i++)
-            result_flat[i] = left_flat[i] - right_flat[i];
-      }
+        unsafe
+        {
+          fixed (double*
+            left_flat = left._matrix as double[],
+            right_flat = right._matrix as double[],
+            result_flat = result._matrix as double[])
+            for (int i = 0; i < size; i++)
+              result_flat[i] = left_flat[i] - right_flat[i];
+        }
 #else
-      double[] left_flat = left._matrix;
-      double[] right_flat = right._matrix;
-      double[] result_flat = result._matrix;
+      double[] left_flat = left._matrix as double[];
+      double[] right_flat = right._matrix as double[];
+      double[] result_flat = result._matrix as double[];
       for (int i = 0; i < size; i++)
         result_flat[i] = left_flat[i] - right_flat[i];
 #endif
 
-      return result;
+        return result;
+      }
+
+      #endregion
+
+      #region default
+
+      else
+      {
+        Matrix<double> result =
+          new Matrix<double>(left.Rows, left.Columns);
+        for (int i = 0; i < left.Rows; i++)
+          for (int j = 0; j < left.Columns; j++)
+            result[i, j] = left[i, j] - right[i, j];
+        return result;
+      }
+
+      #endregion
     }
 
     /// <summary>Subtracts a scalar from all the values in a matrix.</summary>
@@ -13095,6 +14435,8 @@ namespace Seven.Mathematics
     /// <returns>The resulting matrix after the subtractions.</returns>
     public static Matrix<double> Subtract_parallel(Matrix<double> left, Matrix<double> right)
     {
+      #region error checking
+
 #if no_error_checking
       // nothing
 #else
@@ -13105,48 +14447,59 @@ namespace Seven.Mathematics
       if (left.Rows != right.Rows || left.Columns != right.Columns)
         throw new Error("invalid matrix subtraction (dimension miss-match).");
 #endif
-      
-      if (left.Rows * left.Columns > _parallelMinimum)
+
+      #endregion
+
+      // At the moment, subtraction does not benefit from multithreading.
+      if (false) //matrix.Rows * matrix.Columns > _parallelMinimum)
       {
-        Matrix<double> result =
-        new Matrix<double>(left.Rows, left.Columns);
-        int size = left.Rows * left.Columns;
+        #region flattened arrays
+
+        if (left.CurrentFormat == Matrix<double>.Format.FlattenedArray &&
+          right.CurrentFormat == Matrix<double>.Format.FlattenedArray)
+        {
+
+          Matrix<double> result =
+          new Matrix<double>(left.Rows, left.Columns);
+          int size = left.Rows * left.Columns;
 
 #if unsafe_code
-        unsafe
-        {
-          Seven.Parallels.AutoParallel.Divide(
-            (int current, int max) =>
-            {
-              return () =>
+          unsafe
+          {
+            Seven.Parallels.AutoParallel.Divide(
+              (int current, int max) =>
               {
-                fixed (double*
-                  left_flat = left._matrix,
-                  right_flat = right._matrix,
-                  result_flat = result._matrix)
-                  for (int i = current; i < size; i += max)
-                    result_flat[i] = left_flat[i] - right_flat[i];
-              };
-            }, Logic.Max(left.Rows, left.Columns));
-        }
+                return () =>
+                {
+                  fixed (double*
+                    left_flat = left._matrix as double[],
+                    right_flat = right._matrix as double[],
+                    result_flat = result._matrix as double[])
+                    for (int i = current; i < size; i += max)
+                      result_flat[i] = left_flat[i] - right_flat[i];
+                };
+              }, Logic.Max(left.Rows, left.Columns));
+          }
 #else
           Seven.Parallels.AutoParallel.Divide(
           (int current, int max) =>
           {
             return () =>
             {
-              double[] left_flat = left._matrix;
-              double[] right_flat = right._matrix;
-              double[] result_flat = result._matrix;
+              double[] left_flat = left._matrix as double[];
+              double[] right_flat = right._matrix as double[];
+              double[] result_flat = result._matrix as double[];
                 for (int i = current; i < size; i += max)
                   result_flat[i] = left_flat[i] - right_flat[i];
             };
           }, Logic.Max(left.Rows, left.Columns));
 #endif
-        return result;
+          return result;
+        }
+
+        #endregion
       }
-      else
-        return LinearAlgebra.Subtract(left, right);
+      return LinearAlgebra.Subtract(left, right);
     }
 
     /// <summary>Performs multiplication on two matrices.</summary>
@@ -13167,6 +14520,8 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error checking
+
 #if no_error_checking
       // nothing
 #else
@@ -13178,33 +14533,41 @@ namespace Seven.Mathematics
         throw new LinearAlgebra.Error("invalid multiplication (size miss-match).");
 #endif
 
-      double sum;
-      int result_rows = left.Rows;
-      int left_cols = left.Columns;
-      int result_cols = right.Columns;
-      Matrix<double> result =
-        new Matrix<double>(result_rows, result_cols);
+      #endregion
+
+      #region flattened arrays
+
+      if (left.CurrentFormat == Matrix<double>.Format.FlattenedArray &&
+        right.CurrentFormat == Matrix<double>.Format.FlattenedArray)
+      {
+
+        double sum;
+        int result_rows = left.Rows;
+        int left_cols = left.Columns;
+        int result_cols = right.Columns;
+        Matrix<double> result =
+          new Matrix<double>(result_rows, result_cols);
 
 #if unsafe_code
-      unsafe
-      {
-        fixed (double*
-          result_flat = result._matrix,
-          left_flat = left._matrix,
-          right_flat = right._matrix)
-          for (int i = 0; i < result_rows; i++)
-            for (int j = 0; j < result_cols; j++)
-            {
-              sum = 0;
-              for (int k = 0; k < left_cols; k++)
-                sum += left_flat[i * left_cols + k] * right_flat[k * result_cols + j];
-              result_flat[i * result_cols + j] = sum;
-            }
-      }
+        unsafe
+        {
+          fixed (double*
+            result_flat = result._matrix as double[],
+            left_flat = left._matrix as double[],
+            right_flat = right._matrix as double[])
+            for (int i = 0; i < result_rows; i++)
+              for (int j = 0; j < result_cols; j++)
+              {
+                sum = 0;
+                for (int k = 0; k < left_cols; k++)
+                  sum += left_flat[i * left_cols + k] * right_flat[k * result_cols + j];
+                result_flat[i * result_cols + j] = sum;
+              }
+        }
 #else
-      double[] result_flat = result._matrix;
-      double[] left_flat = left._matrix;
-      double[] right_flat = right._matrix;
+      double[] result_flat = result._matrix as double[];
+      double[] left_flat = left._matrix as double[];
+      double[] right_flat = right._matrix as double[];
 
       for (int i = 0; i < result_rows; i++)
         for (int j = 0; j < result_cols; j++)
@@ -13216,7 +14579,25 @@ namespace Seven.Mathematics
         }
 #endif
 
-      return result;
+        return result;
+      }
+
+      #endregion
+
+      #region default
+
+      else
+      {
+        Matrix<double> result =
+          new Matrix<double>(left.Rows, right.Columns);
+        for (int i = 0; i < left.Rows; i++)
+          for (int j = 0; j < right.Columns; j++)
+            for (int k = 0; k < left.Columns; k++)
+              result[i, j] += left[i, k] * right[k, j];
+        return result;
+      }
+
+      #endregion
     }
 
     /// <summary>Performs multiplication on two matrices using multi-threading.</summary>
@@ -13225,6 +14606,8 @@ namespace Seven.Mathematics
     /// <returns>The resulting matrix of the multiplication.</returns>
     public static Matrix<double> Multiply_parrallel(Matrix<double> left, Matrix<double> right)
     {
+      #region error checking
+
 #if no_error_checking
       // nothing
 #else
@@ -13236,33 +14619,42 @@ namespace Seven.Mathematics
         throw new LinearAlgebra.Error("invalid multiplication (dimension miss-match).");
 #endif
 
+      #endregion
+
       int result_rows = left.Rows;
       int left_cols = left.Columns;
       int result_cols = right.Columns;
 
       // If there are enough rows to warrant multi-threading,
       // then multithread the row for-loop.
-      if (result_rows * result_cols > _parallelMinimum && 
+      if (result_rows * result_cols > _parallelMinimum &&
         result_rows >= result_cols)
       {
-        Matrix<double> result =
-          new Matrix<double>(result_rows, result_cols);
-#if unsafe_code
-        unsafe
+        #region flattened arrays
+
+        if (left.CurrentFormat == Matrix<double>.Format.FlattenedArray &&
+          right.CurrentFormat == Matrix<double>.Format.FlattenedArray)
         {
-          Seven.Parallels.AutoParallel.Divide(
-            (int current, int max) =>
-            {
-              return () =>
+
+          Matrix<double> result =
+            new Matrix<double>(result_rows, result_cols);
+
+#if unsafe_code
+          unsafe
+          {
+            Seven.Parallels.AutoParallel.Divide(
+              (int current, int max) =>
+              {
+                return () =>
                 {
                   double sum;
                   int left_i_offest;
                   int result_i_offset;
 
                   fixed (double*
-                    result_flat = result._matrix,
-                    left_flat = left._matrix,
-                    right_flat = right._matrix)
+                    result_flat = result._matrix as double[],
+                    left_flat = left._matrix as double[],
+                    right_flat = right._matrix as double[])
                     for (int i = current; i < result_rows; i += max)
                     {
                       left_i_offest = i * left_cols;
@@ -13276,63 +14668,73 @@ namespace Seven.Mathematics
                       }
                     }
                 };
-            }, result_rows);
-        }
+              }, result_rows);
+          }
 #else
-              double[] result_flat = result._matrix;
-              double[] left_flat = left._matrix;
-              double[] right_flat = right._matrix;
+        double[] result_flat = result._matrix as double[];
+        double[] left_flat = left._matrix as double[];
+        double[] right_flat = right._matrix as double[];
 
-              Seven.Parallels.AutoParallel.Divide(
-                  (int current, int max) =>
+        Seven.Parallels.AutoParallel.Divide(
+            (int current, int max) =>
+            {
+              return () =>
+              {
+                double sum;
+                int left_i_offest;
+                int result_i_offset;
+
+                for (int i = current; i < result_rows; i += max)
+                {
+                  left_i_offest = i * left_cols;
+                  result_i_offset = i * result_cols;
+                  for (int j = 0; j < result_cols; j++)
                   {
-                    return () =>
-                    {
-                      double sum;
-                      int left_i_offest;
-                      int result_i_offset;
-
-                      for (int i = current; i < result_rows; i += max)
-                      {
-                        left_i_offest = i * left_cols;
-                        result_i_offset = i * result_cols;
-                        for (int j = 0; j < result_cols; j++)
-                        {
-                          sum = 0;
-                          for (int k = 0; k < left_cols; k++)
-                            sum += left_flat[left_i_offest + k] * right_flat[k * result_cols + j];
-                          result_flat[result_i_offset + j] = sum;
-                        }
-                      }
-                    };
-                  }, result_rows);
+                    sum = 0;
+                    for (int k = 0; k < left_cols; k++)
+                      sum += left_flat[left_i_offest + k] * right_flat[k * result_cols + j];
+                    result_flat[result_i_offset + j] = sum;
+                  }
+                }
+              };
+            }, result_rows);
 
 #endif
-        return result;
+
+          return result;
+        }
+
+        #endregion
       }
       // If there are enough columns to warrant multi-threading,
       // then multithread the column for-loop.
       else if (result_rows * result_cols > _parallelMinimum &&
         result_rows < result_cols)
       {
-        Matrix<double> result =
-          new Matrix<double>(result_rows, result_cols);
-#if unsafe_code
-        unsafe
+        #region flattened arrays
+
+        if (left.CurrentFormat == Matrix<double>.Format.FlattenedArray &&
+          right.CurrentFormat == Matrix<double>.Format.FlattenedArray)
         {
-          Seven.Parallels.AutoParallel.Divide(
-            (int current, int max) =>
-            {
-              return () =>
+
+          Matrix<double> result =
+            new Matrix<double>(result_rows, result_cols);
+#if unsafe_code
+          unsafe
+          {
+            Seven.Parallels.AutoParallel.Divide(
+              (int current, int max) =>
+              {
+                return () =>
                 {
                   double sum;
                   int left_i_offest;
                   int result_i_offset;
 
                   fixed (double*
-                    result_flat = result._matrix,
-                    left_flat = left._matrix,
-                    right_flat = right._matrix)
+                    result_flat = result._matrix as double[],
+                    left_flat = left._matrix as double[],
+                    right_flat = right._matrix as double[])
                     for (int i = 0; i < result_rows; i++)
                     {
                       left_i_offest = i * left_cols;
@@ -13346,44 +14748,47 @@ namespace Seven.Mathematics
                       }
                     }
                 };
-            }, result_cols);
-        }
+              }, result_cols);
+          }
 #else
-              double[] result_flat = result._matrix;
-              double[] left_flat = left._matrix;
-              double[] right_flat = right._matrix;
+        double[] result_flat = result._matrix as double[];
+        double[] left_flat = left._matrix as double[];
+        double[] right_flat = right._matrix as double[];
 
-              Seven.Parallels.AutoParallel.Divide(
-                  (int current, int max) =>
+        Seven.Parallels.AutoParallel.Divide(
+            (int current, int max) =>
+            {
+              return () =>
+              {
+                double sum;
+                int left_i_offest;
+                int result_i_offset;
+
+                for (int i = 0; i < result_rows; i++)
+                {
+                  left_i_offest = i * left_cols;
+                  result_i_offset = i * result_cols;
+                  for (int j = current; j < result_cols; j += max)
                   {
-                    return () =>
-                    {
-                      double sum;
-                      int left_i_offest;
-                      int result_i_offset;
-
-                      for (int i = 0; i < result_rows; i++)
-                      {
-                        left_i_offest = i * left_cols;
-                        result_i_offset = i * result_cols;
-                        for (int j = current; j < result_cols; j += max)
-                        {
-                          sum = 0;
-                          for (int k = 0; k < left_cols; k++)
-                            sum += left_flat[left_i_offest + k] * right_flat[k * result_cols + j];
-                          result_flat[result_i_offset + j] = sum;
-                        }
-                      }
-                    };
-                  }, result_cols);
+                    sum = 0;
+                    for (int k = 0; k < left_cols; k++)
+                      sum += left_flat[left_i_offest + k] * right_flat[k * result_cols + j];
+                    result_flat[result_i_offset + j] = sum;
+                  }
+                }
+              };
+            }, result_cols);
 #endif
-        return result;
+          return result;
+
+        }
+
+        #endregion
       }
       // Multi-threading is not necessary.
-      else
-        return LinearAlgebra.Multiply(left, right);
+      return LinearAlgebra.Multiply(left, right);
     }
-        
+
     /// <summary>Does a standard (triple for looped) multiplication between matrices.</summary>
     /// <param name="left">The left matrix of the multiplication.</param>
     /// <param name="right">The right matrix of the multiplication.</param>
@@ -13401,40 +14806,62 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error
+
 #if no_error_checking
-      int left_row = left.Rows;
-      int left_col = left.Columns;
+      // nothing
 #else
-      int left_row = left.Rows;
-      int left_col = left.Columns;
       if (left.Columns != right.Dimensions)
         throw new Error("invalid multiplication (size miss-match).");
 #endif
 
-      Vector<double> result = new Vector<double>(right.Dimensions);
+      #endregion
+
+      #region flattened array
+
+      if (left.CurrentFormat == Matrix<double>.Format.FlattenedArray)
+      {
+        int left_row = left.Rows;
+        int left_col = left.Columns;
+        Vector<double> result = new Vector<double>(right.Dimensions);
 
 #if unsafe_code
-      unsafe
-      {
-        fixed (double* 
-          left_flat = left._matrix,
-          right_flat = right._vector,
-          result_flat = result._vector)
-          for (int i = 0; i < left_row; i++)
-            for (int j = 0; j < left_col; j++)
-              result_flat[i] += left_flat[i * left_col + j] * right_flat[j];
-        return result;
-      }
+        unsafe
+        {
+          fixed (double*
+            left_flat = left._matrix as double[],
+            right_flat = right._vector as double[],
+            result_flat = result._vector as double[])
+            for (int i = 0; i < left_row; i++)
+              for (int j = 0; j < left_col; j++)
+                result_flat[i] += left_flat[i * left_col + j] * right_flat[j];
+        }
 #else
-      double[] left_flat = left._matrix;
-      double[] right_flat = right._vector;
-      double[] result_flat = result._vector;
+      double[] left_flat = left._matrix as double[];
+      double[] right_flat = right._vector as double[];
+      double[] result_flat = result._vector as double[];
       for (int i = 0; i < left_row; i++)
         for (int j = 0; j < left_col; j++)
           result_flat[i] += left_flat[i * left_col + j] * right_flat[j];
-      return result;
 #endif
-      return result;
+        return result;
+      }
+
+      #endregion
+
+      #region defualt
+
+      else
+      {
+        Vector<double> result =
+          new Vector<double>(right.Dimensions);
+        for (int i = 0; i < left.Rows; i++)
+          for (int j = 0; j < left.Columns; j++)
+            result[i] += left[i, j] * right[j];
+        return result;
+      }
+
+      #endregion
     }
 
     /// <summary>Multiplies all the values in a matrix by a scalar.</summary>
@@ -13454,6 +14881,8 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error checking
+
 #if no_error_checking
       // nothing
 #else
@@ -13461,27 +14890,51 @@ namespace Seven.Mathematics
         throw new Error("null reference: left");
 #endif
 
-      int rows = left.Rows;
-      int columns = left.Columns;
-      Matrix<double> result = new Matrix<double>(rows, columns);
+      #endregion
+
+      #region flattened array
+
+      if (left.CurrentFormat == Matrix<double>.Format.FlattenedArray)
+      {
+
+        int rows = left.Rows;
+        int columns = left.Columns;
+        Matrix<double> result = new Matrix<double>(rows, columns);
 
 #if unsafe_code
-      unsafe
-      {
-        fixed (double*
-          left_flat = left._matrix,
-          result_flat = result._matrix)
-          for (int i = 0; i < rows; i++)
-            for (int j = 0; j < columns; j++)
-              result_flat[i * columns + j] = left_flat[i * columns + j] * right;
-      }
+        unsafe
+        {
+          fixed (double*
+            left_flat = left._matrix as double[],
+            result_flat = result._matrix as double[])
+            for (int i = 0; i < rows; i++)
+              for (int j = 0; j < columns; j++)
+                result_flat[i * columns + j] = left_flat[i * columns + j] * right;
+        }
 #else
       for (int i = 0; i < rows; i++)
         for (int j = 0; j < columns; j++)
           result[i, j] = left[i, j] * right;
 #endif
 
-      return result;
+        return result;
+      }
+
+      #endregion
+
+      #region default
+
+      else
+      {
+        Matrix<double> result =
+          new Matrix<double>(left.Rows, left.Columns);
+        for (int i = 0; i < left.Rows; i++)
+          for (int j = 0; j < left.Columns; j++)
+            result[i, j] = left[i, j] * right;
+        return result;
+      }
+
+      #endregion
     }
 
     /// <summary>Applies a power to a square matrix.</summary>
@@ -13494,10 +14947,12 @@ namespace Seven.Mathematics
 
       //Matrix<double> result = matrix.Clone();
       //for (int i = 0; i < power; i++)
-      //  result = LinearAlgebra.Multiply(result, result);
+      //  result = LinearAlgebra.Multiply(result, matrix);
       //return result;
 
       #endregion
+
+      #region error checking
 
 #if no_error_checking
       // nothing
@@ -13507,6 +14962,9 @@ namespace Seven.Mathematics
       if (!(power >= 0))
         throw new Error("invalid power !(power > -1)");
 #endif
+
+      #endregion
+
       // this is not optimized...
       if (power == 0)
         return LinearAlgebra.MatrixFactoryIdentity_double(matrix.Rows, matrix.Columns);
@@ -13533,6 +14991,8 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error checking
+
 #if no_error_checking
       // nothing
 #else
@@ -13540,32 +15000,56 @@ namespace Seven.Mathematics
         throw new Error("null reference: matrix");
 #endif
 
-      int matrix_row = matrix.Rows;
-      int matrix_col = matrix.Columns;
-      Matrix<double> result =
-        new Matrix<double>(matrix_row, matrix_col);
+      #endregion
+
+      #region flattened array
+
+      if (matrix.CurrentFormat == Matrix<double>.Format.FlattenedArray)
+      {
+
+        int matrix_row = matrix.Rows;
+        int matrix_col = matrix.Columns;
+        Matrix<double> result =
+          new Matrix<double>(matrix_row, matrix_col);
 
 #if unsafe_code
-      unsafe
-      {
-        fixed (double*
-          matrix_flat = matrix._matrix,
-          result_flat = result._matrix)
-          for (int i = 0; i < matrix_row; i++)
-            for (int j = 0; j < matrix_col; j++)
-              result_flat[i * matrix_col + j] = 
-                matrix_flat[i * matrix_col + j] / right;
-      }
+        unsafe
+        {
+          fixed (double*
+            matrix_flat = matrix._matrix as double[],
+            result_flat = result._matrix as double[])
+            for (int i = 0; i < matrix_row; i++)
+              for (int j = 0; j < matrix_col; j++)
+                result_flat[i * matrix_col + j] =
+                  matrix_flat[i * matrix_col + j] / right;
+        }
 #else
-      double[] matrix_flat = matrix._matrix;
-      double[] result_flat = result._matrix;
+      double[] matrix_flat = matrix._matrix as double[];
+      double[] result_flat = result._matrix as double[];
       for (int i = 0; i < matrix_row; i++)
         for (int j = 0; j < matrix_col; j++)
           result_flat[i * matrix_col + j] = 
             matrix_flat[i * matrix_col + j] / right;
 
 #endif
-      return result;
+        return result;
+      }
+
+      #endregion
+
+      #region default
+
+      else
+      {
+        Matrix<double> result =
+          new Matrix<double>(matrix.Rows, matrix.Columns);
+        for (int i = 0; i < matrix.Rows; i++)
+          for (int j = 0; j < matrix.Columns; j++)
+            result[i, j] = matrix[i, j] / right;
+        return result;
+      }
+
+      #endregion
     }
 
     /// <summary>Gets the minor of a matrix.</summary>
@@ -13596,6 +15080,8 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error checking
+
 #if no_error_checking
       // nothing
 #else
@@ -13609,34 +15095,41 @@ namespace Seven.Mathematics
         throw new Error("invalid column on matrix minor: !(0 <= column < matrix.Columns)");
 #endif
 
-      Matrix<double> minor = 
-        new Matrix<double>(matrix.Rows - 1, matrix.Columns - 1);
-      int matrix_rows = matrix.Rows;
-      int matrix_cols = matrix.Columns;
+      #endregion
+
+      #region flattened array
+
+      if (matrix.CurrentFormat == Matrix<double>.Format.FlattenedArray)
+      {
+
+        Matrix<double> minor =
+          new Matrix<double>(matrix.Rows - 1, matrix.Columns - 1);
+        int matrix_rows = matrix.Rows;
+        int matrix_cols = matrix.Columns;
 
 #if unsafe_code
-      unsafe
-      {
-        fixed (double*
-          matrix_flat = matrix._matrix,
-          minor_flat = minor._matrix)
+        unsafe
         {
-          int m = 0, n = 0;
-          for (int i = 0; i < matrix_rows; i++)
+          fixed (double*
+            matrix_flat = matrix._matrix as double[],
+            minor_flat = minor._matrix as double[])
           {
-            if (i == row) continue;
-            n = 0;
-            for (int j = 0; j < matrix_cols; j++)
+            int m = 0, n = 0;
+            for (int i = 0; i < matrix_rows; i++)
             {
-              if (j == column) continue;
-              minor_flat[m * matrix_cols + n] =
-                matrix_flat[i * matrix_cols + j];
-              n++;
+              if (i == row) continue;
+              n = 0;
+              for (int j = 0; j < matrix_cols; j++)
+              {
+                if (j == column) continue;
+                minor_flat[m * matrix_cols + n] =
+                  matrix_flat[i * matrix_cols + j];
+                n++;
+              }
+              m++;
             }
-            m++;
           }
         }
-      }
 #else
       int m = 0, n = 0;
       for (int i = 0; i < matrix.Rows; i++)
@@ -13652,7 +15145,34 @@ namespace Seven.Mathematics
         m++;
       }
 #endif
-      return minor;
+        return minor;
+      }
+
+      #endregion
+
+      #region default
+
+      else
+      {
+        Matrix<double> minor =
+          new Matrix<double>(matrix.Rows - 1, matrix.Columns - 1);
+        int m = 0, n = 0;
+        for (int i = 0; i < matrix.Rows; i++)
+        {
+          if (i == row) continue;
+          n = 0;
+          for (int j = 0; j < matrix.Columns; j++)
+          {
+            if (j == column) continue;
+            minor[m, n] = matrix[i, j];
+            n++;
+          }
+          m++;
+        }
+        return minor;
+      }
+
+      #endregion
     }
 
     /// <summary>Combines two matrices from left to right 
@@ -13676,6 +15196,8 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error checking
+
 #if no_errorChecking
       // nothing
 #else
@@ -13687,31 +15209,39 @@ namespace Seven.Mathematics
         throw new Error("invalid row-wise concatenation !(left.Rows == right.Rows).");
 #endif
 
-      Matrix<double> result =
-        new Matrix<double>(left.Rows, left.Columns + right.Columns);
-      int result_rows = result.Rows;
-      int result_cols = result.Columns;
+      #endregion
 
-      int left_cols = left.Columns;
-      int right_cols = right.Columns;
+      #region flattened arrays
+
+      if (left.CurrentFormat == Matrix<double>.Format.FlattenedArray &&
+        right.CurrentFormat == Matrix<double>.Format.FlattenedArray)
+      {
+
+        Matrix<double> result =
+          new Matrix<double>(left.Rows, left.Columns + right.Columns);
+        int result_rows = result.Rows;
+        int result_cols = result.Columns;
+
+        int left_cols = left.Columns;
+        int right_cols = right.Columns;
 
 #if unsafe_code
-      unsafe
-      {
-        // OptimizeMe (jump statement)
-        fixed (double*
-          left_flat = left._matrix,
-          right_flat = right._matrix,
-          result_flat = result._matrix)
-          for (int i = 0; i < result_rows; i++)
-            for (int j = 0; j < result_cols; j++)
-              if (j < left_cols)
-                result_flat[i * result_cols + j] =
-                  left_flat[i * left_cols + j];
-              else
-                result_flat[i * result_cols + j] =
-                  right_flat[i * right_cols + j - left_cols];
-      }
+        unsafe
+        {
+          // OptimizeMe (jump statement)
+          fixed (double*
+            left_flat = left._matrix as double[],
+            right_flat = right._matrix as double[],
+            result_flat = result._matrix as double[])
+            for (int i = 0; i < result_rows; i++)
+              for (int j = 0; j < result_cols; j++)
+                if (j < left_cols)
+                  result_flat[i * result_cols + j] =
+                    left_flat[i * left_cols + j];
+                else
+                  result_flat[i * result_cols + j] =
+                    right_flat[i * right_cols + j - left_cols];
+        }
 #else
       for (int i = 0; i < result_rows; i++)
         for (int j = 0; j < result_cols; j++)
@@ -13723,7 +15253,27 @@ namespace Seven.Mathematics
         }
 #endif
 
-      return result;
+        return result;
+      }
+
+      #endregion
+
+      #region default
+
+      else
+      {
+        Matrix<double> result =
+          new Matrix<double>(left.Rows, left.Columns + right.Columns);
+        for (int i = 0; i < result.Rows; i++)
+          for (int j = 0; j < result.Columns; j++)
+            if (j < left.Columns)
+              result[i, j] = left[i, j];
+            else
+              result[i, j] = right[i, j - left.Columns];
+        return result;
+      }
+
+      #endregion
     }
 
     /// <summary>Calculates the echelon of a matrix (aka REF).</summary>
@@ -13752,12 +15302,16 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error checking
+
 #if no_error_checking
       // nothing
 #else
       if (object.ReferenceEquals(matrix, null))
         throw new Error("null reference: matrix");
 #endif
+
+      #endregion
 
       Matrix<double> result = matrix.Clone();
       for (int i = 0; i < matrix.Rows; i++)
@@ -13806,12 +15360,16 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error checking
+
 #if no_error_checking
       // nothing
 #else
       if (object.ReferenceEquals(matrix, null))
         throw new Error("null reference: matrix");
 #endif
+
+      #endregion
 
       Matrix<double> result = matrix.Clone();
       for (int i = 0; i < matrix.Rows; i++)
@@ -13863,6 +15421,8 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error checking
+
 #if no_error_checking
       // nothing
 #else
@@ -13871,6 +15431,8 @@ namespace Seven.Mathematics
       if (matrix.Rows != matrix.Columns)
         throw new Error("invalid matrix determinent: !(matrix.IsSquare)");
 #endif
+
+      #endregion
 
       double det = 1;
       Matrix<double> rref = matrix.Clone();
@@ -13929,6 +15491,8 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error checking
+
 #if no_error_checking
       // nothing
 #else
@@ -13937,6 +15501,8 @@ namespace Seven.Mathematics
       if (LinearAlgebra.Determinent(matrix) == 0)
         throw new Error("inverse calculation failed.");
 #endif
+
+      #endregion
 
       Matrix<double> identity = LinearAlgebra.MatrixFactoryIdentity_double(matrix.Rows, matrix.Columns);
       Matrix<double> rref = matrix.Clone();
@@ -13983,6 +15549,8 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error checking
+
 #if no_error_checking
       // nothing
 #else
@@ -13991,6 +15559,8 @@ namespace Seven.Mathematics
       if (!(matrix.Rows == matrix.Columns))
         throw new Error("Adjoint of a non-square matrix does not exists");
 #endif
+
+      #endregion
 
       Matrix<double> AdjointMatrix = new Matrix<double>(matrix.Rows, matrix.Columns);
       for (int i = 0; i < matrix.Rows; i++)
@@ -14018,6 +15588,8 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error checking
+
 #if no_error_checking
       // nothing
 #else
@@ -14025,7 +15597,9 @@ namespace Seven.Mathematics
         throw new Error("null reference: matrix");
 #endif
 
-      Matrix<double> transpose = 
+      #endregion
+
+      Matrix<double> transpose =
         new Matrix<double>(matrix.Columns, matrix.Rows);
       for (int i = 0; i < transpose.Rows; i++)
         for (int j = 0; j < transpose.Columns; j++)
@@ -14085,6 +15659,8 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error checking
+
 #if no_error_checking
 #else
       if (object.ReferenceEquals(matrix, null))
@@ -14092,6 +15668,8 @@ namespace Seven.Mathematics
       if (matrix.Rows != matrix.Columns)
         throw new Error("non-square matrix during DecomposeLU function");
 #endif
+
+      #endregion
 
       Lower = LinearAlgebra.MatrixFactoryIdentity_double(matrix.Rows, matrix.Columns);
       Upper = matrix.Clone();
@@ -14213,7 +15791,7 @@ namespace Seven.Mathematics
         return false;
       if (object.ReferenceEquals(right, null))
         return false;
-        
+
       if (left.Rows != right.Rows || left.Columns != right.Columns)
         return false;
       for (int i = 0; i < left.Rows; i++)
@@ -15626,32 +17204,60 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error checking
+
 #if no_errorchecking
       //nothing
 #else
       if (object.ReferenceEquals(matrix, null))
         throw new Error("null reference: matrix");
+#endif
+
+      #endregion
+
       if (matrix.Rows != matrix.Columns)
         return false;
-#endif
-      int size = matrix.Columns;
-#if unsafe_code
-      unsafe
+
+      #region flattened arrays
+
+      if (matrix.CurrentFormat == Matrix<float>.Format.FlattenedArray)
       {
-        fixed (float* matrix_flat = matrix._matrix)
-          for (var row = 0; row < size; row++)
-            for (var column = row + 1; column < size; column++)
-              if (matrix_flat[row * size + column] != matrix_flat[column * size + row])
-                return false;
-      }
+
+        int size = matrix.Columns;
+
+#if unsafe_code
+        unsafe
+        {
+          fixed (float* matrix_flat = matrix._matrix as float[])
+            for (var row = 0; row < size; row++)
+              for (var column = row + 1; column < size; column++)
+                if (matrix_flat[row * size + column] != matrix_flat[column * size + row])
+                  return false;
+        }
 #else
-      float[] matrix_flat = matrix._matrix;
+      float[] matrix_flat = matrix._matrix as float[];
       for (var row = 0; row < size; row++)
         for (var column = row + 1; column < size; column++)
           if (matrix_flat[row * size + column] != matrix_flat[column * size + row])
             return false;
 #endif
-      return true;
+        return true;
+      }
+
+      #endregion
+
+      #region default
+
+      else
+      {
+        for (int i = 0; i < matrix.Rows; i++)
+          for (int j = 0; j < matrix.Columns; j++)
+            if (matrix[i, j] != matrix[j, i])
+              return false;
+        return true;
+      }
+
+      #endregion
     }
 
     /// <summary>Constructs a new identity-matrix of the given dimensions.</summary>
@@ -15670,6 +17276,8 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error checking
+
 #if no_error_checking
       //nothing
 #else
@@ -15679,13 +17287,11 @@ namespace Seven.Mathematics
         throw new Error("invalid column count on matrix creation");
 #endif
 
+      #endregion
+
       Matrix<float> matrix = new Matrix<float>(rows, columns);
-      if (rows <= columns)
-        for (int i = 0; i < rows; i++)
-          matrix[i, i] = 1;
-      else
-        for (int i = 0; i < columns; i++)
-          matrix[i, i] = 1;
+      for (int i = 0, i_max = Logic.Min(rows, columns); i < i_max; i++)
+        matrix[i, i] = 1;
       return matrix;
     }
 
@@ -15705,41 +17311,8 @@ namespace Seven.Mathematics
 
       #endregion
 
-#if no_error_checking
-      // nothing
-#else
-        if (object.ReferenceEquals(matrix, null))
-          throw new Error("null reference: matirx");
-#endif
+      #region error checking
 
-      Matrix<float> result =
-        new Matrix<float>(matrix.Rows, matrix.Columns);
-      int size = matrix.Rows * matrix.Columns;
-
-#if unsafe_code
-      unsafe
-      {
-        fixed (float*
-          result_flat = result._matrix,
-          matrix_flat = matrix._matrix)
-          for (int i = 0; i < size; i++)
-            result_flat[i] = -matrix_flat[i];
-        return result;
-      }
-#else
-      float[] result_flat = result._matrix;
-      float[] matrix_flat = matrix._matrix;
-      for (int i = 0; i < size; i++)
-        result_flat[i] = -matrix_flat[i];
-      return result;
-#endif
-    }
-
-    /// <summary>Negates all the values in a matrix.</summary>
-    /// <param name="matrix">The matrix to have its values negated.</param>
-    /// <returns>The resulting matrix after the negations.</returns>
-    public static Matrix<float> Negate_parallel(Matrix<float> matrix)
-    {
 #if no_error_checking
       // nothing
 #else
@@ -15747,45 +17320,118 @@ namespace Seven.Mathematics
         throw new Error("null reference: matirx");
 #endif
 
-      if (matrix.Rows * matrix.Columns > _parallelMinimum)
+      #endregion
+
+      #region flattened arrays
+
+      if (matrix.CurrentFormat == Matrix<float>.Format.FlattenedArray)
       {
+
         Matrix<float> result =
-        new Matrix<float>(matrix.Rows, matrix.Columns);
+          new Matrix<float>(matrix.Rows, matrix.Columns);
         int size = matrix.Rows * matrix.Columns;
 
 #if unsafe_code
         unsafe
         {
-          Seven.Parallels.AutoParallel.Divide(
-            (int current, int max) =>
-            {
-              return () =>
-              {
-                fixed (float*
-                  result_flat = result._matrix,
-                  matrix_flat = matrix._matrix)
-                  for (int i = current; i < size; i += max)
-                    result_flat[i] = -matrix_flat[i];
-              };
-            }, Logic.Max(matrix.Rows, matrix.Columns));
+          fixed (float*
+            result_flat = result._matrix as float[],
+            matrix_flat = matrix._matrix as float[])
+            for (int i = 0; i < size; i++)
+              result_flat[i] = -matrix_flat[i];
+          return result;
         }
+#else
+      float[] result_flat = result._matrix as float[];
+      float[] matrix_flat = matrix._matrix as float[];
+      for (int i = 0; i < size; i++)
+        result_flat[i] = -matrix_flat[i];
+      return result;
+#endif
+
+      }
+
+      #endregion
+
+      #region default
+
+      else
+      {
+        Matrix<float> result =
+          new Matrix<float>(matrix.Rows, matrix.Columns);
+        for (int i = 0; i < matrix.Rows; i++)
+          for (int j = 0; j < matrix.Rows; j++)
+            result[i, j] = -matrix[i, j];
+        return result;
+      }
+
+      #endregion
+    }
+
+    /// <summary>Negates all the values in a matrix.</summary>
+    /// <param name="matrix">The matrix to have its values negated.</param>
+    /// <returns>The resulting matrix after the negations.</returns>
+    public static Matrix<float> Negate_parallel(Matrix<float> matrix)
+    {
+      #region error checking
+
+#if no_error_checking
+      // nothing
+#else
+      if (object.ReferenceEquals(matrix, null))
+        throw new Error("null reference: matirx");
+#endif
+
+      #endregion
+
+      // At the moment, negation does not benefit from multithreading.
+      if (false) //matrix.Rows * matrix.Columns > _parallelMinimum)
+      {
+        #region flattened array
+
+        if (matrix.CurrentFormat == Matrix<float>.Format.FlattenedArray)
+        {
+
+          Matrix<float> result =
+          new Matrix<float>(matrix.Rows, matrix.Columns);
+          int size = matrix.Rows * matrix.Columns;
+
+#if unsafe_code
+          unsafe
+          {
+            Seven.Parallels.AutoParallel.Divide(
+              (int current, int max) =>
+              {
+                return () =>
+                {
+                  fixed (float*
+                    result_flat = result._matrix as float[],
+                    matrix_flat = matrix._matrix as float[])
+                    for (int i = current; i < size; i += max)
+                      result_flat[i] = -matrix_flat[i];
+                };
+              }, Logic.Max(matrix.Rows, matrix.Columns));
+          }
 #else
           Seven.Parallels.AutoParallel.Divide(
             (int current, int max) =>
             {
               return () =>
               {
-                float[] matrix_flat = matrix._matrix;
-                float[] result_flat = result._matrix;
+                float[] matrix_flat = matrix._matrix as float[];
+                float[] result_flat = result._matrix as float[];
                 for (int i = current; i < size; i += max)
                   result_flat[i] = -matrix_flat[i];
               };
-            }, Logic.Max(left.Rows, left.Columns));
+            }, Logic.Max(matrix.Rows, matrix.Columns));
 #endif
-        return result;
+          return result;
+
+        }
+
+        #endregion
       }
-      else
-        return LinearAlgebra.Negate(matrix);
+      return LinearAlgebra.Negate(matrix);
     }
 
     /// <summary>Does standard addition of two matrices.</summary>
@@ -15805,48 +17451,8 @@ namespace Seven.Mathematics
 
       #endregion
 
-#if no_error_checking
-      // nothing
-#else
-      if (object.ReferenceEquals(left, null))
-          throw new Error("null reference: left");
-      if (object.ReferenceEquals(right, null))
-        throw new Error("null reference: right");
-      if (left.Rows != right.Rows || left.Columns != right.Columns)
-        throw new Error("invalid matrix addition (dimension miss-match).");
-#endif
+      #region error checking
 
-      Matrix<float> result =
-        new Matrix<float>(left.Rows, left.Columns);
-      int size = left.Rows * left.Columns;
-
-#if unsafe_code
-      unsafe
-      {
-        fixed (float*
-          left_flat = left._matrix,
-          right_flat = right._matrix,
-          result_flat = result._matrix)
-          for (int i = 0; i < size; i++)
-            result_flat[i] = left_flat[i] + right_flat[i];
-      }
-#else
-      float[] left_flat = left._matrix;
-      float[] right_flat = right._matrix;
-      float[] result_flat = result._matrix;
-      for (int i = 0; i < size; i++)
-        result_flat[i] = left_flat[i] + right_flat[i];
-#endif
-
-      return result;
-    }
-
-    /// <summary>Does standard addition of two matrices.</summary>
-    /// <param name="left">The left matrix of the addition.</param>
-    /// <param name="right">The right matrix of the addition.</param>
-    /// <returns>The resulting matrix after the addition.</returns>
-    public static Matrix<float> Add_parallel(Matrix<float> left, Matrix<float> right)
-    {
 #if no_error_checking
       // nothing
 #else
@@ -15858,47 +17464,128 @@ namespace Seven.Mathematics
         throw new Error("invalid matrix addition (dimension miss-match).");
 #endif
 
-      if (left.Rows * left.Columns > _parallelMinimum)
+      #endregion
+
+      #region flattened arrays
+
+      if (left.CurrentFormat == Matrix<float>.Format.FlattenedArray &&
+        right.CurrentFormat == Matrix<float>.Format.FlattenedArray)
       {
+
         Matrix<float> result =
-        new Matrix<float>(left.Rows, left.Columns);
+          new Matrix<float>(left.Rows, left.Columns);
         int size = left.Rows * left.Columns;
 
 #if unsafe_code
         unsafe
         {
-          Seven.Parallels.AutoParallel.Divide(
-            (int current, int max) =>
-            {
-              return () =>
-              {
-                fixed (float*
-                  left_flat = left._matrix,
-                  right_flat = right._matrix,
-                  result_flat = result._matrix)
-                  for (int i = current; i < size; i += max)
-                    result_flat[i] = left_flat[i] + right_flat[i];
-              };
-            }, Logic.Max(left.Rows, left.Columns));
+          fixed (float*
+            left_flat = left._matrix as float[],
+            right_flat = right._matrix as float[],
+            result_flat = result._matrix as float[])
+            for (int i = 0; i < size; i++)
+              result_flat[i] = left_flat[i] + right_flat[i];
         }
+#else
+      float[] left_flat = left._matrix as float[];
+      float[] right_flat = right._matrix as float[];
+      float[] result_flat = result._matrix as float[];
+      for (int i = 0; i < size; i++)
+        result_flat[i] = left_flat[i] + right_flat[i];
+#endif
+
+        return result;
+
+      }
+
+      #endregion
+
+      #region default
+
+      else
+      {
+        Matrix<float> result =
+          new Matrix<float>(left.Rows, left.Columns);
+        for (int i = 0; i < left.Rows; i++)
+          for (int j = 0; j < left.Columns; j++)
+            result[i, j] = left[i, j] + right[i, j];
+        return result;
+      }
+
+      #endregion
+    }
+
+    /// <summary>Does standard addition of two matrices.</summary>
+    /// <param name="left">The left matrix of the addition.</param>
+    /// <param name="right">The right matrix of the addition.</param>
+    /// <returns>The resulting matrix after the addition.</returns>
+    public static Matrix<float> Add_parallel(Matrix<float> left, Matrix<float> right)
+    {
+      #region error checking
+
+#if no_error_checking
+      // nothing
+#else
+      if (object.ReferenceEquals(left, null))
+        throw new Error("null reference: left");
+      if (object.ReferenceEquals(right, null))
+        throw new Error("null reference: right");
+      if (left.Rows != right.Rows || left.Columns != right.Columns)
+        throw new Error("invalid matrix addition (dimension miss-match).");
+#endif
+
+      #endregion
+
+      // At the moment, addition does not benefit from multithreading.
+      if (false) //matrix.Rows * matrix.Columns > _parallelMinimum)
+      {
+        #region flattened array
+
+        if (left.CurrentFormat == Matrix<float>.Format.FlattenedArray)
+        {
+
+          Matrix<float> result =
+          new Matrix<float>(left.Rows, left.Columns);
+          int size = left.Rows * left.Columns;
+
+#if unsafe_code
+          unsafe
+          {
+            Seven.Parallels.AutoParallel.Divide(
+              (int current, int max) =>
+              {
+                return () =>
+                {
+                  fixed (float*
+                    left_flat = left._matrix as float[],
+                    right_flat = right._matrix as float[],
+                    result_flat = result._matrix as float[])
+                    for (int i = current; i < size; i += max)
+                      result_flat[i] = left_flat[i] + right_flat[i];
+                };
+              }, Logic.Max(left.Rows, left.Columns));
+          }
 #else
           Seven.Parallels.AutoParallel.Divide(
             (int current, int max) =>
             {
               return () =>
               {
-                float[] left_flat = left._matrix;
-                float[] right_flat = right._matrix;
-                float[] result_flat = result._matrix;
+                float[] left_flat = left._matrix as float[];
+                float[] right_flat = right._matrix as float[];
+                float[] result_flat = result._matrix as float[];
                 for (int i = current; i < size; i += max)
                   result_flat[i] = left_flat[i] + right_flat[i];
               };
             }, Logic.Max(left.Rows, left.Columns));
 #endif
-        return result;
+          return result;
+
+        }
+
+        #endregion
       }
-      else
-        return LinearAlgebra.Add(left, right);
+      return LinearAlgebra.Add(left, right);
     }
 
     /// <summary>Subtracts a scalar from all the values in a matrix.</summary>
@@ -15918,6 +17605,8 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error checking
+
 #if no_error_checking
       // nothing
 #else
@@ -15929,29 +17618,54 @@ namespace Seven.Mathematics
         throw new Error("invalid matrix subtraction (dimension miss-match).");
 #endif
 
-      Matrix<float> result =
-        new Matrix<float>(left.Rows, left.Columns);
-      int size = left.Rows * left.Columns;
+      #endregion
+
+      #region flattened arrays
+
+      if (left.CurrentFormat == Matrix<float>.Format.FlattenedArray &&
+        right.CurrentFormat == Matrix<float>.Format.FlattenedArray)
+      {
+
+        Matrix<float> result =
+          new Matrix<float>(left.Rows, left.Columns);
+        int size = left.Rows * left.Columns;
 
 #if unsafe_code
-      unsafe
-      {
-        fixed (float*
-          left_flat = left._matrix,
-          right_flat = right._matrix,
-          result_flat = result._matrix)
-          for (int i = 0; i < size; i++)
-            result_flat[i] = left_flat[i] - right_flat[i];
-      }
+        unsafe
+        {
+          fixed (float*
+            left_flat = left._matrix as float[],
+            right_flat = right._matrix as float[],
+            result_flat = result._matrix as float[])
+            for (int i = 0; i < size; i++)
+              result_flat[i] = left_flat[i] - right_flat[i];
+        }
 #else
-      float[] left_flat = left._matrix;
-      float[] right_flat = right._matrix;
-      float[] result_flat = result._matrix;
+      float[] left_flat = left._matrix as float[];
+      float[] right_flat = right._matrix as float[];
+      float[] result_flat = result._matrix as float[];
       for (int i = 0; i < size; i++)
         result_flat[i] = left_flat[i] - right_flat[i];
 #endif
 
-      return result;
+        return result;
+      }
+
+      #endregion
+
+      #region default
+
+      else
+      {
+        Matrix<float> result =
+          new Matrix<float>(left.Rows, left.Columns);
+        for (int i = 0; i < left.Rows; i++)
+          for (int j = 0; j < left.Columns; j++)
+            result[i, j] = left[i, j] - right[i, j];
+        return result;
+      }
+
+      #endregion
     }
 
     /// <summary>Subtracts a scalar from all the values in a matrix.</summary>
@@ -15960,6 +17674,8 @@ namespace Seven.Mathematics
     /// <returns>The resulting matrix after the subtractions.</returns>
     public static Matrix<float> Subtract_parallel(Matrix<float> left, Matrix<float> right)
     {
+      #region error checking
+
 #if no_error_checking
       // nothing
 #else
@@ -15971,47 +17687,58 @@ namespace Seven.Mathematics
         throw new Error("invalid matrix subtraction (dimension miss-match).");
 #endif
 
-      if (left.Rows * left.Columns > _parallelMinimum)
+      #endregion
+
+      // At the moment, subtraction does not benefit from multithreading.
+      if (false) //matrix.Rows * matrix.Columns > _parallelMinimum)
       {
-        Matrix<float> result =
-        new Matrix<float>(left.Rows, left.Columns);
-        int size = left.Rows * left.Columns;
+        #region flattened arrays
+
+        if (left.CurrentFormat == Matrix<float>.Format.FlattenedArray &&
+          right.CurrentFormat == Matrix<float>.Format.FlattenedArray)
+        {
+
+          Matrix<float> result =
+          new Matrix<float>(left.Rows, left.Columns);
+          int size = left.Rows * left.Columns;
 
 #if unsafe_code
-        unsafe
-        {
-          Seven.Parallels.AutoParallel.Divide(
-            (int current, int max) =>
-            {
-              return () =>
+          unsafe
+          {
+            Seven.Parallels.AutoParallel.Divide(
+              (int current, int max) =>
               {
-                fixed (float*
-                  left_flat = left._matrix,
-                  right_flat = right._matrix,
-                  result_flat = result._matrix)
-                  for (int i = current; i < size; i += max)
-                    result_flat[i] = left_flat[i] - right_flat[i];
-              };
-            }, Logic.Max(left.Rows, left.Columns));
-        }
+                return () =>
+                {
+                  fixed (float*
+                    left_flat = left._matrix as float[],
+                    right_flat = right._matrix as float[],
+                    result_flat = result._matrix as float[])
+                    for (int i = current; i < size; i += max)
+                      result_flat[i] = left_flat[i] - right_flat[i];
+                };
+              }, Logic.Max(left.Rows, left.Columns));
+          }
 #else
           Seven.Parallels.AutoParallel.Divide(
           (int current, int max) =>
           {
             return () =>
             {
-              float[] left_flat = left._matrix;
-              float[] right_flat = right._matrix;
-              float[] result_flat = result._matrix;
+              float[] left_flat = left._matrix as float[];
+              float[] right_flat = right._matrix as float[];
+              float[] result_flat = result._matrix as float[];
                 for (int i = current; i < size; i += max)
                   result_flat[i] = left_flat[i] - right_flat[i];
             };
           }, Logic.Max(left.Rows, left.Columns));
 #endif
-        return result;
+          return result;
+        }
+
+        #endregion
       }
-      else
-        return LinearAlgebra.Subtract(left, right);
+      return LinearAlgebra.Subtract(left, right);
     }
 
     /// <summary>Performs multiplication on two matrices.</summary>
@@ -16032,6 +17759,8 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error checking
+
 #if no_error_checking
       // nothing
 #else
@@ -16043,33 +17772,41 @@ namespace Seven.Mathematics
         throw new LinearAlgebra.Error("invalid multiplication (size miss-match).");
 #endif
 
-      float sum;
-      int result_rows = left.Rows;
-      int left_cols = left.Columns;
-      int result_cols = right.Columns;
-      Matrix<float> result =
-        new Matrix<float>(result_rows, result_cols);
+      #endregion
+
+      #region flattened arrays
+
+      if (left.CurrentFormat == Matrix<float>.Format.FlattenedArray &&
+        right.CurrentFormat == Matrix<float>.Format.FlattenedArray)
+      {
+
+        float sum;
+        int result_rows = left.Rows;
+        int left_cols = left.Columns;
+        int result_cols = right.Columns;
+        Matrix<float> result =
+          new Matrix<float>(result_rows, result_cols);
 
 #if unsafe_code
-      unsafe
-      {
-        fixed (float*
-          result_flat = result._matrix,
-          left_flat = left._matrix,
-          right_flat = right._matrix)
-          for (int i = 0; i < result_rows; i++)
-            for (int j = 0; j < result_cols; j++)
-            {
-              sum = 0;
-              for (int k = 0; k < left_cols; k++)
-                sum += left_flat[i * left_cols + k] * right_flat[k * result_cols + j];
-              result_flat[i * result_cols + j] = sum;
-            }
-      }
+        unsafe
+        {
+          fixed (float*
+            result_flat = result._matrix as float[],
+            left_flat = left._matrix as float[],
+            right_flat = right._matrix as float[])
+            for (int i = 0; i < result_rows; i++)
+              for (int j = 0; j < result_cols; j++)
+              {
+                sum = 0;
+                for (int k = 0; k < left_cols; k++)
+                  sum += left_flat[i * left_cols + k] * right_flat[k * result_cols + j];
+                result_flat[i * result_cols + j] = sum;
+              }
+        }
 #else
-      float[] result_flat = result._matrix;
-      float[] left_flat = left._matrix;
-      float[] right_flat = right._matrix;
+      float[] result_flat = result._matrix as float[];
+      float[] left_flat = left._matrix as float[];
+      float[] right_flat = right._matrix as float[];
 
       for (int i = 0; i < result_rows; i++)
         for (int j = 0; j < result_cols; j++)
@@ -16081,7 +17818,25 @@ namespace Seven.Mathematics
         }
 #endif
 
-      return result;
+        return result;
+      }
+
+      #endregion
+
+      #region default
+
+      else
+      {
+        Matrix<float> result =
+          new Matrix<float>(left.Rows, right.Columns);
+        for (int i = 0; i < left.Rows; i++)
+          for (int j = 0; j < right.Columns; j++)
+            for (int k = 0; k < left.Columns; k++)
+              result[i, j] += left[i, k] * right[k, j];
+        return result;
+      }
+
+      #endregion
     }
 
     /// <summary>Performs multiplication on two matrices using multi-threading.</summary>
@@ -16090,6 +17845,8 @@ namespace Seven.Mathematics
     /// <returns>The resulting matrix of the multiplication.</returns>
     public static Matrix<float> Multiply_parrallel(Matrix<float> left, Matrix<float> right)
     {
+      #region error checking
+
 #if no_error_checking
       // nothing
 #else
@@ -16101,6 +17858,8 @@ namespace Seven.Mathematics
         throw new LinearAlgebra.Error("invalid multiplication (dimension miss-match).");
 #endif
 
+      #endregion
+
       int result_rows = left.Rows;
       int left_cols = left.Columns;
       int result_cols = right.Columns;
@@ -16110,12 +17869,52 @@ namespace Seven.Mathematics
       if (result_rows * result_cols > _parallelMinimum &&
         result_rows >= result_cols)
       {
-        Matrix<float> result =
-          new Matrix<float>(result_rows, result_cols);
-#if unsafe_code
-        unsafe
+        #region flattened arrays
+
+        if (left.CurrentFormat == Matrix<float>.Format.FlattenedArray &&
+          right.CurrentFormat == Matrix<float>.Format.FlattenedArray)
         {
-          Seven.Parallels.AutoParallel.Divide(
+
+          Matrix<float> result =
+            new Matrix<float>(result_rows, result_cols);
+
+#if unsafe_code
+          unsafe
+          {
+            Seven.Parallels.AutoParallel.Divide(
+              (int current, int max) =>
+              {
+                return () =>
+                {
+                  float sum;
+                  int left_i_offest;
+                  int result_i_offset;
+
+                  fixed (float*
+                    result_flat = result._matrix as float[],
+                    left_flat = left._matrix as float[],
+                    right_flat = right._matrix as float[])
+                    for (int i = current; i < result_rows; i += max)
+                    {
+                      left_i_offest = i * left_cols;
+                      result_i_offset = i * result_cols;
+                      for (int j = 0; j < result_cols; j++)
+                      {
+                        sum = 0;
+                        for (int k = 0; k < left_cols; k++)
+                          sum += left_flat[left_i_offest + k] * right_flat[k * result_cols + j];
+                        result_flat[result_i_offset + j] = sum;
+                      }
+                    }
+                };
+              }, result_rows);
+          }
+#else
+        float[] result_flat = result._matrix as float[];
+        float[] left_flat = left._matrix as float[];
+        float[] right_flat = right._matrix as float[];
+
+        Seven.Parallels.AutoParallel.Divide(
             (int current, int max) =>
             {
               return () =>
@@ -16124,68 +17923,78 @@ namespace Seven.Mathematics
                 int left_i_offest;
                 int result_i_offset;
 
-                fixed (float*
-                  result_flat = result._matrix,
-                  left_flat = left._matrix,
-                  right_flat = right._matrix)
-                  for (int i = current; i < result_rows; i += max)
+                for (int i = current; i < result_rows; i += max)
+                {
+                  left_i_offest = i * left_cols;
+                  result_i_offset = i * result_cols;
+                  for (int j = 0; j < result_cols; j++)
                   {
-                    left_i_offest = i * left_cols;
-                    result_i_offset = i * result_cols;
-                    for (int j = 0; j < result_cols; j++)
-                    {
-                      sum = 0;
-                      for (int k = 0; k < left_cols; k++)
-                        sum += left_flat[left_i_offest + k] * right_flat[k * result_cols + j];
-                      result_flat[result_i_offset + j] = sum;
-                    }
+                    sum = 0;
+                    for (int k = 0; k < left_cols; k++)
+                      sum += left_flat[left_i_offest + k] * right_flat[k * result_cols + j];
+                    result_flat[result_i_offset + j] = sum;
                   }
+                }
               };
             }, result_rows);
-        }
-#else
-              float[] result_flat = result._matrix;
-              float[] left_flat = left._matrix;
-              float[] right_flat = right._matrix;
-
-              Seven.Parallels.AutoParallel.Divide(
-                  (int current, int max) =>
-                  {
-                    return () =>
-                    {
-                      float sum;
-                      int left_i_offest;
-                      int result_i_offset;
-
-                      for (int i = current; i < result_rows; i += max)
-                      {
-                        left_i_offest = i * left_cols;
-                        result_i_offset = i * result_cols;
-                        for (int j = 0; j < result_cols; j++)
-                        {
-                          sum = 0;
-                          for (int k = 0; k < left_cols; k++)
-                            sum += left_flat[left_i_offest + k] * right_flat[k * result_cols + j];
-                          result_flat[result_i_offset + j] = sum;
-                        }
-                      }
-                    };
-                  }, result_rows);
 
 #endif
-        return result;
+
+          return result;
+        }
+
+        #endregion
       }
       // If there are enough columns to warrant multi-threading,
       // then multithread the column for-loop.
       else if (result_rows * result_cols > _parallelMinimum &&
         result_rows < result_cols)
       {
-        Matrix<float> result =
-          new Matrix<float>(result_rows, result_cols);
-#if unsafe_code
-        unsafe
+        #region flattened arrays
+
+        if (left.CurrentFormat == Matrix<float>.Format.FlattenedArray &&
+          right.CurrentFormat == Matrix<float>.Format.FlattenedArray)
         {
-          Seven.Parallels.AutoParallel.Divide(
+
+          Matrix<float> result =
+            new Matrix<float>(result_rows, result_cols);
+#if unsafe_code
+          unsafe
+          {
+            Seven.Parallels.AutoParallel.Divide(
+              (int current, int max) =>
+              {
+                return () =>
+                {
+                  float sum;
+                  int left_i_offest;
+                  int result_i_offset;
+
+                  fixed (float*
+                    result_flat = result._matrix as float[],
+                    left_flat = left._matrix as float[],
+                    right_flat = right._matrix as float[])
+                    for (int i = 0; i < result_rows; i++)
+                    {
+                      left_i_offest = i * left_cols;
+                      result_i_offset = i * result_cols;
+                      for (int j = current; j < result_cols; j += max)
+                      {
+                        sum = 0;
+                        for (int k = 0; k < left_cols; k++)
+                          sum += left_flat[left_i_offest + k] * right_flat[k * result_cols + j];
+                        result_flat[result_i_offset + j] = sum;
+                      }
+                    }
+                };
+              }, result_cols);
+          }
+#else
+        float[] result_flat = result._matrix as float[];
+        float[] left_flat = left._matrix as float[];
+        float[] right_flat = right._matrix as float[];
+
+        Seven.Parallels.AutoParallel.Divide(
             (int current, int max) =>
             {
               return () =>
@@ -16194,59 +18003,29 @@ namespace Seven.Mathematics
                 int left_i_offest;
                 int result_i_offset;
 
-                fixed (float*
-                  result_flat = result._matrix,
-                  left_flat = left._matrix,
-                  right_flat = right._matrix)
-                  for (int i = 0; i < result_rows; i++)
+                for (int i = 0; i < result_rows; i++)
+                {
+                  left_i_offest = i * left_cols;
+                  result_i_offset = i * result_cols;
+                  for (int j = current; j < result_cols; j += max)
                   {
-                    left_i_offest = i * left_cols;
-                    result_i_offset = i * result_cols;
-                    for (int j = current; j < result_cols; j += max)
-                    {
-                      sum = 0;
-                      for (int k = 0; k < left_cols; k++)
-                        sum += left_flat[left_i_offest + k] * right_flat[k * result_cols + j];
-                      result_flat[result_i_offset + j] = sum;
-                    }
+                    sum = 0;
+                    for (int k = 0; k < left_cols; k++)
+                      sum += left_flat[left_i_offest + k] * right_flat[k * result_cols + j];
+                    result_flat[result_i_offset + j] = sum;
                   }
+                }
               };
             }, result_cols);
-        }
-#else
-              float[] result_flat = result._matrix;
-              float[] left_flat = left._matrix;
-              float[] right_flat = right._matrix;
-
-              Seven.Parallels.AutoParallel.Divide(
-                  (int current, int max) =>
-                  {
-                    return () =>
-                    {
-                      float sum;
-                      int left_i_offest;
-                      int result_i_offset;
-
-                      for (int i = 0; i < result_rows; i++)
-                      {
-                        left_i_offest = i * left_cols;
-                        result_i_offset = i * result_cols;
-                        for (int j = current; j < result_cols; j += max)
-                        {
-                          sum = 0;
-                          for (int k = 0; k < left_cols; k++)
-                            sum += left_flat[left_i_offest + k] * right_flat[k * result_cols + j];
-                          result_flat[result_i_offset + j] = sum;
-                        }
-                      }
-                    };
-                  }, result_cols);
 #endif
-        return result;
+          return result;
+
+        }
+
+        #endregion
       }
       // Multi-threading is not necessary.
-      else
-        return LinearAlgebra.Multiply(left, right);
+      return LinearAlgebra.Multiply(left, right);
     }
 
     /// <summary>Does a standard (triple for looped) multiplication between matrices.</summary>
@@ -16266,40 +18045,62 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error
+
 #if no_error_checking
-      int left_row = left.Rows;
-      int left_col = left.Columns;
+      // nothing
 #else
-      int left_row = left.Rows;
-      int left_col = left.Columns;
       if (left.Columns != right.Dimensions)
         throw new Error("invalid multiplication (size miss-match).");
 #endif
 
-      Vector<float> result = new Vector<float>(right.Dimensions);
+      #endregion
+
+      #region flattened array
+
+      if (left.CurrentFormat == Matrix<float>.Format.FlattenedArray)
+      {
+        int left_row = left.Rows;
+        int left_col = left.Columns;
+        Vector<float> result = new Vector<float>(right.Dimensions);
 
 #if unsafe_code
-      unsafe
-      {
-        fixed (float*
-          left_flat = left._matrix,
-          right_flat = right._vector,
-          result_flat = result._vector)
-          for (int i = 0; i < left_row; i++)
-            for (int j = 0; j < left_col; j++)
-              result_flat[i] += left_flat[i * left_col + j] * right_flat[j];
-        return result;
-      }
+        unsafe
+        {
+          fixed (float*
+            left_flat = left._matrix as float[],
+            right_flat = right._vector as float[],
+            result_flat = result._vector as float[])
+            for (int i = 0; i < left_row; i++)
+              for (int j = 0; j < left_col; j++)
+                result_flat[i] += left_flat[i * left_col + j] * right_flat[j];
+        }
 #else
-      float[] left_flat = left._matrix;
-      float[] right_flat = right._vector;
-      float[] result_flat = result._vector;
+      float[] left_flat = left._matrix as float[];
+      float[] right_flat = right._vector as float[];
+      float[] result_flat = result._vector as float[];
       for (int i = 0; i < left_row; i++)
         for (int j = 0; j < left_col; j++)
           result_flat[i] += left_flat[i * left_col + j] * right_flat[j];
-      return result;
 #endif
-      return result;
+        return result;
+      }
+
+      #endregion
+
+      #region defualt
+
+      else
+      {
+        Vector<float> result =
+          new Vector<float>(right.Dimensions);
+        for (int i = 0; i < left.Rows; i++)
+          for (int j = 0; j < left.Columns; j++)
+            result[i] += left[i, j] * right[j];
+        return result;
+      }
+
+      #endregion
     }
 
     /// <summary>Multiplies all the values in a matrix by a scalar.</summary>
@@ -16319,6 +18120,8 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error checking
+
 #if no_error_checking
       // nothing
 #else
@@ -16326,27 +18129,51 @@ namespace Seven.Mathematics
         throw new Error("null reference: left");
 #endif
 
-      int rows = left.Rows;
-      int columns = left.Columns;
-      Matrix<float> result = new Matrix<float>(rows, columns);
+      #endregion
+
+      #region flattened array
+
+      if (left.CurrentFormat == Matrix<float>.Format.FlattenedArray)
+      {
+
+        int rows = left.Rows;
+        int columns = left.Columns;
+        Matrix<float> result = new Matrix<float>(rows, columns);
 
 #if unsafe_code
-      unsafe
-      {
-        fixed (float*
-          left_flat = left._matrix,
-          result_flat = result._matrix)
-          for (int i = 0; i < rows; i++)
-            for (int j = 0; j < columns; j++)
-              result_flat[i * columns + j] = left_flat[i * columns + j] * right;
-      }
+        unsafe
+        {
+          fixed (float*
+            left_flat = left._matrix as float[],
+            result_flat = result._matrix as float[])
+            for (int i = 0; i < rows; i++)
+              for (int j = 0; j < columns; j++)
+                result_flat[i * columns + j] = left_flat[i * columns + j] * right;
+        }
 #else
       for (int i = 0; i < rows; i++)
         for (int j = 0; j < columns; j++)
           result[i, j] = left[i, j] * right;
 #endif
 
-      return result;
+        return result;
+      }
+
+      #endregion
+
+      #region default
+
+      else
+      {
+        Matrix<float> result =
+          new Matrix<float>(left.Rows, left.Columns);
+        for (int i = 0; i < left.Rows; i++)
+          for (int j = 0; j < left.Columns; j++)
+            result[i, j] = left[i, j] * right;
+        return result;
+      }
+
+      #endregion
     }
 
     /// <summary>Applies a power to a square matrix.</summary>
@@ -16359,10 +18186,12 @@ namespace Seven.Mathematics
 
       //Matrix<float> result = matrix.Clone();
       //for (int i = 0; i < power; i++)
-      //  result = LinearAlgebra.Multiply(result, result);
+      //  result = LinearAlgebra.Multiply(result, matrix);
       //return result;
 
       #endregion
+
+      #region error checking
 
 #if no_error_checking
       // nothing
@@ -16372,6 +18201,9 @@ namespace Seven.Mathematics
       if (!(power >= 0))
         throw new Error("invalid power !(power > -1)");
 #endif
+
+      #endregion
+
       // this is not optimized...
       if (power == 0)
         return LinearAlgebra.MatrixFactoryIdentity_float(matrix.Rows, matrix.Columns);
@@ -16398,6 +18230,8 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error checking
+
 #if no_error_checking
       // nothing
 #else
@@ -16405,32 +18239,56 @@ namespace Seven.Mathematics
         throw new Error("null reference: matrix");
 #endif
 
-      int matrix_row = matrix.Rows;
-      int matrix_col = matrix.Columns;
-      Matrix<float> result =
-        new Matrix<float>(matrix_row, matrix_col);
+      #endregion
+
+      #region flattened array
+
+      if (matrix.CurrentFormat == Matrix<float>.Format.FlattenedArray)
+      {
+
+        int matrix_row = matrix.Rows;
+        int matrix_col = matrix.Columns;
+        Matrix<float> result =
+          new Matrix<float>(matrix_row, matrix_col);
 
 #if unsafe_code
-      unsafe
-      {
-        fixed (float*
-          matrix_flat = matrix._matrix,
-          result_flat = result._matrix)
-          for (int i = 0; i < matrix_row; i++)
-            for (int j = 0; j < matrix_col; j++)
-              result_flat[i * matrix_col + j] =
-                matrix_flat[i * matrix_col + j] / right;
-      }
+        unsafe
+        {
+          fixed (float*
+            matrix_flat = matrix._matrix as float[],
+            result_flat = result._matrix as float[])
+            for (int i = 0; i < matrix_row; i++)
+              for (int j = 0; j < matrix_col; j++)
+                result_flat[i * matrix_col + j] =
+                  matrix_flat[i * matrix_col + j] / right;
+        }
 #else
-      float[] matrix_flat = matrix._matrix;
-      float[] result_flat = result._matrix;
+      float[] matrix_flat = matrix._matrix as float[];
+      float[] result_flat = result._matrix as float[];
       for (int i = 0; i < matrix_row; i++)
         for (int j = 0; j < matrix_col; j++)
           result_flat[i * matrix_col + j] = 
             matrix_flat[i * matrix_col + j] / right;
 
 #endif
-      return result;
+        return result;
+      }
+
+      #endregion
+
+      #region default
+
+      else
+      {
+        Matrix<float> result =
+          new Matrix<float>(matrix.Rows, matrix.Columns);
+        for (int i = 0; i < matrix.Rows; i++)
+          for (int j = 0; j < matrix.Columns; j++)
+            result[i, j] = matrix[i, j] / right;
+        return result;
+      }
+
+      #endregion
     }
 
     /// <summary>Gets the minor of a matrix.</summary>
@@ -16461,6 +18319,8 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error checking
+
 #if no_error_checking
       // nothing
 #else
@@ -16474,34 +18334,41 @@ namespace Seven.Mathematics
         throw new Error("invalid column on matrix minor: !(0 <= column < matrix.Columns)");
 #endif
 
-      Matrix<float> minor =
-        new Matrix<float>(matrix.Rows - 1, matrix.Columns - 1);
-      int matrix_rows = matrix.Rows;
-      int matrix_cols = matrix.Columns;
+      #endregion
+
+      #region flattened array
+
+      if (matrix.CurrentFormat == Matrix<float>.Format.FlattenedArray)
+      {
+
+        Matrix<float> minor =
+          new Matrix<float>(matrix.Rows - 1, matrix.Columns - 1);
+        int matrix_rows = matrix.Rows;
+        int matrix_cols = matrix.Columns;
 
 #if unsafe_code
-      unsafe
-      {
-        fixed (float*
-          matrix_flat = matrix._matrix,
-          minor_flat = minor._matrix)
+        unsafe
         {
-          int m = 0, n = 0;
-          for (int i = 0; i < matrix_rows; i++)
+          fixed (float*
+            matrix_flat = matrix._matrix as float[],
+            minor_flat = minor._matrix as float[])
           {
-            if (i == row) continue;
-            n = 0;
-            for (int j = 0; j < matrix_cols; j++)
+            int m = 0, n = 0;
+            for (int i = 0; i < matrix_rows; i++)
             {
-              if (j == column) continue;
-              minor_flat[m * matrix_cols + n] =
-                matrix_flat[i * matrix_cols + j];
-              n++;
+              if (i == row) continue;
+              n = 0;
+              for (int j = 0; j < matrix_cols; j++)
+              {
+                if (j == column) continue;
+                minor_flat[m * matrix_cols + n] =
+                  matrix_flat[i * matrix_cols + j];
+                n++;
+              }
+              m++;
             }
-            m++;
           }
         }
-      }
 #else
       int m = 0, n = 0;
       for (int i = 0; i < matrix.Rows; i++)
@@ -16517,7 +18384,34 @@ namespace Seven.Mathematics
         m++;
       }
 #endif
-      return minor;
+        return minor;
+      }
+
+      #endregion
+
+      #region default
+
+      else
+      {
+        Matrix<float> minor =
+          new Matrix<float>(matrix.Rows - 1, matrix.Columns - 1);
+        int m = 0, n = 0;
+        for (int i = 0; i < matrix.Rows; i++)
+        {
+          if (i == row) continue;
+          n = 0;
+          for (int j = 0; j < matrix.Columns; j++)
+          {
+            if (j == column) continue;
+            minor[m, n] = matrix[i, j];
+            n++;
+          }
+          m++;
+        }
+        return minor;
+      }
+
+      #endregion
     }
 
     /// <summary>Combines two matrices from left to right 
@@ -16541,6 +18435,8 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error checking
+
 #if no_errorChecking
       // nothing
 #else
@@ -16552,31 +18448,39 @@ namespace Seven.Mathematics
         throw new Error("invalid row-wise concatenation !(left.Rows == right.Rows).");
 #endif
 
-      Matrix<float> result =
-        new Matrix<float>(left.Rows, left.Columns + right.Columns);
-      int result_rows = result.Rows;
-      int result_cols = result.Columns;
+      #endregion
 
-      int left_cols = left.Columns;
-      int right_cols = right.Columns;
+      #region flattened arrays
+
+      if (left.CurrentFormat == Matrix<float>.Format.FlattenedArray &&
+        right.CurrentFormat == Matrix<float>.Format.FlattenedArray)
+      {
+
+        Matrix<float> result =
+          new Matrix<float>(left.Rows, left.Columns + right.Columns);
+        int result_rows = result.Rows;
+        int result_cols = result.Columns;
+
+        int left_cols = left.Columns;
+        int right_cols = right.Columns;
 
 #if unsafe_code
-      unsafe
-      {
-        // OptimizeMe (jump statement)
-        fixed (float*
-          left_flat = left._matrix,
-          right_flat = right._matrix,
-          result_flat = result._matrix)
-          for (int i = 0; i < result_rows; i++)
-            for (int j = 0; j < result_cols; j++)
-              if (j < left_cols)
-                result_flat[i * result_cols + j] =
-                  left_flat[i * left_cols + j];
-              else
-                result_flat[i * result_cols + j] =
-                  right_flat[i * right_cols + j - left_cols];
-      }
+        unsafe
+        {
+          // OptimizeMe (jump statement)
+          fixed (float*
+            left_flat = left._matrix as float[],
+            right_flat = right._matrix as float[],
+            result_flat = result._matrix as float[])
+            for (int i = 0; i < result_rows; i++)
+              for (int j = 0; j < result_cols; j++)
+                if (j < left_cols)
+                  result_flat[i * result_cols + j] =
+                    left_flat[i * left_cols + j];
+                else
+                  result_flat[i * result_cols + j] =
+                    right_flat[i * right_cols + j - left_cols];
+        }
 #else
       for (int i = 0; i < result_rows; i++)
         for (int j = 0; j < result_cols; j++)
@@ -16588,7 +18492,27 @@ namespace Seven.Mathematics
         }
 #endif
 
-      return result;
+        return result;
+      }
+
+      #endregion
+
+      #region default
+
+      else
+      {
+        Matrix<float> result =
+          new Matrix<float>(left.Rows, left.Columns + right.Columns);
+        for (int i = 0; i < result.Rows; i++)
+          for (int j = 0; j < result.Columns; j++)
+            if (j < left.Columns)
+              result[i, j] = left[i, j];
+            else
+              result[i, j] = right[i, j - left.Columns];
+        return result;
+      }
+
+      #endregion
     }
 
     /// <summary>Calculates the echelon of a matrix (aka REF).</summary>
@@ -16617,12 +18541,16 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error checking
+
 #if no_error_checking
       // nothing
 #else
       if (object.ReferenceEquals(matrix, null))
         throw new Error("null reference: matrix");
 #endif
+
+      #endregion
 
       Matrix<float> result = matrix.Clone();
       for (int i = 0; i < matrix.Rows; i++)
@@ -16671,12 +18599,16 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error checking
+
 #if no_error_checking
       // nothing
 #else
       if (object.ReferenceEquals(matrix, null))
         throw new Error("null reference: matrix");
 #endif
+
+      #endregion
 
       Matrix<float> result = matrix.Clone();
       for (int i = 0; i < matrix.Rows; i++)
@@ -16728,6 +18660,8 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error checking
+
 #if no_error_checking
       // nothing
 #else
@@ -16736,6 +18670,8 @@ namespace Seven.Mathematics
       if (matrix.Rows != matrix.Columns)
         throw new Error("invalid matrix determinent: !(matrix.IsSquare)");
 #endif
+
+      #endregion
 
       float det = 1;
       Matrix<float> rref = matrix.Clone();
@@ -16794,6 +18730,8 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error checking
+
 #if no_error_checking
       // nothing
 #else
@@ -16802,6 +18740,8 @@ namespace Seven.Mathematics
       if (LinearAlgebra.Determinent(matrix) == 0)
         throw new Error("inverse calculation failed.");
 #endif
+
+      #endregion
 
       Matrix<float> identity = LinearAlgebra.MatrixFactoryIdentity_float(matrix.Rows, matrix.Columns);
       Matrix<float> rref = matrix.Clone();
@@ -16848,6 +18788,8 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error checking
+
 #if no_error_checking
       // nothing
 #else
@@ -16856,6 +18798,8 @@ namespace Seven.Mathematics
       if (!(matrix.Rows == matrix.Columns))
         throw new Error("Adjoint of a non-square matrix does not exists");
 #endif
+
+      #endregion
 
       Matrix<float> AdjointMatrix = new Matrix<float>(matrix.Rows, matrix.Columns);
       for (int i = 0; i < matrix.Rows; i++)
@@ -16883,12 +18827,16 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error checking
+
 #if no_error_checking
       // nothing
 #else
       if (object.ReferenceEquals(matrix, null))
         throw new Error("null reference: matrix");
 #endif
+
+      #endregion
 
       Matrix<float> transpose =
         new Matrix<float>(matrix.Columns, matrix.Rows);
@@ -16950,6 +18898,8 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error checking
+
 #if no_error_checking
 #else
       if (object.ReferenceEquals(matrix, null))
@@ -16957,6 +18907,8 @@ namespace Seven.Mathematics
       if (matrix.Rows != matrix.Columns)
         throw new Error("non-square matrix during DecomposeLU function");
 #endif
+
+      #endregion
 
       Lower = LinearAlgebra.MatrixFactoryIdentity_float(matrix.Rows, matrix.Columns);
       Upper = matrix.Clone();
@@ -18156,7 +20108,7 @@ namespace Seven.Mathematics
     /// <returns>The angle between the two vectors in radians.</returns>
     public static long Angle(Vector<long> first, Vector<long> second)
     {
-      throw new Error("requiers rational numeric types");
+      throw new Error("requires rational rational types");
 
 //      #region pre-optimization
 
@@ -18180,19 +20132,17 @@ namespace Seven.Mathematics
 //        LinearAlgebra.DotProduct(first, second) /
 //        (LinearAlgebra.Magnitude(first) *
 //        LinearAlgebra.Magnitude(second)));
-    }
+//    }
 
-    /// <summary>Rotates a 3-component vector by the specified axis and rotation values.</summary>
-    /// <param name="vector">The vector to rotate.</param>
-    /// <param name="angle">The angle of the rotation in radians.</param>
-    /// <param name="x">The x component of the axis vector to rotate about.</param>
-    /// <param name="y">The y component of the axis vector to rotate about.</param>
-    /// <param name="z">The z component of the axis vector to rotate about.</param>
-    /// <returns>The result of the rotation.</returns>
-    public static Vector<long> RotateBy(Vector<long> vector, long angle, long x, long y, long z)
-    {
-      throw new Error("requiers rational numeric types");
-
+//    /// <summary>Rotates a 3-component vector by the specified axis and rotation values.</summary>
+//    /// <param name="vector">The vector to rotate.</param>
+//    /// <param name="angle">The angle of the rotation in radians.</param>
+//    /// <param name="x">The x component of the axis vector to rotate about.</param>
+//    /// <param name="y">The y component of the axis vector to rotate about.</param>
+//    /// <param name="z">The z component of the axis vector to rotate about.</param>
+//    /// <returns>The result of the rotation.</returns>
+//    public static Vector<long> RotateBy(Vector<long> vector, long angle, long x, long y, long z)
+//    {
 //      #region pre-optimization
 
 //      //long sinHalfAngle = Trigonometry.sin(angle / 2);
@@ -18324,7 +20274,7 @@ namespace Seven.Mathematics
     /// <returns>The result of the slerp operation.</returns>
     public static Vector<long> Slerp(Vector<long> left, Vector<long> right, long blend)
     {
-      throw new Error("requiers rational numeric types");
+      throw new Error("requires rational rational types");
 
 //      #region pre-optimization
 
@@ -18497,32 +20447,60 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error checking
+
 #if no_errorchecking
       //nothing
 #else
       if (object.ReferenceEquals(matrix, null))
         throw new Error("null reference: matrix");
+#endif
+
+      #endregion
+
       if (matrix.Rows != matrix.Columns)
         return false;
-#endif
-      int size = matrix.Columns;
-#if unsafe_code
-      unsafe
+
+      #region flattened arrays
+
+      if (matrix.CurrentFormat == Matrix<long>.Format.FlattenedArray)
       {
-        fixed (long* matrix_flat = matrix._matrix)
-          for (var row = 0; row < size; row++)
-            for (var column = row + 1; column < size; column++)
-              if (matrix_flat[row * size + column] != matrix_flat[column * size + row])
-                return false;
-      }
+
+        int size = matrix.Columns;
+
+#if unsafe_code
+        unsafe
+        {
+          fixed (long* matrix_flat = matrix._matrix as long[])
+            for (var row = 0; row < size; row++)
+              for (var column = row + 1; column < size; column++)
+                if (matrix_flat[row * size + column] != matrix_flat[column * size + row])
+                  return false;
+        }
 #else
-      long[] matrix_flat = matrix._matrix;
+      long[] matrix_flat = matrix._matrix as long[];
       for (var row = 0; row < size; row++)
         for (var column = row + 1; column < size; column++)
           if (matrix_flat[row * size + column] != matrix_flat[column * size + row])
             return false;
 #endif
-      return true;
+        return true;
+      }
+
+      #endregion
+
+      #region default
+
+      else
+      {
+        for (int i = 0; i < matrix.Rows; i++)
+          for (int j = 0; j < matrix.Columns; j++)
+            if (matrix[i, j] != matrix[j, i])
+              return false;
+        return true;
+      }
+
+      #endregion
     }
 
     /// <summary>Constructs a new identity-matrix of the given dimensions.</summary>
@@ -18541,6 +20519,8 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error checking
+
 #if no_error_checking
       //nothing
 #else
@@ -18550,13 +20530,11 @@ namespace Seven.Mathematics
         throw new Error("invalid column count on matrix creation");
 #endif
 
+      #endregion
+
       Matrix<long> matrix = new Matrix<long>(rows, columns);
-      if (rows <= columns)
-        for (int i = 0; i < rows; i++)
-          matrix[i, i] = 1;
-      else
-        for (int i = 0; i < columns; i++)
-          matrix[i, i] = 1;
+      for (int i = 0, i_max = Logic.Min(rows, columns); i < i_max; i++)
+        matrix[i, i] = 1;
       return matrix;
     }
 
@@ -18576,41 +20554,8 @@ namespace Seven.Mathematics
 
       #endregion
 
-#if no_error_checking
-      // nothing
-#else
-        if (object.ReferenceEquals(matrix, null))
-          throw new Error("null reference: matirx");
-#endif
+      #region error checking
 
-      Matrix<long> result =
-        new Matrix<long>(matrix.Rows, matrix.Columns);
-      int size = matrix.Rows * matrix.Columns;
-
-#if unsafe_code
-      unsafe
-      {
-        fixed (long*
-          result_flat = result._matrix,
-          matrix_flat = matrix._matrix)
-          for (int i = 0; i < size; i++)
-            result_flat[i] = -matrix_flat[i];
-        return result;
-      }
-#else
-      long[] result_flat = result._matrix;
-      long[] matrix_flat = matrix._matrix;
-      for (int i = 0; i < size; i++)
-        result_flat[i] = -matrix_flat[i];
-      return result;
-#endif
-    }
-
-    /// <summary>Negates all the values in a matrix.</summary>
-    /// <param name="matrix">The matrix to have its values negated.</param>
-    /// <returns>The resulting matrix after the negations.</returns>
-    public static Matrix<long> Negate_parallel(Matrix<long> matrix)
-    {
 #if no_error_checking
       // nothing
 #else
@@ -18618,45 +20563,118 @@ namespace Seven.Mathematics
         throw new Error("null reference: matirx");
 #endif
 
-      if (matrix.Rows * matrix.Columns > _parallelMinimum)
+      #endregion
+
+      #region flattened arrays
+
+      if (matrix.CurrentFormat == Matrix<long>.Format.FlattenedArray)
       {
+
         Matrix<long> result =
-        new Matrix<long>(matrix.Rows, matrix.Columns);
+          new Matrix<long>(matrix.Rows, matrix.Columns);
         int size = matrix.Rows * matrix.Columns;
 
 #if unsafe_code
         unsafe
         {
-          Seven.Parallels.AutoParallel.Divide(
-            (int current, int max) =>
-            {
-              return () =>
-              {
-                fixed (long*
-                  result_flat = result._matrix,
-                  matrix_flat = matrix._matrix)
-                  for (int i = current; i < size; i += max)
-                    result_flat[i] = -matrix_flat[i];
-              };
-            }, Logic.Max(matrix.Rows, matrix.Columns));
+          fixed (long*
+            result_flat = result._matrix as long[],
+            matrix_flat = matrix._matrix as long[])
+            for (int i = 0; i < size; i++)
+              result_flat[i] = -matrix_flat[i];
+          return result;
         }
+#else
+      long[] result_flat = result._matrix as long[];
+      long[] matrix_flat = matrix._matrix as long[];
+      for (int i = 0; i < size; i++)
+        result_flat[i] = -matrix_flat[i];
+      return result;
+#endif
+
+      }
+
+      #endregion
+
+      #region default
+
+      else
+      {
+        Matrix<long> result =
+          new Matrix<long>(matrix.Rows, matrix.Columns);
+        for (int i = 0; i < matrix.Rows; i++)
+          for (int j = 0; j < matrix.Rows; j++)
+            result[i, j] = -matrix[i, j];
+        return result;
+      }
+
+      #endregion
+    }
+
+    /// <summary>Negates all the values in a matrix.</summary>
+    /// <param name="matrix">The matrix to have its values negated.</param>
+    /// <returns>The resulting matrix after the negations.</returns>
+    public static Matrix<long> Negate_parallel(Matrix<long> matrix)
+    {
+      #region error checking
+
+#if no_error_checking
+      // nothing
+#else
+      if (object.ReferenceEquals(matrix, null))
+        throw new Error("null reference: matirx");
+#endif
+
+      #endregion
+
+      // At the moment, negation does not benefit from multithreading.
+      if (false) //matrix.Rows * matrix.Columns > _parallelMinimum)
+      {
+        #region flattened array
+
+        if (matrix.CurrentFormat == Matrix<long>.Format.FlattenedArray)
+        {
+
+          Matrix<long> result =
+          new Matrix<long>(matrix.Rows, matrix.Columns);
+          int size = matrix.Rows * matrix.Columns;
+
+#if unsafe_code
+          unsafe
+          {
+            Seven.Parallels.AutoParallel.Divide(
+              (int current, int max) =>
+              {
+                return () =>
+                {
+                  fixed (long*
+                    result_flat = result._matrix as long[],
+                    matrix_flat = matrix._matrix as long[])
+                    for (int i = current; i < size; i += max)
+                      result_flat[i] = -matrix_flat[i];
+                };
+              }, Logic.Max(matrix.Rows, matrix.Columns));
+          }
 #else
           Seven.Parallels.AutoParallel.Divide(
             (int current, int max) =>
             {
               return () =>
               {
-                long[] matrix_flat = matrix._matrix;
-                long[] result_flat = result._matrix;
+                long[] matrix_flat = matrix._matrix as long[];
+                long[] result_flat = result._matrix as long[];
                 for (int i = current; i < size; i += max)
                   result_flat[i] = -matrix_flat[i];
               };
-            }, Logic.Max(left.Rows, left.Columns));
+            }, Logic.Max(matrix.Rows, matrix.Columns));
 #endif
-        return result;
+          return result;
+
+        }
+
+        #endregion
       }
-      else
-        return LinearAlgebra.Negate(matrix);
+      return LinearAlgebra.Negate(matrix);
     }
 
     /// <summary>Does standard addition of two matrices.</summary>
@@ -18676,48 +20694,8 @@ namespace Seven.Mathematics
 
       #endregion
 
-#if no_error_checking
-      // nothing
-#else
-      if (object.ReferenceEquals(left, null))
-          throw new Error("null reference: left");
-      if (object.ReferenceEquals(right, null))
-        throw new Error("null reference: right");
-      if (left.Rows != right.Rows || left.Columns != right.Columns)
-        throw new Error("invalid matrix addition (dimension miss-match).");
-#endif
+      #region error checking
 
-      Matrix<long> result =
-        new Matrix<long>(left.Rows, left.Columns);
-      int size = left.Rows * left.Columns;
-
-#if unsafe_code
-      unsafe
-      {
-        fixed (long*
-          left_flat = left._matrix,
-          right_flat = right._matrix,
-          result_flat = result._matrix)
-          for (int i = 0; i < size; i++)
-            result_flat[i] = left_flat[i] + right_flat[i];
-      }
-#else
-      long[] left_flat = left._matrix;
-      long[] right_flat = right._matrix;
-      long[] result_flat = result._matrix;
-      for (int i = 0; i < size; i++)
-        result_flat[i] = left_flat[i] + right_flat[i];
-#endif
-
-      return result;
-    }
-
-    /// <summary>Does standard addition of two matrices.</summary>
-    /// <param name="left">The left matrix of the addition.</param>
-    /// <param name="right">The right matrix of the addition.</param>
-    /// <returns>The resulting matrix after the addition.</returns>
-    public static Matrix<long> Add_parallel(Matrix<long> left, Matrix<long> right)
-    {
 #if no_error_checking
       // nothing
 #else
@@ -18729,47 +20707,128 @@ namespace Seven.Mathematics
         throw new Error("invalid matrix addition (dimension miss-match).");
 #endif
 
-      if (left.Rows * left.Columns > _parallelMinimum)
+      #endregion
+
+      #region flattened arrays
+
+      if (left.CurrentFormat == Matrix<long>.Format.FlattenedArray &&
+        right.CurrentFormat == Matrix<long>.Format.FlattenedArray)
       {
+
         Matrix<long> result =
-        new Matrix<long>(left.Rows, left.Columns);
+          new Matrix<long>(left.Rows, left.Columns);
         int size = left.Rows * left.Columns;
 
 #if unsafe_code
         unsafe
         {
-          Seven.Parallels.AutoParallel.Divide(
-            (int current, int max) =>
-            {
-              return () =>
-              {
-                fixed (long*
-                  left_flat = left._matrix,
-                  right_flat = right._matrix,
-                  result_flat = result._matrix)
-                  for (int i = current; i < size; i += max)
-                    result_flat[i] = left_flat[i] + right_flat[i];
-              };
-            }, Logic.Max(left.Rows, left.Columns));
+          fixed (long*
+            left_flat = left._matrix as long[],
+            right_flat = right._matrix as long[],
+            result_flat = result._matrix as long[])
+            for (int i = 0; i < size; i++)
+              result_flat[i] = left_flat[i] + right_flat[i];
         }
+#else
+      long[] left_flat = left._matrix as long[];
+      long[] right_flat = right._matrix as long[];
+      long[] result_flat = result._matrix as long[];
+      for (int i = 0; i < size; i++)
+        result_flat[i] = left_flat[i] + right_flat[i];
+#endif
+
+        return result;
+
+      }
+
+      #endregion
+
+      #region default
+
+      else
+      {
+        Matrix<long> result =
+          new Matrix<long>(left.Rows, left.Columns);
+        for (int i = 0; i < left.Rows; i++)
+          for (int j = 0; j < left.Columns; j++)
+            result[i, j] = left[i, j] + right[i, j];
+        return result;
+      }
+
+      #endregion
+    }
+
+    /// <summary>Does standard addition of two matrices.</summary>
+    /// <param name="left">The left matrix of the addition.</param>
+    /// <param name="right">The right matrix of the addition.</param>
+    /// <returns>The resulting matrix after the addition.</returns>
+    public static Matrix<long> Add_parallel(Matrix<long> left, Matrix<long> right)
+    {
+      #region error checking
+
+#if no_error_checking
+      // nothing
+#else
+      if (object.ReferenceEquals(left, null))
+        throw new Error("null reference: left");
+      if (object.ReferenceEquals(right, null))
+        throw new Error("null reference: right");
+      if (left.Rows != right.Rows || left.Columns != right.Columns)
+        throw new Error("invalid matrix addition (dimension miss-match).");
+#endif
+
+      #endregion
+
+      // At the moment, addition does not benefit from multithreading.
+      if (false) //matrix.Rows * matrix.Columns > _parallelMinimum)
+      {
+        #region flattened array
+
+        if (left.CurrentFormat == Matrix<long>.Format.FlattenedArray)
+        {
+
+          Matrix<long> result =
+          new Matrix<long>(left.Rows, left.Columns);
+          int size = left.Rows * left.Columns;
+
+#if unsafe_code
+          unsafe
+          {
+            Seven.Parallels.AutoParallel.Divide(
+              (int current, int max) =>
+              {
+                return () =>
+                {
+                  fixed (long*
+                    left_flat = left._matrix as long[],
+                    right_flat = right._matrix as long[],
+                    result_flat = result._matrix as long[])
+                    for (int i = current; i < size; i += max)
+                      result_flat[i] = left_flat[i] + right_flat[i];
+                };
+              }, Logic.Max(left.Rows, left.Columns));
+          }
 #else
           Seven.Parallels.AutoParallel.Divide(
             (int current, int max) =>
             {
               return () =>
               {
-                long[] left_flat = left._matrix;
-                long[] right_flat = right._matrix;
-                long[] result_flat = result._matrix;
+                long[] left_flat = left._matrix as long[];
+                long[] right_flat = right._matrix as long[];
+                long[] result_flat = result._matrix as long[];
                 for (int i = current; i < size; i += max)
                   result_flat[i] = left_flat[i] + right_flat[i];
               };
             }, Logic.Max(left.Rows, left.Columns));
 #endif
-        return result;
+          return result;
+
+        }
+
+        #endregion
       }
-      else
-        return LinearAlgebra.Add(left, right);
+      return LinearAlgebra.Add(left, right);
     }
 
     /// <summary>Subtracts a scalar from all the values in a matrix.</summary>
@@ -18789,6 +20848,8 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error checking
+
 #if no_error_checking
       // nothing
 #else
@@ -18800,29 +20861,54 @@ namespace Seven.Mathematics
         throw new Error("invalid matrix subtraction (dimension miss-match).");
 #endif
 
-      Matrix<long> result =
-        new Matrix<long>(left.Rows, left.Columns);
-      int size = left.Rows * left.Columns;
+      #endregion
+
+      #region flattened arrays
+
+      if (left.CurrentFormat == Matrix<long>.Format.FlattenedArray &&
+        right.CurrentFormat == Matrix<long>.Format.FlattenedArray)
+      {
+
+        Matrix<long> result =
+          new Matrix<long>(left.Rows, left.Columns);
+        int size = left.Rows * left.Columns;
 
 #if unsafe_code
-      unsafe
-      {
-        fixed (long*
-          left_flat = left._matrix,
-          right_flat = right._matrix,
-          result_flat = result._matrix)
-          for (int i = 0; i < size; i++)
-            result_flat[i] = left_flat[i] - right_flat[i];
-      }
+        unsafe
+        {
+          fixed (long*
+            left_flat = left._matrix as long[],
+            right_flat = right._matrix as long[],
+            result_flat = result._matrix as long[])
+            for (int i = 0; i < size; i++)
+              result_flat[i] = left_flat[i] - right_flat[i];
+        }
 #else
-      long[] left_flat = left._matrix;
-      long[] right_flat = right._matrix;
-      long[] result_flat = result._matrix;
+      long[] left_flat = left._matrix as long[];
+      long[] right_flat = right._matrix as long[];
+      long[] result_flat = result._matrix as long[];
       for (int i = 0; i < size; i++)
         result_flat[i] = left_flat[i] - right_flat[i];
 #endif
 
-      return result;
+        return result;
+      }
+
+      #endregion
+
+      #region default
+
+      else
+      {
+        Matrix<long> result =
+          new Matrix<long>(left.Rows, left.Columns);
+        for (int i = 0; i < left.Rows; i++)
+          for (int j = 0; j < left.Columns; j++)
+            result[i, j] = left[i, j] - right[i, j];
+        return result;
+      }
+
+      #endregion
     }
 
     /// <summary>Subtracts a scalar from all the values in a matrix.</summary>
@@ -18831,6 +20917,8 @@ namespace Seven.Mathematics
     /// <returns>The resulting matrix after the subtractions.</returns>
     public static Matrix<long> Subtract_parallel(Matrix<long> left, Matrix<long> right)
     {
+      #region error checking
+
 #if no_error_checking
       // nothing
 #else
@@ -18842,47 +20930,58 @@ namespace Seven.Mathematics
         throw new Error("invalid matrix subtraction (dimension miss-match).");
 #endif
 
-      if (left.Rows * left.Columns > _parallelMinimum)
+      #endregion
+
+      // At the moment, subtraction does not benefit from multithreading.
+      if (false) //matrix.Rows * matrix.Columns > _parallelMinimum)
       {
-        Matrix<long> result =
-        new Matrix<long>(left.Rows, left.Columns);
-        int size = left.Rows * left.Columns;
+        #region flattened arrays
+
+        if (left.CurrentFormat == Matrix<long>.Format.FlattenedArray &&
+          right.CurrentFormat == Matrix<long>.Format.FlattenedArray)
+        {
+
+          Matrix<long> result =
+          new Matrix<long>(left.Rows, left.Columns);
+          int size = left.Rows * left.Columns;
 
 #if unsafe_code
-        unsafe
-        {
-          Seven.Parallels.AutoParallel.Divide(
-            (int current, int max) =>
-            {
-              return () =>
+          unsafe
+          {
+            Seven.Parallels.AutoParallel.Divide(
+              (int current, int max) =>
               {
-                fixed (long*
-                  left_flat = left._matrix,
-                  right_flat = right._matrix,
-                  result_flat = result._matrix)
-                  for (int i = current; i < size; i += max)
-                    result_flat[i] = left_flat[i] - right_flat[i];
-              };
-            }, Logic.Max(left.Rows, left.Columns));
-        }
+                return () =>
+                {
+                  fixed (long*
+                    left_flat = left._matrix as long[],
+                    right_flat = right._matrix as long[],
+                    result_flat = result._matrix as long[])
+                    for (int i = current; i < size; i += max)
+                      result_flat[i] = left_flat[i] - right_flat[i];
+                };
+              }, Logic.Max(left.Rows, left.Columns));
+          }
 #else
           Seven.Parallels.AutoParallel.Divide(
           (int current, int max) =>
           {
             return () =>
             {
-              long[] left_flat = left._matrix;
-              long[] right_flat = right._matrix;
-              long[] result_flat = result._matrix;
+              long[] left_flat = left._matrix as long[];
+              long[] right_flat = right._matrix as long[];
+              long[] result_flat = result._matrix as long[];
                 for (int i = current; i < size; i += max)
                   result_flat[i] = left_flat[i] - right_flat[i];
             };
           }, Logic.Max(left.Rows, left.Columns));
 #endif
-        return result;
+          return result;
+        }
+
+        #endregion
       }
-      else
-        return LinearAlgebra.Subtract(left, right);
+      return LinearAlgebra.Subtract(left, right);
     }
 
     /// <summary>Performs multiplication on two matrices.</summary>
@@ -18903,6 +21002,8 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error checking
+
 #if no_error_checking
       // nothing
 #else
@@ -18914,33 +21015,41 @@ namespace Seven.Mathematics
         throw new LinearAlgebra.Error("invalid multiplication (size miss-match).");
 #endif
 
-      long sum;
-      int result_rows = left.Rows;
-      int left_cols = left.Columns;
-      int result_cols = right.Columns;
-      Matrix<long> result =
-        new Matrix<long>(result_rows, result_cols);
+      #endregion
+
+      #region flattened arrays
+
+      if (left.CurrentFormat == Matrix<long>.Format.FlattenedArray &&
+        right.CurrentFormat == Matrix<long>.Format.FlattenedArray)
+      {
+
+        long sum;
+        int result_rows = left.Rows;
+        int left_cols = left.Columns;
+        int result_cols = right.Columns;
+        Matrix<long> result =
+          new Matrix<long>(result_rows, result_cols);
 
 #if unsafe_code
-      unsafe
-      {
-        fixed (long*
-          result_flat = result._matrix,
-          left_flat = left._matrix,
-          right_flat = right._matrix)
-          for (int i = 0; i < result_rows; i++)
-            for (int j = 0; j < result_cols; j++)
-            {
-              sum = 0;
-              for (int k = 0; k < left_cols; k++)
-                sum += left_flat[i * left_cols + k] * right_flat[k * result_cols + j];
-              result_flat[i * result_cols + j] = sum;
-            }
-      }
+        unsafe
+        {
+          fixed (long*
+            result_flat = result._matrix as long[],
+            left_flat = left._matrix as long[],
+            right_flat = right._matrix as long[])
+            for (int i = 0; i < result_rows; i++)
+              for (int j = 0; j < result_cols; j++)
+              {
+                sum = 0;
+                for (int k = 0; k < left_cols; k++)
+                  sum += left_flat[i * left_cols + k] * right_flat[k * result_cols + j];
+                result_flat[i * result_cols + j] = sum;
+              }
+        }
 #else
-      long[] result_flat = result._matrix;
-      long[] left_flat = left._matrix;
-      long[] right_flat = right._matrix;
+      long[] result_flat = result._matrix as long[];
+      long[] left_flat = left._matrix as long[];
+      long[] right_flat = right._matrix as long[];
 
       for (int i = 0; i < result_rows; i++)
         for (int j = 0; j < result_cols; j++)
@@ -18952,7 +21061,25 @@ namespace Seven.Mathematics
         }
 #endif
 
-      return result;
+        return result;
+      }
+
+      #endregion
+
+      #region default
+
+      else
+      {
+        Matrix<long> result =
+          new Matrix<long>(left.Rows, right.Columns);
+        for (int i = 0; i < left.Rows; i++)
+          for (int j = 0; j < right.Columns; j++)
+            for (int k = 0; k < left.Columns; k++)
+              result[i, j] += left[i, k] * right[k, j];
+        return result;
+      }
+
+      #endregion
     }
 
     /// <summary>Performs multiplication on two matrices using multi-threading.</summary>
@@ -18961,6 +21088,8 @@ namespace Seven.Mathematics
     /// <returns>The resulting matrix of the multiplication.</returns>
     public static Matrix<long> Multiply_parrallel(Matrix<long> left, Matrix<long> right)
     {
+      #region error checking
+
 #if no_error_checking
       // nothing
 #else
@@ -18972,6 +21101,8 @@ namespace Seven.Mathematics
         throw new LinearAlgebra.Error("invalid multiplication (dimension miss-match).");
 #endif
 
+      #endregion
+
       int result_rows = left.Rows;
       int left_cols = left.Columns;
       int result_cols = right.Columns;
@@ -18981,12 +21112,52 @@ namespace Seven.Mathematics
       if (result_rows * result_cols > _parallelMinimum &&
         result_rows >= result_cols)
       {
-        Matrix<long> result =
-          new Matrix<long>(result_rows, result_cols);
-#if unsafe_code
-        unsafe
+        #region flattened arrays
+
+        if (left.CurrentFormat == Matrix<long>.Format.FlattenedArray &&
+          right.CurrentFormat == Matrix<long>.Format.FlattenedArray)
         {
-          Seven.Parallels.AutoParallel.Divide(
+
+          Matrix<long> result =
+            new Matrix<long>(result_rows, result_cols);
+
+#if unsafe_code
+          unsafe
+          {
+            Seven.Parallels.AutoParallel.Divide(
+              (int current, int max) =>
+              {
+                return () =>
+                {
+                  long sum;
+                  int left_i_offest;
+                  int result_i_offset;
+
+                  fixed (long*
+                    result_flat = result._matrix as long[],
+                    left_flat = left._matrix as long[],
+                    right_flat = right._matrix as long[])
+                    for (int i = current; i < result_rows; i += max)
+                    {
+                      left_i_offest = i * left_cols;
+                      result_i_offset = i * result_cols;
+                      for (int j = 0; j < result_cols; j++)
+                      {
+                        sum = 0;
+                        for (int k = 0; k < left_cols; k++)
+                          sum += left_flat[left_i_offest + k] * right_flat[k * result_cols + j];
+                        result_flat[result_i_offset + j] = sum;
+                      }
+                    }
+                };
+              }, result_rows);
+          }
+#else
+        long[] result_flat = result._matrix as long[];
+        long[] left_flat = left._matrix as long[];
+        long[] right_flat = right._matrix as long[];
+
+        Seven.Parallels.AutoParallel.Divide(
             (int current, int max) =>
             {
               return () =>
@@ -18995,68 +21166,78 @@ namespace Seven.Mathematics
                 int left_i_offest;
                 int result_i_offset;
 
-                fixed (long*
-                  result_flat = result._matrix,
-                  left_flat = left._matrix,
-                  right_flat = right._matrix)
-                  for (int i = current; i < result_rows; i += max)
+                for (int i = current; i < result_rows; i += max)
+                {
+                  left_i_offest = i * left_cols;
+                  result_i_offset = i * result_cols;
+                  for (int j = 0; j < result_cols; j++)
                   {
-                    left_i_offest = i * left_cols;
-                    result_i_offset = i * result_cols;
-                    for (int j = 0; j < result_cols; j++)
-                    {
-                      sum = 0;
-                      for (int k = 0; k < left_cols; k++)
-                        sum += left_flat[left_i_offest + k] * right_flat[k * result_cols + j];
-                      result_flat[result_i_offset + j] = sum;
-                    }
+                    sum = 0;
+                    for (int k = 0; k < left_cols; k++)
+                      sum += left_flat[left_i_offest + k] * right_flat[k * result_cols + j];
+                    result_flat[result_i_offset + j] = sum;
                   }
+                }
               };
             }, result_rows);
-        }
-#else
-              long[] result_flat = result._matrix;
-              long[] left_flat = left._matrix;
-              long[] right_flat = right._matrix;
-
-              Seven.Parallels.AutoParallel.Divide(
-                  (int current, int max) =>
-                  {
-                    return () =>
-                    {
-                      long sum;
-                      int left_i_offest;
-                      int result_i_offset;
-
-                      for (int i = current; i < result_rows; i += max)
-                      {
-                        left_i_offest = i * left_cols;
-                        result_i_offset = i * result_cols;
-                        for (int j = 0; j < result_cols; j++)
-                        {
-                          sum = 0;
-                          for (int k = 0; k < left_cols; k++)
-                            sum += left_flat[left_i_offest + k] * right_flat[k * result_cols + j];
-                          result_flat[result_i_offset + j] = sum;
-                        }
-                      }
-                    };
-                  }, result_rows);
 
 #endif
-        return result;
+
+          return result;
+        }
+
+        #endregion
       }
       // If there are enough columns to warrant multi-threading,
       // then multithread the column for-loop.
       else if (result_rows * result_cols > _parallelMinimum &&
         result_rows < result_cols)
       {
-        Matrix<long> result =
-          new Matrix<long>(result_rows, result_cols);
-#if unsafe_code
-        unsafe
+        #region flattened arrays
+
+        if (left.CurrentFormat == Matrix<long>.Format.FlattenedArray &&
+          right.CurrentFormat == Matrix<long>.Format.FlattenedArray)
         {
-          Seven.Parallels.AutoParallel.Divide(
+
+          Matrix<long> result =
+            new Matrix<long>(result_rows, result_cols);
+#if unsafe_code
+          unsafe
+          {
+            Seven.Parallels.AutoParallel.Divide(
+              (int current, int max) =>
+              {
+                return () =>
+                {
+                  long sum;
+                  int left_i_offest;
+                  int result_i_offset;
+
+                  fixed (long*
+                    result_flat = result._matrix as long[],
+                    left_flat = left._matrix as long[],
+                    right_flat = right._matrix as long[])
+                    for (int i = 0; i < result_rows; i++)
+                    {
+                      left_i_offest = i * left_cols;
+                      result_i_offset = i * result_cols;
+                      for (int j = current; j < result_cols; j += max)
+                      {
+                        sum = 0;
+                        for (int k = 0; k < left_cols; k++)
+                          sum += left_flat[left_i_offest + k] * right_flat[k * result_cols + j];
+                        result_flat[result_i_offset + j] = sum;
+                      }
+                    }
+                };
+              }, result_cols);
+          }
+#else
+        long[] result_flat = result._matrix as long[];
+        long[] left_flat = left._matrix as long[];
+        long[] right_flat = right._matrix as long[];
+
+        Seven.Parallels.AutoParallel.Divide(
             (int current, int max) =>
             {
               return () =>
@@ -19065,59 +21246,29 @@ namespace Seven.Mathematics
                 int left_i_offest;
                 int result_i_offset;
 
-                fixed (long*
-                  result_flat = result._matrix,
-                  left_flat = left._matrix,
-                  right_flat = right._matrix)
-                  for (int i = 0; i < result_rows; i++)
+                for (int i = 0; i < result_rows; i++)
+                {
+                  left_i_offest = i * left_cols;
+                  result_i_offset = i * result_cols;
+                  for (int j = current; j < result_cols; j += max)
                   {
-                    left_i_offest = i * left_cols;
-                    result_i_offset = i * result_cols;
-                    for (int j = current; j < result_cols; j += max)
-                    {
-                      sum = 0;
-                      for (int k = 0; k < left_cols; k++)
-                        sum += left_flat[left_i_offest + k] * right_flat[k * result_cols + j];
-                      result_flat[result_i_offset + j] = sum;
-                    }
+                    sum = 0;
+                    for (int k = 0; k < left_cols; k++)
+                      sum += left_flat[left_i_offest + k] * right_flat[k * result_cols + j];
+                    result_flat[result_i_offset + j] = sum;
                   }
+                }
               };
             }, result_cols);
-        }
-#else
-              long[] result_flat = result._matrix;
-              long[] left_flat = left._matrix;
-              long[] right_flat = right._matrix;
-
-              Seven.Parallels.AutoParallel.Divide(
-                  (int current, int max) =>
-                  {
-                    return () =>
-                    {
-                      long sum;
-                      int left_i_offest;
-                      int result_i_offset;
-
-                      for (int i = 0; i < result_rows; i++)
-                      {
-                        left_i_offest = i * left_cols;
-                        result_i_offset = i * result_cols;
-                        for (int j = current; j < result_cols; j += max)
-                        {
-                          sum = 0;
-                          for (int k = 0; k < left_cols; k++)
-                            sum += left_flat[left_i_offest + k] * right_flat[k * result_cols + j];
-                          result_flat[result_i_offset + j] = sum;
-                        }
-                      }
-                    };
-                  }, result_cols);
 #endif
-        return result;
+          return result;
+
+        }
+
+        #endregion
       }
       // Multi-threading is not necessary.
-      else
-        return LinearAlgebra.Multiply(left, right);
+      return LinearAlgebra.Multiply(left, right);
     }
 
     /// <summary>Does a standard (triple for looped) multiplication between matrices.</summary>
@@ -19137,40 +21288,62 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error
+
 #if no_error_checking
-      int left_row = left.Rows;
-      int left_col = left.Columns;
+      // nothing
 #else
-      int left_row = left.Rows;
-      int left_col = left.Columns;
       if (left.Columns != right.Dimensions)
         throw new Error("invalid multiplication (size miss-match).");
 #endif
 
-      Vector<long> result = new Vector<long>(right.Dimensions);
+      #endregion
+
+      #region flattened array
+
+      if (left.CurrentFormat == Matrix<long>.Format.FlattenedArray)
+      {
+        int left_row = left.Rows;
+        int left_col = left.Columns;
+        Vector<long> result = new Vector<long>(right.Dimensions);
 
 #if unsafe_code
-      unsafe
-      {
-        fixed (long*
-          left_flat = left._matrix,
-          right_flat = right._vector,
-          result_flat = result._vector)
-          for (int i = 0; i < left_row; i++)
-            for (int j = 0; j < left_col; j++)
-              result_flat[i] += left_flat[i * left_col + j] * right_flat[j];
-        return result;
-      }
+        unsafe
+        {
+          fixed (long*
+            left_flat = left._matrix as long[],
+            right_flat = right._vector as long[],
+            result_flat = result._vector as long[])
+            for (int i = 0; i < left_row; i++)
+              for (int j = 0; j < left_col; j++)
+                result_flat[i] += left_flat[i * left_col + j] * right_flat[j];
+        }
 #else
-      long[] left_flat = left._matrix;
-      long[] right_flat = right._vector;
-      long[] result_flat = result._vector;
+      long[] left_flat = left._matrix as long[];
+      long[] right_flat = right._vector as long[];
+      long[] result_flat = result._vector as long[];
       for (int i = 0; i < left_row; i++)
         for (int j = 0; j < left_col; j++)
           result_flat[i] += left_flat[i * left_col + j] * right_flat[j];
-      return result;
 #endif
-      return result;
+        return result;
+      }
+
+      #endregion
+
+      #region defualt
+
+      else
+      {
+        Vector<long> result =
+          new Vector<long>(right.Dimensions);
+        for (int i = 0; i < left.Rows; i++)
+          for (int j = 0; j < left.Columns; j++)
+            result[i] += left[i, j] * right[j];
+        return result;
+      }
+
+      #endregion
     }
 
     /// <summary>Multiplies all the values in a matrix by a scalar.</summary>
@@ -19190,6 +21363,8 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error checking
+
 #if no_error_checking
       // nothing
 #else
@@ -19197,27 +21372,51 @@ namespace Seven.Mathematics
         throw new Error("null reference: left");
 #endif
 
-      int rows = left.Rows;
-      int columns = left.Columns;
-      Matrix<long> result = new Matrix<long>(rows, columns);
+      #endregion
+
+      #region flattened array
+
+      if (left.CurrentFormat == Matrix<long>.Format.FlattenedArray)
+      {
+
+        int rows = left.Rows;
+        int columns = left.Columns;
+        Matrix<long> result = new Matrix<long>(rows, columns);
 
 #if unsafe_code
-      unsafe
-      {
-        fixed (long*
-          left_flat = left._matrix,
-          result_flat = result._matrix)
-          for (int i = 0; i < rows; i++)
-            for (int j = 0; j < columns; j++)
-              result_flat[i * columns + j] = left_flat[i * columns + j] * right;
-      }
+        unsafe
+        {
+          fixed (long*
+            left_flat = left._matrix as long[],
+            result_flat = result._matrix as long[])
+            for (int i = 0; i < rows; i++)
+              for (int j = 0; j < columns; j++)
+                result_flat[i * columns + j] = left_flat[i * columns + j] * right;
+        }
 #else
       for (int i = 0; i < rows; i++)
         for (int j = 0; j < columns; j++)
           result[i, j] = left[i, j] * right;
 #endif
 
-      return result;
+        return result;
+      }
+
+      #endregion
+
+      #region default
+
+      else
+      {
+        Matrix<long> result =
+          new Matrix<long>(left.Rows, left.Columns);
+        for (int i = 0; i < left.Rows; i++)
+          for (int j = 0; j < left.Columns; j++)
+            result[i, j] = left[i, j] * right;
+        return result;
+      }
+
+      #endregion
     }
 
     /// <summary>Applies a power to a square matrix.</summary>
@@ -19230,10 +21429,12 @@ namespace Seven.Mathematics
 
       //Matrix<long> result = matrix.Clone();
       //for (int i = 0; i < power; i++)
-      //  result = LinearAlgebra.Multiply(result, result);
+      //  result = LinearAlgebra.Multiply(result, matrix);
       //return result;
 
       #endregion
+
+      #region error checking
 
 #if no_error_checking
       // nothing
@@ -19243,6 +21444,9 @@ namespace Seven.Mathematics
       if (!(power >= 0))
         throw new Error("invalid power !(power > -1)");
 #endif
+
+      #endregion
+
       // this is not optimized...
       if (power == 0)
         return LinearAlgebra.MatrixFactoryIdentity_long(matrix.Rows, matrix.Columns);
@@ -19269,6 +21473,8 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error checking
+
 #if no_error_checking
       // nothing
 #else
@@ -19276,32 +21482,56 @@ namespace Seven.Mathematics
         throw new Error("null reference: matrix");
 #endif
 
-      int matrix_row = matrix.Rows;
-      int matrix_col = matrix.Columns;
-      Matrix<long> result =
-        new Matrix<long>(matrix_row, matrix_col);
+      #endregion
+
+      #region flattened array
+
+      if (matrix.CurrentFormat == Matrix<long>.Format.FlattenedArray)
+      {
+
+        int matrix_row = matrix.Rows;
+        int matrix_col = matrix.Columns;
+        Matrix<long> result =
+          new Matrix<long>(matrix_row, matrix_col);
 
 #if unsafe_code
-      unsafe
-      {
-        fixed (long*
-          matrix_flat = matrix._matrix,
-          result_flat = result._matrix)
-          for (int i = 0; i < matrix_row; i++)
-            for (int j = 0; j < matrix_col; j++)
-              result_flat[i * matrix_col + j] =
-                matrix_flat[i * matrix_col + j] / right;
-      }
+        unsafe
+        {
+          fixed (long*
+            matrix_flat = matrix._matrix as long[],
+            result_flat = result._matrix as long[])
+            for (int i = 0; i < matrix_row; i++)
+              for (int j = 0; j < matrix_col; j++)
+                result_flat[i * matrix_col + j] =
+                  matrix_flat[i * matrix_col + j] / right;
+        }
 #else
-      long[] matrix_flat = matrix._matrix;
-      long[] result_flat = result._matrix;
+      long[] matrix_flat = matrix._matrix as long[];
+      long[] result_flat = result._matrix as long[];
       for (int i = 0; i < matrix_row; i++)
         for (int j = 0; j < matrix_col; j++)
           result_flat[i * matrix_col + j] = 
             matrix_flat[i * matrix_col + j] / right;
 
 #endif
-      return result;
+        return result;
+      }
+
+      #endregion
+
+      #region default
+
+      else
+      {
+        Matrix<long> result =
+          new Matrix<long>(matrix.Rows, matrix.Columns);
+        for (int i = 0; i < matrix.Rows; i++)
+          for (int j = 0; j < matrix.Columns; j++)
+            result[i, j] = matrix[i, j] / right;
+        return result;
+      }
+
+      #endregion
     }
 
     /// <summary>Gets the minor of a matrix.</summary>
@@ -19332,6 +21562,8 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error checking
+
 #if no_error_checking
       // nothing
 #else
@@ -19345,34 +21577,41 @@ namespace Seven.Mathematics
         throw new Error("invalid column on matrix minor: !(0 <= column < matrix.Columns)");
 #endif
 
-      Matrix<long> minor =
-        new Matrix<long>(matrix.Rows - 1, matrix.Columns - 1);
-      int matrix_rows = matrix.Rows;
-      int matrix_cols = matrix.Columns;
+      #endregion
+
+      #region flattened array
+
+      if (matrix.CurrentFormat == Matrix<long>.Format.FlattenedArray)
+      {
+
+        Matrix<long> minor =
+          new Matrix<long>(matrix.Rows - 1, matrix.Columns - 1);
+        int matrix_rows = matrix.Rows;
+        int matrix_cols = matrix.Columns;
 
 #if unsafe_code
-      unsafe
-      {
-        fixed (long*
-          matrix_flat = matrix._matrix,
-          minor_flat = minor._matrix)
+        unsafe
         {
-          int m = 0, n = 0;
-          for (int i = 0; i < matrix_rows; i++)
+          fixed (long*
+            matrix_flat = matrix._matrix as long[],
+            minor_flat = minor._matrix as long[])
           {
-            if (i == row) continue;
-            n = 0;
-            for (int j = 0; j < matrix_cols; j++)
+            int m = 0, n = 0;
+            for (int i = 0; i < matrix_rows; i++)
             {
-              if (j == column) continue;
-              minor_flat[m * matrix_cols + n] =
-                matrix_flat[i * matrix_cols + j];
-              n++;
+              if (i == row) continue;
+              n = 0;
+              for (int j = 0; j < matrix_cols; j++)
+              {
+                if (j == column) continue;
+                minor_flat[m * matrix_cols + n] =
+                  matrix_flat[i * matrix_cols + j];
+                n++;
+              }
+              m++;
             }
-            m++;
           }
         }
-      }
 #else
       int m = 0, n = 0;
       for (int i = 0; i < matrix.Rows; i++)
@@ -19388,7 +21627,34 @@ namespace Seven.Mathematics
         m++;
       }
 #endif
-      return minor;
+        return minor;
+      }
+
+      #endregion
+
+      #region default
+
+      else
+      {
+        Matrix<long> minor =
+          new Matrix<long>(matrix.Rows - 1, matrix.Columns - 1);
+        int m = 0, n = 0;
+        for (int i = 0; i < matrix.Rows; i++)
+        {
+          if (i == row) continue;
+          n = 0;
+          for (int j = 0; j < matrix.Columns; j++)
+          {
+            if (j == column) continue;
+            minor[m, n] = matrix[i, j];
+            n++;
+          }
+          m++;
+        }
+        return minor;
+      }
+
+      #endregion
     }
 
     /// <summary>Combines two matrices from left to right 
@@ -19412,6 +21678,8 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error checking
+
 #if no_errorChecking
       // nothing
 #else
@@ -19423,31 +21691,39 @@ namespace Seven.Mathematics
         throw new Error("invalid row-wise concatenation !(left.Rows == right.Rows).");
 #endif
 
-      Matrix<long> result =
-        new Matrix<long>(left.Rows, left.Columns + right.Columns);
-      int result_rows = result.Rows;
-      int result_cols = result.Columns;
+      #endregion
 
-      int left_cols = left.Columns;
-      int right_cols = right.Columns;
+      #region flattened arrays
+
+      if (left.CurrentFormat == Matrix<long>.Format.FlattenedArray &&
+        right.CurrentFormat == Matrix<long>.Format.FlattenedArray)
+      {
+
+        Matrix<long> result =
+          new Matrix<long>(left.Rows, left.Columns + right.Columns);
+        int result_rows = result.Rows;
+        int result_cols = result.Columns;
+
+        int left_cols = left.Columns;
+        int right_cols = right.Columns;
 
 #if unsafe_code
-      unsafe
-      {
-        // OptimizeMe (jump statement)
-        fixed (long*
-          left_flat = left._matrix,
-          right_flat = right._matrix,
-          result_flat = result._matrix)
-          for (int i = 0; i < result_rows; i++)
-            for (int j = 0; j < result_cols; j++)
-              if (j < left_cols)
-                result_flat[i * result_cols + j] =
-                  left_flat[i * left_cols + j];
-              else
-                result_flat[i * result_cols + j] =
-                  right_flat[i * right_cols + j - left_cols];
-      }
+        unsafe
+        {
+          // OptimizeMe (jump statement)
+          fixed (long*
+            left_flat = left._matrix as long[],
+            right_flat = right._matrix as long[],
+            result_flat = result._matrix as long[])
+            for (int i = 0; i < result_rows; i++)
+              for (int j = 0; j < result_cols; j++)
+                if (j < left_cols)
+                  result_flat[i * result_cols + j] =
+                    left_flat[i * left_cols + j];
+                else
+                  result_flat[i * result_cols + j] =
+                    right_flat[i * right_cols + j - left_cols];
+        }
 #else
       for (int i = 0; i < result_rows; i++)
         for (int j = 0; j < result_cols; j++)
@@ -19459,7 +21735,27 @@ namespace Seven.Mathematics
         }
 #endif
 
-      return result;
+        return result;
+      }
+
+      #endregion
+
+      #region default
+
+      else
+      {
+        Matrix<long> result =
+          new Matrix<long>(left.Rows, left.Columns + right.Columns);
+        for (int i = 0; i < result.Rows; i++)
+          for (int j = 0; j < result.Columns; j++)
+            if (j < left.Columns)
+              result[i, j] = left[i, j];
+            else
+              result[i, j] = right[i, j - left.Columns];
+        return result;
+      }
+
+      #endregion
     }
 
     /// <summary>Calculates the echelon of a matrix (aka REF).</summary>
@@ -19488,12 +21784,16 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error checking
+
 #if no_error_checking
       // nothing
 #else
       if (object.ReferenceEquals(matrix, null))
         throw new Error("null reference: matrix");
 #endif
+
+      #endregion
 
       Matrix<long> result = matrix.Clone();
       for (int i = 0; i < matrix.Rows; i++)
@@ -19542,12 +21842,16 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error checking
+
 #if no_error_checking
       // nothing
 #else
       if (object.ReferenceEquals(matrix, null))
         throw new Error("null reference: matrix");
 #endif
+
+      #endregion
 
       Matrix<long> result = matrix.Clone();
       for (int i = 0; i < matrix.Rows; i++)
@@ -19599,6 +21903,8 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error checking
+
 #if no_error_checking
       // nothing
 #else
@@ -19607,6 +21913,8 @@ namespace Seven.Mathematics
       if (matrix.Rows != matrix.Columns)
         throw new Error("invalid matrix determinent: !(matrix.IsSquare)");
 #endif
+
+      #endregion
 
       long det = 1;
       Matrix<long> rref = matrix.Clone();
@@ -19665,6 +21973,8 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error checking
+
 #if no_error_checking
       // nothing
 #else
@@ -19673,6 +21983,8 @@ namespace Seven.Mathematics
       if (LinearAlgebra.Determinent(matrix) == 0)
         throw new Error("inverse calculation failed.");
 #endif
+
+      #endregion
 
       Matrix<long> identity = LinearAlgebra.MatrixFactoryIdentity_long(matrix.Rows, matrix.Columns);
       Matrix<long> rref = matrix.Clone();
@@ -19719,6 +22031,8 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error checking
+
 #if no_error_checking
       // nothing
 #else
@@ -19727,6 +22041,8 @@ namespace Seven.Mathematics
       if (!(matrix.Rows == matrix.Columns))
         throw new Error("Adjoint of a non-square matrix does not exists");
 #endif
+
+      #endregion
 
       Matrix<long> AdjointMatrix = new Matrix<long>(matrix.Rows, matrix.Columns);
       for (int i = 0; i < matrix.Rows; i++)
@@ -19754,12 +22070,16 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error checking
+
 #if no_error_checking
       // nothing
 #else
       if (object.ReferenceEquals(matrix, null))
         throw new Error("null reference: matrix");
 #endif
+
+      #endregion
 
       Matrix<long> transpose =
         new Matrix<long>(matrix.Columns, matrix.Rows);
@@ -19821,6 +22141,8 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error checking
+
 #if no_error_checking
 #else
       if (object.ReferenceEquals(matrix, null))
@@ -19828,6 +22150,8 @@ namespace Seven.Mathematics
       if (matrix.Rows != matrix.Columns)
         throw new Error("non-square matrix during DecomposeLU function");
 #endif
+
+      #endregion
 
       Lower = LinearAlgebra.MatrixFactoryIdentity_long(matrix.Rows, matrix.Columns);
       Upper = matrix.Clone();
@@ -20259,7 +22583,7 @@ namespace Seven.Mathematics
     /// <returns>The result of the interpolation.</returns>
     public static Quaternion<long> Slerp(Quaternion<long> left, Quaternion<long> right, long blend)
     {
-      throw new Error("requiers rational numeric types");
+      throw new Error("requires rational rational types");
 
 //#if no_error_checking
 //      // nothing
@@ -21029,7 +23353,7 @@ namespace Seven.Mathematics
     /// <returns>The angle between the two vectors in radians.</returns>
     public static int Angle(Vector<int> first, Vector<int> second)
     {
-      throw new Error("requiers rational numeric types");
+      throw new Error("requires rational rational types");
 
 //      #region pre-optimization
 
@@ -21064,7 +23388,7 @@ namespace Seven.Mathematics
     /// <returns>The result of the rotation.</returns>
     public static Vector<int> RotateBy(Vector<int> vector, int angle, int x, int y, int z)
     {
-      throw new Error("requiers rational numeric types");
+      throw new Error("requires rational rational types");
 
 //      #region pre-optimization
 
@@ -21197,7 +23521,7 @@ namespace Seven.Mathematics
     /// <returns>The result of the slerp operation.</returns>
     public static Vector<int> Slerp(Vector<int> left, Vector<int> right, int blend)
     {
-      throw new Error("requiers rational numeric types");
+      throw new Error("requires rational rational types");
 
 //      #region pre-optimization
 
@@ -21370,32 +23694,60 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error checking
+
 #if no_errorchecking
       //nothing
 #else
       if (object.ReferenceEquals(matrix, null))
         throw new Error("null reference: matrix");
+#endif
+
+      #endregion
+
       if (matrix.Rows != matrix.Columns)
         return false;
-#endif
-      int size = matrix.Columns;
-#if unsafe_code
-      unsafe
+
+      #region flattened arrays
+
+      if (matrix.CurrentFormat == Matrix<int>.Format.FlattenedArray)
       {
-        fixed (int* matrix_flat = matrix._matrix)
-          for (var row = 0; row < size; row++)
-            for (var column = row + 1; column < size; column++)
-              if (matrix_flat[row * size + column] != matrix_flat[column * size + row])
-                return false;
-      }
+
+        int size = matrix.Columns;
+
+#if unsafe_code
+        unsafe
+        {
+          fixed (int* matrix_flat = matrix._matrix as int[])
+            for (var row = 0; row < size; row++)
+              for (var column = row + 1; column < size; column++)
+                if (matrix_flat[row * size + column] != matrix_flat[column * size + row])
+                  return false;
+        }
 #else
-      int[] matrix_flat = matrix._matrix;
+      int[] matrix_flat = matrix._matrix as int[];
       for (var row = 0; row < size; row++)
         for (var column = row + 1; column < size; column++)
           if (matrix_flat[row * size + column] != matrix_flat[column * size + row])
             return false;
 #endif
-      return true;
+        return true;
+      }
+
+      #endregion
+
+      #region default
+
+      else
+      {
+        for (int i = 0; i < matrix.Rows; i++)
+          for (int j = 0; j < matrix.Columns; j++)
+            if (matrix[i, j] != matrix[j, i])
+              return false;
+        return true;
+      }
+
+      #endregion
     }
 
     /// <summary>Constructs a new identity-matrix of the given dimensions.</summary>
@@ -21414,6 +23766,8 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error checking
+
 #if no_error_checking
       //nothing
 #else
@@ -21423,13 +23777,11 @@ namespace Seven.Mathematics
         throw new Error("invalid column count on matrix creation");
 #endif
 
+      #endregion
+
       Matrix<int> matrix = new Matrix<int>(rows, columns);
-      if (rows <= columns)
-        for (int i = 0; i < rows; i++)
-          matrix[i, i] = 1;
-      else
-        for (int i = 0; i < columns; i++)
-          matrix[i, i] = 1;
+      for (int i = 0, i_max = Logic.Min(rows, columns); i < i_max; i++)
+        matrix[i, i] = 1;
       return matrix;
     }
 
@@ -21449,41 +23801,8 @@ namespace Seven.Mathematics
 
       #endregion
 
-#if no_error_checking
-      // nothing
-#else
-        if (object.ReferenceEquals(matrix, null))
-          throw new Error("null reference: matirx");
-#endif
+      #region error checking
 
-      Matrix<int> result =
-        new Matrix<int>(matrix.Rows, matrix.Columns);
-      int size = matrix.Rows * matrix.Columns;
-
-#if unsafe_code
-      unsafe
-      {
-        fixed (int*
-          result_flat = result._matrix,
-          matrix_flat = matrix._matrix)
-          for (int i = 0; i < size; i++)
-            result_flat[i] = -matrix_flat[i];
-        return result;
-      }
-#else
-      int[] result_flat = result._matrix;
-      int[] matrix_flat = matrix._matrix;
-      for (int i = 0; i < size; i++)
-        result_flat[i] = -matrix_flat[i];
-      return result;
-#endif
-    }
-
-    /// <summary>Negates all the values in a matrix.</summary>
-    /// <param name="matrix">The matrix to have its values negated.</param>
-    /// <returns>The resulting matrix after the negations.</returns>
-    public static Matrix<int> Negate_parallel(Matrix<int> matrix)
-    {
 #if no_error_checking
       // nothing
 #else
@@ -21491,45 +23810,118 @@ namespace Seven.Mathematics
         throw new Error("null reference: matirx");
 #endif
 
-      if (matrix.Rows * matrix.Columns > _parallelMinimum)
+      #endregion
+
+      #region flattened arrays
+
+      if (matrix.CurrentFormat == Matrix<int>.Format.FlattenedArray)
       {
+
         Matrix<int> result =
-        new Matrix<int>(matrix.Rows, matrix.Columns);
+          new Matrix<int>(matrix.Rows, matrix.Columns);
         int size = matrix.Rows * matrix.Columns;
 
 #if unsafe_code
         unsafe
         {
-          Seven.Parallels.AutoParallel.Divide(
-            (int current, int max) =>
-            {
-              return () =>
-              {
-                fixed (int*
-                  result_flat = result._matrix,
-                  matrix_flat = matrix._matrix)
-                  for (int i = current; i < size; i += max)
-                    result_flat[i] = -matrix_flat[i];
-              };
-            }, Logic.Max(matrix.Rows, matrix.Columns));
+          fixed (int*
+            result_flat = result._matrix as int[],
+            matrix_flat = matrix._matrix as int[])
+            for (int i = 0; i < size; i++)
+              result_flat[i] = -matrix_flat[i];
+          return result;
         }
+#else
+      int[] result_flat = result._matrix as int[];
+      int[] matrix_flat = matrix._matrix as int[];
+      for (int i = 0; i < size; i++)
+        result_flat[i] = -matrix_flat[i];
+      return result;
+#endif
+
+      }
+
+      #endregion
+
+      #region default
+
+      else
+      {
+        Matrix<int> result =
+          new Matrix<int>(matrix.Rows, matrix.Columns);
+        for (int i = 0; i < matrix.Rows; i++)
+          for (int j = 0; j < matrix.Rows; j++)
+            result[i, j] = -matrix[i, j];
+        return result;
+      }
+
+      #endregion
+    }
+
+    /// <summary>Negates all the values in a matrix.</summary>
+    /// <param name="matrix">The matrix to have its values negated.</param>
+    /// <returns>The resulting matrix after the negations.</returns>
+    public static Matrix<int> Negate_parallel(Matrix<int> matrix)
+    {
+      #region error checking
+
+#if no_error_checking
+      // nothing
+#else
+      if (object.ReferenceEquals(matrix, null))
+        throw new Error("null reference: matirx");
+#endif
+
+      #endregion
+
+      // At the moment, negation does not benefit from multithreading.
+      if (false) //matrix.Rows * matrix.Columns > _parallelMinimum)
+      {
+        #region flattened array
+
+        if (matrix.CurrentFormat == Matrix<int>.Format.FlattenedArray)
+        {
+
+          Matrix<int> result =
+          new Matrix<int>(matrix.Rows, matrix.Columns);
+          int size = matrix.Rows * matrix.Columns;
+
+#if unsafe_code
+          unsafe
+          {
+            Seven.Parallels.AutoParallel.Divide(
+              (int current, int max) =>
+              {
+                return () =>
+                {
+                  fixed (int*
+                    result_flat = result._matrix as int[],
+                    matrix_flat = matrix._matrix as int[])
+                    for (int i = current; i < size; i += max)
+                      result_flat[i] = -matrix_flat[i];
+                };
+              }, Logic.Max(matrix.Rows, matrix.Columns));
+          }
 #else
           Seven.Parallels.AutoParallel.Divide(
             (int current, int max) =>
             {
               return () =>
               {
-                int[] matrix_flat = matrix._matrix;
-                int[] result_flat = result._matrix;
+                int[] matrix_flat = matrix._matrix as int[];
+                int[] result_flat = result._matrix as int[];
                 for (int i = current; i < size; i += max)
                   result_flat[i] = -matrix_flat[i];
               };
-            }, Logic.Max(left.Rows, left.Columns));
+            }, Logic.Max(matrix.Rows, matrix.Columns));
 #endif
-        return result;
+          return result;
+
+        }
+
+        #endregion
       }
-      else
-        return LinearAlgebra.Negate(matrix);
+      return LinearAlgebra.Negate(matrix);
     }
 
     /// <summary>Does standard addition of two matrices.</summary>
@@ -21549,48 +23941,8 @@ namespace Seven.Mathematics
 
       #endregion
 
-#if no_error_checking
-      // nothing
-#else
-      if (object.ReferenceEquals(left, null))
-          throw new Error("null reference: left");
-      if (object.ReferenceEquals(right, null))
-        throw new Error("null reference: right");
-      if (left.Rows != right.Rows || left.Columns != right.Columns)
-        throw new Error("invalid matrix addition (dimension miss-match).");
-#endif
+      #region error checking
 
-      Matrix<int> result =
-        new Matrix<int>(left.Rows, left.Columns);
-      int size = left.Rows * left.Columns;
-
-#if unsafe_code
-      unsafe
-      {
-        fixed (int*
-          left_flat = left._matrix,
-          right_flat = right._matrix,
-          result_flat = result._matrix)
-          for (int i = 0; i < size; i++)
-            result_flat[i] = left_flat[i] + right_flat[i];
-      }
-#else
-      int[] left_flat = left._matrix;
-      int[] right_flat = right._matrix;
-      int[] result_flat = result._matrix;
-      for (int i = 0; i < size; i++)
-        result_flat[i] = left_flat[i] + right_flat[i];
-#endif
-
-      return result;
-    }
-
-    /// <summary>Does standard addition of two matrices.</summary>
-    /// <param name="left">The left matrix of the addition.</param>
-    /// <param name="right">The right matrix of the addition.</param>
-    /// <returns>The resulting matrix after the addition.</returns>
-    public static Matrix<int> Add_parallel(Matrix<int> left, Matrix<int> right)
-    {
 #if no_error_checking
       // nothing
 #else
@@ -21602,47 +23954,128 @@ namespace Seven.Mathematics
         throw new Error("invalid matrix addition (dimension miss-match).");
 #endif
 
-      if (left.Rows * left.Columns > _parallelMinimum)
+      #endregion
+
+      #region flattened arrays
+
+      if (left.CurrentFormat == Matrix<int>.Format.FlattenedArray &&
+        right.CurrentFormat == Matrix<int>.Format.FlattenedArray)
       {
+
         Matrix<int> result =
-        new Matrix<int>(left.Rows, left.Columns);
+          new Matrix<int>(left.Rows, left.Columns);
         int size = left.Rows * left.Columns;
 
 #if unsafe_code
         unsafe
         {
-          Seven.Parallels.AutoParallel.Divide(
-            (int current, int max) =>
-            {
-              return () =>
-              {
-                fixed (int*
-                  left_flat = left._matrix,
-                  right_flat = right._matrix,
-                  result_flat = result._matrix)
-                  for (int i = current; i < size; i += max)
-                    result_flat[i] = left_flat[i] + right_flat[i];
-              };
-            }, Logic.Max(left.Rows, left.Columns));
+          fixed (int*
+            left_flat = left._matrix as int[],
+            right_flat = right._matrix as int[],
+            result_flat = result._matrix as int[])
+            for (int i = 0; i < size; i++)
+              result_flat[i] = left_flat[i] + right_flat[i];
         }
+#else
+      int[] left_flat = left._matrix as int[];
+      int[] right_flat = right._matrix as int[];
+      int[] result_flat = result._matrix as int[];
+      for (int i = 0; i < size; i++)
+        result_flat[i] = left_flat[i] + right_flat[i];
+#endif
+
+        return result;
+
+      }
+
+      #endregion
+
+      #region default
+
+      else
+      {
+        Matrix<int> result =
+          new Matrix<int>(left.Rows, left.Columns);
+        for (int i = 0; i < left.Rows; i++)
+          for (int j = 0; j < left.Columns; j++)
+            result[i, j] = left[i, j] + right[i, j];
+        return result;
+      }
+
+      #endregion
+    }
+
+    /// <summary>Does standard addition of two matrices.</summary>
+    /// <param name="left">The left matrix of the addition.</param>
+    /// <param name="right">The right matrix of the addition.</param>
+    /// <returns>The resulting matrix after the addition.</returns>
+    public static Matrix<int> Add_parallel(Matrix<int> left, Matrix<int> right)
+    {
+      #region error checking
+
+#if no_error_checking
+      // nothing
+#else
+      if (object.ReferenceEquals(left, null))
+        throw new Error("null reference: left");
+      if (object.ReferenceEquals(right, null))
+        throw new Error("null reference: right");
+      if (left.Rows != right.Rows || left.Columns != right.Columns)
+        throw new Error("invalid matrix addition (dimension miss-match).");
+#endif
+
+      #endregion
+
+      // At the moment, addition does not benefit from multithreading.
+      if (false) //matrix.Rows * matrix.Columns > _parallelMinimum)
+      {
+        #region flattened array
+
+        if (left.CurrentFormat == Matrix<int>.Format.FlattenedArray)
+        {
+
+          Matrix<int> result =
+          new Matrix<int>(left.Rows, left.Columns);
+          int size = left.Rows * left.Columns;
+
+#if unsafe_code
+          unsafe
+          {
+            Seven.Parallels.AutoParallel.Divide(
+              (int current, int max) =>
+              {
+                return () =>
+                {
+                  fixed (int*
+                    left_flat = left._matrix as int[],
+                    right_flat = right._matrix as int[],
+                    result_flat = result._matrix as int[])
+                    for (int i = current; i < size; i += max)
+                      result_flat[i] = left_flat[i] + right_flat[i];
+                };
+              }, Logic.Max(left.Rows, left.Columns));
+          }
 #else
           Seven.Parallels.AutoParallel.Divide(
             (int current, int max) =>
             {
               return () =>
               {
-                int[] left_flat = left._matrix;
-                int[] right_flat = right._matrix;
-                int[] result_flat = result._matrix;
+                int[] left_flat = left._matrix as int[];
+                int[] right_flat = right._matrix as int[];
+                int[] result_flat = result._matrix as int[];
                 for (int i = current; i < size; i += max)
                   result_flat[i] = left_flat[i] + right_flat[i];
               };
             }, Logic.Max(left.Rows, left.Columns));
 #endif
-        return result;
+          return result;
+
+        }
+
+        #endregion
       }
-      else
-        return LinearAlgebra.Add(left, right);
+      return LinearAlgebra.Add(left, right);
     }
 
     /// <summary>Subtracts a scalar from all the values in a matrix.</summary>
@@ -21662,6 +24095,8 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error checking
+
 #if no_error_checking
       // nothing
 #else
@@ -21673,29 +24108,54 @@ namespace Seven.Mathematics
         throw new Error("invalid matrix subtraction (dimension miss-match).");
 #endif
 
-      Matrix<int> result =
-        new Matrix<int>(left.Rows, left.Columns);
-      int size = left.Rows * left.Columns;
+      #endregion
+
+      #region flattened arrays
+
+      if (left.CurrentFormat == Matrix<int>.Format.FlattenedArray &&
+        right.CurrentFormat == Matrix<int>.Format.FlattenedArray)
+      {
+
+        Matrix<int> result =
+          new Matrix<int>(left.Rows, left.Columns);
+        int size = left.Rows * left.Columns;
 
 #if unsafe_code
-      unsafe
-      {
-        fixed (int*
-          left_flat = left._matrix,
-          right_flat = right._matrix,
-          result_flat = result._matrix)
-          for (int i = 0; i < size; i++)
-            result_flat[i] = left_flat[i] - right_flat[i];
-      }
+        unsafe
+        {
+          fixed (int*
+            left_flat = left._matrix as int[],
+            right_flat = right._matrix as int[],
+            result_flat = result._matrix as int[])
+            for (int i = 0; i < size; i++)
+              result_flat[i] = left_flat[i] - right_flat[i];
+        }
 #else
-      int[] left_flat = left._matrix;
-      int[] right_flat = right._matrix;
-      int[] result_flat = result._matrix;
+      int[] left_flat = left._matrix as int[];
+      int[] right_flat = right._matrix as int[];
+      int[] result_flat = result._matrix as int[];
       for (int i = 0; i < size; i++)
         result_flat[i] = left_flat[i] - right_flat[i];
 #endif
 
-      return result;
+        return result;
+      }
+
+      #endregion
+
+      #region default
+
+      else
+      {
+        Matrix<int> result =
+          new Matrix<int>(left.Rows, left.Columns);
+        for (int i = 0; i < left.Rows; i++)
+          for (int j = 0; j < left.Columns; j++)
+            result[i, j] = left[i, j] - right[i, j];
+        return result;
+      }
+
+      #endregion
     }
 
     /// <summary>Subtracts a scalar from all the values in a matrix.</summary>
@@ -21704,6 +24164,8 @@ namespace Seven.Mathematics
     /// <returns>The resulting matrix after the subtractions.</returns>
     public static Matrix<int> Subtract_parallel(Matrix<int> left, Matrix<int> right)
     {
+      #region error checking
+
 #if no_error_checking
       // nothing
 #else
@@ -21715,47 +24177,58 @@ namespace Seven.Mathematics
         throw new Error("invalid matrix subtraction (dimension miss-match).");
 #endif
 
-      if (left.Rows * left.Columns > _parallelMinimum)
+      #endregion
+
+      // At the moment, subtraction does not benefit from multithreading.
+      if (false) //matrix.Rows * matrix.Columns > _parallelMinimum)
       {
-        Matrix<int> result =
-        new Matrix<int>(left.Rows, left.Columns);
-        int size = left.Rows * left.Columns;
+        #region flattened arrays
+
+        if (left.CurrentFormat == Matrix<int>.Format.FlattenedArray &&
+          right.CurrentFormat == Matrix<int>.Format.FlattenedArray)
+        {
+
+          Matrix<int> result =
+          new Matrix<int>(left.Rows, left.Columns);
+          int size = left.Rows * left.Columns;
 
 #if unsafe_code
-        unsafe
-        {
-          Seven.Parallels.AutoParallel.Divide(
-            (int current, int max) =>
-            {
-              return () =>
+          unsafe
+          {
+            Seven.Parallels.AutoParallel.Divide(
+              (int current, int max) =>
               {
-                fixed (int*
-                  left_flat = left._matrix,
-                  right_flat = right._matrix,
-                  result_flat = result._matrix)
-                  for (int i = current; i < size; i += max)
-                    result_flat[i] = left_flat[i] - right_flat[i];
-              };
-            }, Logic.Max(left.Rows, left.Columns));
-        }
+                return () =>
+                {
+                  fixed (int*
+                    left_flat = left._matrix as int[],
+                    right_flat = right._matrix as int[],
+                    result_flat = result._matrix as int[])
+                    for (int i = current; i < size; i += max)
+                      result_flat[i] = left_flat[i] - right_flat[i];
+                };
+              }, Logic.Max(left.Rows, left.Columns));
+          }
 #else
           Seven.Parallels.AutoParallel.Divide(
           (int current, int max) =>
           {
             return () =>
             {
-              int[] left_flat = left._matrix;
-              int[] right_flat = right._matrix;
-              int[] result_flat = result._matrix;
+              int[] left_flat = left._matrix as int[];
+              int[] right_flat = right._matrix as int[];
+              int[] result_flat = result._matrix as int[];
                 for (int i = current; i < size; i += max)
                   result_flat[i] = left_flat[i] - right_flat[i];
             };
           }, Logic.Max(left.Rows, left.Columns));
 #endif
-        return result;
+          return result;
+        }
+
+        #endregion
       }
-      else
-        return LinearAlgebra.Subtract(left, right);
+      return LinearAlgebra.Subtract(left, right);
     }
 
     /// <summary>Performs multiplication on two matrices.</summary>
@@ -21776,6 +24249,8 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error checking
+
 #if no_error_checking
       // nothing
 #else
@@ -21787,33 +24262,41 @@ namespace Seven.Mathematics
         throw new LinearAlgebra.Error("invalid multiplication (size miss-match).");
 #endif
 
-      int sum;
-      int result_rows = left.Rows;
-      int left_cols = left.Columns;
-      int result_cols = right.Columns;
-      Matrix<int> result =
-        new Matrix<int>(result_rows, result_cols);
+      #endregion
+
+      #region flattened arrays
+
+      if (left.CurrentFormat == Matrix<int>.Format.FlattenedArray &&
+        right.CurrentFormat == Matrix<int>.Format.FlattenedArray)
+      {
+
+        int sum;
+        int result_rows = left.Rows;
+        int left_cols = left.Columns;
+        int result_cols = right.Columns;
+        Matrix<int> result =
+          new Matrix<int>(result_rows, result_cols);
 
 #if unsafe_code
-      unsafe
-      {
-        fixed (int*
-          result_flat = result._matrix,
-          left_flat = left._matrix,
-          right_flat = right._matrix)
-          for (int i = 0; i < result_rows; i++)
-            for (int j = 0; j < result_cols; j++)
-            {
-              sum = 0;
-              for (int k = 0; k < left_cols; k++)
-                sum += left_flat[i * left_cols + k] * right_flat[k * result_cols + j];
-              result_flat[i * result_cols + j] = sum;
-            }
-      }
+        unsafe
+        {
+          fixed (int*
+            result_flat = result._matrix as int[],
+            left_flat = left._matrix as int[],
+            right_flat = right._matrix as int[])
+            for (int i = 0; i < result_rows; i++)
+              for (int j = 0; j < result_cols; j++)
+              {
+                sum = 0;
+                for (int k = 0; k < left_cols; k++)
+                  sum += left_flat[i * left_cols + k] * right_flat[k * result_cols + j];
+                result_flat[i * result_cols + j] = sum;
+              }
+        }
 #else
-      int[] result_flat = result._matrix;
-      int[] left_flat = left._matrix;
-      int[] right_flat = right._matrix;
+      int[] result_flat = result._matrix as int[];
+      int[] left_flat = left._matrix as int[];
+      int[] right_flat = right._matrix as int[];
 
       for (int i = 0; i < result_rows; i++)
         for (int j = 0; j < result_cols; j++)
@@ -21825,7 +24308,25 @@ namespace Seven.Mathematics
         }
 #endif
 
-      return result;
+        return result;
+      }
+
+      #endregion
+
+      #region default
+
+      else
+      {
+        Matrix<int> result =
+          new Matrix<int>(left.Rows, right.Columns);
+        for (int i = 0; i < left.Rows; i++)
+          for (int j = 0; j < right.Columns; j++)
+            for (int k = 0; k < left.Columns; k++)
+              result[i, j] += left[i, k] * right[k, j];
+        return result;
+      }
+
+      #endregion
     }
 
     /// <summary>Performs multiplication on two matrices using multi-threading.</summary>
@@ -21834,6 +24335,8 @@ namespace Seven.Mathematics
     /// <returns>The resulting matrix of the multiplication.</returns>
     public static Matrix<int> Multiply_parrallel(Matrix<int> left, Matrix<int> right)
     {
+      #region error checking
+
 #if no_error_checking
       // nothing
 #else
@@ -21845,6 +24348,8 @@ namespace Seven.Mathematics
         throw new LinearAlgebra.Error("invalid multiplication (dimension miss-match).");
 #endif
 
+      #endregion
+
       int result_rows = left.Rows;
       int left_cols = left.Columns;
       int result_cols = right.Columns;
@@ -21854,12 +24359,52 @@ namespace Seven.Mathematics
       if (result_rows * result_cols > _parallelMinimum &&
         result_rows >= result_cols)
       {
-        Matrix<int> result =
-          new Matrix<int>(result_rows, result_cols);
-#if unsafe_code
-        unsafe
+        #region flattened arrays
+
+        if (left.CurrentFormat == Matrix<int>.Format.FlattenedArray &&
+          right.CurrentFormat == Matrix<int>.Format.FlattenedArray)
         {
-          Seven.Parallels.AutoParallel.Divide(
+
+          Matrix<int> result =
+            new Matrix<int>(result_rows, result_cols);
+
+#if unsafe_code
+          unsafe
+          {
+            Seven.Parallels.AutoParallel.Divide(
+              (int current, int max) =>
+              {
+                return () =>
+                {
+                  int sum;
+                  int left_i_offest;
+                  int result_i_offset;
+
+                  fixed (int*
+                    result_flat = result._matrix as int[],
+                    left_flat = left._matrix as int[],
+                    right_flat = right._matrix as int[])
+                    for (int i = current; i < result_rows; i += max)
+                    {
+                      left_i_offest = i * left_cols;
+                      result_i_offset = i * result_cols;
+                      for (int j = 0; j < result_cols; j++)
+                      {
+                        sum = 0;
+                        for (int k = 0; k < left_cols; k++)
+                          sum += left_flat[left_i_offest + k] * right_flat[k * result_cols + j];
+                        result_flat[result_i_offset + j] = sum;
+                      }
+                    }
+                };
+              }, result_rows);
+          }
+#else
+        int[] result_flat = result._matrix as int[];
+        int[] left_flat = left._matrix as int[];
+        int[] right_flat = right._matrix as int[];
+
+        Seven.Parallels.AutoParallel.Divide(
             (int current, int max) =>
             {
               return () =>
@@ -21868,68 +24413,78 @@ namespace Seven.Mathematics
                 int left_i_offest;
                 int result_i_offset;
 
-                fixed (int*
-                  result_flat = result._matrix,
-                  left_flat = left._matrix,
-                  right_flat = right._matrix)
-                  for (int i = current; i < result_rows; i += max)
+                for (int i = current; i < result_rows; i += max)
+                {
+                  left_i_offest = i * left_cols;
+                  result_i_offset = i * result_cols;
+                  for (int j = 0; j < result_cols; j++)
                   {
-                    left_i_offest = i * left_cols;
-                    result_i_offset = i * result_cols;
-                    for (int j = 0; j < result_cols; j++)
-                    {
-                      sum = 0;
-                      for (int k = 0; k < left_cols; k++)
-                        sum += left_flat[left_i_offest + k] * right_flat[k * result_cols + j];
-                      result_flat[result_i_offset + j] = sum;
-                    }
+                    sum = 0;
+                    for (int k = 0; k < left_cols; k++)
+                      sum += left_flat[left_i_offest + k] * right_flat[k * result_cols + j];
+                    result_flat[result_i_offset + j] = sum;
                   }
+                }
               };
             }, result_rows);
-        }
-#else
-              int[] result_flat = result._matrix;
-              int[] left_flat = left._matrix;
-              int[] right_flat = right._matrix;
-
-              Seven.Parallels.AutoParallel.Divide(
-                  (int current, int max) =>
-                  {
-                    return () =>
-                    {
-                      int sum;
-                      int left_i_offest;
-                      int result_i_offset;
-
-                      for (int i = current; i < result_rows; i += max)
-                      {
-                        left_i_offest = i * left_cols;
-                        result_i_offset = i * result_cols;
-                        for (int j = 0; j < result_cols; j++)
-                        {
-                          sum = 0;
-                          for (int k = 0; k < left_cols; k++)
-                            sum += left_flat[left_i_offest + k] * right_flat[k * result_cols + j];
-                          result_flat[result_i_offset + j] = sum;
-                        }
-                      }
-                    };
-                  }, result_rows);
 
 #endif
-        return result;
+
+          return result;
+        }
+
+        #endregion
       }
       // If there are enough columns to warrant multi-threading,
       // then multithread the column for-loop.
       else if (result_rows * result_cols > _parallelMinimum &&
         result_rows < result_cols)
       {
-        Matrix<int> result =
-          new Matrix<int>(result_rows, result_cols);
-#if unsafe_code
-        unsafe
+        #region flattened arrays
+
+        if (left.CurrentFormat == Matrix<int>.Format.FlattenedArray &&
+          right.CurrentFormat == Matrix<int>.Format.FlattenedArray)
         {
-          Seven.Parallels.AutoParallel.Divide(
+
+          Matrix<int> result =
+            new Matrix<int>(result_rows, result_cols);
+#if unsafe_code
+          unsafe
+          {
+            Seven.Parallels.AutoParallel.Divide(
+              (int current, int max) =>
+              {
+                return () =>
+                {
+                  int sum;
+                  int left_i_offest;
+                  int result_i_offset;
+
+                  fixed (int*
+                    result_flat = result._matrix as int[],
+                    left_flat = left._matrix as int[],
+                    right_flat = right._matrix as int[])
+                    for (int i = 0; i < result_rows; i++)
+                    {
+                      left_i_offest = i * left_cols;
+                      result_i_offset = i * result_cols;
+                      for (int j = current; j < result_cols; j += max)
+                      {
+                        sum = 0;
+                        for (int k = 0; k < left_cols; k++)
+                          sum += left_flat[left_i_offest + k] * right_flat[k * result_cols + j];
+                        result_flat[result_i_offset + j] = sum;
+                      }
+                    }
+                };
+              }, result_cols);
+          }
+#else
+        int[] result_flat = result._matrix as int[];
+        int[] left_flat = left._matrix as int[];
+        int[] right_flat = right._matrix as int[];
+
+        Seven.Parallels.AutoParallel.Divide(
             (int current, int max) =>
             {
               return () =>
@@ -21938,59 +24493,29 @@ namespace Seven.Mathematics
                 int left_i_offest;
                 int result_i_offset;
 
-                fixed (int*
-                  result_flat = result._matrix,
-                  left_flat = left._matrix,
-                  right_flat = right._matrix)
-                  for (int i = 0; i < result_rows; i++)
+                for (int i = 0; i < result_rows; i++)
+                {
+                  left_i_offest = i * left_cols;
+                  result_i_offset = i * result_cols;
+                  for (int j = current; j < result_cols; j += max)
                   {
-                    left_i_offest = i * left_cols;
-                    result_i_offset = i * result_cols;
-                    for (int j = current; j < result_cols; j += max)
-                    {
-                      sum = 0;
-                      for (int k = 0; k < left_cols; k++)
-                        sum += left_flat[left_i_offest + k] * right_flat[k * result_cols + j];
-                      result_flat[result_i_offset + j] = sum;
-                    }
+                    sum = 0;
+                    for (int k = 0; k < left_cols; k++)
+                      sum += left_flat[left_i_offest + k] * right_flat[k * result_cols + j];
+                    result_flat[result_i_offset + j] = sum;
                   }
+                }
               };
             }, result_cols);
-        }
-#else
-              int[] result_flat = result._matrix;
-              int[] left_flat = left._matrix;
-              int[] right_flat = right._matrix;
-
-              Seven.Parallels.AutoParallel.Divide(
-                  (int current, int max) =>
-                  {
-                    return () =>
-                    {
-                      int sum;
-                      int left_i_offest;
-                      int result_i_offset;
-
-                      for (int i = 0; i < result_rows; i++)
-                      {
-                        left_i_offest = i * left_cols;
-                        result_i_offset = i * result_cols;
-                        for (int j = current; j < result_cols; j += max)
-                        {
-                          sum = 0;
-                          for (int k = 0; k < left_cols; k++)
-                            sum += left_flat[left_i_offest + k] * right_flat[k * result_cols + j];
-                          result_flat[result_i_offset + j] = sum;
-                        }
-                      }
-                    };
-                  }, result_cols);
 #endif
-        return result;
+          return result;
+
+        }
+
+        #endregion
       }
       // Multi-threading is not necessary.
-      else
-        return LinearAlgebra.Multiply(left, right);
+      return LinearAlgebra.Multiply(left, right);
     }
 
     /// <summary>Does a standard (triple for looped) multiplication between matrices.</summary>
@@ -22010,40 +24535,62 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error
+
 #if no_error_checking
-      int left_row = left.Rows;
-      int left_col = left.Columns;
+      // nothing
 #else
-      int left_row = left.Rows;
-      int left_col = left.Columns;
       if (left.Columns != right.Dimensions)
         throw new Error("invalid multiplication (size miss-match).");
 #endif
 
-      Vector<int> result = new Vector<int>(right.Dimensions);
+      #endregion
+
+      #region flattened array
+
+      if (left.CurrentFormat == Matrix<int>.Format.FlattenedArray)
+      {
+        int left_row = left.Rows;
+        int left_col = left.Columns;
+        Vector<int> result = new Vector<int>(right.Dimensions);
 
 #if unsafe_code
-      unsafe
-      {
-        fixed (int*
-          left_flat = left._matrix,
-          right_flat = right._vector,
-          result_flat = result._vector)
-          for (int i = 0; i < left_row; i++)
-            for (int j = 0; j < left_col; j++)
-              result_flat[i] += left_flat[i * left_col + j] * right_flat[j];
-        return result;
-      }
+        unsafe
+        {
+          fixed (int*
+            left_flat = left._matrix as int[],
+            right_flat = right._vector as int[],
+            result_flat = result._vector as int[])
+            for (int i = 0; i < left_row; i++)
+              for (int j = 0; j < left_col; j++)
+                result_flat[i] += left_flat[i * left_col + j] * right_flat[j];
+        }
 #else
-      int[] left_flat = left._matrix;
-      int[] right_flat = right._vector;
-      int[] result_flat = result._vector;
+      int[] left_flat = left._matrix as int[];
+      int[] right_flat = right._vector as int[];
+      int[] result_flat = result._vector as int[];
       for (int i = 0; i < left_row; i++)
         for (int j = 0; j < left_col; j++)
           result_flat[i] += left_flat[i * left_col + j] * right_flat[j];
-      return result;
 #endif
-      return result;
+        return result;
+      }
+
+      #endregion
+
+      #region defualt
+
+      else
+      {
+        Vector<int> result =
+          new Vector<int>(right.Dimensions);
+        for (int i = 0; i < left.Rows; i++)
+          for (int j = 0; j < left.Columns; j++)
+            result[i] += left[i, j] * right[j];
+        return result;
+      }
+
+      #endregion
     }
 
     /// <summary>Multiplies all the values in a matrix by a scalar.</summary>
@@ -22063,6 +24610,8 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error checking
+
 #if no_error_checking
       // nothing
 #else
@@ -22070,27 +24619,51 @@ namespace Seven.Mathematics
         throw new Error("null reference: left");
 #endif
 
-      int rows = left.Rows;
-      int columns = left.Columns;
-      Matrix<int> result = new Matrix<int>(rows, columns);
+      #endregion
+
+      #region flattened array
+
+      if (left.CurrentFormat == Matrix<int>.Format.FlattenedArray)
+      {
+
+        int rows = left.Rows;
+        int columns = left.Columns;
+        Matrix<int> result = new Matrix<int>(rows, columns);
 
 #if unsafe_code
-      unsafe
-      {
-        fixed (int*
-          left_flat = left._matrix,
-          result_flat = result._matrix)
-          for (int i = 0; i < rows; i++)
-            for (int j = 0; j < columns; j++)
-              result_flat[i * columns + j] = left_flat[i * columns + j] * right;
-      }
+        unsafe
+        {
+          fixed (int*
+            left_flat = left._matrix as int[],
+            result_flat = result._matrix as int[])
+            for (int i = 0; i < rows; i++)
+              for (int j = 0; j < columns; j++)
+                result_flat[i * columns + j] = left_flat[i * columns + j] * right;
+        }
 #else
       for (int i = 0; i < rows; i++)
         for (int j = 0; j < columns; j++)
           result[i, j] = left[i, j] * right;
 #endif
 
-      return result;
+        return result;
+      }
+
+      #endregion
+
+      #region default
+
+      else
+      {
+        Matrix<int> result =
+          new Matrix<int>(left.Rows, left.Columns);
+        for (int i = 0; i < left.Rows; i++)
+          for (int j = 0; j < left.Columns; j++)
+            result[i, j] = left[i, j] * right;
+        return result;
+      }
+
+      #endregion
     }
 
     /// <summary>Applies a power to a square matrix.</summary>
@@ -22103,10 +24676,12 @@ namespace Seven.Mathematics
 
       //Matrix<int> result = matrix.Clone();
       //for (int i = 0; i < power; i++)
-      //  result = LinearAlgebra.Multiply(result, result);
+      //  result = LinearAlgebra.Multiply(result, matrix);
       //return result;
 
       #endregion
+
+      #region error checking
 
 #if no_error_checking
       // nothing
@@ -22116,6 +24691,9 @@ namespace Seven.Mathematics
       if (!(power >= 0))
         throw new Error("invalid power !(power > -1)");
 #endif
+
+      #endregion
+
       // this is not optimized...
       if (power == 0)
         return LinearAlgebra.MatrixFactoryIdentity_int(matrix.Rows, matrix.Columns);
@@ -22142,6 +24720,8 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error checking
+
 #if no_error_checking
       // nothing
 #else
@@ -22149,32 +24729,56 @@ namespace Seven.Mathematics
         throw new Error("null reference: matrix");
 #endif
 
-      int matrix_row = matrix.Rows;
-      int matrix_col = matrix.Columns;
-      Matrix<int> result =
-        new Matrix<int>(matrix_row, matrix_col);
+      #endregion
+
+      #region flattened array
+
+      if (matrix.CurrentFormat == Matrix<int>.Format.FlattenedArray)
+      {
+
+        int matrix_row = matrix.Rows;
+        int matrix_col = matrix.Columns;
+        Matrix<int> result =
+          new Matrix<int>(matrix_row, matrix_col);
 
 #if unsafe_code
-      unsafe
-      {
-        fixed (int*
-          matrix_flat = matrix._matrix,
-          result_flat = result._matrix)
-          for (int i = 0; i < matrix_row; i++)
-            for (int j = 0; j < matrix_col; j++)
-              result_flat[i * matrix_col + j] =
-                matrix_flat[i * matrix_col + j] / right;
-      }
+        unsafe
+        {
+          fixed (int*
+            matrix_flat = matrix._matrix as int[],
+            result_flat = result._matrix as int[])
+            for (int i = 0; i < matrix_row; i++)
+              for (int j = 0; j < matrix_col; j++)
+                result_flat[i * matrix_col + j] =
+                  matrix_flat[i * matrix_col + j] / right;
+        }
 #else
-      int[] matrix_flat = matrix._matrix;
-      int[] result_flat = result._matrix;
+      int[] matrix_flat = matrix._matrix as int[];
+      int[] result_flat = result._matrix as int[];
       for (int i = 0; i < matrix_row; i++)
         for (int j = 0; j < matrix_col; j++)
           result_flat[i * matrix_col + j] = 
             matrix_flat[i * matrix_col + j] / right;
 
 #endif
-      return result;
+        return result;
+      }
+
+      #endregion
+
+      #region default
+
+      else
+      {
+        Matrix<int> result =
+          new Matrix<int>(matrix.Rows, matrix.Columns);
+        for (int i = 0; i < matrix.Rows; i++)
+          for (int j = 0; j < matrix.Columns; j++)
+            result[i, j] = matrix[i, j] / right;
+        return result;
+      }
+
+      #endregion
     }
 
     /// <summary>Gets the minor of a matrix.</summary>
@@ -22205,6 +24809,8 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error checking
+
 #if no_error_checking
       // nothing
 #else
@@ -22218,34 +24824,41 @@ namespace Seven.Mathematics
         throw new Error("invalid column on matrix minor: !(0 <= column < matrix.Columns)");
 #endif
 
-      Matrix<int> minor =
-        new Matrix<int>(matrix.Rows - 1, matrix.Columns - 1);
-      int matrix_rows = matrix.Rows;
-      int matrix_cols = matrix.Columns;
+      #endregion
+
+      #region flattened array
+
+      if (matrix.CurrentFormat == Matrix<int>.Format.FlattenedArray)
+      {
+
+        Matrix<int> minor =
+          new Matrix<int>(matrix.Rows - 1, matrix.Columns - 1);
+        int matrix_rows = matrix.Rows;
+        int matrix_cols = matrix.Columns;
 
 #if unsafe_code
-      unsafe
-      {
-        fixed (int*
-          matrix_flat = matrix._matrix,
-          minor_flat = minor._matrix)
+        unsafe
         {
-          int m = 0, n = 0;
-          for (int i = 0; i < matrix_rows; i++)
+          fixed (int*
+            matrix_flat = matrix._matrix as int[],
+            minor_flat = minor._matrix as int[])
           {
-            if (i == row) continue;
-            n = 0;
-            for (int j = 0; j < matrix_cols; j++)
+            int m = 0, n = 0;
+            for (int i = 0; i < matrix_rows; i++)
             {
-              if (j == column) continue;
-              minor_flat[m * matrix_cols + n] =
-                matrix_flat[i * matrix_cols + j];
-              n++;
+              if (i == row) continue;
+              n = 0;
+              for (int j = 0; j < matrix_cols; j++)
+              {
+                if (j == column) continue;
+                minor_flat[m * matrix_cols + n] =
+                  matrix_flat[i * matrix_cols + j];
+                n++;
+              }
+              m++;
             }
-            m++;
           }
         }
-      }
 #else
       int m = 0, n = 0;
       for (int i = 0; i < matrix.Rows; i++)
@@ -22261,7 +24874,34 @@ namespace Seven.Mathematics
         m++;
       }
 #endif
-      return minor;
+        return minor;
+      }
+
+      #endregion
+
+      #region default
+
+      else
+      {
+        Matrix<int> minor =
+          new Matrix<int>(matrix.Rows - 1, matrix.Columns - 1);
+        int m = 0, n = 0;
+        for (int i = 0; i < matrix.Rows; i++)
+        {
+          if (i == row) continue;
+          n = 0;
+          for (int j = 0; j < matrix.Columns; j++)
+          {
+            if (j == column) continue;
+            minor[m, n] = matrix[i, j];
+            n++;
+          }
+          m++;
+        }
+        return minor;
+      }
+
+      #endregion
     }
 
     /// <summary>Combines two matrices from left to right 
@@ -22285,6 +24925,8 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error checking
+
 #if no_errorChecking
       // nothing
 #else
@@ -22296,31 +24938,39 @@ namespace Seven.Mathematics
         throw new Error("invalid row-wise concatenation !(left.Rows == right.Rows).");
 #endif
 
-      Matrix<int> result =
-        new Matrix<int>(left.Rows, left.Columns + right.Columns);
-      int result_rows = result.Rows;
-      int result_cols = result.Columns;
+      #endregion
 
-      int left_cols = left.Columns;
-      int right_cols = right.Columns;
+      #region flattened arrays
+
+      if (left.CurrentFormat == Matrix<int>.Format.FlattenedArray &&
+        right.CurrentFormat == Matrix<int>.Format.FlattenedArray)
+      {
+
+        Matrix<int> result =
+          new Matrix<int>(left.Rows, left.Columns + right.Columns);
+        int result_rows = result.Rows;
+        int result_cols = result.Columns;
+
+        int left_cols = left.Columns;
+        int right_cols = right.Columns;
 
 #if unsafe_code
-      unsafe
-      {
-        // OptimizeMe (jump statement)
-        fixed (int*
-          left_flat = left._matrix,
-          right_flat = right._matrix,
-          result_flat = result._matrix)
-          for (int i = 0; i < result_rows; i++)
-            for (int j = 0; j < result_cols; j++)
-              if (j < left_cols)
-                result_flat[i * result_cols + j] =
-                  left_flat[i * left_cols + j];
-              else
-                result_flat[i * result_cols + j] =
-                  right_flat[i * right_cols + j - left_cols];
-      }
+        unsafe
+        {
+          // OptimizeMe (jump statement)
+          fixed (int*
+            left_flat = left._matrix as int[],
+            right_flat = right._matrix as int[],
+            result_flat = result._matrix as int[])
+            for (int i = 0; i < result_rows; i++)
+              for (int j = 0; j < result_cols; j++)
+                if (j < left_cols)
+                  result_flat[i * result_cols + j] =
+                    left_flat[i * left_cols + j];
+                else
+                  result_flat[i * result_cols + j] =
+                    right_flat[i * right_cols + j - left_cols];
+        }
 #else
       for (int i = 0; i < result_rows; i++)
         for (int j = 0; j < result_cols; j++)
@@ -22332,7 +24982,27 @@ namespace Seven.Mathematics
         }
 #endif
 
-      return result;
+        return result;
+      }
+
+      #endregion
+
+      #region default
+
+      else
+      {
+        Matrix<int> result =
+          new Matrix<int>(left.Rows, left.Columns + right.Columns);
+        for (int i = 0; i < result.Rows; i++)
+          for (int j = 0; j < result.Columns; j++)
+            if (j < left.Columns)
+              result[i, j] = left[i, j];
+            else
+              result[i, j] = right[i, j - left.Columns];
+        return result;
+      }
+
+      #endregion
     }
 
     /// <summary>Calculates the echelon of a matrix (aka REF).</summary>
@@ -22361,12 +25031,16 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error checking
+
 #if no_error_checking
       // nothing
 #else
       if (object.ReferenceEquals(matrix, null))
         throw new Error("null reference: matrix");
 #endif
+
+      #endregion
 
       Matrix<int> result = matrix.Clone();
       for (int i = 0; i < matrix.Rows; i++)
@@ -22415,12 +25089,16 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error checking
+
 #if no_error_checking
       // nothing
 #else
       if (object.ReferenceEquals(matrix, null))
         throw new Error("null reference: matrix");
 #endif
+
+      #endregion
 
       Matrix<int> result = matrix.Clone();
       for (int i = 0; i < matrix.Rows; i++)
@@ -22472,6 +25150,8 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error checking
+
 #if no_error_checking
       // nothing
 #else
@@ -22480,6 +25160,8 @@ namespace Seven.Mathematics
       if (matrix.Rows != matrix.Columns)
         throw new Error("invalid matrix determinent: !(matrix.IsSquare)");
 #endif
+
+      #endregion
 
       int det = 1;
       Matrix<int> rref = matrix.Clone();
@@ -22538,6 +25220,8 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error checking
+
 #if no_error_checking
       // nothing
 #else
@@ -22546,6 +25230,8 @@ namespace Seven.Mathematics
       if (LinearAlgebra.Determinent(matrix) == 0)
         throw new Error("inverse calculation failed.");
 #endif
+
+      #endregion
 
       Matrix<int> identity = LinearAlgebra.MatrixFactoryIdentity_int(matrix.Rows, matrix.Columns);
       Matrix<int> rref = matrix.Clone();
@@ -22592,6 +25278,8 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error checking
+
 #if no_error_checking
       // nothing
 #else
@@ -22600,6 +25288,8 @@ namespace Seven.Mathematics
       if (!(matrix.Rows == matrix.Columns))
         throw new Error("Adjoint of a non-square matrix does not exists");
 #endif
+
+      #endregion
 
       Matrix<int> AdjointMatrix = new Matrix<int>(matrix.Rows, matrix.Columns);
       for (int i = 0; i < matrix.Rows; i++)
@@ -22627,12 +25317,16 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error checking
+
 #if no_error_checking
       // nothing
 #else
       if (object.ReferenceEquals(matrix, null))
         throw new Error("null reference: matrix");
 #endif
+
+      #endregion
 
       Matrix<int> transpose =
         new Matrix<int>(matrix.Columns, matrix.Rows);
@@ -22694,6 +25388,8 @@ namespace Seven.Mathematics
 
       #endregion
 
+      #region error checking
+
 #if no_error_checking
 #else
       if (object.ReferenceEquals(matrix, null))
@@ -22701,6 +25397,8 @@ namespace Seven.Mathematics
       if (matrix.Rows != matrix.Columns)
         throw new Error("non-square matrix during DecomposeLU function");
 #endif
+
+      #endregion
 
       Lower = LinearAlgebra.MatrixFactoryIdentity_int(matrix.Rows, matrix.Columns);
       Upper = matrix.Clone();
@@ -23132,7 +25830,7 @@ namespace Seven.Mathematics
     /// <returns>The result of the interpolation.</returns>
     public static Quaternion<int> Slerp(Quaternion<int> left, Quaternion<int> right, int blend)
     {
-      throw new Error("requiers rational numeric types");
+      throw new Error("requires rational rational types");
 
 //#if no_error_checking
 //      // nothing
@@ -24376,9 +27074,34 @@ namespace Seven.Mathematics
   public class Matrix<T>
   {
     /// <summary>The flattened array of this matrix.</summary>
-    public readonly T[] _matrix;
+    public readonly object _matrix;
     private int _rows;
     private int _columns;
+
+    #region format
+
+    /// <summary>The possible formats of a matrix.</summary>
+    public enum Format
+    {
+      /// <summary>
+      /// A [rows * columns] sized 1D array. 
+      /// Stores every value in the matrix.
+      /// </summary>
+      FlattenedArray,
+      /// <summary>
+      /// A Map (aka dictionary) between flattened indeces (row * columns + column) 
+      /// and the numeric types. Stores only necessary values.
+      /// </summary>
+      Map,
+      /// <summary>
+      /// A Quadtree that stores items based on X-Y coordinates.
+      /// Stores only necessary values. Can handle extremely large
+      /// matrices.
+      /// </summary>
+      Quadtree
+    };
+
+    #endregion
 
     #region runtime function mapping
 
@@ -24460,6 +27183,22 @@ namespace Seven.Mathematics
     /// <summary>Determines if the matrix is a 4 square matrix.</summary>
     public bool Is4x4 { get { return this._rows == 4 && this._columns == 4; } }
 
+    /// <summary>The current memory format of this matrix.</summary>
+    public Format CurrentFormat
+    {
+      get
+      {
+        if (this._matrix as T[] != null)
+          return Matrix<T>.Format.FlattenedArray;
+        else if (this._matrix as Map<T, int> != null)
+          return Matrix<T>.Format.FlattenedArray;
+        else if (this._matrix as Quadtree<T, int> != null)
+          return Matrix<T>.Format.Quadtree;
+        else
+          throw new Error("matrix has been corrupted");
+      }
+    }
+
     /// <summary>Standard row-major matrix indexing.</summary>
     /// <param name="row">The row index.</param>
     /// <param name="column">The column index.</param>
@@ -24468,13 +27207,69 @@ namespace Seven.Mathematics
     {
       get
       {
-        try { return this._matrix[row * this._columns + column]; }
-        catch { throw new Error("index out of bounds."); }
+        #region error checking
+
+#if no_error_checking
+        // nothing
+#else
+        if (row < 0 || row > this._rows)
+          throw new Error("index out of bounds: row");
+        if (column < 0 || column > this._columns)
+          throw new Error("index out of bounds: column");
+#endif
+
+        #endregion
+
+        if (this.CurrentFormat == Format.FlattenedArray)
+          return (this._matrix as T[])[row * this._columns + column];
+        else if (this.CurrentFormat == Format.Map)
+        {
+          return (this._matrix as Map<T, int>)[row * this._columns + column];
+        }
+        else if (this.CurrentFormat == Format.Quadtree)
+        {
+          T temp = default(T);
+          bool found = false;
+          (this._matrix as Quadtree<Link<int, int, T>, int>).Foreach(
+            (Link<int, int, T> item) => { found = true; temp = item.Three; },
+            new int[] { row, column }, new int[] { row, column });
+          if (found)
+            return temp;
+          else
+            // NOTE: ADD DEFAULT VALUES
+            return temp;
+        }
+        else
+          throw new Error("SevenFramework error - invalid matrix format on index");
       }
       set
       {
-        try { this._matrix[row * this._columns + column] = value; }
-        catch { throw new Error("index out of bounds."); }
+        #region error checking
+
+#if no_error_checking
+        // nothing
+#else
+        if (row < 0 || row > this._rows)
+          throw new Error("index out of bounds: row");
+        if (column < 0 || column > this._columns)
+          throw new Error("index out of bounds: column");
+#endif
+
+        #endregion
+
+        if (this.CurrentFormat == Format.FlattenedArray)
+          (this._matrix as T[])[row * this._columns + column] = value;
+        else if (this.CurrentFormat == Format.Map)
+        {
+          (this._matrix as Map<T, int>)[row * this._columns + column] = value;
+        }
+        else if (this.CurrentFormat == Format.Quadtree)
+        {
+          (this._matrix as Quadtree<Link<int, int, T>, int>).Remove(new int[] { row, column }, new int[] { row, column });
+          (this._matrix as Quadtree<Link<int, int, T>, int>).Add(new Link<int,int,T>(row, column, value));
+        }
+        else
+          throw new Error("SevenFramework error - invalid matrix format on index");
       }
     }
 
@@ -24482,7 +27277,54 @@ namespace Seven.Mathematics
 
     #region constructors
 
-    /// <summary>Constructs a new zero-matrix of the given dimensions.</summary>
+//    /// <summary>Constructs a new zero-matrix of the given dimensions.</summary>
+//    /// <param name="rows">The number of row dimensions.</param>
+//    /// <param name="columns">The number of column dimensions.</param>
+//    /// <param name="defaultValue">The default value for non-initialized entries in the matrix.</param>
+//    /// <param name="format">The format in which to store the data in memory.</param>
+//    public Matrix(int rows, int columns, Format format, T defaultValue)
+//    {
+//      #region error checking
+
+//#if no_error_checking
+//      // nothing
+//#else
+//      if (rows < 1)
+//        throw new Error("Invalid rows on matrix contruction");
+//      if (columns < 1)
+//        throw new Error("Invalid columns on matrix contruction");
+//#endif
+
+//      #endregion
+
+//      if (format == Matrix<T>.Format.FlattenedArray)
+//      {
+//        this._matrix = new T[rows * columns];
+//        this._rows = rows;
+//        this._columns = columns;
+//      }
+//      else if (format == Matrix<T>.Format.Map)
+//      {
+//        this._matrix = new Map_Linked<T, int>(Logic.Equate, Hash.Compute);
+//        this._rows = rows;
+//        this._columns = columns;
+//      }
+//      else if (format == Matrix<T>.Format.Quadtree)
+//      {
+//        this._matrix =
+//          new Quadtree_Linked<Link<int, int, T>, int>(
+//            0, 0, rows, columns,
+//            (Link<int, int, T> entry, out int x, out int y) =>
+//            { x = entry.One; y = entry.Two; },
+//            Logic.Compare, Statistics.Mean);
+//        this._rows = rows;
+//        this._columns = columns;
+//      }
+//      else
+//        throw new Error("SevenFramework error - unsupported matrix format");
+//    }
+
+    /// <summary>Constructs a new zero-matrix of the given dimensions (using FlattenedArray format).</summary>
     /// <param name="rows">The number of row dimensions.</param>
     /// <param name="columns">The number of column dimensions.</param>
     public Matrix(int rows, int columns)
@@ -24497,22 +27339,23 @@ namespace Seven.Mathematics
       this._columns = columns;
     }
 
-    /// <summary>Constructs a matrix from a T[,].</summary>
+    /// <summary>Constructs a matrix from a T[,] (using FlattenedArray format).</summary>
     /// <param name="matrix">The float[,] to wrap in a matrix class.</param>
     public Matrix(T[,] matrix)
     {
       this._rows = matrix.GetLength(0);
       this._columns = matrix.GetLength(1);
       this._matrix = new T[this._rows * this._columns];
-      for (int i = 0; i < this._matrix.Length; i++)
-        this._matrix[i] = matrix[i / this._rows, i % this._columns];
+      T[] this_matrix_flat = this._matrix as T[]; ;
+      for (int i = 0; i < this_matrix_flat.Length; i++)
+       this_matrix_flat[i] = matrix[i / this._rows, i % this._columns];
     }
 
     private Matrix(Matrix<T> matrix)
     {
       this._rows = matrix._rows;
       this._columns = matrix.Columns;
-      this._matrix = matrix._matrix.Clone() as T[];
+      this._matrix = (matrix._matrix as T[]).Clone() as T[];
     }
 
     internal Matrix(Vector<T> vector)
