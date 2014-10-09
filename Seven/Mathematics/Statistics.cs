@@ -680,7 +680,7 @@ namespace Seven.Mathematics
       Map<int, Vector<Fraction128>> map =
         new Map_Linked<int, Vector<Fraction128>>(
           Vector<Fraction128>.EqualsValue,
-          Hash.Compute);
+          Hash.Default);
 
       traversal(
         (Vector<Fraction128> vector) =>
@@ -720,7 +720,7 @@ namespace Seven.Mathematics
       Map<int, Vector<Fraction128>> map =
         new Map_Linked<int, Vector<Fraction128>>(
           Vector<Fraction128>.EqualsValue,
-          Hash.Compute);
+          Hash.Default);
 
       foreach (Vector<Fraction128> vector in values)
         if (map.Contains(vector))
@@ -876,7 +876,7 @@ namespace Seven.Mathematics
       Map<int, Vector<Fraction64>> map =
         new Map_Linked<int, Vector<Fraction64>>(
           Vector<Fraction64>.EqualsValue,
-          Hash.Compute);
+          Hash.Default);
 
       traversal(
         (Vector<Fraction64> vector) =>
@@ -916,7 +916,7 @@ namespace Seven.Mathematics
       Map<int, Vector<Fraction64>> map =
         new Map_Linked<int, Vector<Fraction64>>(
           Vector<Fraction64>.EqualsValue,
-          Hash.Compute);
+          Hash.Default);
 
       foreach (Vector<Fraction64> vector in values)
         if (map.Contains(vector))
@@ -1072,7 +1072,7 @@ namespace Seven.Mathematics
       Map<int, Vector<decimal>> map =
         new Map_Linked<int, Vector<decimal>>(
           Vector<decimal>.EqualsValue,
-          Hash.Compute);
+          Hash.Default);
 
       traversal(
         (Vector<decimal> vector) =>
@@ -1112,7 +1112,7 @@ namespace Seven.Mathematics
       Map<int, Vector<decimal>> map =
         new Map_Linked<int, Vector<decimal>>(
           Vector<decimal>.EqualsValue,
-          Hash.Compute);
+          Hash.Default);
 
       foreach (Vector<decimal> vector in values)
         if (map.Contains(vector))
@@ -1268,7 +1268,7 @@ namespace Seven.Mathematics
       Map<int, Vector<double>> map =
         new Map_Linked<int, Vector<double>>(
           Vector<double>.EqualsValue,
-          Hash.Compute);
+          Hash.Default);
 
       traversal(
         (Vector<double> vector) =>
@@ -1308,7 +1308,7 @@ namespace Seven.Mathematics
       Map<int, Vector<double>> map =
         new Map_Linked<int, Vector<double>>(
           Vector<double>.EqualsValue,
-          Hash.Compute);
+          Hash.Default);
 
       foreach (Vector<double> vector in values)
         if (map.Contains(vector))
@@ -1464,7 +1464,7 @@ namespace Seven.Mathematics
       Map<int, Vector<float>> map =
         new Map_Linked<int, Vector<float>>(
           Vector<float>.EqualsValue,
-          Hash.Compute);
+          Hash.Default);
 
       traversal(
         (Vector<float> vector) =>
@@ -1504,7 +1504,7 @@ namespace Seven.Mathematics
       Map<int, Vector<float>> map =
         new Map_Linked<int, Vector<float>>(
           Vector<float>.EqualsValue,
-          Hash.Compute);
+          Hash.Default);
 
       foreach (Vector<float> vector in values)
         if (map.Contains(vector))
@@ -1660,7 +1660,7 @@ namespace Seven.Mathematics
       Map<int, Vector<long>> map =
         new Map_Linked<int, Vector<long>>(
           Vector<long>.EqualsValue,
-          Hash.Compute);
+          Hash.Default);
 
       traversal(
         (Vector<long> vector) =>
@@ -1700,7 +1700,7 @@ namespace Seven.Mathematics
       Map<int, Vector<long>> map =
         new Map_Linked<int, Vector<long>>(
           Vector<long>.EqualsValue,
-          Hash.Compute);
+          Hash.Default);
 
       foreach (Vector<long> vector in values)
         if (map.Contains(vector))
@@ -1856,7 +1856,7 @@ namespace Seven.Mathematics
       Map<int, Vector<int>> map =
         new Map_Linked<int, Vector<int>>(
           Vector<int>.EqualsValue,
-          Hash.Compute);
+          Hash.Default);
 
       traversal(
         (Vector<int> vector) =>
@@ -1896,7 +1896,7 @@ namespace Seven.Mathematics
       Map<int, Vector<int>> map =
         new Map_Linked<int, Vector<int>>(
           Vector<int>.EqualsValue,
-          Hash.Compute);
+          Hash.Default);
 
       foreach (Vector<int> vector in values)
         if (map.Contains(vector))
@@ -2271,39 +2271,147 @@ namespace Seven.Mathematics
     /// <returns>The mean of the provides values.</returns>
     public static double Mean(double a, double b)
     {
-      return (a + b) * 0.5d;
+      return (a + b) / (double)2;
     }
 
+    /// <summary>Computes the mean of a set of values.</summary>
+    /// <param name="values">The set values to mean.</param>
+    /// <returns>The computed mean of the set.</returns>
     public static double Mean(params double[] values)
     {
-      double sum = 0.0d;
-      foreach (double value in values)
-        sum += value;
-      return sum / (double)values.Length;
+      return Statistics.Mean(
+        (Foreach<double> function) => 
+        {
+          foreach (double value in values)
+            function(value);
+        });
     }
 
-    public static Heap<Link<double, int>> Mode(params double[] values)
+    /// <summary>Computes the mean of a set of values.</summary>
+    /// <param name="function">The set values to mean.</param>
+    /// <returns>The computed mean of the set.</returns>
+    public static double Mean(Traversal<double> function)
     {
-      Heap<Link<double, int>> heap =
-        new Heap_Array<Link<double, int>>(
-          (Link<double, int> left, Link<double, int> right) =>
-            { return Logic.Compare(left.Two, right.Two); });
+      double sum = 0;
+      int count = 0;
+      function((double current) =>
+        {
+          count++;
+          sum += current;
+        });
+      return sum / (double)count;
+    }
 
+    /// <summary>Computes the geometric mean of a set.</summary>
+    /// <param name="values">The set to compute the geometric mean of.</param>
+    /// <returns>The computed geometric mean of the set.</returns>
+    public static double GeometricMean(params double[] values)
+    {
+      return Statistics.GeometricMean(
+        (Foreach<double> function) =>
+        {
+          foreach (double value in values)
+            function(value);
+        });
+    }
+
+    /// <summary></summary>
+    /// <param name="function"></param>
+    /// <returns></returns>
+    public static double GeometricMean(Traversal<double> function)
+    {
+      double multiple = 1;
+      int count = 0;
+      function((double current) =>
+        {
+          count++;
+          multiple *= current;
+        });
+      return Algebra.root(multiple, (double)count);
+    }
+
+    /// <summary>Findes the mode(s) of a set.</summary>
+    /// <param name="modes">The modes that are found.</param>
+    /// <param name="ocurrences">The number of occurences of the modes.</param>
+    /// <param name="values">The set to find the modes of.</param>
+    public static void Mode(out double[] modes, out int ocurrences, params double[] values)
+    {
       // Can be improved when the dictionary heap is finished (no clone-sort necessary)
       double[] sorted = values.Clone() as double[];
       Sort.Quick<double>(Logic.Compare, sorted);
 
       int temp = 0;
-
+      ocurrences = 1;
+      List<double> possible_modes = new List_Linked<double>();
       for (int i = 0; i < sorted.Length; i++)
       {
         temp = i - 1;
         for (; i + 1 < sorted.Length && sorted[i] == sorted[i + 1]; i++)
           continue;
-        heap.Enqueue(new Link<double, int>(sorted[i], i - temp));
+
+        if (ocurrences > 1)
+        {
+          int i_ocurrences = i - temp;
+          if (i_ocurrences > ocurrences)
+          {
+            possible_modes.Clear();
+            ocurrences = i_ocurrences;
+            possible_modes.Add(sorted[i]);
+          }
+          else if (i_ocurrences == ocurrences)
+          {
+            possible_modes.Add(sorted[i]);
+          }
+        }
       }
 
-      return heap;
+      if (ocurrences == 1)
+        modes = sorted;
+      else
+        modes = possible_modes.ToArray();
+    }
+
+    /// <summary>Findes the mode(s) of a set.</summary>
+    /// <param name="modes">The modes that are found.</param>
+    /// <param name="ocurrences">The number of occurences of the modes.</param>
+    /// <param name="function">The set to find the modes of.</param>
+    public static void Mode(out double[] modes, out int ocurrences, Traversal<double> function)
+    {
+      List<double> values = new List_Linked<double>();
+      function((double i) => { values.Add(i); });
+
+      double[] sorted = values.ToArray();
+      Sort.Quick<double>(Logic.Compare, sorted);
+
+      int temp = 0;
+      ocurrences = 1;
+      List<double> possible_modes = new List_Linked<double>();
+      for (int i = 0; i < sorted.Length; i++)
+      {
+        temp = i - 1;
+        for (; i + 1 < sorted.Length && sorted[i] == sorted[i + 1]; i++)
+          continue;
+
+        if (ocurrences > 1)
+        {
+          int i_ocurrences = i - temp;
+          if (i_ocurrences > ocurrences)
+          {
+            possible_modes.Clear();
+            ocurrences = i_ocurrences;
+            possible_modes.Add(sorted[i]);
+          }
+          else if (i_ocurrences == ocurrences)
+          {
+            possible_modes.Add(sorted[i]);
+          }
+        }
+      }
+
+      if (ocurrences == 1)
+        modes = sorted;
+      else
+        modes = possible_modes.ToArray();
     }
 
     public static double Median(params double[] values)
@@ -2314,6 +2422,284 @@ namespace Seven.Mathematics
         return sorted[sorted.Length / 2];
       else
         return Statistics.Mean(sorted[sorted.Length / 2], sorted[sorted.Length / 2 + 1]);
+    }
+
+    public static double Median(Traversal<double> function)
+    {
+      // Note: optimize...
+      List<double> values = new List_Linked<double>();
+      function((double i) =>
+        {
+          values.Add(i);
+        });
+
+      double[] values_array = values.ToArray();
+
+      Sort.Quick<double>(Logic.Compare, values_array);
+      if (values_array.Length % 2 == 1)
+        return values_array[values_array.Length / 2];
+      else
+        return Statistics.Mean(values_array[values_array.Length / 2], values_array[values_array.Length / 2 + 1]);
+    }
+
+    public static void Range(out double min, out double max, params double[] values)
+    {
+      Statistics.Range(out min, out max, (Foreach<double> function) =>
+        {
+          foreach (double i in values)
+            function(i);
+        });
+    }
+
+    public static void Range(out double min, out double max, Traversal<double> function)
+    {
+      double temp_min = double.MaxValue;
+      double temp_max = double.MinValue;
+
+      function((double i) =>
+      {
+        temp_min = i < temp_min ? i : temp_min;
+        temp_max = i > temp_max ? i : temp_max;
+      });
+
+      min = temp_min;
+      max = temp_max;
+    }
+
+    public static double Variance(params double[] values)
+    {
+      #region error checking
+
+#if no_error_checking
+      // nothing
+#else
+      if (values == null)
+        throw new Error("null reference: values");
+#endif
+
+      #endregion
+
+      return Statistics.Variance((Foreach<double> function) =>
+        {
+          foreach (double i in values)
+            function(i);
+        });
+    }
+
+    public static double Variance(Traversal<double> function)
+    {
+      #region error checking
+
+#if no_error_checking
+      // nothing
+#else
+      if (function == null)
+        throw new Error("null reference: values");
+#endif
+
+      #endregion
+
+      double mean = Mean(function);
+      double variance = 0;
+      int count = 0;
+      function((double i) =>
+        {
+          double i_minus_mean = i - mean;
+          variance += i_minus_mean * i_minus_mean;
+          count++;
+        });
+      return variance / (double)count;
+    }
+
+    public static double MeanDeviation(params double[] data)
+    {
+      return Statistics.MeanDeviation((Foreach<double> function) =>
+        {
+          foreach (double i in data)
+            function(i);
+        });
+    }
+
+    public static double MeanDeviation(Traversal<double> function)
+    {
+      double mean = Statistics.Mean(function);
+
+      double temp = 0;
+      int count = 0;
+
+      function((double i) =>
+        {
+          temp += Logic.Abs(i - mean);
+          count++;
+        });
+
+      return temp / (double)count;
+    }
+
+    public static double StandardDeviation(params double[] data)
+    {
+      #region error checking
+#if no_error_checking
+      // nothing
+#else
+      if (data == null)
+        throw new Error("null reference: data");
+#endif
+      #endregion
+
+      return Algebra.sqrt(Variance(data));
+    }
+
+    public static double StandardDeviation(Traversal<double> function)
+    {
+      #region error checking
+
+#if no_error_checking
+      // nothing
+#else
+      if (function == null)
+        throw new Error("null reference: function");
+#endif
+
+      #endregion
+
+      return Algebra.sqrt(Variance(function));
+    }
+
+    public static double[] Quantiles(int divisions, params double[] data)
+    {
+      #region error checking
+#if no_error_checking
+      // nothing
+#else
+      if (data == null)
+        throw new Error("null reference: data");
+      if (divisions < 1)
+        throw new Error("invalid numer of dimensions on Quantile division");
+#endif
+      #endregion
+
+      return Statistics.Quantiles(divisions, (Foreach<double> function) =>
+        {
+          foreach (double i in data)
+            function(i);
+        });
+    }
+
+    public static double[] Quantiles(int divisions, Traversal<double> function)
+    {
+      #region error checking
+
+#if no_error_checking
+      // nothing
+#else
+      if (function == null)
+        throw new Error("null reference: data");
+      if (divisions < 1)
+        throw new Error("invalid numer of dimensions on Quantile division");
+#endif
+
+      #endregion
+
+      List<double> values = new List_Linked<double>();
+      function((double i) => { values.Add(i); });
+
+      double[] ordered = values.ToArray();
+      Sort.Quick<double>(Logic.Compare, ordered);
+
+      double[] quantiles = new double[divisions + 1];
+      quantiles[0] = ordered[0];
+      quantiles[quantiles.Length - 1] = ordered[ordered.Length - 1];
+      for (int i = 1; i < divisions; i++)
+      {
+        float temp = (ordered.Length / (float)(divisions + 1)) * i;
+        if (temp % 1 == 0)
+          quantiles[i] = ordered[(int)temp];
+        else
+          quantiles[i] = (ordered[(int)temp] + ordered[(int)temp + 1]) / (double)2;
+      }
+
+      return quantiles;
+    }
+
+    public static double Correlation(double[] a, double[] b)
+    {
+      double a_mean = Statistics.Mean(a);
+      double b_mean = Statistics.Mean(b);
+
+      // a_temp = a - b_mean
+      double[] a_temp = new double[a.Length];
+      for (int i = 0; i < a_temp.Length; i++)
+        a_temp[i] = a[i] - b_mean;
+
+      // b_temp = b - a_mean
+      double[] b_temp = new double[b.Length];
+      for (int i = 0; i < b_temp.Length; i++)
+        b_temp[i] = b[i] - a_mean;
+
+      double[] a_cross_b = new double[a.Length * b.Length];
+      for (int i = 0; i < a_temp.Length; i++)
+        for (int j = 0; j < b_temp.Length; j++)
+          a_cross_b[i * b_temp.Length + j] = a[i] * b[j];
+
+      // square each entry in a_temp
+      for (int i = 0; i < a_temp.Length; i++)
+        a_temp[i] *= a_temp[i];
+
+      // square each entry in b_temp
+      for (int i = 0; i < b_temp.Length; i++)
+        b_temp[i] *= b_temp[i];
+
+      double sum_a_cross_b = 0;
+      foreach (double i in a_cross_b)
+        sum_a_cross_b += i;
+
+      double sum_a_temp = 0;
+      foreach (double i in a_temp)
+        sum_a_temp += i;
+
+      double sum_b_temp = 0;
+      foreach (double i in b_temp)
+        sum_b_temp += i;
+
+      return sum_a_cross_b / Algebra.sqrt(sum_a_temp * sum_b_temp);
+    }
+
+    public static double Correlation(Traversal<double> a, Traversal<double> b)
+    {
+      double a_mean = Statistics.Mean(a);
+      double b_mean = Statistics.Mean(b);
+
+      List<double> a_temp = new List_Linked<double>();
+      a((double i) => { a_temp.Add(i - b_mean); });
+
+      List<double> b_temp = new List_Linked<double>();
+      b((double i) => { b_temp.Add(i - a_mean); });
+
+
+      double[] a_cross_b = new double[a_temp.Count * b_temp.Count];
+      int count = 0;
+      a_temp.Foreach((double i_a) =>
+        {
+          b_temp.Foreach((double i_b) =>
+            {
+              a_cross_b[count++] = i_a * i_b;
+            });
+        });
+
+      a_temp.Foreach((ref double i) => { i *= i; });
+      b_temp.Foreach((ref double i) => { i *= i; });
+      
+      double sum_a_cross_b = 0;
+      foreach (double i in a_cross_b)
+        sum_a_cross_b += i;
+
+      double sum_a_temp = 0;
+      a_temp.Foreach((double i) => { sum_a_temp += i; });
+      double sum_b_temp = 0;
+      b_temp.Foreach((double i) => { sum_b_temp += i; });
+
+      return sum_a_cross_b / Algebra.sqrt(sum_a_temp * sum_b_temp);
     }
 
     #endregion

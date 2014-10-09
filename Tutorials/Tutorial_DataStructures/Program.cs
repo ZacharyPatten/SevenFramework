@@ -180,7 +180,7 @@ namespace Testing
       #region Map
 
       Console.WriteLine("  Testing HashTable_Linked<int, int>---------");
-      Map<int, int> hashTable_linked = new Map_Linked<int, int>(Logic.Equate, Hash.Compute);
+      Map<int, int> hashTable_linked = new Map_Linked<int, int>(Logic.Equate, Hash.Default);
       for (int i = 0; i < test; i++)
         hashTable_linked.Add(i, i);
       Console.Write("    Look Ups: ");

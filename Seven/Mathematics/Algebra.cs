@@ -795,7 +795,7 @@ namespace Seven.Mathematics
 
     public static double root(double _base, double root)
     {
-      throw new System.NotImplementedException();
+      return System.Math.Pow(_base, 1 / root);
     }
 
     public static double exp(double value)
@@ -857,6 +857,21 @@ namespace Seven.Mathematics
       return System.Math.Sqrt(number);
     }
 
+    private static double GreatestCommonDenominator(params double[] values)
+    {
+      if (null == values)
+        throw new Error("null reference: values");
+
+      if (values.Length == 0)
+        return 0;
+
+      var gcd = System.Math.Abs(values[0]);
+      for (var i = 1; (i < values.Length) && (gcd > 1); i++)
+        gcd = GreatestCommonDenominator(gcd, values[i]);
+
+      return gcd;
+    }
+
     private static double GreatestCommonDenominator(double first, double second)
     {
       if (first % 1 != 0 || second % 1 != 0)
@@ -875,6 +890,29 @@ namespace Seven.Mathematics
         first = first % second;
       } while (first != 0);
       return second;
+    }
+
+    public static double LeastCommonMultiple(double a, double b)
+    {
+      if (a == 0 || b == 0)
+        return 0;
+      return Logic.Abs((a / Algebra.GreatestCommonDenominator(a, b)) * b);
+    }
+
+    public static double LeastCommonMultiple(params double[] values)
+    {
+      if (null == values)
+        throw new Error("null reference: integers");
+
+      if (values.Length == 0)
+        return 1;
+
+      double lcm = Logic.Abs(values[0]);
+
+      for (int i = 1; i < values.Length; i++)
+        lcm = LeastCommonMultiple(lcm, values[i]);
+
+      return lcm;
     }
 
     static public double LinearInterpolation(double x, double x0, double x1, double y0, double y1)

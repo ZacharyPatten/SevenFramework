@@ -18,6 +18,6 @@ namespace Seven.Structures
     /// <typeparam name="T">The generic type of the hash operation.</typeparam>
     /// <param name="item">The item to get the hash code of.</param>
     /// <returns>The computed hash code using the base GetHashCode instance method.</returns>
-    public static int Compute<T>(T item) { return item.GetHashCode(); }
+    public static int Default<T>(T item) { return item.GetHashCode(); }
   }
 }

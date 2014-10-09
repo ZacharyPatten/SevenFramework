@@ -32,6 +32,7 @@ namespace Tutorial_Mathematics
       Console.WriteLine("  Statistics-----------------------------------------");
       Console.WriteLine();
 
+      // Makin some random data...
       double mode_temp = random.NextDouble() * 100;
       double[] statistics_data = new double[]
       {
@@ -44,6 +45,7 @@ namespace Tutorial_Mathematics
         mode_temp
       };
 
+      // Print the data to the console...
       Console.WriteLine("    data: [" +
         string.Format("{0:0.00}", statistics_data[0]) + ", " +
         string.Format("{0:0.00}", statistics_data[1]) + ", " +
@@ -55,7 +57,7 @@ namespace Tutorial_Mathematics
       Console.WriteLine();
 
       // Mean
-      Console.WriteLine("    Mean(data): " +string.Format("{0:0.00}", _.mean(statistics_data)));
+      Console.WriteLine("    Mean(data): " + string.Format("{0:0.00}", _.mean(statistics_data)));
       Console.WriteLine();
 
       // Median
@@ -64,11 +66,39 @@ namespace Tutorial_Mathematics
 
       // Mode
       Console.Write("    Mode(data): ");
-      int max_mode;
-      Heap<Link<double, int>> modeResults = _.mode(statistics_data);
-      max_mode = modeResults.Peek().Two;
-      while (modeResults.Peek().Two == max_mode)
-        Console.Write(string.Format("{0:0.00}", modeResults.Dequeue().One));
+      double[] modes;
+      int ocurrences;
+      Statistics.Mode(out modes, out ocurrences, statistics_data);
+      Console.WriteLine();
+      Console.WriteLine();
+
+      // Geometric Mean
+      Console.WriteLine("    Geometric Mean(data): " + string.Format("{0:0.00}", Statistics.GeometricMean(statistics_data)));
+      Console.WriteLine();
+
+      // Range
+      double range_min, range_max;
+      Statistics.Range(out range_min, out range_max, statistics_data);
+      Console.WriteLine("    Range(data): " + string.Format("{0:0.00}", range_min) + "-" + string.Format("{0:0.00}", range_max));
+      Console.WriteLine();
+
+      // Variance
+      Console.WriteLine("    Variance(data): " + string.Format("{0:0.00}", Statistics.Variance(statistics_data)));
+      Console.WriteLine();
+
+      // Standard Deviation
+      Console.WriteLine("    Standard Deviation(data): " + string.Format("{0:0.00}", Statistics.StandardDeviation(statistics_data)));
+      Console.WriteLine();
+
+      // Mean Deviation
+      Console.WriteLine("    Mean Deviation(data): " + string.Format("{0:0.00}", Statistics.MeanDeviation(statistics_data)));
+      Console.WriteLine();
+
+      // Quantiles
+      double[] quatiles = Statistics.Quantiles(4, statistics_data);
+      Console.Write("    Quartiles(data):");
+      foreach (double i in quatiles)
+        Console.Write(string.Format(" {0:0.00}", i));
       Console.WriteLine();
       Console.WriteLine();
 
@@ -92,14 +122,17 @@ namespace Tutorial_Mathematics
       Console.WriteLine();
 
       // Greatest Common Denominators
-      int gdc_1 = random.Next(10000, 100000), gdc_2 = random.Next(10000, 100000);
+      int
+        gdc = random.Next(0, 1000),
+        gdc_1 = gdc * random.Next(0, 1000),
+        gdc_2 = gdc * random.Next(0, 1000);
       Console.Write("    GDC(" + gdc_1 + ", " + gdc_2 + "): " + _.gdc(gdc_1, gdc_2));
       Console.WriteLine();
       Console.WriteLine();
 
       // Logarithms
       int log_1 = random.Next(0, 11), log_2 = random.Next(0, 100000);
-      Console.WriteLine("    log_" + log_1 + "(" + log_2 + "): " + _.log(log_1, log_2));
+      Console.WriteLine("    log_" + log_1 + "(" + log_2 + "): " + string.Format("{0:0.00}", _.log((double)log_1, (double)log_2)));
       Console.WriteLine();
 
       #endregion
@@ -120,7 +153,7 @@ namespace Tutorial_Mathematics
       // Choose
       Console.WriteLine("    7 choose 2: " + _.choose(7, 2));
       Console.WriteLine();
-    
+
       #endregion
 
       #region Linear Algebra
@@ -298,7 +331,7 @@ namespace Tutorial_Mathematics
       result = ComputerAlgebra.Differentiate(node, variable: "z");
       Console.WriteLine(result);
       Console.WriteLine();
-    
+
       #endregion
 
       Console.WriteLine();
@@ -312,10 +345,10 @@ namespace Tutorial_Mathematics
     public static void ConsoleWrite(Quaternion<double> quaternion)
     {
       Console.WriteLine(
-        "      [ x " + 
-        string.Format("{0:0.00}", quaternion.X) + ", y " + 
-        string.Format("{0:0.00}", quaternion.Y) + ", z " + 
-        string.Format("{0:0.00}", quaternion.Z) + ", w " + 
+        "      [ x " +
+        string.Format("{0:0.00}", quaternion.X) + ", y " +
+        string.Format("{0:0.00}", quaternion.Y) + ", z " +
+        string.Format("{0:0.00}", quaternion.Z) + ", w " +
         string.Format("{0:0.00}", quaternion.W) + " ]");
       Console.WriteLine();
     }
