@@ -283,7 +283,7 @@ namespace Seven.Structures
         else // (compareResult == Copmarison.Less)
           _current = _current.RightChild;
       }
-      throw new Exception("Attempting to get a non-existing value: " + get.ToString() + ".");
+      throw new Error("Attempting to get a non-existing value: " + get.ToString() + ".");
     }
 
     /// <summary>Gets the item with the designated by the string.</summary>
@@ -327,7 +327,7 @@ namespace Seven.Structures
       Comparison compareResult = this._compare(avlTree.Value, addition);
       if (compareResult == Comparison.Equal)
         if (this.HandleDuplicate == null)
-          throw new Exception("Attempting to add an already existing id exists.");
+          throw new Error("Attempting to add an already existing id exists.");
         else
         {
           this.HandleDuplicate(avlTree.Value);
@@ -419,7 +419,7 @@ namespace Seven.Structures
         SetHeight(avlTree);
         return Balance(avlTree);
       }
-      throw new Exception("Attempting to remove a non-existing entry.");
+      throw new Error("Attempting to remove a non-existing entry.");
     }
 
     /// <summary>Removes an object from the AVL Tree.</summary>
@@ -487,7 +487,7 @@ namespace Seven.Structures
         SetHeight(avlTree);
         return Balance(avlTree);
       }
-      throw new Exception("Attempting to remove a non-existing entry.");
+      throw new Error("Attempting to remove a non-existing entry.");
     }
 
     /// <summary>Removes an object from the AVL Tree.</summary>
@@ -748,7 +748,7 @@ namespace Seven.Structures
     public virtual void ForeachInOrder(Foreach<T> function, T minimum, T maximum)
     {
       if (this._compare(minimum, maximum) == Comparison.Greater)
-        throw new Exception("invalid minimum and maximum values on Avl traversal.");
+        throw new Error("invalid minimum and maximum values on Avl traversal.");
       AvlTree_Linked<T>.TraversalInOrder(function, _avlTree);
     }
     protected void TraversalInOrder(Foreach<T> function, Node node, T minimum, T maximum)
@@ -794,7 +794,7 @@ namespace Seven.Structures
     public virtual void ForeachInOrder(ForeachRef<T> function, T minimum, T maximum)
     {
       if (this._compare(minimum, maximum) == Comparison.Greater)
-        throw new Exception("invalid minimum and maximum values on Avl traversal.");
+        throw new Error("invalid minimum and maximum values on Avl traversal.");
       this.TraversalInOrder(function, _avlTree, minimum, maximum);
     }
     protected void TraversalInOrder(ForeachRef<T> function, Node node, T minimum, T maximum)
@@ -846,7 +846,7 @@ namespace Seven.Structures
     public virtual ForeachStatus ForeachInOrder(ForeachBreak<T> function, T minimum, T maximum)
     {
       if (this._compare(minimum, maximum) == Comparison.Greater)
-        throw new Exception("invalid minimum and maximum values on Avl traversal.");
+        throw new Error("invalid minimum and maximum values on Avl traversal.");
       return this.ForeachInOrder(function, _avlTree, minimum, maximum);
     }
     protected ForeachStatus ForeachInOrder(ForeachBreak<T> function, Node node, T minimum, T maximum)
@@ -903,7 +903,7 @@ namespace Seven.Structures
     public virtual ForeachStatus ForeachInOrder(ForeachRefBreak<T> function, T minimum, T maximum)
     {
       if (this._compare(minimum, maximum) == Comparison.Greater)
-        throw new Exception("invalid minimum and maximum values on Avl traversal.");
+        throw new Error("invalid minimum and maximum values on Avl traversal.");
       return this.ForeachInOrder(function, _avlTree, minimum, maximum);
     }
     protected ForeachStatus ForeachInOrder(ForeachRefBreak<T> function, Node node, T minimum, T maximum)
@@ -1183,16 +1183,6 @@ namespace Seven.Structures
       foreach (T current in this)
         clone.Add(current);
       return clone;
-    }
-
-    #endregion
-
-    #region error
-
-    /// <summary>This is used for throwing AVL Tree exceptions only to make debugging faster.</summary>
-    protected class Exception : Error
-    {
-      public Exception(string message) : base(message) { }
     }
 
     #endregion
@@ -1709,7 +1699,7 @@ namespace Seven.Structures
       throw new Error("still in development");
 
       if (maximumSize < 1)
-        throw new AvlTree_Array<T>.Exception("");
+        throw new Error("");
       _avlTree = new Link<bool,T>[maximumSize + 1];
       _count = 0;
       _compare = compare;
@@ -2442,15 +2432,6 @@ namespace Seven.Structures
     //    ToArray(array, avltreeNode.RightChild, position);
     //  }
     //}
-
-    #endregion
-
-    #region error
-
-    public class Exception : Error
-    {
-      public Exception(string message) : base(message) { }
-    }
 
     #endregion
   }

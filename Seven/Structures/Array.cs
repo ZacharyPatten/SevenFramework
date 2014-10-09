@@ -270,15 +270,5 @@ namespace Seven.Structures
     }
 
     #endregion
-
-    #region error
-
-    /// <summary>This is used for throwing AVL Tree exceptions only to make debugging faster.</summary>
-    private class Error : Structure.Error
-    {
-      public Error(string message) : base(message) { }
-    }
-
-    #endregion
   }
 }

@@ -354,6 +354,40 @@ namespace Testing
 
 			#endregion
 
+      #region Graph
+
+      Console.WriteLine("  Testing Graph_SetQuadtree<int>--------------------");
+      Graph<int> graph = new Graph_SetQuadtree<int>(Logic.Equate, Logic.Compare, Hash.Default, 0, test, Statistics.Mean);
+      // add nodes
+      for (int i = 0; i < test; i++)
+        graph.Add(i);
+      // add edges
+      for (int i = 0; i < test - 1; i++)
+        graph.Add(i, i + 1);
+      Console.Write("    Delegate: ");
+      graph.Foreach((int current) => { Console.Write(current); });
+      Console.WriteLine();
+      Console.Write("    IEnumerator: not yet implemented");
+      //foreach (int current in graph)
+      //    Console.Write(current);
+      Console.WriteLine();
+      Console.WriteLine("    Edges: ");
+      //((Graph_SetQuadtree<int>)graph)._edges.Foreach((Graph_SetQuadtree<int>.Edge e) => { Console.WriteLine("     " + e.Start + " " + e.End); });
+      graph.Foreach(
+          (int current) =>
+          {
+            Console.Write("     " + current + ": ");
+            graph.Neighbors(current,
+            (int a) =>
+            {
+              Console.Write(a);
+            });
+            Console.WriteLine();
+          });
+      Console.WriteLine();
+
+      #endregion
+
       Console.WriteLine();
       Console.WriteLine("============================================");
       Console.WriteLine(" Testing Complete...");

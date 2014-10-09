@@ -72,9 +72,9 @@ namespace Seven
       protected void RaiseExceptionIfNecessary()
       {
         if (this.Error != null)
-          throw new BackgroundThreadException("BS");
+          throw new Error("BS");
         if (this.Cancelled)
-          throw new BackgroundThreadException("BS");
+          throw new Error("BS");
       }
     }
 
@@ -231,7 +231,7 @@ namespace Seven
     public void Trigger(object argument)
     {
       if (!_hasResulted)
-        throw new BackgroundThreadException("BS");
+        throw new Error("BS");
       _hasResulted = false;
       _cancellationPending = false;
 
@@ -268,12 +268,6 @@ namespace Seven
       }
       catch (Exception ex) { error = ex; }
       this._asyncOperation.PostOperationCompleted(this._operationCompleted, (object)new ResultEventArgs(result, error, cancelled));
-    }
-
-    /// <summary>This is used for throwing BackgroundThread Tree exceptions only to make debugging faster.</summary>
-    protected class BackgroundThreadException : Error
-    {
-      public BackgroundThreadException(string message) : base(message) { }
     }
   }
 }

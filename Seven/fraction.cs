@@ -493,15 +493,6 @@ namespace Seven
     }
 
     #endregion
-
-    #region error
-
-    public class Error : Seven.Error
-    {
-      public Error(string Message) : base(Message) { }
-    }
-
-    #endregion
   }
 
   /// <summary>A fraction represented as two ints (numerator / denomnator).</summary>
@@ -952,15 +943,6 @@ namespace Seven
       {
         throw new Error("Cannot reduce Fraction: " + exp.Message);
       }
-    }
-
-    #endregion
-
-    #region error
-
-    public class Error : Seven.Error
-    {
-      public Error(string Message) : base(Message) { }
     }
 
     #endregion

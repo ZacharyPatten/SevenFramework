@@ -749,16 +749,6 @@ namespace Seven.Structures
     }
 
     #endregion
-
-    #region error
-
-    /// <summary>This is used for throwing RedBlackTree exceptions only to make debugging faster.</summary>
-    protected class Error : Structure.Error
-    {
-      public Error(string message) : base(message) { }
-    }
-
-    #endregion
   }
 
   #region RedBlackTreeLinkedThreadSafe<Type>

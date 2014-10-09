@@ -1341,15 +1341,5 @@ namespace Seven.Mathematics
     //};
 
     #endregion
-
-    #region error
-
-    /// <summary>Error type for all algebra computations.</summary>
-    public class Error : Seven.Error
-    {
-      public Error(string message) : base(message) { }
-    }
-
-    #endregion
   }
 }

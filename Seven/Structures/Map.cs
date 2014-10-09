@@ -404,15 +404,5 @@ namespace Seven.Structures
     }
 
     #endregion
-
-    #region error
-
-    /// <summary>This is used for throwing hash table exceptions only to make debugging faster.</summary>
-    private class Error : Structure.Error
-    {
-      public Error(string message) : base(message) { }
-    }
-
-    #endregion
   }
 }

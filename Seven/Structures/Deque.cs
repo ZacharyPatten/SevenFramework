@@ -81,7 +81,7 @@ namespace Seven.Structures
     public Type DequeueFront()
     {
       if (_head == null)
-        throw new Exception("Attempting to remove a non-existing id value.");
+        throw new Error("Attempting to remove a non-existing id value.");
       Type value = _head.Value;
       if (_head == _tail)
         _tail = null;
@@ -95,7 +95,7 @@ namespace Seven.Structures
     public Type PeekFront()
     {
       if (_head == null)
-        throw new Exception("Attempting to remove a non-existing id value.");
+        throw new Error("Attempting to remove a non-existing id value.");
       Type returnValue = _head.Value;
       return returnValue;
     }
@@ -233,16 +233,6 @@ namespace Seven.Structures
     public Structure<Type> Clone()
     {
       throw new System.NotImplementedException();
-    }
-
-    #endregion
-
-    #region error
-
-    /// <summary>This is used for throwing AVL Tree exceptions only to make debugging faster.</summary>
-    private class Exception : Error
-    {
-      public Exception(string message) : base(message) { }
     }
 
     #endregion

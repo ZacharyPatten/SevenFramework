@@ -126,18 +126,6 @@ namespace Seven.Structures
     public delegate M Average<M>(M left, M right);
 
     #endregion
-
-    #region error
-
-    /// <summary>Polymorphism base for Octree exceptions.</summary>
-    public class Error : Structure.Error
-    {
-      /// <summary>Constructs an Octree exception.</summary>
-      /// <param name="message">The message of the exception.</param>
-      public Error(string message) : base(message) { }
-    }
-
-    #endregion
   }
 
   /// <summary>Sorts items along 3 dimensions. Made by Zachary Patten.</summary>
@@ -1644,16 +1632,6 @@ namespace Seven.Structures
     }
 
     #endregion
-
-    #region error
-
-    /// <summary>Octree_Array Exception.</summary>
-    private class Error : Octree.Error
-    {
-      public Error(string message) : base(message) { }
-    }
-
-    #endregion
   }
 
   /// <summary>Sorts items along 3 dimensions. Made by Zachary Patten.</summary>
@@ -3041,16 +3019,6 @@ namespace Seven.Structures
         Octree_Array<T, M>.Int_Power(this._load + 1, this._dimensions);
       this._loadPowered =
         Octree_Array<T, M>.Int_Power(_load, _dimensions);
-    }
-
-    #endregion
-
-    #region error
-
-    /// <summary>Octree_Array Exception.</summary>
-    private class Error : Octree.Error
-    {
-      public Error(string message) : base(message) { }
     }
 
     #endregion

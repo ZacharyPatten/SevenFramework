@@ -276,16 +276,6 @@ namespace Seven.Structures
     }
 
     #endregion
-
-    #region error
-
-    /// <summary>This is used for throwing AVL Tree exceptions only to make debugging faster.</summary>
-    private class Exception : Error
-    {
-      public Exception(string message) : base(message) { }
-    }
-
-    #endregion
   }
 
   /// <summary>Implements a growing list as an array (with expansions/contractions) 
@@ -344,7 +334,7 @@ namespace Seven.Structures
       set
       {
         if (value < 1)
-          throw new ListArrayException("Attempting to set a minimum capacity to a negative or zero value.");
+          throw new Error("Attempting to set a minimum capacity to a negative or zero value.");
         else if (value > _queue.Length)
         {
           Type[] newList = new Type[value];
@@ -383,7 +373,7 @@ namespace Seven.Structures
       {
         if (_queue.Length > Int32.MaxValue / 2)
         {
-          throw new ListArrayException("your queue is so large that it can no longer double itself (Int32.MaxValue barrier reached).");
+          throw new Error("your queue is so large that it can no longer double itself (Int32.MaxValue barrier reached).");
         }
         Type[] newQueue = new Type[_queue.Length * 2];
         for (int i = 0; i < _count; i++)
@@ -399,7 +389,7 @@ namespace Seven.Structures
     public Type Dequeue()
     {
       if (_count == 0)
-        throw new ListArrayException("attempting to dequeue from an empty queue.");
+        throw new Error("attempting to dequeue from an empty queue.");
       if (_count < _queue.Length / 4 && _queue.Length / 2 > _minimumCapacity)
       {
         Type[] newQueue = new Type[_queue.Length / 2];
@@ -450,7 +440,7 @@ namespace Seven.Structures
     public bool TraverseBreakable(Func<Type, bool> traversalFunction, int start, int end)
     {
       if (start < 0 || start < end || end > _count)
-        throw new ListArrayException("invalid index parameters on traversal");
+        throw new Error("invalid index parameters on traversal");
       for (int i = start; i < end; i++)
         if (!traversalFunction(_queue[i]))
         {
@@ -475,7 +465,7 @@ namespace Seven.Structures
     public void Traverse(Action<Type> traversalAction, int start, int end)
     {
       if (start < 0 || start < end || end > _count)
-        throw new ListArrayException("invalid index parameters on traversal");
+        throw new Error("invalid index parameters on traversal");
       for (int i = start; i < end; i++) traversalAction(_queue[i]);
     }
 
@@ -590,16 +580,6 @@ namespace Seven.Structures
     //}
 
     #endregion
-
-    #endregion
-
-    #region error
-
-    /// <summary>This is used for throwing AVL Tree exceptions only to make debugging faster.</summary>
-    private class ListArrayException : Structure.Error
-    {
-      public ListArrayException(string message) : base(message) { }
-    }
 
     #endregion
   }

@@ -11,7 +11,7 @@ namespace Seven.Structures
     //Equate<T> Equate { get; }
   }
 
-  public class Set_Linked<T> : Set<T>
+  public class Set_Hash<T> : Set<T>
   {
     #region class
 
@@ -79,7 +79,7 @@ namespace Seven.Structures
 
     /// <summary>Constructs a new hash table instance.</summary>
     /// <remarks>Runtime: O(1).</remarks>
-    public Set_Linked(Equate<T> equate, Hash<T> hash)
+    public Set_Hash(Equate<T> equate, Hash<T> hash)
     {
       this._equate = equate;
       this._hash = hash;
@@ -295,16 +295,6 @@ namespace Seven.Structures
     public Structure<T> Clone()
     {
       throw new System.NotImplementedException();
-    }
-
-    #endregion
-
-    #region error
-
-    /// <summary>This is used for throwing hash table exceptions only to make debugging faster.</summary>
-    private class Error : Structure.Error
-    {
-      public Error(string message) : base(message) { }
     }
 
     #endregion

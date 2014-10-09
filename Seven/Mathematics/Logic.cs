@@ -2761,14 +2761,5 @@ namespace Seven.Mathematics
 		#endregion
 
 		#endregion
-
-    #region error
-
-    public class Error : Seven.Error
-    {
-      public Error(string message) : base(message) { }
-    }
-
-    #endregion
   }
 }

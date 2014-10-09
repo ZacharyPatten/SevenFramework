@@ -152,7 +152,7 @@ namespace Seven.Structures
     public void RemoveFirst(Type removal, Compare<Type> compare)
     {
       if (_head == null)
-        throw new Exception("Attempting to remove a non-existing id value.");
+        throw new Error("Attempting to remove a non-existing id value.");
       if (compare(removal, _head.Value) == Comparison.Equal)
       {
         _head = _head.Next;
@@ -163,7 +163,7 @@ namespace Seven.Structures
       while (listNode != null)
       {
         if (listNode.Next == null)
-          throw new Exception("Attempting to remove a non-existing id value.");
+          throw new Error("Attempting to remove a non-existing id value.");
         else if (compare(removal, _head.Value) == Comparison.Equal)
         {
           if (listNode.Next.Equals(_tail))
@@ -174,7 +174,7 @@ namespace Seven.Structures
         else
           listNode = listNode.Next;
       }
-      throw new Exception("Attempting to remove a non-existing id value.");
+      throw new Error("Attempting to remove a non-existing id value.");
     }
 
     /// <summary>Removes the first equality by object reference.</summary>
@@ -323,7 +323,7 @@ namespace Seven.Structures
       for (Node looper = this._head; looper != null; looper = looper.Next)
         if (compare(looper.Value, key) == Comparison.Equal)
           return looper.Value;
-      throw new Exception("key not found.");
+      throw new Error("key not found.");
     }
 
     /// <summary>Trys to look up an item this structure by a given key.</summary>
@@ -420,16 +420,6 @@ namespace Seven.Structures
         looper = looper.Next;
       }
       return array;
-    }
-
-    #endregion
-
-    #region error
-
-    /// <summary>This is used for throwing AVL Tree exceptions only to make debugging faster.</summary>
-    private class Exception : Error
-    {
-      public Exception(string message) : base(message) { }
     }
 
     #endregion
@@ -805,16 +795,6 @@ namespace Seven.Structures
     }
 
     #endregion
-
-    #region error
-
-    /// <summary>This is used for throwing AVL Tree exceptions only to make debugging faster.</summary>
-    private class Error : Structure.Error
-    {
-      public Error(string message) : base(message) { }
-    }
-
-    #endregion
   }
 
   /// <summary>Implements a growing list as an array (with expansions/contractions) 
@@ -1148,16 +1128,6 @@ namespace Seven.Structures
       Type[] array = new Type[_count];
       for (int i = 0; i < _count; i++) array[i] = _list[i];
       return array;
-    }
-
-    #endregion
-
-    #region error
-
-    /// <summary>This is used for throwing AVL Tree exceptions only to make debugging faster.</summary>
-    private class Error : Structure.Error
-    {
-      public Error(string message) : base(message) { }
     }
 
     #endregion

@@ -233,8 +233,8 @@ namespace Seven.Mathematics
       /// <summary>Gets Arithmetic for "int" types.</summary>
       public static Constants_long Get { get { return Instance; } }
 
-      public long e { get { throw new Constants.Error("constant e cannot be represented as a long"); } }
-      public long pi { get { throw new Constants.Error("constant e cannot be represented as a long"); } }
+      public long e { get { throw new Error("constant e cannot be represented as a long"); } }
+      public long pi { get { throw new Error("constant e cannot be represented as a long"); } }
 
       public long factory(int value) { return value; }
       public long factory(float value) { return (long)value; }
@@ -260,8 +260,8 @@ namespace Seven.Mathematics
       /// <summary>Gets Arithmetic for "int" types.</summary>
       public static Constants_int Get { get { return Instance; } }
 
-      public int e { get { throw new Constants.Error("constant e cannot be represented as an int"); } }
-      public int pi { get { throw new Constants.Error("constant e cannot be represented as an int"); } }
+      public int e { get { throw new Error("constant e cannot be represented as an int"); } }
+      public int pi { get { throw new Error("constant e cannot be represented as an int"); } }
 
       public int factory(int value) { return value; }
       public int factory(float value) { return (int)value; }
@@ -273,8 +273,8 @@ namespace Seven.Mathematics
     {
       public Constants_unsupported() { }
 
-      public T e { get { throw new Constants.Error("constant e cannot be represented as an int"); } }
-      public T pi { get { throw new Constants.Error("constant e cannot be represented as an int"); } }
+      public T e { get { throw new Error("constant e cannot be represented as an int"); } }
+      public T pi { get { throw new Error("constant e cannot be represented as an int"); } }
              
       public T factory(int value) { throw new Error("Constants are undefined for type: " + typeof(T)); }
       public T factory(float value) { throw new Error("Constants are undefined for type: " + typeof(T)); }
@@ -283,16 +283,6 @@ namespace Seven.Mathematics
     }
 
     #endregion
-
-    #endregion
-
-    #region error
-
-    /// <summary>Error type for all algebra computations.</summary>
-    public class Error : Seven.Error
-    {
-      public Error(string message) : base(message) { }
-    }
 
     #endregion
   }

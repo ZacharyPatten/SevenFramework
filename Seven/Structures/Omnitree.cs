@@ -133,18 +133,6 @@ namespace Seven.Structures
     public delegate M Average<M>(M left, M right);
 
     #endregion
-
-    #region error
-
-    /// <summary>Polymorphism base for Omnitree exceptions.</summary>
-    public class Error : Structure.Error
-    {
-      /// <summary>Constructs an Omnitree exception.</summary>
-      /// <param name="message">The message of the exception.</param>
-      public Error(string message) : base(message) { }
-    }
-
-    #endregion
   }
 
   /// <summary>Sorts items along N dimensions. The one data structure to rule them all. Made by Zachary Patten.</summary>
@@ -2693,16 +2681,6 @@ namespace Seven.Structures
     }
 
     #endregion
-
-    #region error
-
-    /// <summary>Omnitree_Array Exception.</summary>
-    private class Error : Omnitree.Error
-    {
-      public Error(string message) : base(message) { }
-    }
-
-    #endregion
   }
 
   /// <summary>Sorts items along N dimensions. The one data structure to rule them all. Made by Zachary Patten.</summary>
@@ -3139,7 +3117,7 @@ namespace Seven.Structures
       {
         // value is a branch; we need to overwrite a leaf
         for (int i = 0; i < branch.Children.Length; i++)
-          if (branch.Children[i].Index == index)
+          if (branch.Children[i] == null || branch.Children[i].Index == index)
           {
             branch.Children[i] = value;
             break;
@@ -3890,12 +3868,16 @@ namespace Seven.Structures
       else
       {
         Branch branch = node as Branch;
+        // if the length of the child array is equal to its maximum capacity,
+        // use real indeces and skip null children
         if (branch.Children.Length == this._children)
         {
-          for (int i = 0; i < branch.ChildCount; i++)
+          for (int i = 0; i < branch.Children.Length; i++)
             if (branch.Children[i] != null && InclusionCheck(branch.Children[i].Min, branch.Children[i].Max, min, max))
               this.Foreach(function, branch.Children[i], min, max);
         }
+        // if the length of the child array is less than its maximum capacity,
+        // iterate through the artificially index children where there will be no null values
         else
         {
           for (int i = 0; i < branch.ChildCount; i++)
@@ -3933,12 +3915,16 @@ namespace Seven.Structures
       else
       {
         Branch branch = node as Branch;
+        // if the length of the child array is equal to its maximum capacity,
+        // use real indeces and skip null children
         if (branch.Children.Length == this._children)
         {
-          for (int i = 0; i < this._children; i++)
+          for (int i = 0; i < branch.Children.Length; i++)
             if (branch.Children[i] != null && InclusionCheck(branch.Children[i].Min, branch.Children[i].Max, min, max))
               this.Foreach(function, branch.Children[i], min, max);
         }
+        // if the length of the child array is less than its maximum capacity,
+        // iterate through the artificially index children where there will be no null values
         else
         {
           for (int i = 0; i < branch.ChildCount; i++)
@@ -3977,13 +3963,17 @@ namespace Seven.Structures
       else
       {
         Branch branch = node as Branch;
+        // if the length of the child array is equal to its maximum capacity,
+        // use real indeces and skip null children
         if (branch.Children.Length == this._children)
         {
-          for (int i = 0; i < this._children; i++)
+          for (int i = 0; i < branch.Children.Length; i++)
             if (branch.Children[i] != null && InclusionCheck(branch.Children[i].Min, branch.Children[i].Max, min, max))
               if (this.Foreach(function, branch.Children[i], min, max) == ForeachStatus.Break)
                 return ForeachStatus.Break;
         }
+        // if the length of the child array is less than its maximum capacity,
+        // iterate through the artificially index children where there will be no null values
         else
         {
           for (int i = 0; i < branch.ChildCount; i++)
@@ -4024,13 +4014,17 @@ namespace Seven.Structures
       else
       {
         Branch branch = node as Branch;
+        // if the length of the child array is equal to its maximum capacity,
+        // use real indeces and skip null children
         if (branch.Children.Length == this._children)
         {
-          for (int i = 0; i < this._children; i++)
+          for (int i = 0; i < branch.Children.Length; i++)
             if (branch.Children[i] != null && InclusionCheck(branch.Children[i].Min, branch.Children[i].Max, min, max))
               if (this.Foreach(function, branch.Children[i], min, max) == ForeachStatus.Break)
                 return ForeachStatus.Break;
         }
+        // if the length of the child array is less than its maximum capacity,
+        // iterate through the artificially index children where there will be no null values
         else
         {
           for (int i = 0; i < branch.ChildCount; i++)
@@ -4093,16 +4087,6 @@ namespace Seven.Structures
         Omnitree_Array<T, M>.Int_Power(this._load + 1, this._dimensions);
       this._loadPowered =
         Omnitree_Array<T, M>.Int_Power(_load, _dimensions);
-    }
-
-    #endregion
-
-    #region error
-
-    /// <summary>Omnitree_Array Exception.</summary>
-    private class Error : Omnitree.Error
-    {
-      public Error(string message) : base(message) { }
     }
 
     #endregion

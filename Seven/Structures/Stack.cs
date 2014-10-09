@@ -81,7 +81,7 @@ namespace Seven.Structures
     public Type Peek()
     {
       if (_top == null)
-        throw new StackLinkedException("Attempting to remove from an empty queue.");
+        throw new Error("Attempting to remove from an empty queue.");
       Type peek = _top.Value;
       return peek;
     }
@@ -267,12 +267,6 @@ namespace Seven.Structures
       }
       return array;
     }
-
-    /// <summary>This is used for throwing AVL Tree exceptions only to make debugging faster.</summary>
-    private class StackLinkedException : Error
-    {
-      public StackLinkedException(string message) : base(message) { }
-    }
   }
 
   /// <summary>Implements a First-In-Last-Out stack data structure that inherits InterfaceTraversable.</summary>
@@ -389,12 +383,6 @@ namespace Seven.Structures
       {
         this._readerWriterLock.ReaderUnlock();
       }
-    }
-    
-    /// <summary>This is used for throwing AVL Tree exceptions only to make debugging faster.</summary>
-    private class Error : Structure.Error
-    {
-      public Error(string message) : base(message) { }
     }
   }
 
@@ -637,12 +625,6 @@ namespace Seven.Structures
       for (int i = 0; i < _count; i++)
         array[i] = _stack[i];
       return array;
-    }
-
-    /// <summary>This is used for throwing AVL Tree exceptions only to make debugging faster.</summary>
-    private class Error : Structure.Error
-    {
-      public Error(string message) : base(message) { }
     }
   }
 

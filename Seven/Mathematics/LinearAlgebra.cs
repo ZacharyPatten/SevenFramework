@@ -4758,7 +4758,7 @@ namespace Seven.Mathematics
       if (right == null)
         throw new Error("null reference: right");
       if (left.Columns != right.Rows)
-        throw new LinearAlgebra.Error("invalid multiplication (size miss-match).");
+        throw new Error("invalid multiplication (size miss-match).");
 #endif
 
       #endregion
@@ -4862,7 +4862,7 @@ namespace Seven.Mathematics
       if (right == null)
         throw new Error("null reference: right");
       if (left.Columns != right.Rows)
-        throw new LinearAlgebra.Error("invalid multiplication (dimension miss-match).");
+        throw new Error("invalid multiplication (dimension miss-match).");
 #endif
 
       #endregion
@@ -8052,7 +8052,7 @@ namespace Seven.Mathematics
       if (right == null)
         throw new Error("null reference: right");
       if (left.Columns != right.Rows)
-        throw new LinearAlgebra.Error("invalid multiplication (size miss-match).");
+        throw new Error("invalid multiplication (size miss-match).");
 #endif
 
       #endregion
@@ -8138,7 +8138,7 @@ namespace Seven.Mathematics
       if (right == null)
         throw new Error("null reference: right");
       if (left.Columns != right.Rows)
-        throw new LinearAlgebra.Error("invalid multiplication (dimension miss-match).");
+        throw new Error("invalid multiplication (dimension miss-match).");
 #endif
 
       #endregion
@@ -11291,7 +11291,7 @@ namespace Seven.Mathematics
       if (right == null)
         throw new Error("null reference: right");
       if (left.Columns != right.Rows)
-        throw new LinearAlgebra.Error("invalid multiplication (size miss-match).");
+        throw new Error("invalid multiplication (size miss-match).");
 #endif
 
       #endregion
@@ -11377,7 +11377,7 @@ namespace Seven.Mathematics
       if (right == null)
         throw new Error("null reference: right");
       if (left.Columns != right.Rows)
-        throw new LinearAlgebra.Error("invalid multiplication (dimension miss-match).");
+        throw new Error("invalid multiplication (dimension miss-match).");
 #endif
 
       #endregion
@@ -14530,7 +14530,7 @@ namespace Seven.Mathematics
       if (right == null)
         throw new Error("null reference: right");
       if (left.Columns != right.Rows)
-        throw new LinearAlgebra.Error("invalid multiplication (size miss-match).");
+        throw new Error("invalid multiplication (size miss-match).");
 #endif
 
       #endregion
@@ -14616,7 +14616,7 @@ namespace Seven.Mathematics
       if (right == null)
         throw new Error("null reference: right");
       if (left.Columns != right.Rows)
-        throw new LinearAlgebra.Error("invalid multiplication (dimension miss-match).");
+        throw new Error("invalid multiplication (dimension miss-match).");
 #endif
 
       #endregion
@@ -17769,7 +17769,7 @@ namespace Seven.Mathematics
       if (right == null)
         throw new Error("null reference: right");
       if (left.Columns != right.Rows)
-        throw new LinearAlgebra.Error("invalid multiplication (size miss-match).");
+        throw new Error("invalid multiplication (size miss-match).");
 #endif
 
       #endregion
@@ -17855,7 +17855,7 @@ namespace Seven.Mathematics
       if (right == null)
         throw new Error("null reference: right");
       if (left.Columns != right.Rows)
-        throw new LinearAlgebra.Error("invalid multiplication (dimension miss-match).");
+        throw new Error("invalid multiplication (dimension miss-match).");
 #endif
 
       #endregion
@@ -21012,7 +21012,7 @@ namespace Seven.Mathematics
       if (right == null)
         throw new Error("null reference: right");
       if (left.Columns != right.Rows)
-        throw new LinearAlgebra.Error("invalid multiplication (size miss-match).");
+        throw new Error("invalid multiplication (size miss-match).");
 #endif
 
       #endregion
@@ -21098,7 +21098,7 @@ namespace Seven.Mathematics
       if (right == null)
         throw new Error("null reference: right");
       if (left.Columns != right.Rows)
-        throw new LinearAlgebra.Error("invalid multiplication (dimension miss-match).");
+        throw new Error("invalid multiplication (dimension miss-match).");
 #endif
 
       #endregion
@@ -24259,7 +24259,7 @@ namespace Seven.Mathematics
       if (right == null)
         throw new Error("null reference: right");
       if (left.Columns != right.Rows)
-        throw new LinearAlgebra.Error("invalid multiplication (size miss-match).");
+        throw new Error("invalid multiplication (size miss-match).");
 #endif
 
       #endregion
@@ -24345,7 +24345,7 @@ namespace Seven.Mathematics
       if (right == null)
         throw new Error("null reference: right");
       if (left.Columns != right.Rows)
-        throw new LinearAlgebra.Error("invalid multiplication (dimension miss-match).");
+        throw new Error("invalid multiplication (dimension miss-match).");
 #endif
 
       #endregion
@@ -26107,16 +26107,6 @@ namespace Seven.Mathematics
     #endregion
 
     #endregion
-
-    #endregion
-
-    #region error
-
-    /// <summary>Error type for all linear algebra computations.</summary>
-		internal class Error : Seven.Error
-		{
-			public Error(string message) : base(message) { }
-    }
 
     #endregion
   }

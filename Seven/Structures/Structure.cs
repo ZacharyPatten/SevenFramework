@@ -240,11 +240,5 @@ namespace Seven.Structures
     }
 
     #endregion
-
-    /// <summary>The polymorphism base of all structure errors in the Seven framework.</summary>
-    public class Error : Seven.Error
-    {
-      public Error(string message) : base(message) { }
-    }
   }
 }
