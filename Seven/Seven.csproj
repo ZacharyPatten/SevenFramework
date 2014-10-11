@@ -130,7 +130,7 @@
     <Compile Include="Structures\Deque.cs" />
     <Compile Include="Structures\Foreach.cs" />
     <Compile Include="Structures\Graph.cs" />
-    <Compile Include="Structures\Hash.cs" />
+    <Compile Include="Hash.cs" />
     <Compile Include="Structures\Map.cs" />
     <Compile Include="Structures\Heap.cs" />
     <Compile Include="Structures\Omnitree.cs" />

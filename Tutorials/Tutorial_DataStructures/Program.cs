@@ -357,7 +357,7 @@ namespace Testing
       #region Graph
 
       Console.WriteLine("  Testing Graph_SetQuadtree<int>--------------------");
-      Graph<int> graph = new Graph_SetQuadtree<int>(Logic.Equate, Logic.Compare, Hash.Default, 0, test, Statistics.Mean);
+      Graph<int> graph = new Graph_SetOmnitree<int>(Logic.Equate, Logic.Compare, Hash.Default, 0, test, Statistics.Mean);
       // add nodes
       for (int i = 0; i < test; i++)
         graph.Add(i);
