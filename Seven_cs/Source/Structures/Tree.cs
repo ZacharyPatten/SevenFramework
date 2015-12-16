@@ -38,6 +38,7 @@ namespace Seven.Structures
 
 	/// <summary>A generic tree data structure using a dictionary to store node data.</summary>
 	/// <typeparam name="T">The generic type stored in this data structure.</typeparam>
+	[System.Serializable]
 	public class Tree_Map<T> : Tree<T>
 	{
 		#region Node
