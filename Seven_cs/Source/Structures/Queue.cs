@@ -40,6 +40,7 @@ namespace Seven.Structures
 		#region Node
 
 		/// <summary>This class just holds the data for each individual node of the list.</summary>
+		[System.Serializable]
 		private class Node
 		{
 			private T _value;

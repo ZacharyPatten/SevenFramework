@@ -42,6 +42,7 @@ namespace Seven.Structures
 	{
 		#region Node
 
+		[System.Serializable]
 		private class NodeData
 		{
 			private T _parent;

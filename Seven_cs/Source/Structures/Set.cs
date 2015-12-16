@@ -31,10 +31,12 @@ namespace Seven.Structures
 
 	/// <summary>An unsorted structure of unique items.</summary>
 	/// <typeparam name="T">The generic type of the structure.</typeparam>
+	[System.Serializable]
 	public class Set_Hash<T> : Set<T>
 	{
 		#region Node
 
+		[System.Serializable]
 		private class Node
 		{
 			private T _key;

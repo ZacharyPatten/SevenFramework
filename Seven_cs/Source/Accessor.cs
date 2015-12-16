@@ -23,8 +23,28 @@ namespace Seven
 	{
 		public static Get<T> Get<T>(IList<T> ilist)
 		{
-			return (int index) => { return ilist[index]; };
+			return new GetIList_Wrapper<T>(ilist).Get;
 		}
+
+		#region GetIList_Wrapper<T>
+
+		[System.Serializable]
+		internal struct GetIList_Wrapper<T>
+		{
+			IList<T> _ilist;
+
+			internal GetIList_Wrapper(IList<T> ilist)
+			{
+				_ilist = ilist;
+			}
+
+			internal T Get(int index)
+			{
+				return this._ilist[index];
+			}
+		}
+
+		#endregion
 
 		public static Assign<T> Assign<T>(IList<T> ilist)
 		{

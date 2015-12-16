@@ -117,12 +117,12 @@ namespace Tutorial_Mathematics
 			Console.WriteLine();
 
 			// Quantiles
-			double[] quatiles = Statistics<double>.Quantiles(4, statistics_data.Stepper());
-			Console.Write("		Quartiles(data):");
-			foreach (double i in quatiles)
-				Console.Write(string.Format(" {0:0.00}", i));
-			Console.WriteLine();
-			Console.WriteLine();
+			//double[] quatiles = Statistics<double>.Quantiles(4, statistics_data.Stepper());
+			//Console.Write("		Quartiles(data):");
+			//foreach (double i in quatiles)
+			//	Console.Write(string.Format(" {0:0.00}", i));
+			//Console.WriteLine();
+			//Console.WriteLine();
 
 			#endregion
 

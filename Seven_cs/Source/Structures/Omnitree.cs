@@ -118,7 +118,7 @@ namespace Seven.Structures
 		#region extensions
 
 		/// <summary>Gets the dimensions of the center point of the Omnitree.</summary>
-		public static M[] Get_Origin<T, M>(this Omnitree<T, M> omniTree)
+		public static M[] Origin_Array<T, M>(this Omnitree<T, M> omniTree)
 		{
 			M[] array = new M[omniTree.Dimensions];
 			for (int i = 0; i < omniTree.Dimensions; i++)
@@ -127,7 +127,7 @@ namespace Seven.Structures
 		}
 
 		/// <summary>The minimum dimensions of the Omnitree.</summary>
-		public static M[] Get_Min<T, M>(this Omnitree<T, M> omniTree)
+		public static M[] Min_Array<T, M>(this Omnitree<T, M> omniTree)
 		{
 			M[] array = new M[omniTree.Dimensions];
 			for (int i = 0; i < omniTree.Dimensions; i++)
@@ -136,7 +136,7 @@ namespace Seven.Structures
 		}
 
 		/// <summary>The maximum dimensions of the Omnitree.</summary>
-		public static M[] Get_Max<T, M>(this Omnitree<T, M> omniTree)
+		public static M[] Max_Array<T, M>(this Omnitree<T, M> omniTree)
 		{
 			M[] array = new M[omniTree.Dimensions];
 			for (int i = 0; i < omniTree.Dimensions; i++)
@@ -147,10 +147,19 @@ namespace Seven.Structures
 		/// <summary>Iterates through the provided dimensions and ensures each item is in the proper leaf.</summary>
 		/// <param name="min">The minimum dimensions of the space to update.</param>
 		/// <param name="max">The maximum dimensions of the space to update.</param>
-		public static void Update<T, M>(this Omnitree<T, M> omniTree,
-			System.Collections.Generic.IList<M> min,
-			System.Collections.Generic.IList<M> max)
+		public static void Update<T, M>(this Omnitree<T, M> omniTree, M[] min, M[] max)
 		{
+			#region error
+#if no_error_checking
+			// nothing
+#else
+			if (min.Length != omniTree.Dimensions)
+				throw new Error("Invalid argument (Omnitree<T, M>.Dimensions != min.Count)");
+			if (max.Length != omniTree.Dimensions)
+				throw new Error("Invalid argument (Omnitree<T, M>.Dimensions != max.Count)");
+#endif
+			#endregion
+
 			omniTree.Update(
 				Accessor.Get(min),
 				Accessor.Get(max));
@@ -159,10 +168,19 @@ namespace Seven.Structures
 		/// <summary>Removes all the items in a given space.</summary>
 		/// <param name="min">The minimum values of the space.</param>
 		/// <param name="max">The maximum values of the space.</param>
-		public static void Remove<T, M>(this Omnitree<T, M> omniTree,
-			System.Collections.Generic.IList<M> min,
-			System.Collections.Generic.IList<M> max)
+		public static void Remove<T, M>(this Omnitree<T, M> omniTree, M[] min, M[] max)
 		{
+			#region error
+#if no_error_checking
+			// nothing
+#else
+			if (min.Length != omniTree.Dimensions)
+				throw new Error("Invalid argument (Omnitree<T, M>.Dimensions != min.Count)");
+			if (max.Length != omniTree.Dimensions)
+				throw new Error("Invalid argument (Omnitree<T, M>.Dimensions != max.Count)");
+#endif
+			#endregion
+
 			omniTree.Remove(
 				Accessor.Get(min),
 				Accessor.Get(max));
@@ -172,11 +190,19 @@ namespace Seven.Structures
 		/// <param name="min">The minimum values of the space.</param>
 		/// <param name="max">The maximum values of the space.</param>
 		/// <param name="where">The equality constraint of the removal.</param>
-		public static void Remove<T, M>(this Omnitree<T, M> omniTree,
-			System.Collections.Generic.IList<M> min,
-			System.Collections.Generic.IList<M> max,
-			Predicate<T> where)
+		public static void Remove<T, M>(this Omnitree<T, M> omniTree, M[] min, M[] max, Predicate<T> where)
 		{
+			#region error
+#if no_error_checking
+			// nothing
+#else
+			if (min.Length != omniTree.Dimensions)
+				throw new Error("Invalid argument (Omnitree<T, M>.Dimensions != min.Count)");
+			if (max.Length != omniTree.Dimensions)
+				throw new Error("Invalid argument (Omnitree<T, M>.Dimensions != max.Count)");
+#endif
+			#endregion
+
 			omniTree.Remove(
 				Accessor.Get(min),
 				Accessor.Get(max),
@@ -187,10 +213,19 @@ namespace Seven.Structures
 		/// <param name="function">The delegate to perform on all items in the tree within the given bounds.</param>
 		/// <param name="min">The minimum dimensions of the traversal.</param>
 		/// <param name="max">The maximum dimensions of the traversal.</param>
-		public static void Stepper<T, M>(this Omnitree<T, M> omniTree, Step<T> function,
-			System.Collections.Generic.IList<M> min,
-			System.Collections.Generic.IList<M> max)
+		public static void Stepper<T, M>(this Omnitree<T, M> omniTree, Step<T> function, M[] min, M[] max)
 		{
+			#region error
+#if no_error_checking
+			// nothing
+#else
+			if (min.Length != omniTree.Dimensions)
+				throw new Error("Invalid argument (Omnitree<T, M>.Dimensions != min.Count)");
+			if (max.Length != omniTree.Dimensions)
+				throw new Error("Invalid argument (Omnitree<T, M>.Dimensions != max.Count)");
+#endif
+			#endregion
+
 			omniTree.Stepper(
 				function,
 				Accessor.Get(min),
@@ -201,10 +236,19 @@ namespace Seven.Structures
 		/// <param name="function">The delegate to perform on all items in the tree within the given bounds.</param>
 		/// <param name="min">The minimum dimensions of the traversal.</param>
 		/// <param name="max">The maximum dimensions of the traversal.</param>
-		public static void Stepper<T, M>(this Omnitree<T, M> omniTree, StepRef<T> function,
-			System.Collections.Generic.IList<M> min,
-			System.Collections.Generic.IList<M> max)
+		public static void Stepper<T, M>(this Omnitree<T, M> omniTree, StepRef<T> function, M[] min, M[] max)
 		{
+			#region error
+#if no_error_checking
+			// nothing
+#else
+			if (min.Length != omniTree.Dimensions)
+				throw new Error("Invalid argument (Omnitree<T, M>.Dimensions != min.Count)");
+			if (max.Length != omniTree.Dimensions)
+				throw new Error("Invalid argument (Omnitree<T, M>.Dimensions != max.Count)");
+#endif
+			#endregion
+
 			omniTree.Stepper(
 				function,
 				Accessor.Get(min),
@@ -215,10 +259,19 @@ namespace Seven.Structures
 		/// <param name="function">The delegate to perform on all items in the tree within the given bounds.</param>
 		/// <param name="min">The minimum dimensions of the traversal.</param>
 		/// <param name="max">The maximum dimensions of the traversal.</param>
-		public static StepStatus Stepper<T, M>(this Omnitree<T, M> omniTree, StepBreak<T> function,
-			System.Collections.Generic.IList<M> min,
-			System.Collections.Generic.IList<M> max)
+		public static StepStatus Stepper<T, M>(this Omnitree<T, M> omniTree, StepBreak<T> function, M[] min, M[] max)
 		{
+			#region error
+#if no_error_checking
+			// nothing
+#else
+			if (min.Length != omniTree.Dimensions)
+				throw new Error("Invalid argument (Omnitree<T, M>.Dimensions != min.Count)");
+			if (max.Length != omniTree.Dimensions)
+				throw new Error("Invalid argument (Omnitree<T, M>.Dimensions != max.Count)");
+#endif
+			#endregion
+
 			return omniTree.Stepper(
 				function,
 				Accessor.Get(min),
@@ -229,14 +282,33 @@ namespace Seven.Structures
 		/// <param name="function">The delegate to perform on all items in the tree within the given bounds.</param>
 		/// <param name="min">The minimum dimensions of the traversal.</param>
 		/// <param name="max">The maximum dimensions of the traversal.</param>
-		public static StepStatus Stepper<T, M>(this Omnitree<T, M> omniTree, StepRefBreak<T> function,
-			System.Collections.Generic.IList<M> min,
-			System.Collections.Generic.IList<M> max)
+		public static StepStatus Stepper<T, M>(this Omnitree<T, M> omniTree, StepRefBreak<T> function, M[] min, M[] max)
 		{
+			#region error
+#if no_error_checking
+			// nothing
+#else
+			if (min.Length != omniTree.Dimensions)
+				throw new Error("Invalid argument (Omnitree<T, M>.Dimensions != min.Count)");
+			if (max.Length != omniTree.Dimensions)
+				throw new Error("Invalid argument (Omnitree<T, M>.Dimensions != max.Count)");
+#endif
+			#endregion
+
 			return omniTree.Stepper(
 				function,
 				Accessor.Get(min),
 				Accessor.Get(max));
+		}
+
+		/// <summary>Shallow data structure copy into an array.</summary>
+		/// <returns>An array with all the item</returns>
+		public static T[] ToArray<T, M>(this Omnitree<T, M> omniTree)
+		{
+			T[] array = new T[omniTree.Count];
+			int index = 0;
+			omniTree.Stepper((T entry) => { array[index++] = entry; });
+			return array;
 		}
 
 		#endregion
@@ -248,7 +320,7 @@ namespace Seven.Structures
 	[System.Serializable]
 	public class Omnitree_LinkedArrayLists<T, M> : Omnitree<T, M>
 	{
-		#region class
+		#region Node
 
 		/// <summary>Can be a leaf or a branch.</summary>
 		[System.Serializable]
@@ -275,6 +347,10 @@ namespace Seven.Structures
 			}
 		}
 
+		#endregion
+
+		#region Leaf
+
 		/// <summary>A leaf in the tree. Only contains items.</summary>
 		[System.Serializable]
 		private class Leaf : Node
@@ -289,6 +365,10 @@ namespace Seven.Structures
 				this._contents = new T[_defaultLoad];
 			}
 		}
+
+		#endregion
+
+		#region Branch
 
 		/// <summary>A branch in the tree. Only contains nodes.</summary>
 		[System.Serializable]
@@ -405,9 +485,7 @@ namespace Seven.Structures
 		/// <param name="locate">A function for locating an item along the provided dimensions.</param>
 		/// <param name="compare">A function for comparing two items of the types of the axis.</param>
 		/// <param name="average">A function for computing the average between two items of the axis types.</param>
-		public Omnitree_LinkedArrayLists(
-			System.Collections.Generic.IList<M> min,
-			System.Collections.Generic.IList<M> max,
+		public Omnitree_LinkedArrayLists(M[] min, M[] max,
 			Omnitree.Locate_Final<T, M> locate,
 			Compare<M> compare,
 			Omnitree.Average<M> average)
@@ -416,7 +494,7 @@ namespace Seven.Structures
 #if no_error_checking
 			// nothing
 #else
-			if (min.Count != max.Count)
+			if (min.Length != max.Length)
 				throw new Error("invalid min/max dimensions when constructing an Omnitree_Array");
 #endif
 			#endregion
@@ -766,13 +844,13 @@ namespace Seven.Structures
 			{
 				Node oldChild = this._top;
 				this._top = new Leaf(oldChild.Min, oldChild.Max, parent, oldChild.Index);
-				this.Stepper((T i) => { this.Add(i); }, oldChild);
+				this.Stepper(new Step<T>(this.Add), oldChild);
 			}
 			else if (parent.Children.Length == this._children)
 			{
 				Node oldChild = parent.Children[child];
 				parent.Children[child] = new Leaf(oldChild.Min, oldChild.Max, parent, oldChild.Index);
-				this.Stepper((T i) => { this.Add(i); }, oldChild);
+				this.Stepper(new Step<T>(this.Add), oldChild);
 			}
 			else
 			{
@@ -782,7 +860,7 @@ namespace Seven.Structures
 					{
 						Node oldChild = parent.Children[i];
 						parent.Children[i] = new Leaf(oldChild.Min, oldChild.Max, parent, oldChild.Index);
-						this.Stepper((T j) => { this.Add(j); }, oldChild);
+						this.Stepper(new Step<T>(this.Add), oldChild);
 						break;
 					}
 				}
@@ -1334,17 +1412,7 @@ namespace Seven.Structures
 			}
 			return StepStatus.Continue;
 		}
-
-		/// <summary>Puts all the items on this tree into an array.</summary>
-		/// <returns>The array containing all the items within the tree.</returns>
-		public T[] ToArray()
-		{
-			int index = 0;
-			T[] array = new T[this._count];
-			this.Stepper((T entry) => { array[index++] = entry; });
-			return array;
-		}
-
+		
 		/// <summary>Creates a shallow clone of this data structure.</summary>
 		/// <returns>A shallow clone of this data structure.</returns>
 		public Omnitree_LinkedArrayLists<T, M> Clone()
@@ -1354,7 +1422,7 @@ namespace Seven.Structures
 				this._dimensions,
 				this._top.Min,this._top.Max,
 				this._locate, this._compare, this._average);
-			this.Stepper((T current) => { clone.Add(current); });
+			this.Stepper(new Step<T>(clone.Add));
 			return clone;
 		}
 
@@ -1659,7 +1727,7 @@ namespace Seven.Structures
 	[System.Serializable]
 	public class Omnitree_LinkedLinkedLists<T, M> : Omnitree<T, M>
 	{
-		#region class
+		#region Node
 
 		/// <summary>Can be a leaf or a branch.</summary>
 		[System.Serializable]
@@ -1686,10 +1754,15 @@ namespace Seven.Structures
 			}
 		}
 
+		#endregion
+
+		#region Leaf
+
 		/// <summary>A branch in the tree. Only contains items.</summary>
 		[System.Serializable]
 		private class Leaf : Node
 		{
+			[System.Serializable]
 			internal class Node
 			{
 				internal T _value;
@@ -1706,7 +1779,6 @@ namespace Seven.Structures
 			}
 
 			private Node _head;
-			private int _count;
 
 			public Node Head { get { return this._head; } set { this._head = value; } }
 
@@ -1714,10 +1786,15 @@ namespace Seven.Structures
 				: base(min, max, parent, index) { }
 		}
 
+		#endregion
+
+		#region Branch
+
 		/// <summary>A branch in the tree. Only contains nodes.</summary>
 		[System.Serializable]
 		private class Branch : Node
 		{
+			[System.Serializable]
 			internal class Node
 			{
 				private Omnitree_LinkedLinkedLists<T, M>.Node _value;
@@ -1868,14 +1945,12 @@ namespace Seven.Structures
 		/// <param name="locate">A function for locating an item along the provided dimensions.</param>
 		/// <param name="compare">A function for comparing two items of the types of the axis.</param>
 		/// <param name="average">A function for computing the average between two items of the axis types.</param>
-		public Omnitree_LinkedLinkedLists(
-			System.Collections.Generic.IList<M> min,
-			System.Collections.Generic.IList<M> max,
+		public Omnitree_LinkedLinkedLists(M[] min, M[] max,
 			Omnitree.Locate_Final<T, M> locate,
 			Compare<M> compare,
 			Omnitree.Average<M> average) :
 			this(
-				min.Count,
+				min.Length,
 				Accessor.Get(min),
 				Accessor.Get(max),
 				locate,
@@ -1886,33 +1961,11 @@ namespace Seven.Structures
 #if no_error_checking
 			// nothing
 #else
-			if (min.Count != max.Count)
+			if (min.Length != max.Length)
 				throw new Error("invalid min/max dimensions when constructing an Omnitree_Linked");
 #endif
 			#endregion
 		}
-
-		///// <summary>Constructor for an Omnitree_Linked2.</summary>
-		///// <param name="min">The minimum values of the tree.</param>
-		///// <param name="max">The maximum values of the tree.</param>
-		///// <param name="locate">A function for locating an item along the provided dimensions.</param>
-		///// <param name="compare">A function for comparing two items of the types of the axis.</param>
-		///// <param name="average">A function for computing the average between two items of the axis types.</param>
-		//public Omnitree_Linked2(
-		//	int dimensions,
-		//	Get<M> min, Get<M> max,
-		//	Omnitree.Locate_NonOut<T, M> locate,
-		//	Compare<M> compare,
-		//	Omnitree.Average<M> average)
-		//	: this(
-		//	dimensions,
-		//	min, max,
-		//		// this is just an adapter - JIT should optimize
-		//	(T item, out M[] ms) => { ms = locate(item); },
-		//	compare, average)
-		//{
-
-		//}
 
 		#endregion
 
@@ -2353,7 +2406,7 @@ namespace Seven.Structures
 			{
 				Node oldChild = this._top;
 				this._top = new Leaf(oldChild.Min, oldChild.Max, parent, oldChild.Index);
-				this.Stepper((T i) => { this.Add(i); }, oldChild);
+				this.Stepper(new Step<T>(this.Add), oldChild);
 			}
 			else
 			{
@@ -2368,7 +2421,7 @@ namespace Seven.Structures
 						{
 							Branch.Node shrinking = list.Next;
 							list.Next = new Branch.Node(new Leaf(shrinking.Value.Min, shrinking.Value.Max, parent, shrinking.Value.Index), list.Next.Next);
-							this.Stepper((T j) => { this.Add(j); }, shrinking.Value);
+							this.Stepper(new Step<T>(this.Add), shrinking.Value);
 							break;
 						}
 						list = list.Next;
@@ -2532,8 +2585,8 @@ namespace Seven.Structures
 				}
 			}
 
-			min = (int dimension) => { return min_array[dimension]; };
-			max = (int dimension) => { return max_array[dimension]; };
+			min = Accessor.Get(min_array);
+			max = Accessor.Get(max_array);
 		}
 
 		/// <summary>Checks a node for inclusion (overlap) between two spaces.</summary>
@@ -3149,16 +3202,6 @@ namespace Seven.Structures
 			return StepStatus.Continue;
 		}
 
-		/// <summary>Puts all the items on this tree into an array.</summary>
-		/// <returns>The array containing all the items within the tree.</returns>
-		public T[] ToArray()
-		{
-			int index = 0;
-			T[] array = new T[this._count];
-			this.Stepper((T entry) => { array[index++] = entry; });
-			return array;
-		}
-
 		/// <summary>Creates a shallow clone of this data structure.</summary>
 		/// <returns>A shallow clone of this data structure.</returns>
 		public Omnitree_LinkedLinkedLists<T, M> Clone()
@@ -3170,7 +3213,7 @@ namespace Seven.Structures
 				this._locate,
 				this._compare,
 				this._average);
-			this.Stepper((T current) => { clone.Add(current); });
+			this.Stepper(new Step<T>(clone.Add));
 			return clone;
 		}
 

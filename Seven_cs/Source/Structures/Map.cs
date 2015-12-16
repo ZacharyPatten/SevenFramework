@@ -63,6 +63,7 @@ namespace Seven.Structures
 	{
 		#region Node
 
+		[System.Serializable]
 		private class Node
 		{
 			private K _key;

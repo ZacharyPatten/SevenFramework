@@ -212,6 +212,7 @@ namespace Seven.Structures
 		#region Node
 
 		/// <summary>This class just holds the data for each individual node of the tree.</summary>
+		[System.Serializable]
 		private class Node
 		{
 			private T _value;
@@ -1167,6 +1168,7 @@ namespace Seven.Structures
 	{
 		#region Node
 
+		[System.Serializable]
 		public struct Node
 		{
 			public bool _occupied;

@@ -8,7 +8,6 @@ namespace Seven.Mathematics
 	/// <summary>Contains generic mathematics linear algebra operations.</summary>
 	public static class LinearAlgebra<T>
 	{
-
 		#region static controls
 
 		// The minimum size (rows x columns) that will trigger multithreading 
@@ -6261,7 +6260,6 @@ namespace Seven.Mathematics
 		#endregion
 
 		#endregion
-
 	}
 
 	#region Vector

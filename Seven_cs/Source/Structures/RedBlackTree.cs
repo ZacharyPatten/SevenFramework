@@ -149,6 +149,7 @@
 	{
 		#region Node
 
+		[System.Serializable]
 		private class Node
 		{
 			private bool _color;
