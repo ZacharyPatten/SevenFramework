@@ -5,7 +5,7 @@
 
 ##### Summary
 
->The Seven code library is a general purpose C# & C++ framework library.
+>The Seven code library is a general purpose C# framework library.
 >Its goal is to provide fundamental concepts to aid in the development
 >of any kind of project. These concepts include data structures,
 >mathematics, multi-threading utilities, and more. Check out the source 
