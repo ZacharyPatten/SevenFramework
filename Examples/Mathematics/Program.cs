@@ -162,13 +162,13 @@ namespace Tutorial_Mathematics
 			// Prime Factorization
 			int prime_factors = random.Next(0, 100000);
 			Console.Write("    Prime Factors(" + prime_factors + "): ");
-			Compute<int>.factorPrimes(prime_factors, (int i) => { Console.Write(i + " "); });
+			Compute<int>.FactorPrimes(prime_factors, (int i) => { Console.Write(i + " "); });
 			Console.WriteLine();
 			Console.WriteLine();
 
 			// Logarithms
 			int log_1 = random.Next(0, 11), log_2 = random.Next(0, 100000);
-			Console.WriteLine("    log_" + log_1 + "(" + log_2 + "): " + string.Format("{0:0.00}", Compute<double>.log((double)log_1, (double)log_2)));
+			Console.WriteLine("    log_" + log_1 + "(" + log_2 + "): " + string.Format("{0:0.00}", Compute<double>.Logarithm((double)log_1, (double)log_2)));
 			Console.WriteLine();
 
 			// Summation

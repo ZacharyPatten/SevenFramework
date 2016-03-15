@@ -20,7 +20,7 @@ namespace Seven.Mathematics
 		/// <summary>Static storage class for all the delegates used in the Compute class.</summary>
 		public static class Delegates
 		{
-			#region constant
+			#region Constant
 
 			public delegate T IntCast(int value);
 
@@ -28,7 +28,7 @@ namespace Seven.Mathematics
 
 			#endregion
 
-			#region arithmetic
+			#region Arithmetic
 
 			/// <summary>Negates a value.</summary>
 			/// <param name="value">The value to negate.</param>
@@ -73,10 +73,15 @@ namespace Seven.Mathematics
 			/// <param name="r">The root to find of b.</param>
 			/// <returns>x from: [ x ^ r = b ]</returns>
 			public delegate T Root(T b, T r);
+			/// <summary>Computes: [ log_b(n) ].</summary>
+			/// <param name="n">The value to be log-ed.</param>
+			/// <param name="b">The base of the log operation.</param>
+			/// <returns>[ log_b(n) ]</returns>
+			public delegate T Logarithm(T n, T b);
 
 			#endregion
 
-			#region logic
+			#region Logic
 
 			/// <summary>Computes the absolute value of a value.</summary>
 			/// <param name="n">The value to be absolut-ed.</param>
@@ -105,7 +110,7 @@ namespace Seven.Mathematics
 
 			#endregion
 
-			#region factoring / multiple
+			#region Factors & Multiples
 
 			/// <summary>Finds the greatest common factor between multiple integers.</summary>
 			/// <param name="stepper">The stepper function for the set.</param>
@@ -123,25 +128,20 @@ namespace Seven.Mathematics
 
 			#endregion
 
-			#region exponential / logarithm
+			#region Exponential / Natural Logarithm
 
 			/// <summary>Computes: [ e ^ x ].</summary>
 			/// <param name="x">The exponent.</param>
 			/// <returns>[ e ^ x ]</returns>
-			public delegate T exp(T x);
+			public delegate T Exponential(T x);
 			/// <summary>Computes (natrual log): [ ln(n) ].</summary>
 			/// <param name="n">The value to compute the natural log of.</param>
 			/// <returns>The result of the natrual log operation.</returns>
-			public delegate T ln(T n);
-			/// <summary>Computes: [ log_b(n) ].</summary>
-			/// <param name="n">The value to be log-ed.</param>
-			/// <param name="b">The base of the log operation.</param>
-			/// <returns>[ log_b(n) ]</returns>
-			public delegate T log(T n, T b);
+			public delegate T NaturalLogarithm(T n);
 
 			#endregion
 
-			#region angles
+			#region Angles
 
 			public delegate T DegreesToRadians(T degrees);
 			public delegate T TurnsToRadians(T turns);
@@ -170,6 +170,8 @@ namespace Seven.Mathematics
 			public delegate T LinearInterpolation(T x, T x0, T x1, T y0, T y1);
 
 			#endregion
+
+			#region Linear Algebra
 
 			#region vector
 
@@ -468,6 +470,8 @@ namespace Seven.Mathematics
 
 			#endregion
 
+			#endregion
+
 			#region Combinatorics
 
 			/// <summary>Computes: [ N! ].</summary>
@@ -490,7 +494,7 @@ namespace Seven.Mathematics
 
 			#endregion
 
-			#region statistics
+			#region Statistics
 
 			/// <summary>Finds the number of occurences for each item and sorts them into a heap.</summary>
 			/// <param name="stepper">The values to find the mode(s) of.</param>
@@ -539,7 +543,7 @@ namespace Seven.Mathematics
 
 			#endregion
 
-			#region trigonometry
+			#region Trigonometry
 
 			/// <summary>Computes the ratio [length of the side opposite to the angle / hypotenuse] in a right triangle.</summary>
 			/// <param name="angle">The angle to compute the trigonometric function of.</param>
@@ -1272,6 +1276,22 @@ namespace Seven.Mathematics
 		};
 		#endregion
 
+		#region Logarithm
+		/// <summary>Computes: [ log_b(n) ].</summary>
+		public static Compute<T>.Delegates.Logarithm Logarithm = (T value, T _base) =>
+		{
+#if show_Numeric
+			Compute<Numeric>.delegates.log compile_testing = (Numeric _value, Numeric __base) => { return (Numeric)System.Math.Log((double)_value, (double)__base); };
+#endif
+
+			Compute<T>.Logarithm =
+				Meta.Compile<Compute<T>.Delegates.Logarithm>(
+					string.Concat("(" + Type_String + " _value, " + Type_String + " __base) => { return (" + Type_String + ")System.Math.Log((double)_value, (double)__base); }"));
+
+			return Compute<T>.Logarithm(value, _base);
+		};
+		#endregion
+
 		#endregion
 
 		#region Logic
@@ -1520,8 +1540,9 @@ namespace Seven.Mathematics
 
 		#endregion
 
-		#region factoring / multiple
+		#region Factors & Multiples
 
+		#region GreatestCommonFactor
 		/// <summary>Computes (greatest common factor): [ GCF(set) ].</summary>
 		public static Compute<T>.Delegates.GreatestCommonFactor GreatestCommonFactor = (Stepper<T> stepper) =>
 		{
@@ -1603,7 +1624,9 @@ namespace Seven.Mathematics
 
 			return Compute<T>.GreatestCommonFactor(stepper);
 		};
+		#endregion
 
+		#region LeastCommonMultiple
 		/// <summary>Computes (least common multiple): [ LCM(set) ].</summary>
 		public static Compute<T>.Delegates.LeastCommonMultiple LeastCommonMultiple = (Stepper<T> stepper) =>
 		{
@@ -1679,9 +1702,11 @@ namespace Seven.Mathematics
 
 			return Compute<T>.LeastCommonMultiple(stepper);
 		};
+		#endregion
 
+		#region FactorPrimes
 		/// <summary>Computes the prime factors of n.</summary>
-		public static Compute<T>.Delegates.FactorPrimes factorPrimes = (T value, Step<T> step) =>
+		public static Compute<T>.Delegates.FactorPrimes FactorPrimes = (T value, Step<T> step) =>
 		{
 #if show_Numeric
 			Compute<Numeric>.delegates.FactorPrimes compile_testing =
@@ -1713,7 +1738,7 @@ namespace Seven.Mathematics
 					};
 #endif
 
-			Compute<T>.factorPrimes =
+			Compute<T>.FactorPrimes =
 				Meta.Compile<Compute<T>.Delegates.FactorPrimes>(
 					string.Concat(
 @"(", Type_String, " _value, Step<", Type_String, @"> _step) =>
@@ -1743,58 +1768,49 @@ namespace Seven.Mathematics
 		_step(__value);
 }"));
 
-			Compute<T>.factorPrimes(value, step);
+			Compute<T>.FactorPrimes(value, step);
 		};
+		#endregion
 
 		#endregion
 
-		#region exponential / logarithm
+		#region Exponential & Natural Logarithm
 
+		#region Exponential
 		/// <summary>Computes: [ e ^ x ].</summary>
-		public static Compute<T>.Delegates.exp exp = (T value) =>
+		public static Compute<T>.Delegates.Exponential Exponential = (T value) =>
 		{
 #if show_Numeric
 			Compute<Numeric>.delegates.exp compile_testing = (Compute<Numeric>.delegates.exp)((Numeric _value) => { throw new Error("not yet implemented"); });
 #endif
 
-			Compute<T>.exp =
-				Meta.Compile<Compute<T>.Delegates.exp>(
+			Compute<T>.Exponential =
+				Meta.Compile<Compute<T>.Delegates.Exponential>(
 					string.Concat("(", Type_String, " _value) => { return (", Type_String, ")System.Math.Sqrt((double)_value); }"));
 
-			return Compute<T>.exp(value);
+			return Compute<T>.Exponential(value);
 		};
+		#endregion
 
+		#region Natural Logarithm
 		/// <summary>Computes (natrual log): [ ln(n) ].</summary>
-		public static Compute<T>.Delegates.ln ln = (T value) =>
+		public static Compute<T>.Delegates.NaturalLogarithm NaturalLogarithm = (T value) =>
 		{
 #if show_Numeric
 			Compute<Numeric>.delegates.ln compile_testing = (Numeric _value) => { throw new Error("not yet implemented"); };
 #endif
 
-			Compute<T>.ln =
-				Meta.Compile<Compute<T>.Delegates.ln>(
+			Compute<T>.NaturalLogarithm =
+				Meta.Compile<Compute<T>.Delegates.NaturalLogarithm>(
 					string.Concat("(", Type_String, " _value) => { throw new Error(\"not yet implemented\"); }"));
 
-			return Compute<T>.ln(value);
+			return Compute<T>.NaturalLogarithm(value);
 		};
-
-		/// <summary>Computes: [ log_b(n) ].</summary>
-		public static Compute<T>.Delegates.log log = (T value, T _base) =>
-		{
-#if show_Numeric
-			Compute<Numeric>.delegates.log compile_testing = (Numeric _value, Numeric __base) => { return (Numeric)System.Math.Log((double)_value, (double)__base); };
-#endif
-
-			Compute<T>.log =
-				Meta.Compile<Compute<T>.Delegates.log>(
-					string.Concat("(" + Type_String + " _value, " + Type_String + " __base) => { return (" + Type_String + ")System.Math.Log((double)_value, (double)__base); }"));
-
-			return Compute<T>.log(value, _base);
-		};
+		#endregion
 
 		#endregion
 
-		#region angles
+		#region Angles
 
 		/// <summary>Converts degrees to radians.</summary>
 		public static Compute<T>.Delegates.DegreesToRadians DegreesToRadians = (T degrees) =>
@@ -2036,6 +2052,8 @@ namespace Seven.Mathematics
 			};
 
 		#endregion
+
+		#region Linear Algebra
 
 		#region vector
 
@@ -7528,8 +7546,11 @@ namespace Seven.Mathematics
 
 		#endregion
 
-		#region combinatorics
+		#endregion
 
+		#region Combinatorics
+
+		#region Factorial
 		/// <summary>Computes: [ N! ].</summary>
 		public static Compute<T>.Delegates.Factorial Factorial = (T value) =>
 		{
@@ -7575,7 +7596,9 @@ namespace Seven.Mathematics
 
 			return Compute<T>.Factorial(value);
 		};
+		#endregion
 
+		#region Combinations
 		/// <summary>Computes: [ N! / (n[0]! + n[1]! + n[3]! ...) ].</summary>
 		public static Compute<T>.Delegates.Combinations Combinations = (T N, T[] n) =>
 		{
@@ -7625,7 +7648,9 @@ namespace Seven.Mathematics
 
 			return Compute<T>.Combinations(N, n);
 		};
+		#endregion
 
+		#region Choose
 		/// <summary>Computes: [ N! / (N - n)! ]</summary>
 		public static Compute<T>.Delegates.Choose Choose = (T N, T n) =>
 		{
@@ -7660,11 +7685,13 @@ namespace Seven.Mathematics
 
 			return Compute<T>.Choose(N, n);
 		};
+		#endregion
 
 		#endregion
 
-		#region statistics
+		#region Statistics
 
+		#region Mode
 		/// <summary>Finds the number of occurences for each item and sorts them into a heap.</summary>
 		public static Compute<T>.Delegates.Mode Mode = (Stepper<T> stepper) =>
 		{
@@ -7735,7 +7762,9 @@ namespace Seven.Mathematics
 
 			return Compute<T>.Mode(stepper);
 		};
+		#endregion
 
+		#region Mean
 		/// <summary>Computes the mean (or average) between multiple values.</summary>
 		public static Compute<T>.Delegates.Mean Mean = (Stepper<T> stepper) =>
 		{
@@ -7763,7 +7792,9 @@ namespace Seven.Mathematics
 
 			return Compute<T>.Mean(stepper);
 		};
+		#endregion
 
+		#region Median
 		/// <summary>Computes the median of a set of values.</summary>
 		public static Compute<T>.Delegates.Median Median = (Stepper<T> stepper) =>
 		{
@@ -7849,7 +7880,9 @@ namespace Seven.Mathematics
 
 			return Compute<T>.Median(stepper);
 		};
+		#endregion
 
+		#region GeometricMean
 		/// <summary>Computes the median of a set of values.</summary>
 		public static Compute<T>.Delegates.GeometricMean GeometricMean = (Stepper<T> stepper) =>
 		{
@@ -7885,7 +7918,9 @@ namespace Seven.Mathematics
 
 			return Compute<T>.GeometricMean(stepper);
 		};
+		#endregion
 
+		#region Variance
 		/// <summary>Computes the variance of a set of values.</summary>
 		public static Compute<T>.Delegates.Variance Variance = (Stepper<T> stepper) =>
 		{
@@ -7936,7 +7971,9 @@ namespace Seven.Mathematics
 
 			return Compute<T>.Variance(stepper);
 		};
+		#endregion
 
+		#region StandardDeviation
 		/// <summary>Computes the standard deviation of a set of values.</summary>
 		public static Compute<T>.Delegates.StandardDeviation StandardDeviation = (Stepper<T> stepper) =>
 		{
@@ -7970,7 +8007,9 @@ namespace Seven.Mathematics
 
 			return Compute<T>.StandardDeviation(stepper);
 		};
+		#endregion
 
+		#region MeanDeviation
 		/// <summary>Computes the mean deviation of a set of values.</summary>
 		/// <see cref="Seven.Mathematics.Logic<T>.abs"/>
 		/// <see cref="Seven.Mathematics.Compute<T>.Mean"/>
@@ -8010,7 +8049,9 @@ namespace Seven.Mathematics
 
 			return Compute<T>.MeanDeviation(stepper);
 		};
+		#endregion
 
+		#region Range
 		/// <summary>Computes the standard deviation of a set of values.</summary>
 		public static Compute<T>.Delegates.Range Range = (out T min, out T max, Stepper<T> stepper) =>
 		{
@@ -8068,7 +8109,9 @@ namespace Seven.Mathematics
 
 			Compute<T>.Range(out min, out max, stepper);
 		};
+		#endregion
 
+		#region Quantiles
 		/// <summary>Computes the quantiles of a set of values.</summary>
 		public static Compute<T>.Delegates.Quantiles Quantiles = (int quantiles, Stepper<T> stepper) =>
 		{
@@ -8140,7 +8183,9 @@ namespace Seven.Mathematics
 
 			return Compute<T>.Quantiles(quantiles, stepper);
 		};
+		#endregion
 
+		#region Correlation
 		/// <summary>Computes the median of a set of values.</summary>
 		public static Compute<T>.Delegates.Correlation Correlation = (Stepper<T> a, Stepper<T> b) =>
 		{
@@ -8213,10 +8258,11 @@ namespace Seven.Mathematics
 
 			return Compute<T>.Correlation(a, b);
 		};
+		#endregion
 
 		#endregion
-		
-		#region trigonometry
+
+		#region Trigonometry
 
 		/// <summary>Computes the ratio [length of the side opposite to the angle / hypotenuse] in a right triangle.</summary>
 		public static Compute<T>.Delegates.Sine Sine = (Angle<T> angle) =>
