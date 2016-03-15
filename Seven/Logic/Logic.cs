@@ -8,6 +8,154 @@
 //{
 //	public class Logic<T>
 //	{
+
+//		#region Definition
+
+//		public abstract class Node
+//		{
+//			public static implicit operator Node(T constant) { return new Constant(constant); }
+
+//			public Node Simplify() { return Symbolics<T>.Simplify(this); }
+//			public Node Assign(string variable, T value) { return Symbolics<T>.Assign(this, variable, value); }
+//			public Node Derive(string variable) { return Symbolics<T>.Derive(this, variable); }
+//			public Node Integrate(string variable) { return Symbolics<T>.Integrate(this, variable); }
+//		}
+
+//		public class Constant : Node
+//		{
+//			T _constant;
+
+//			public T Value { get { return this._constant; } }
+
+//			public Constant(T constant)
+//			{
+//				this._constant = constant;
+//			}
+
+//			public static implicit operator T(Constant constant) { return constant._constant; }
+
+//			public override string ToString() { return this._constant.ToString(); }
+//		}
+
+//		public class Variable : Node
+//		{
+//			public string _name;
+
+//			public string Name { get { return this._name; } }
+
+//			public Variable(string name)
+//			{
+//				this._name = name;
+//			}
+
+//			public override string ToString() { return this._name; }
+//		}
+
+//		public abstract class Operation : Node
+//		{
+//		}
+
+//		public abstract class Unary : Operation
+//		{
+//			protected Node _operand;
+
+//			public Node Operand
+//			{
+//				get { return this._operand; }
+//				set { this._operand = value; }
+//			}
+
+//			public Unary() : base() { }
+
+//			public Unary(Node operand)
+//			{
+//				this._operand = operand;
+//			}
+//		}
+
+//		public abstract class Binary : Operation
+//		{
+//			protected Node _left;
+//			protected Node _right;
+
+//			public Node Left
+//			{
+//				get { return this._left; }
+//				set { this._left = value; }
+//			}
+
+//			public Node Right
+//			{
+//				get { return this._right; }
+//				set { this._right = value; }
+//			}
+
+//			public Binary() { }
+
+//			public Binary(Node left, Node right)
+//			{
+//				this._left = left;
+//				this._right = right;
+//			}
+//		}
+
+//		public abstract class Ternary : Operation
+//		{
+//			protected Node _one;
+//			protected Node _two;
+//			protected Node _three;
+
+//			public Node One
+//			{
+//				get { return this._one; }
+//				set { this._one = value; }
+//			}
+
+//			public Node Two
+//			{
+//				get { return this._two; }
+//				set { this._two = value; }
+//			}
+
+//			public Node Three
+//			{
+//				get { return this._three; }
+//				set { this._three = value; }
+//			}
+
+//			public Ternary() { }
+
+//			public Ternary(Node one, Node two, Node three)
+//			{
+//				this._one = one;
+//				this._two = two;
+//				this._three = three;
+//			}
+//		}
+
+//		public abstract class Multinary : Operation
+//		{
+//			protected Node[] _operands;
+
+//			public Node[] Operands
+//			{
+//				get { return this._operands; }
+//				set { this._operands = value; }
+//			}
+
+//			public Multinary() { }
+
+//			public Multinary(Node[] operands)
+//			{
+//				this._operands = operands;
+//			}
+//		}
+
+//		#endregion
+
+
+
+
 //		public const string material_implication = "⇒";
 //		public const string double_material_implication = "⇔";
 //		public const string negation = "¬";

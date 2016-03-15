@@ -3,14 +3,14 @@
 // LISCENSE: See "LISCENSE.md" in th root project directory.
 // SUPPORT: See "SUPPORT.md" in the root project directory.
 
-using System;
+//using System;
 using System.Linq.Expressions;
 
 namespace Seven.Mathematics
 {
 	/// <summary>Contains syntax definitions for the Seven.Mathematics language.</summary>
 	/// <typeparam name="T"></typeparam>
-	public static class Syntax<T>
+	public static class Symbolics<T>
 	{
 		#region Definition
 
@@ -18,10 +18,10 @@ namespace Seven.Mathematics
 		{
 			public static implicit operator Node(T constant) { return new Constant(constant); }
 
-			public Node Simplify() { return Syntax<T>.Simplify(this); }
-			public Node Assign(string variable, T value) { return Syntax<T>.Assign(this, variable, value); }
-			public Node Derive(string variable) { return Syntax<T>.Derive(this, variable); }
-			public Node Integrate(string variable) { return Syntax<T>.Integrate(this, variable); }
+			public Node Simplify() { return Symbolics<T>.Simplify(this); }
+			public Node Assign(string variable, T value) { return Symbolics<T>.Assign(this, variable, value); }
+			public Node Derive(string variable) { return Symbolics<T>.Derive(this, variable); }
+			public Node Integrate(string variable) { return Symbolics<T>.Integrate(this, variable); }
 		}
 
 		public class Constant : Node
@@ -347,8 +347,8 @@ namespace Seven.Mathematics
 		{
 			try
 			{
-				Func<Expression, Node> recursive = null;
-				Func<InvocationExpression, Node> invocationExpression_to_node = null;
+				System.Func<Expression, Node> recursive = null;
+				System.Func<InvocationExpression, Node> invocationExpression_to_node = null;
 
 				recursive =
 					(Expression expression) =>
@@ -386,12 +386,12 @@ namespace Seven.Mathematics
 								return new Power(recursive(binary_expression.Left), recursive(binary_expression.Right));
 							// call
 							case ExpressionType.Call:
-								throw new ArithmeticException("Invalid syntax parse (only members of Seven.MathematicsCompute<T> allowed): " + expression);
+								throw new System.ArithmeticException("Invalid syntax parse (only members of Seven.MathematicsCompute<T> allowed): " + expression);
 							// Invocation
 							case ExpressionType.Invoke:
 								return invocationExpression_to_node(expression as InvocationExpression);
 						}
-						throw new ArithmeticException("Invalid syntax parse (unexpected expression node type): " + expression);
+						throw new System.ArithmeticException("Invalid syntax parse (unexpected expression node type): " + expression);
 					};
 
 				invocationExpression_to_node =
@@ -399,7 +399,7 @@ namespace Seven.Mathematics
 					{
 						MemberExpression member_expression = invocationExpression.Expression as MemberExpression;
 						if (member_expression == null || member_expression.Member.DeclaringType != typeof(Compute<T>))
-							throw new ArithmeticException("Invalid syntax parse (only members of Seven.MathematicsCompute<T> allowed): " + invocationExpression);
+							throw new System.ArithmeticException("Invalid syntax parse (only members of Seven.MathematicsCompute<T> allowed): " + invocationExpression);
 
 						Node[] nodes = null;
 						if (invocationExpression.Arguments != null)
@@ -554,14 +554,14 @@ namespace Seven.Mathematics
 							case "InverseHyperbolicSecant": break;
 							case "InverseHyperbolicCotangent": break;
 						}
-						throw new ArithmeticException("Invalid syntax parse (only members of Seven.MathematicsCompute<T> allowed): " + invocationExpression);
+						throw new System.ArithmeticException("Invalid syntax parse (only members of Seven.MathematicsCompute<T> allowed): " + invocationExpression);
 					};
 
 				return recursive(e);
 			}
-			catch (ArithmeticException exception_specific)
+			catch (System.ArithmeticException exception_specific)
 			{
-				throw new ArithmeticException("failed to parse expression into SevenFramework mathematical syntax: " + e, exception_specific);
+				throw new System.ArithmeticException("failed to parse expression into SevenFramework mathematical syntax: " + e, exception_specific);
 			}
 		}
 
@@ -936,7 +936,7 @@ namespace Seven.Mathematics
 					}
 					#endregion
 
-					return Activator.CreateInstance(
+					return System.Activator.CreateInstance(
 						node.GetType(),
 						new object[]
 						{ 
@@ -1420,7 +1420,7 @@ namespace Seven.Mathematics
 					}
 					#endregion
 
-					return Activator.CreateInstance(
+					return System.Activator.CreateInstance(
 						node.GetType(),
 						new object[]
 						{ 
@@ -1438,7 +1438,7 @@ namespace Seven.Mathematics
 					Node three = Simplify(ternary.Three);
 
 
-					return Activator.CreateInstance(
+					return System.Activator.CreateInstance(
 						node.GetType(),
 						new object[]
 						{ 
@@ -1489,7 +1489,7 @@ namespace Seven.Mathematics
 				#region Unary
 				if (node is Unary)
 				{
-					return Activator.CreateInstance(
+					return System.Activator.CreateInstance(
 						node.GetType(), 
 						new object[]
 						{ 
@@ -1500,7 +1500,7 @@ namespace Seven.Mathematics
 				#region Binary
 				else if (node is Binary)
 				{
-					return Activator.CreateInstance(
+					return System.Activator.CreateInstance(
 						node.GetType(),
 						new object[]
 						{ 
@@ -1512,7 +1512,7 @@ namespace Seven.Mathematics
 				#region Ternary
 				else if (node is Ternary)
 				{
-					return Activator.CreateInstance(
+					return System.Activator.CreateInstance(
 						node.GetType(),
 						new object[]
 						{ 

@@ -101,7 +101,7 @@
     <Compile Include="Error.cs" />
     <Compile Include="Mathematics\Quaternion.cs" />
     <Compile Include="Mathematics\Range.cs" />
-    <Compile Include="Mathematics\Syntax.cs" />
+    <Compile Include="Mathematics\Symbolics.cs" />
     <Compile Include="Mathematics\Tableau.cs" />
     <Compile Include="Mathematics\Tween.cs" />
     <Compile Include="Mathematics\Vector.cs" />

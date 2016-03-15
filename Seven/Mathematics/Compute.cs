@@ -8,7 +8,6 @@
 
 using Seven.Algorithms;
 using Seven.Structures;
-using System.Reflection;
 
 namespace Seven.Mathematics
 {
@@ -16,32 +15,10 @@ namespace Seven.Mathematics
 	/// <typeparam name="T">The generic type to perform mathematics on (expected to be numeric).</typeparam>
 	public static class Compute<T>
 	{
-		#region Compile All
-
-		public static void Compile()
-		{
-			throw new System.NotImplementedException();
-			//FieldInfo[] fields = typeof(Compute<T>).GetFields(BindingFlags.Public | BindingFlags.Static);
-			//System.Type[] delegates = typeof(Compute<T>.delegates).GetNestedTypes(BindingFlags.Public | BindingFlags.Static);
-
-			//foreach (FieldInfo field in compute_fields)
-			//{
-			//	foreach (System.Type type in delegates)
-			//	{
-			//		if (type.Name.CompareTo(field.Name))
-			//		{
-			//			field.FieldType
-			//		}
-			//	}
-			//}
-		}
-
-		#endregion
-
-		#region delegates
+		#region Delegates
 
 		/// <summary>Static storage class for all the delegates used in the Compute class.</summary>
-		public static class delegates
+		public static class Delegates
 		{
 			#region constant
 
@@ -683,7 +660,7 @@ namespace Seven.Mathematics
 		#endif
 		#endregion
 
-		#region constant
+		#region Constant
 
 		private const int pi_maximum_iterations = 100;
 		// NOTE: decimal accuracy for pi requires pi_maximum_iterations = 92
@@ -731,8 +708,8 @@ namespace Seven.Mathematics
 				}
 #endif
 
-				Compute<T>.delegates.ComputePi computation =
-					Meta.Compile<Compute<T>.delegates.ComputePi>(
+				Compute<T>.Delegates.ComputePi computation =
+					Meta.Compile<Compute<T>.Delegates.ComputePi>(
 					string.Concat(
 @"() =>
 {
@@ -763,7 +740,7 @@ namespace Seven.Mathematics
 			}
 		}
 
-		internal static Compute<T>.delegates.IntCast IntCast = (int value) =>
+		internal static Compute<T>.Delegates.IntCast IntCast = (int value) =>
 			{
 				#if show_Numeric
 				Compute<Numeric>.IntCast = (int _value) => { return (Numeric)_value; };
@@ -773,7 +750,7 @@ namespace Seven.Mathematics
 					throw new System.ArithmeticException(string.Concat("casting operator does not exist: implicit/explicit ", Type_String, "(int)"));
 
 				Compute<T>.IntCast = 
-					Meta.Compile<Compute<T>.delegates.IntCast>(
+					Meta.Compile<Compute<T>.Delegates.IntCast>(
 						string.Concat("(int value) => { return (" + Type_String + ")value; }"));
 
 				return Compute<T>.IntCast(value);
@@ -1128,10 +1105,11 @@ namespace Seven.Mathematics
 
 		#endregion
 
-		#region arithmetic
+		#region Arithmetic
 
+		#region Negate
 		/// <summary>Negates a value.</summary>
-		public static Compute<T>.delegates.Negate Negate = (T value) =>
+		public static Compute<T>.Delegates.Negate Negate = (T value) =>
 		{
 #if show_Numeric
 			Compute<Numeric>.delegates.Negate Negate = (Numeric _value) => { return -_value; };
@@ -1140,14 +1118,16 @@ namespace Seven.Mathematics
 			if (!Meta.Validate.Operator.UnaryNegation(typeof(T), typeof(T))) { throw new System.ArithmeticException(string.Concat("computation requires a unary negation operator: ", Type_String, " -(", Type_String, ")")); }
 
 			Compute<T>.Negate =
-				Meta.Compile<Compute<T>.delegates.Negate>(
+				Meta.Compile<Compute<T>.Delegates.Negate>(
 					string.Concat("(", Type_String, " _value) => { return -_value; }"));
 
 			return Compute<T>.Negate(value);
 		};
+		#endregion
 
+		#region Add
 		/// <summary>Adds two operands together.</summary>
-		public static Compute<T>.delegates.Add Add = (T left, T right) =>
+		public static Compute<T>.Delegates.Add Add = (T left, T right) =>
 		{
 #if show_Numeric
 			Compute<Numeric>.delegates.Add Add = (Numeric _left, Numeric _right) => { return _left + _right; };
@@ -1156,14 +1136,16 @@ namespace Seven.Mathematics
 			if (!Meta.Validate.Operator.Addition(typeof(T), typeof(T), typeof(T))) { throw new System.ArithmeticException(string.Concat("computation requires an addition operator: ", Type_String, " +(", Type_String, ", ", Type_String, ")")); }
 
 			Compute<T>.Add =
-				Meta.Compile<Compute<T>.delegates.Add>(
+				Meta.Compile<Compute<T>.Delegates.Add>(
 					string.Concat("(", Type_String, " _left, ", Type_String, " _right) => { return _left + _right; }"));
 
 			return Compute<T>.Add(left, right);
 		};
+		#endregion
 
+		#region Summation
 		/// <summary>Compuates the algebraic summation [ Σ (stepper) ].</summary>
-		public static Compute<T>.delegates.Summation Summation = (Stepper<T> stepper) =>
+		public static Compute<T>.Delegates.Summation Summation = (Stepper<T> stepper) =>
 		{
 #if show_Numeric
 			Compute<Numeric>.delegates.Summation compile_testing = (Stepper<Numeric> _stepper) => { Numeric sum = 0; _stepper((Numeric i) => { sum += i; }); return sum; };
@@ -1172,15 +1154,17 @@ namespace Seven.Mathematics
 			if (!Meta.Validate.Operator.Addition(typeof(T), typeof(T), typeof(T))) { throw new System.ArithmeticException(string.Concat("computation requires an addition operator: ", Type_String, " +(", Type_String, ", ", Type_String, ")")); }
 
 			Compute<T>.Summation =
-				Meta.Compile<Compute<T>.delegates.Summation>(
+				Meta.Compile<Compute<T>.Delegates.Summation>(
 					string.Concat(
 					"(Stepper<", Type_String, "> _stepper) => { ", Type_String, " sum = 0; _stepper((", Type_String, " i) => { sum += i; }); return sum; }"));
 
 			return Compute<T>.Summation(stepper);
 		};
+		#endregion
 
+		#region Subtract
 		/// <summary>Subtracts two operands.</summary>
-		public static Compute<T>.delegates.Subtract Subtract = (T left, T right) =>
+		public static Compute<T>.Delegates.Subtract Subtract = (T left, T right) =>
 		{
 #if show_Numeric
 			Compute<Numeric>.delegates.Subtract Add = (Numeric _left, Numeric _right) => { return _left - _right; };
@@ -1189,14 +1173,16 @@ namespace Seven.Mathematics
 			if (!Meta.Validate.Operator.Subtraction(typeof(T), typeof(T), typeof(T))) { throw new System.ArithmeticException(string.Concat("computation requires a subtraction operator: ", Type_String, " -(", Type_String, ", ", Type_String, ")")); }
 
 			Compute<T>.Subtract =
-				Meta.Compile<Compute<T>.delegates.Subtract>(
+				Meta.Compile<Compute<T>.Delegates.Subtract>(
 					string.Concat("(", Type_String, " _left, ", Type_String, " _right) => { return _left - _right; }"));
 
 			return Compute<T>.Subtract(left, right);
 		};
+		#endregion
 
+		#region Multiply
 		/// <summary>Multiplies two operands together.</summary>
-		public static Compute<T>.delegates.Multiply Multiply = (T left, T right) =>
+		public static Compute<T>.Delegates.Multiply Multiply = (T left, T right) =>
 		{
 #if show_Numeric
 			Compute<Numeric>.delegates.Multiply Add = (Numeric _left, Numeric _right) => { return _left * _right; };
@@ -1205,14 +1191,16 @@ namespace Seven.Mathematics
 			if (!Meta.Validate.Operator.Multiplication(typeof(T), typeof(T), typeof(T))) { throw new System.ArithmeticException(string.Concat("computation requires a multiplication operator: ", Type_String, " *(", Type_String, ", ", Type_String, ")")); }
 
 			Compute<T>.Multiply =
-				Meta.Compile<Compute<T>.delegates.Multiply>(
+				Meta.Compile<Compute<T>.Delegates.Multiply>(
 					string.Concat("(", Type_String, " _left, ", Type_String, " _right) => { return _left * _right; }"));
 
 			return Compute<T>.Multiply(left, right);
 		};
+		#endregion
 
+		#region Divide
 		/// <summary>Divides two operands.</summary>
-		public static Compute<T>.delegates.Divide Divide = (T left, T right) =>
+		public static Compute<T>.Delegates.Divide Divide = (T left, T right) =>
 		{
 #if show_Numeric
 			Compute<Numeric>.delegates.Divide Divide = (Numeric _left, Numeric _right) => { return _left / _right; };
@@ -1221,17 +1209,24 @@ namespace Seven.Mathematics
 			if (!Meta.Validate.Operator.Division(typeof(T), typeof(T), typeof(T))) { throw new System.ArithmeticException(string.Concat("computation requires a division operator: ", Type_String, " /(", Type_String, ", ", Type_String, ")")); }
 
 			Compute<T>.Divide =
-				Meta.Compile<Compute<T>.delegates.Divide>(
+				Meta.Compile<Compute<T>.Delegates.Divide>(
 					string.Concat("(", Type_String, " _left, ", Type_String, " _right) => { return _left / _right; }"));
 
 			return Compute<T>.Divide(left, right);
 		};
+		#endregion
 
+		#region Power
 		/// <summary>Takes one operand to the power of another.</summary>
-		public static Compute<T>.delegates.Power Power = (T left, T right) =>
+		public static Compute<T>.Delegates.Power Power = (T left, T right) =>
 		{
 #if show_Numeric
-			Compute<Numeric>.delegates.Power Power = (Numeric _left, Numeric _right) => { return (Numeric)System.Math.Pow((double)_left, (double)_right); };
+			Compute<Numeric>.delegates.Power Power =
+				(Numeric _left, Numeric _right) =>
+				{
+					//Numeric 
+					return (Numeric)System.Math.Pow((double)_left, (double)_right);
+				};
 #endif
 
 			if (typeof(T) == typeof(double))
@@ -1242,44 +1237,48 @@ namespace Seven.Mathematics
 				Compute<int>.Power = (int _left, int _right) => { return (int)System.Math.Pow(_left, _right); };
 			else
 				Compute<T>.Power =
-					Meta.Compile<Compute<T>.delegates.Power>(
+					Meta.Compile<Compute<T>.Delegates.Power>(
 						string.Concat("(", Type_String, " _left, ", Type_String, " _right) => { return (", Type_String, ")System.Math.Pow((double)_left, (double)_right); }"));
 
 			return Compute<T>.Power(left, right);
 		};
+		#endregion
 
+		#region SquareRoot
 		/// <summary>Solves for "x": [ x ^ 2 = b ].</summary>
-		public static Compute<T>.delegates.SquareRoot SquareRoot = (T value) =>
+		public static Compute<T>.Delegates.SquareRoot SquareRoot = (T value) =>
 		{
 #if show_Numeric
 			Compute<Numeric>.delegates.SquareRoot compile_testing = (Numeric _value) => { return (Numeric)System.Math.Sqrt((double)_value); };
 #endif
 
-			Compute<T>.SquareRoot = Meta.Compile<Compute<T>.delegates.SquareRoot>(
+			Compute<T>.SquareRoot = Meta.Compile<Compute<T>.Delegates.SquareRoot>(
 				string.Concat("(", Type_String, " _value) => { return (", Type_String, ")System.Math.Sqrt((double)_value); }"));
 
 			return Compute<T>.SquareRoot(value);
 		};
 
 		/// <summary>Solves for "x": [ x ^ r = b ].</summary>
-		public static Compute<T>.delegates.Root Root = (T _base, T root) =>
+		public static Compute<T>.Delegates.Root Root = (T _base, T root) =>
 		{
 #if show_Numeric
 			Compute<Numeric>.delegates.Root compile_testing = (Numeric __base, Numeric _root) => { return (Numeric)System.Math.Pow((double)__base, (double)(1 / _root)); };
 #endif
 
-			Compute<T>.Root = Meta.Compile<Compute<T>.delegates.Root>(
+			Compute<T>.Root = Meta.Compile<Compute<T>.Delegates.Root>(
 				string.Concat("(", Type_String, " __base, ", Type_String, " _root) => { return (", Type_String, ")System.Math.Pow((double)__base, (double)(1 / _root)); }"));
 
 			return Compute<T>.Root(_base, root);
 		};
+		#endregion
 
 		#endregion
 
-		#region logic
+		#region Logic
 
+		#region AbsoluteValue
 		/// <summary>Computes the absolute value of a value.</summary>
-		public static Compute<T>.delegates.AbsoluteValue AbsoluteValue = (T n) =>
+		public static Compute<T>.Delegates.AbsoluteValue AbsoluteValue = (T n) =>
 		{
 #if show_Numeric
 			Compute<Numeric>.delegates.AbsoluteValue compile_testing =
@@ -1292,10 +1291,11 @@ namespace Seven.Mathematics
 				};
 #endif
 
-			if (!Meta.Validate.Operator.LessThan(typeof(T), typeof(T), typeof(T))) { throw new System.ArithmeticException(string.Concat("computation requires a less than operator: ", Type_String, " <(", Type_String, ", ", Type_String, ")")); }
+			if (!Meta.Validate.Operator.LessThan(typeof(T), typeof(T), typeof(T)))
+			{ throw new System.ArithmeticException(string.Concat("computation requires a less than operator: ", Type_String, " <(", Type_String, ", ", Type_String, ")")); }
 
 			Compute<T>.AbsoluteValue =
-				Meta.Compile<Compute<T>.delegates.AbsoluteValue>(
+				Meta.Compile<Compute<T>.Delegates.AbsoluteValue>(
 					string.Concat(
 "(", Type_String, @" _n) =>
 {
@@ -1307,9 +1307,11 @@ namespace Seven.Mathematics
 
 			return Compute<T>.AbsoluteValue(n);
 		};
+		#endregion
 
+		#region Maximum
 		/// <summary>Finds the max value in a set.</summary>
-		public static Compute<T>.delegates.Maximum max = (Stepper<T> stepper) =>
+		public static Compute<T>.Delegates.Maximum Maximum = (Stepper<T> stepper) =>
 		{
 #if show_Numeric
 			Compute<Numeric>.delegates.Maximum compile_testing =
@@ -1330,8 +1332,8 @@ namespace Seven.Mathematics
 
 			if (!Meta.Validate.Operator.GreaterThan(typeof(T), typeof(T), typeof(T))) { throw new System.ArithmeticException(string.Concat("computation requires a greater than operator: ", Type_String, " >(", Type_String, ", ", Type_String, ")")); }
 
-			Compute<T>.max =
-				Meta.Compile<Compute<T>.delegates.Maximum>(
+			Compute<T>.Maximum =
+				Meta.Compile<Compute<T>.Delegates.Maximum>(
 					string.Concat(
 @"(Stepper<", Type_String, @"> _stepper) =>
 {
@@ -1347,11 +1349,13 @@ namespace Seven.Mathematics
 	return max;
 }"));
 
-			return Compute<T>.max(stepper);
+			return Compute<T>.Maximum(stepper);
 		};
+		#endregion
 
+		#region Minimum
 		/// <summary>Finds the min value in a set.</summary>
-		public static Compute<T>.delegates.Minimum min = (Stepper<T> stepper) =>
+		public static Compute<T>.Delegates.Minimum Minimum = (Stepper<T> stepper) =>
 		{
 #if show_Numeric
 			Compute<Numeric>.delegates.Minimum compile_testing =
@@ -1372,8 +1376,8 @@ namespace Seven.Mathematics
 
 			if (!Meta.Validate.Operator.LessThan(typeof(T), typeof(T), typeof(T))) { throw new System.ArithmeticException(string.Concat("computation requires a less than operator: ", Type_String, " >(", Type_String, ", ", Type_String, ")")); }
 
-			Compute<T>.min =
-				Meta.Compile<Compute<T>.delegates.Minimum>(
+			Compute<T>.Minimum =
+				Meta.Compile<Compute<T>.Delegates.Minimum>(
 					string.Concat(
 @"(Stepper<", Type_String, @"> _stepper) =>
 {
@@ -1389,11 +1393,13 @@ namespace Seven.Mathematics
 	return min;
 }"));
 
-			return Compute<T>.max(stepper);
+			return Compute<T>.Maximum(stepper);
 		};
+		#endregion
 
+		#region Clamp
 		/// <summary>Restricts a value to a min-max range.</summary>
-		public static Compute<T>.delegates.Clamp clamp = (T value, T minimum, T maximum) =>
+		public static Compute<T>.Delegates.Clamp Clamp = (T value, T minimum, T maximum) =>
 		{
 #if show_Numeric
 			Compute<Numeric>.delegates.Clamp compile_testing =
@@ -1416,8 +1422,8 @@ namespace Seven.Mathematics
 			if (!Meta.Validate.Operator.GreaterThan(typeof(T), typeof(T), typeof(T))) { throw new System.ArithmeticException(string.Concat("computation requires a greater than operator: ", Type_String, " >(", Type_String, ", ", Type_String, ")")); }
 			if (!Meta.Validate.Operator.LessThan(typeof(T), typeof(T), typeof(T))) { throw new System.ArithmeticException(string.Concat("computation requires a less than operator: ", Type_String, " >(", Type_String, ", ", Type_String, ")")); }
 
-			Compute<T>.clamp =
-				Meta.Compile<Compute<T>.delegates.Clamp>(
+			Compute<T>.Clamp =
+				Meta.Compile<Compute<T>.Delegates.Clamp>(
 					string.Concat(
 @"(", Type_String, " _value, ", Type_String, " _minimum, ", Type_String, @" _maximum) =>
 {",
@@ -1435,11 +1441,13 @@ namespace Seven.Mathematics
 			return _value;
 }"));
 
-			return Compute<T>.clamp(value, minimum, maximum);
+			return Compute<T>.Clamp(value, minimum, maximum);
 		};
+		#endregion
 
+		#region EqualsLeniency
 		/// <summary>Checks for equality by value with a leniency.</summary>
-		public static Compute<T>.delegates.EqualsLeniency equ_len = (T left, T right, T leniency) =>
+		public static Compute<T>.Delegates.EqualsLeniency EqualsLeniency = (T left, T right, T leniency) =>
 		{
 #if show_Numeric
 			Compute<Numeric>.delegates.EqualsLeniency compile_testing =
@@ -1456,8 +1464,8 @@ namespace Seven.Mathematics
 			if (!Meta.Validate.Operator.LessThan(typeof(T), typeof(T), typeof(T))) { throw new System.ArithmeticException(string.Concat("computation requires a less than operator: ", Type_String, " >(", Type_String, ", ", Type_String, ")")); }
 			if (!Meta.Validate.Operator.Subtraction(typeof(T), typeof(T), typeof(T))) { throw new System.ArithmeticException(string.Concat("computation requires a subtraction operator: ", Type_String, " >(", Type_String, ", ", Type_String, ")")); }
 			
-			Compute<T>.equ_len =
-				Meta.Compile<Compute<T>.delegates.EqualsLeniency>(
+			Compute<T>.EqualsLeniency =
+				Meta.Compile<Compute<T>.Delegates.EqualsLeniency>(
 					string.Concat(
 @"(", Type_String, " _left, ", Type_String, " _right, ", Type_String, @" _leniency) =>
 {
@@ -1467,9 +1475,11 @@ namespace Seven.Mathematics
 			return (_left - _right) < _leniency;
 }"));
 
-			return Compute<T>.equ_len(left, right, leniency);
+			return Compute<T>.EqualsLeniency(left, right, leniency);
 		};
+		#endregion
 
+		#region Compare
 		public static Compare<T> Compare = (T left, T right) =>
 		{
 #if show_Numeric
@@ -1502,15 +1512,18 @@ namespace Seven.Mathematics
 
 			return Compute<T>.Compare(left, right);
 		};
+		#endregion
 
+		#region Equals
 		public static Equate<T> Equate = Seven.Equate.Default;
+		#endregion
 
 		#endregion
 
 		#region factoring / multiple
 
 		/// <summary>Computes (greatest common factor): [ GCF(set) ].</summary>
-		public static Compute<T>.delegates.GreatestCommonFactor GreatestCommonFactor = (Stepper<T> stepper) =>
+		public static Compute<T>.Delegates.GreatestCommonFactor GreatestCommonFactor = (Stepper<T> stepper) =>
 		{
 #if show_Numeric
 			Compute<Numeric>.GreatestCommonFactor =
@@ -1551,7 +1564,7 @@ namespace Seven.Mathematics
 #endif
 
 			Compute<T>.GreatestCommonFactor =
-				Meta.Compile<Compute<T>.delegates.GreatestCommonFactor>(
+				Meta.Compile<Compute<T>.Delegates.GreatestCommonFactor>(
 					string.Concat(
 @"(Stepper<", Type_String, @"> _stepper) =>
 {
@@ -1592,7 +1605,7 @@ namespace Seven.Mathematics
 		};
 
 		/// <summary>Computes (least common multiple): [ LCM(set) ].</summary>
-		public static Compute<T>.delegates.LeastCommonMultiple LeastCommonMultiple = (Stepper<T> stepper) =>
+		public static Compute<T>.Delegates.LeastCommonMultiple LeastCommonMultiple = (Stepper<T> stepper) =>
 		{
 #if show_Numeric
 			Compute<Numeric>.delegates.LeastCommonMultiple compile_testing =
@@ -1630,7 +1643,7 @@ namespace Seven.Mathematics
 #endif
 
 			Compute<T>.LeastCommonMultiple =
-				Meta.Compile<Compute<T>.delegates.LeastCommonMultiple>(
+				Meta.Compile<Compute<T>.Delegates.LeastCommonMultiple>(
 					string.Concat(
 @"(Stepper<", Type_String, @"> _stepper) =>
 {
@@ -1668,7 +1681,7 @@ namespace Seven.Mathematics
 		};
 
 		/// <summary>Computes the prime factors of n.</summary>
-		public static Compute<T>.delegates.FactorPrimes factorPrimes = (T value, Step<T> step) =>
+		public static Compute<T>.Delegates.FactorPrimes factorPrimes = (T value, Step<T> step) =>
 		{
 #if show_Numeric
 			Compute<Numeric>.delegates.FactorPrimes compile_testing =
@@ -1701,7 +1714,7 @@ namespace Seven.Mathematics
 #endif
 
 			Compute<T>.factorPrimes =
-				Meta.Compile<Compute<T>.delegates.FactorPrimes>(
+				Meta.Compile<Compute<T>.Delegates.FactorPrimes>(
 					string.Concat(
 @"(", Type_String, " _value, Step<", Type_String, @"> _step) =>
 {
@@ -1738,42 +1751,42 @@ namespace Seven.Mathematics
 		#region exponential / logarithm
 
 		/// <summary>Computes: [ e ^ x ].</summary>
-		public static Compute<T>.delegates.exp exp = (T value) =>
+		public static Compute<T>.Delegates.exp exp = (T value) =>
 		{
 #if show_Numeric
 			Compute<Numeric>.delegates.exp compile_testing = (Compute<Numeric>.delegates.exp)((Numeric _value) => { throw new Error("not yet implemented"); });
 #endif
 
 			Compute<T>.exp =
-				Meta.Compile<Compute<T>.delegates.exp>(
+				Meta.Compile<Compute<T>.Delegates.exp>(
 					string.Concat("(", Type_String, " _value) => { return (", Type_String, ")System.Math.Sqrt((double)_value); }"));
 
 			return Compute<T>.exp(value);
 		};
 
 		/// <summary>Computes (natrual log): [ ln(n) ].</summary>
-		public static Compute<T>.delegates.ln ln = (T value) =>
+		public static Compute<T>.Delegates.ln ln = (T value) =>
 		{
 #if show_Numeric
 			Compute<Numeric>.delegates.ln compile_testing = (Numeric _value) => { throw new Error("not yet implemented"); };
 #endif
 
 			Compute<T>.ln =
-				Meta.Compile<Compute<T>.delegates.ln>(
+				Meta.Compile<Compute<T>.Delegates.ln>(
 					string.Concat("(", Type_String, " _value) => { throw new Error(\"not yet implemented\"); }"));
 
 			return Compute<T>.ln(value);
 		};
 
 		/// <summary>Computes: [ log_b(n) ].</summary>
-		public static Compute<T>.delegates.log log = (T value, T _base) =>
+		public static Compute<T>.Delegates.log log = (T value, T _base) =>
 		{
 #if show_Numeric
 			Compute<Numeric>.delegates.log compile_testing = (Numeric _value, Numeric __base) => { return (Numeric)System.Math.Log((double)_value, (double)__base); };
 #endif
 
 			Compute<T>.log =
-				Meta.Compile<Compute<T>.delegates.log>(
+				Meta.Compile<Compute<T>.Delegates.log>(
 					string.Concat("(" + Type_String + " _value, " + Type_String + " __base) => { return (" + Type_String + ")System.Math.Log((double)_value, (double)__base); }"));
 
 			return Compute<T>.log(value, _base);
@@ -1784,7 +1797,7 @@ namespace Seven.Mathematics
 		#region angles
 
 		/// <summary>Converts degrees to radians.</summary>
-		public static Compute<T>.delegates.DegreesToRadians DegreesToRadians = (T degrees) =>
+		public static Compute<T>.Delegates.DegreesToRadians DegreesToRadians = (T degrees) =>
 			{
 #if show_Numeric
 				Compute<Numeric>.DegreesToRadians = (Numeric _degrees) =>
@@ -1794,7 +1807,7 @@ namespace Seven.Mathematics
 #endif
 
 				Compute<T>.DegreesToRadians =
-					Meta.Compile<Compute<T>.delegates.DegreesToRadians>(
+					Meta.Compile<Compute<T>.Delegates.DegreesToRadians>(
 						string.Concat(
 @"(", Type_String, @" _degrees) =>
 {
@@ -1805,7 +1818,7 @@ namespace Seven.Mathematics
 			};
 
 		/// <summary>Converts turns to radians.</summary>
-		public static Compute<T>.delegates.TurnsToRadians TurnsToRadians = (T turns) =>
+		public static Compute<T>.Delegates.TurnsToRadians TurnsToRadians = (T turns) =>
 			{
 #if show_Numeric
 				Compute<Numeric>.TurnsToRadians = (Numeric _turns) =>
@@ -1815,7 +1828,7 @@ namespace Seven.Mathematics
 #endif
 
 				Compute<T>.TurnsToRadians =
-					Meta.Compile<Compute<T>.delegates.TurnsToRadians>(
+					Meta.Compile<Compute<T>.Delegates.TurnsToRadians>(
 						string.Concat(
 @"(", Type_String, @" _turns) =>
 {
@@ -1826,7 +1839,7 @@ namespace Seven.Mathematics
 			};
 
 		/// <summary>Converts gradians to radians.</summary>
-		public static Compute<T>.delegates.GradiansToRadians GradiansToRadians = (T gradians) =>
+		public static Compute<T>.Delegates.GradiansToRadians GradiansToRadians = (T gradians) =>
 			{
 #if show_Numeric
 				Compute<Numeric>.GradiansToRadians = (Numeric _gradians) =>
@@ -1836,7 +1849,7 @@ namespace Seven.Mathematics
 #endif
 
 				Compute<T>.GradiansToRadians =
-					Meta.Compile<Compute<T>.delegates.GradiansToRadians>(
+					Meta.Compile<Compute<T>.Delegates.GradiansToRadians>(
 						string.Concat(
 @"(", Type_String, @" _gradians) =>
 {
@@ -1847,7 +1860,7 @@ namespace Seven.Mathematics
 			};
 
 		/// <summary>Converts radians to degrees.</summary>
-		public static Compute<T>.delegates.RadiansToDegrees RadiansToDegrees = (T radians) =>
+		public static Compute<T>.Delegates.RadiansToDegrees RadiansToDegrees = (T radians) =>
 			{
 #if show_Numeric
 				Compute<Numeric>.RadiansToDegrees = (Numeric _radians) =>
@@ -1857,7 +1870,7 @@ namespace Seven.Mathematics
 #endif
 
 				Compute<T>.RadiansToDegrees =
-					Meta.Compile<Compute<T>.delegates.RadiansToDegrees>(
+					Meta.Compile<Compute<T>.Delegates.RadiansToDegrees>(
 					 string.Concat(
 @"(", Type_String, @" _radians) =>
 {
@@ -1868,7 +1881,7 @@ namespace Seven.Mathematics
 			};
 
 		/// <summary>Converts radians to turns.</summary>
-		public static Compute<T>.delegates.RadiansToTurns RadiansToTurns = (T radians) =>
+		public static Compute<T>.Delegates.RadiansToTurns RadiansToTurns = (T radians) =>
 			{
 #if show_Numeric
 				Compute<Numeric>.RadiansToTurns = (Numeric _radians) =>
@@ -1878,7 +1891,7 @@ namespace Seven.Mathematics
 #endif
 
 				Compute<T>.RadiansToTurns =
-					Meta.Compile<Compute<T>.delegates.RadiansToTurns>(
+					Meta.Compile<Compute<T>.Delegates.RadiansToTurns>(
 						string.Concat(
 @"(", Type_String, @" _radians) =>
 {
@@ -1889,7 +1902,7 @@ namespace Seven.Mathematics
 			};
 
 		/// <summary>Converts radians to gradians.</summary>
-		public static Compute<T>.delegates.RadiansToGradians RadiansToGradians = (T radians) =>
+		public static Compute<T>.Delegates.RadiansToGradians RadiansToGradians = (T radians) =>
 		{
 #if show_Numeric
 			Compute<Numeric>.RadiansToGradians = (Numeric _gradians) =>
@@ -1899,7 +1912,7 @@ namespace Seven.Mathematics
 #endif
 
 			Compute<T>.RadiansToGradians =
-				Meta.Compile<Compute<T>.delegates.RadiansToGradians>(
+				Meta.Compile<Compute<T>.Delegates.RadiansToGradians>(
 					string.Concat(
 @"(", Type_String, @" _radians) =>
 {
@@ -1914,7 +1927,7 @@ namespace Seven.Mathematics
 		#region miscellaneous
 
 		/// <summary>Computes (natrual log): [ ln(n) ].</summary>
-		public static Compute<T>.delegates.IsPrime IsPrime = (T value) =>
+		public static Compute<T>.Delegates.IsPrime IsPrime = (T value) =>
 		{
 #if show_Numeric
 			Compute<Numeric>.delegates.IsPrime compile_testing =
@@ -1936,7 +1949,7 @@ namespace Seven.Mathematics
 #endif
 
 			Compute<T>.IsPrime =
-				Meta.Compile<Compute<T>.delegates.IsPrime>(
+				Meta.Compile<Compute<T>.Delegates.IsPrime>(
 					string.Concat(
 @"(", Type_String, @" candidate) =>
 {
@@ -1958,7 +1971,7 @@ namespace Seven.Mathematics
 		};
 
 		/// <summary>Computes: [ 1 / n ].</summary>
-		public static Compute<T>.delegates.Invert invert = (T value) =>
+		public static Compute<T>.Delegates.Invert invert = (T value) =>
 		{
 #if show_Numeric
 			Compute<Numeric>.delegates.Invert compile_testing = (Numeric _value) => { return 1 / _value; };
@@ -1967,7 +1980,7 @@ namespace Seven.Mathematics
 			if (!Meta.Validate.Operator.Division(typeof(T), typeof(T), typeof(T))) { throw new System.ArithmeticException(string.Concat("computation requires a division operator: ", Type_String, " /(", Type_String, ", ", Type_String, ")")); }
 
 			Compute<T>.invert =
-				Meta.Compile<Compute<T>.delegates.Invert>(
+				Meta.Compile<Compute<T>.Delegates.Invert>(
 					string.Concat("(", Type_String, " _value) => { return 1 / _value; }"));
 
 			return Compute<T>.invert(value);
@@ -1978,7 +1991,7 @@ namespace Seven.Mathematics
 		#region interpolation
 
 		/// <summary>Interpolates in a linear fashion.</summary>
-		public static Compute<T>.delegates.LinearInterpolation LinearInterpolation = (T x, T x0, T x1, T y0, T y1) =>
+		public static Compute<T>.Delegates.LinearInterpolation LinearInterpolation = (T x, T x0, T x1, T y0, T y1) =>
 			{
 #if show_Numeric
 				Compute<Numeric>.LinearInterpolation = (Numeric _x, Numeric _x0, Numeric _x1, Numeric _y0, Numeric _y1) =>
@@ -2000,7 +2013,7 @@ namespace Seven.Mathematics
 #endif
 
 				Compute<T>.LinearInterpolation =
-					Meta.Compile<Compute<T>.delegates.LinearInterpolation>(
+					Meta.Compile<Compute<T>.Delegates.LinearInterpolation>(
 						string.Concat(
 @"(", Type_String, " _x, ", Type_String, " _x0, ", Type_String, " _x1, ", Type_String, " _y0, ", Type_String, @" _y1) =>
 {
@@ -2027,7 +2040,7 @@ namespace Seven.Mathematics
 		#region vector
 
 		/// <summary>Adds two vectors together.</summary>
-		public static Compute<T>.delegates.Vector_Add Vector_Add = (Vector<T> left, Vector<T> right) =>
+		public static Compute<T>.Delegates.Vector_Add Vector_Add = (Vector<T> left, Vector<T> right) =>
 		#region code
 		{
 			// pre-optimization
@@ -2067,7 +2080,7 @@ namespace Seven.Mathematics
 #endif
 
 			Compute<T>.Vector_Add =
-					Meta.Compile<Compute<T>.delegates.Vector_Add>(
+					Meta.Compile<Compute<T>.Delegates.Vector_Add>(
 						string.Concat(
 @"(Vector<", Type_String, "> _left, Vector<", Type_String, @"> _right) =>
 {", System.Environment.NewLine,
@@ -2097,7 +2110,7 @@ namespace Seven.Mathematics
 		#endregion
 
 		/// <summary>Negates all the values in a vector.</summary>
-		public static Compute<T>.delegates.Vector_Negate Vector_Negate = (Vector<T> vector) =>
+		public static Compute<T>.Delegates.Vector_Negate Vector_Negate = (Vector<T> vector) =>
 		#region code
 		{
 			// pre-optimization
@@ -2132,7 +2145,7 @@ namespace Seven.Mathematics
 #endif
 			
 			Compute<T>.Vector_Negate =
-					Meta.Compile<Compute<T>.delegates.Vector_Negate>(
+					Meta.Compile<Compute<T>.Delegates.Vector_Negate>(
 						string.Concat(
 @"(Vector<", Type_String, @"> _vector) =>
 {", System.Environment.NewLine,
@@ -2157,7 +2170,7 @@ namespace Seven.Mathematics
 		#endregion
 
 		/// <summary>Subtracts two vectors.</summary>
-		public static Compute<T>.delegates.Vector_Subtract Vector_Subtract = (Vector<T> left, Vector<T> right) =>
+		public static Compute<T>.Delegates.Vector_Subtract Vector_Subtract = (Vector<T> left, Vector<T> right) =>
 		#region code
 		{
 			// pre-optimization
@@ -2200,7 +2213,7 @@ namespace Seven.Mathematics
 #endif
 			
 			Compute<T>.Vector_Subtract =
-				Meta.Compile<Compute<T>.delegates.Vector_Subtract>(
+				Meta.Compile<Compute<T>.Delegates.Vector_Subtract>(
 					string.Concat(
 @"(Vector<", Type_String, "> _left, Vector<", Type_String, @"> _right) =>
 {", System.Environment.NewLine,
@@ -2230,7 +2243,7 @@ namespace Seven.Mathematics
 		#endregion
 
 		/// <summary>Multiplies all the components of a vecotr by a scalar.</summary>
-		public static Compute<T>.delegates.Vector_Multiply Vector_Multiply = (Vector<T> left, T right) =>
+		public static Compute<T>.Delegates.Vector_Multiply Vector_Multiply = (Vector<T> left, T right) =>
 		#region code
 		{
 			// pre-optimization
@@ -2267,7 +2280,7 @@ namespace Seven.Mathematics
 #endif
 
 			Compute<T>.Vector_Multiply =
-				Meta.Compile<Compute<T>.delegates.Vector_Multiply>(
+				Meta.Compile<Compute<T>.Delegates.Vector_Multiply>(
 					string.Concat(
 "(Vector<", Type_String, "> _left, ", Type_String, @" _right) =>
 {", System.Environment.NewLine,
@@ -2292,7 +2305,7 @@ namespace Seven.Mathematics
 		#endregion
 
 		/// <summary>Divides all the components of a vector by a scalar.</summary>
-		public static Compute<T>.delegates.Vector_Divide Vector_Divide = (Vector<T> vector, T right) =>
+		public static Compute<T>.Delegates.Vector_Divide Vector_Divide = (Vector<T> vector, T right) =>
 		#region code
 		{
 			// pre-optimization
@@ -2331,7 +2344,7 @@ namespace Seven.Mathematics
 #endif
 
 			Compute<T>.Vector_Divide =
-				Meta.Compile<Compute<T>.delegates.Vector_Divide>(
+				Meta.Compile<Compute<T>.Delegates.Vector_Divide>(
 					string.Concat(
 @"(Vector<", Type_String, "> _left, ", Type_String, @" _right) =>
 {", System.Environment.NewLine,
@@ -2356,7 +2369,7 @@ namespace Seven.Mathematics
 		#endregion
 
 		/// <summary>Computes the dot product between two vectors.</summary>
-		public static Compute<T>.delegates.Vector_DotProduct Vector_DotProduct = (Vector<T> left, Vector<T> right) =>
+		public static Compute<T>.Delegates.Vector_DotProduct Vector_DotProduct = (Vector<T> left, Vector<T> right) =>
 		#region code
 		{
 			#region pre-optimization
@@ -2467,14 +2480,14 @@ namespace Seven.Mathematics
 			#endregion
 
 			Compute<T>.Vector_DotProduct =
-				Meta.Compile<Compute<T>.delegates.Vector_DotProduct>(Vector_DotProduct_string);
+				Meta.Compile<Compute<T>.Delegates.Vector_DotProduct>(Vector_DotProduct_string);
 
 			return Compute<T>.Vector_DotProduct(left, right);
 		};
 		#endregion
 
 		/// <summary>Computes teh cross product of two vectors.</summary>
-		public static Compute<T>.delegates.Vector_CrossProduct Vector_CrossProduct = (Vector<T> left, Vector<T> right) =>
+		public static Compute<T>.Delegates.Vector_CrossProduct Vector_CrossProduct = (Vector<T> left, Vector<T> right) =>
 		#region code
 		{
 			#region pre-optimization
@@ -2605,14 +2618,14 @@ namespace Seven.Mathematics
 			#endregion
 
 			Compute<T>.Vector_CrossProduct =
-				Meta.Compile<Compute<T>.delegates.Vector_CrossProduct>(Vector_CrossProduct_string);
+				Meta.Compile<Compute<T>.Delegates.Vector_CrossProduct>(Vector_CrossProduct_string);
 
 			return Compute<T>.Vector_CrossProduct(left, right);
 		};
 		#endregion
 
 		/// <summary>Normalizes a vector.</summary>
-		public static Compute<T>.delegates.Vector_Normalize Vector_Normalize = (Vector<T> vector) =>
+		public static Compute<T>.Delegates.Vector_Normalize Vector_Normalize = (Vector<T> vector) =>
 		#region code
 		{
 			#region pre-optimization
@@ -2730,14 +2743,14 @@ namespace Seven.Mathematics
 			#endregion
 
 			Compute<T>.Vector_Normalize =
-				Meta.Compile<Compute<T>.delegates.Vector_Normalize>(Vector_Normalize_string);
+				Meta.Compile<Compute<T>.Delegates.Vector_Normalize>(Vector_Normalize_string);
 
 			return Compute<T>.Vector_Normalize(vector);
 		};
 		#endregion
 
 		/// <summary>Computes the length of a vector.</summary>
-		public static Compute<T>.delegates.Vector_Magnitude Vector_Magnitude = (Vector<T> vector) =>
+		public static Compute<T>.Delegates.Vector_Magnitude Vector_Magnitude = (Vector<T> vector) =>
 		#region code
 		{
 			#region pre-optimization
@@ -2834,14 +2847,14 @@ namespace Seven.Mathematics
 			#endregion
 
 			Compute<T>.Vector_Magnitude =
-				Meta.Compile<Compute<T>.delegates.Vector_Magnitude>(Vector_Magnitude_string);
+				Meta.Compile<Compute<T>.Delegates.Vector_Magnitude>(Vector_Magnitude_string);
 
 			return Compute<T>.Vector_Magnitude(vector);
 		};
 		#endregion
 
 		/// <summary>Computes the length of a vector but doesn't square root it for efficiency (length remains squared).</summary>
-		public static Compute<T>.delegates.Vector_MagnitudeSquared Vector_MagnitudeSquared = (Vector<T> vector) =>
+		public static Compute<T>.Delegates.Vector_MagnitudeSquared Vector_MagnitudeSquared = (Vector<T> vector) =>
 		#region code
 		{
 			#region pre-optimization
@@ -2938,14 +2951,14 @@ namespace Seven.Mathematics
 			#endregion
 
 			Compute<T>.Vector_MagnitudeSquared =
-				Meta.Compile<Compute<T>.delegates.Vector_MagnitudeSquared>(Vector_MagnitudeSquared_string);
+				Meta.Compile<Compute<T>.Delegates.Vector_MagnitudeSquared>(Vector_MagnitudeSquared_string);
 
 			return Compute<T>.Vector_MagnitudeSquared(vector);
 		};
 		#endregion
 
 		/// <summary>Computes the angle between two vectors.</summary>
-		public static Compute<T>.delegates.Vector_Angle Vector_Angle = (Vector<T> first, Vector<T> second) =>
+		public static Compute<T>.Delegates.Vector_Angle Vector_Angle = (Vector<T> first, Vector<T> second) =>
 		#region code
 		{
 			throw new Error("not yet implemented");
@@ -2974,7 +2987,7 @@ namespace Seven.Mathematics
 		#endregion
 
 		/// <summary>Rotates a vector by the specified axis and rotation values.</summary>
-		public static Compute<T>.delegates.Vector_RotateBy Vector_RotateBy = (Vector<T> vector, T angle, T x, T y, T z) =>
+		public static Compute<T>.Delegates.Vector_RotateBy Vector_RotateBy = (Vector<T> vector, T angle, T x, T y, T z) =>
 		#region code
 		{
 			throw new Error("not yet implemented");
@@ -3003,7 +3016,7 @@ namespace Seven.Mathematics
 		#endregion
 
 		/// <summary>Computes the linear interpolation between two vectors.</summary>
-		public static Compute<T>.delegates.Vector_Lerp Vector_Lerp = (Vector<T> left, Vector<T> right, T blend) =>
+		public static Compute<T>.Delegates.Vector_Lerp Vector_Lerp = (Vector<T> left, Vector<T> right, T blend) =>
 		#region code
 		{
 			#region pre-optimization
@@ -3118,14 +3131,14 @@ namespace Seven.Mathematics
 			#endregion
 
 			Compute<T>.Vector_Lerp =
-				Meta.Compile<Compute<T>.delegates.Vector_Lerp>(Vector_Lerp_string);
+				Meta.Compile<Compute<T>.Delegates.Vector_Lerp>(Vector_Lerp_string);
 
 			return Compute<T>.Vector_Lerp(left, right, blend);
 		};
 		#endregion
 
 		/// <summary>Sphereically interpolates between two vectors.</summary>
-		public static Compute<T>.delegates.Vector_Slerp Vector_Slerp = (Vector<T> left, Vector<T> right, T blend) =>
+		public static Compute<T>.Delegates.Vector_Slerp Vector_Slerp = (Vector<T> left, Vector<T> right, T blend) =>
 		#region code
 		{
 			throw new Error("not yet implemented");
@@ -3154,7 +3167,7 @@ namespace Seven.Mathematics
 		#endregion
 
 		/// <summary>Interpolates between three vectors using barycentric coordinates.</summary>
-		public static Compute<T>.delegates.Vector_Blerp Vector_Blerp = (Vector<T> a, Vector<T> b, Vector<T> c, T u, T v) =>
+		public static Compute<T>.Delegates.Vector_Blerp Vector_Blerp = (Vector<T> a, Vector<T> b, Vector<T> c, T u, T v) =>
 		#region code
 		{
 			#region pre-optimization
@@ -3222,14 +3235,14 @@ namespace Seven.Mathematics
 			#endregion
 
 			Compute<T>.Vector_Blerp =
-				Meta.Compile<Compute<T>.delegates.Vector_Blerp>(Vector_Blerp_string);
+				Meta.Compile<Compute<T>.Delegates.Vector_Blerp>(Vector_Blerp_string);
 
 			return Compute<T>.Vector_Blerp(a, b, c, u, v);
 		};
 		#endregion
 
 		/// <summary>Does a value equality check.</summary>
-		public static Compute<T>.delegates.Vector_EqualsValue Vector_EqualsValue = (Vector<T> left, Vector<T> right) =>
+		public static Compute<T>.Delegates.Vector_EqualsValue Vector_EqualsValue = (Vector<T> left, Vector<T> right) =>
 		#region code
 		{
 			#region pre-optimization
@@ -3297,14 +3310,14 @@ namespace Seven.Mathematics
 			#endregion
 
 			Compute<T>.Vector_EqualsValue =
-				Meta.Compile<Compute<T>.delegates.Vector_EqualsValue>(Vector_EqualsValue_string);
+				Meta.Compile<Compute<T>.Delegates.Vector_EqualsValue>(Vector_EqualsValue_string);
 
 			return Compute<T>.Vector_EqualsValue(left, right);
 		};
 		#endregion
 
 		/// <summary>Does a value equality check with leniency.</summary>
-		public static Compute<T>.delegates.Vector_EqualsValue_leniency Vector_EqualsValue_leniency = (Vector<T> left, Vector<T> right, T leniency) =>
+		public static Compute<T>.Delegates.Vector_EqualsValue_leniency Vector_EqualsValue_leniency = (Vector<T> left, Vector<T> right, T leniency) =>
 		#region code
 		{
 			#region pre-optimization
@@ -3367,14 +3380,14 @@ namespace Seven.Mathematics
 			#endregion
 
 			Compute<T>.Vector_EqualsValue_leniency =
-				Meta.Compile<Compute<T>.delegates.Vector_EqualsValue_leniency>(Vector_EqualsValue_leniency_string);
+				Meta.Compile<Compute<T>.Delegates.Vector_EqualsValue_leniency>(Vector_EqualsValue_leniency_string);
 
 			return Compute<T>.Vector_EqualsValue_leniency(left, right, leniency);
 		};
 		#endregion
 
 		/// <summary>Rotates a vector by a quaternion.</summary>
-		public static Compute<T>.delegates.Vector_RotateBy_quaternion Vector_RotateBy_quaternion = (Vector<T> vector, Quaternion<T> rotation) =>
+		public static Compute<T>.Delegates.Vector_RotateBy_quaternion Vector_RotateBy_quaternion = (Vector<T> vector, Quaternion<T> rotation) =>
 		#region code
 		{
 			return Compute<T>.Quaternion_Rotate(rotation, vector);
@@ -3584,7 +3597,7 @@ namespace Seven.Mathematics
 		#region matrix
 
 		/// <summary>Creates a zero matrix of the given dimensions.</summary>
-		public static Compute<T>.delegates.Matrix_FactoryZero Matrix_FactoryZero = (int rows, int columns) =>
+		public static Compute<T>.Delegates.Matrix_FactoryZero Matrix_FactoryZero = (int rows, int columns) =>
 		#region code
 		{
 #if show_Numeric
@@ -3620,14 +3633,14 @@ namespace Seven.Mathematics
 			#endregion
 
 			Compute<T>.Matrix_FactoryZero =
-				Meta.Compile<Compute<T>.delegates.Matrix_FactoryZero>(Matrix_FactoryZero_string);
+				Meta.Compile<Compute<T>.Delegates.Matrix_FactoryZero>(Matrix_FactoryZero_string);
 
 			return Compute<T>.Matrix_FactoryZero(rows, columns);
 		};
 		#endregion
 
 		/// <summary>Creates a ones matrix of the given dimensions.</summary>
-		public static Compute<T>.delegates.Matrix_FactoryOne Matrix_FactoryOne = (int rows, int columns) =>
+		public static Compute<T>.Delegates.Matrix_FactoryOne Matrix_FactoryOne = (int rows, int columns) =>
 		#region code
 		{
 			#region generic
@@ -3665,14 +3678,14 @@ namespace Seven.Mathematics
 			#endregion
 
 			Compute<T>.Matrix_FactoryOne =
-				Meta.Compile<Compute<T>.delegates.Matrix_FactoryOne>(Matrix_FactoryOne_string);
+				Meta.Compile<Compute<T>.Delegates.Matrix_FactoryOne>(Matrix_FactoryOne_string);
 
 			return Compute<T>.Matrix_FactoryOne(rows, columns);
 		};
 		#endregion
 
 		/// <summary>Creates an identity (ones along diagnol, zeros otherwise) matrix of the given dimensions.</summary>
-		public static Compute<T>.delegates.Matrix_FactoryIdentity Matrix_FactoryIdentity = (int rows, int columns) =>
+		public static Compute<T>.Delegates.Matrix_FactoryIdentity Matrix_FactoryIdentity = (int rows, int columns) =>
 		#region code
 		{
 			#region generic
@@ -3718,14 +3731,14 @@ namespace Seven.Mathematics
 			Matrix_FactoryIdentity_string = Matrix_FactoryIdentity_string.Replace("generic", Meta.ConvertTypeToCsharpSource(typeof(T)));
 
 			Compute<T>.Matrix_FactoryIdentity =
-				Meta.Compile<Compute<T>.delegates.Matrix_FactoryIdentity>(Matrix_FactoryIdentity_string);
+				Meta.Compile<Compute<T>.Delegates.Matrix_FactoryIdentity>(Matrix_FactoryIdentity_string);
 
 			return Compute<T>.Matrix_FactoryIdentity(rows, columns);
 		};
 		#endregion
 
 		/// <summary>Determines if a matrix is symetric.</summary>
-		public static Compute<T>.delegates.Matrix_IsSymetric Matrix_IsSymetric = (Matrix<T> matrix) =>
+		public static Compute<T>.Delegates.Matrix_IsSymetric Matrix_IsSymetric = (Matrix<T> matrix) =>
 		#region code
 		{
 			#region pre-optimization
@@ -3836,14 +3849,14 @@ namespace Seven.Mathematics
 			#endregion
 
 			Compute<T>.Matrix_IsSymetric =
-			Meta.Compile<Compute<T>.delegates.Matrix_IsSymetric>(Matrix_IsSymetric_string);
+			Meta.Compile<Compute<T>.Delegates.Matrix_IsSymetric>(Matrix_IsSymetric_string);
 
 			return Compute<T>.Matrix_IsSymetric(matrix);
 		};
 		#endregion
 
 		/// <summary>Negates all the values in a matrix.</summary>
-		public static Compute<T>.delegates.Matrix_Negate Matrix_Negate = (Matrix<T> matrix) =>
+		public static Compute<T>.Delegates.Matrix_Negate Matrix_Negate = (Matrix<T> matrix) =>
 		#region code
 		{
 			#region pre-optimization
@@ -3950,14 +3963,14 @@ namespace Seven.Mathematics
 			#endregion
 
 			Compute<T>.Matrix_Negate =
-			Meta.Compile<Compute<T>.delegates.Matrix_Negate>(Matrix_Negate_string);
+			Meta.Compile<Compute<T>.Delegates.Matrix_Negate>(Matrix_Negate_string);
 
 			return Compute<T>.Matrix_Negate(matrix);
 		};
 		#endregion
 
 		/// <summary>Does standard addition of two matrices.</summary>
-		public static Compute<T>.delegates.Matrix_Add Matrix_Add = (Matrix<T> left, Matrix<T> right) =>
+		public static Compute<T>.Delegates.Matrix_Add Matrix_Add = (Matrix<T> left, Matrix<T> right) =>
 		#region code
 		{
 			#region pre-optimization
@@ -4078,14 +4091,14 @@ namespace Seven.Mathematics
 			#endregion
 
 			Compute<T>.Matrix_Add =
-				Meta.Compile<Compute<T>.delegates.Matrix_Add>(Matrix_Add_string);
+				Meta.Compile<Compute<T>.Delegates.Matrix_Add>(Matrix_Add_string);
 
 			return Compute<T>.Matrix_Add(left, right);
 		};
 		#endregion
 
 		/// <summary>Subtracts a scalar from all the values in a matrix.</summary>
-		public static Compute<T>.delegates.Matrix_Subtract Matrix_Subtract = (Matrix<T> left, Matrix<T> right) =>
+		public static Compute<T>.Delegates.Matrix_Subtract Matrix_Subtract = (Matrix<T> left, Matrix<T> right) =>
 		#region code
 		{
 			#region pre-optimization
@@ -4206,14 +4219,14 @@ namespace Seven.Mathematics
 			#endregion
 
 			Compute<T>.Matrix_Subtract =
-				Meta.Compile<Compute<T>.delegates.Matrix_Subtract>(Matrix_Subtract_string);
+				Meta.Compile<Compute<T>.Delegates.Matrix_Subtract>(Matrix_Subtract_string);
 
 			return Compute<T>.Matrix_Subtract(left, right);
 		};
 		#endregion
 
 		/// <summary>Does a standard (triple for looped) multiplication between matrices.</summary>
-		public static Compute<T>.delegates.Matrix_Multiply Matrix_Multiply = (Matrix<T> left, Matrix<T> right) =>
+		public static Compute<T>.Delegates.Matrix_Multiply Matrix_Multiply = (Matrix<T> left, Matrix<T> right) =>
 		#region code
 		{
 			#region pre-optimization
@@ -4383,14 +4396,14 @@ namespace Seven.Mathematics
 			#endregion
 
 			Compute<T>.Matrix_Multiply =
-				Meta.Compile<Compute<T>.delegates.Matrix_Multiply>(Matrix_Multiply_string);
+				Meta.Compile<Compute<T>.Delegates.Matrix_Multiply>(Matrix_Multiply_string);
 
 			return Compute<T>.Matrix_Multiply(left, right);
 		};
 		#endregion
 
 		/// <summary>Does a standard (triple for looped) multiplication between matrices.</summary>
-		public static Compute<T>.delegates.Matrix_Multiply_vector Matrix_Multiply_vector = (Matrix<T> left, Vector<T> right) =>
+		public static Compute<T>.Delegates.Matrix_Multiply_vector Matrix_Multiply_vector = (Matrix<T> left, Vector<T> right) =>
 		#region code
 		{
 			#region pre-optimization
@@ -4517,14 +4530,14 @@ namespace Seven.Mathematics
 			#endregion
 
 			Compute<T>.Matrix_Multiply_vector =
-				Meta.Compile<Compute<T>.delegates.Matrix_Multiply_vector>(Matrix_Multiply_vector_string);
+				Meta.Compile<Compute<T>.Delegates.Matrix_Multiply_vector>(Matrix_Multiply_vector_string);
 
 			return Compute<T>.Matrix_Multiply_vector(left, right);
 		};
 		#endregion
 
 		/// <summary>Multiplies all the values in a matrix by a scalar.</summary>
-		public static Compute<T>.delegates.Matrix_Multiply_scalar Matrix_Multiply_scalar = (Matrix<T> left, T right) =>
+		public static Compute<T>.Delegates.Matrix_Multiply_scalar Matrix_Multiply_scalar = (Matrix<T> left, T right) =>
 		#region code
 		{
 			#region pre-optimization
@@ -4633,14 +4646,14 @@ namespace Seven.Mathematics
 			#endregion
 
 			Compute<T>.Matrix_Multiply_scalar =
-				Meta.Compile<Compute<T>.delegates.Matrix_Multiply_scalar>(Matrix_Multiply_scalar_string);
+				Meta.Compile<Compute<T>.Delegates.Matrix_Multiply_scalar>(Matrix_Multiply_scalar_string);
 
 			return Compute<T>.Matrix_Multiply_scalar(left, right);
 		};
 		#endregion
 
 		/// <summary>Divides all the values in the matrix by a scalar.</summary>
-		public static Compute<T>.delegates.Matrix_Divide Matrix_Divide = (Matrix<T> left, T right) =>
+		public static Compute<T>.Delegates.Matrix_Divide Matrix_Divide = (Matrix<T> left, T right) =>
 		#region code
 		{
 			#region pre-optimization
@@ -4764,14 +4777,14 @@ namespace Seven.Mathematics
 			#endregion
 
 			Compute<T>.Matrix_Divide =
-				Meta.Compile<Compute<T>.delegates.Matrix_Divide>(Matrix_Divide_string);
+				Meta.Compile<Compute<T>.Delegates.Matrix_Divide>(Matrix_Divide_string);
 
 			return Compute<T>.Matrix_Divide(left, right);
 		};
 		#endregion
 
 		/// <summary>Applies a power to a square matrix.</summary>
-		public static Compute<T>.delegates.Matrix_Power Matrix_Power = (Matrix<T> matrix, int power) =>
+		public static Compute<T>.Delegates.Matrix_Power Matrix_Power = (Matrix<T> matrix, int power) =>
 		#region code
 		{
 			#region pre-optimization
@@ -4829,14 +4842,14 @@ namespace Seven.Mathematics
 			#endregion
 
 			Compute<T>.Matrix_Power =
-				Meta.Compile<Compute<T>.delegates.Matrix_Power>(Matrix_Power_string);
+				Meta.Compile<Compute<T>.Delegates.Matrix_Power>(Matrix_Power_string);
 
 			return Compute<T>.Matrix_Power(matrix, power);
 		};
 		#endregion
 
 		/// <summary>Gets the minor of a matrix.</summary>
-		public static Compute<T>.delegates.Matrix_Minor Matrix_Minor = (Matrix<T> matrix, int row, int column) =>
+		public static Compute<T>.Delegates.Matrix_Minor Matrix_Minor = (Matrix<T> matrix, int row, int column) =>
 		#region code
 		{
 			#region pre-optimization
@@ -5031,14 +5044,14 @@ namespace Seven.Mathematics
 			#endregion
 
 			Compute<T>.Matrix_Minor =
-				Meta.Compile<Compute<T>.delegates.Matrix_Minor>(Matrix_Minor_string);
+				Meta.Compile<Compute<T>.Delegates.Matrix_Minor>(Matrix_Minor_string);
 
 			return Compute<T>.Matrix_Minor(matrix, row, column);
 		};
 		#endregion
 
 		/// <summary>Combines two matrices from left to right (result.Rows = left.Rows && result.Columns = left.Columns + right.Columns).</summary>
-		public static Compute<T>.delegates.Matrix_ConcatenateRowWise Matrix_ConcatenateRowWise = (Matrix<T> left, Matrix<T> right) =>
+		public static Compute<T>.Delegates.Matrix_ConcatenateRowWise Matrix_ConcatenateRowWise = (Matrix<T> left, Matrix<T> right) =>
 		#region code
 		{
 			#region pre-optimization
@@ -5186,14 +5199,14 @@ namespace Seven.Mathematics
 			#endregion
 
 			Compute<T>.Matrix_ConcatenateRowWise =
-				Meta.Compile<Compute<T>.delegates.Matrix_ConcatenateRowWise>(Matrix_ConcatenateRowWise_string);
+				Meta.Compile<Compute<T>.Delegates.Matrix_ConcatenateRowWise>(Matrix_ConcatenateRowWise_string);
 
 			return Compute<T>.Matrix_ConcatenateRowWise(left, right);
 		};
 		#endregion
 
 		/// <summary>Calculates the determinent of a square matrix.</summary>
-		public static Compute<T>.delegates.Matrix_Determinent Matrix_Determinent = (Matrix<T> matrix) =>
+		public static Compute<T>.Delegates.Matrix_Determinent Matrix_Determinent = (Matrix<T> matrix) =>
 		#region code
 		{
 			#region pre-optimization
@@ -5293,14 +5306,14 @@ namespace Seven.Mathematics
 			#endregion
 
 			Compute<T>.Matrix_Determinent =
-				Meta.Compile<Compute<T>.delegates.Matrix_Determinent>(Matrix_Determinent_string);
+				Meta.Compile<Compute<T>.Delegates.Matrix_Determinent>(Matrix_Determinent_string);
 
 			return Compute<T>.Matrix_Determinent(matrix);
 		};
 		#endregion
 
 		/// <summary>Calculates the echelon of a matrix (aka REF).</summary>
-		public static Compute<T>.delegates.Matrix_Echelon Matrix_Echelon = (Matrix<T> matrix) =>
+		public static Compute<T>.Delegates.Matrix_Echelon Matrix_Echelon = (Matrix<T> matrix) =>
 		#region code
 		{
 			#region pre-optimization
@@ -5391,14 +5404,14 @@ namespace Seven.Mathematics
 			#endregion
 
 			Compute<T>.Matrix_Echelon =
-				Meta.Compile<Compute<T>.delegates.Matrix_Echelon>(Matrix_Echelon_string);
+				Meta.Compile<Compute<T>.Delegates.Matrix_Echelon>(Matrix_Echelon_string);
 
 			return Compute<T>.Matrix_Echelon(matrix);
 		};
 		#endregion
 
 		/// <summary>Calculates the echelon of a matrix and reduces it (aka RREF).</summary>
-		public static Compute<T>.delegates.Matrix_ReducedEchelon Matrix_ReducedEchelon = (Matrix<T> matrix) =>
+		public static Compute<T>.Delegates.Matrix_ReducedEchelon Matrix_ReducedEchelon = (Matrix<T> matrix) =>
 		#region code
 		{
 			#region pre-optimization
@@ -5492,14 +5505,14 @@ namespace Seven.Mathematics
 			#endregion
 
 			Compute<T>.Matrix_ReducedEchelon =
-				Meta.Compile<Compute<T>.delegates.Matrix_ReducedEchelon>(Matrix_ReducedEchelon_string);
+				Meta.Compile<Compute<T>.Delegates.Matrix_ReducedEchelon>(Matrix_ReducedEchelon_string);
 
 			return Compute<T>.Matrix_ReducedEchelon(matrix);
 		};
 		#endregion
 
 		/// <summary>Calculates the inverse of a matrix.</summary>
-		public static Compute<T>.delegates.Matrix_Inverse Matrix_Inverse = (Matrix<T> matrix) =>
+		public static Compute<T>.Delegates.Matrix_Inverse Matrix_Inverse = (Matrix<T> matrix) =>
 		#region code
 		{
 			#region pre-optimization
@@ -5618,14 +5631,14 @@ namespace Seven.Mathematics
 			#endregion
 
 			Compute<T>.Matrix_Inverse =
-				Meta.Compile<Compute<T>.delegates.Matrix_Inverse>(Matrix_Inverse_string);
+				Meta.Compile<Compute<T>.Delegates.Matrix_Inverse>(Matrix_Inverse_string);
 
 			return Compute<T>.Matrix_Inverse(matrix);
 		};
 		#endregion
 
 		/// <summary>Calculates the adjoint of a matrix.</summary>
-		public static Compute<T>.delegates.Matrix_Adjoint Matrix_Adjoint = (Matrix<T> matrix) =>
+		public static Compute<T>.Delegates.Matrix_Adjoint Matrix_Adjoint = (Matrix<T> matrix) =>
 		#region code
 		{
 			#region pre-optimization
@@ -5692,14 +5705,14 @@ namespace Seven.Mathematics
 			#endregion
 
 			Compute<T>.Matrix_Adjoint =
-				Meta.Compile<Compute<T>.delegates.Matrix_Adjoint>(Matrix_Adjoint_string);
+				Meta.Compile<Compute<T>.Delegates.Matrix_Adjoint>(Matrix_Adjoint_string);
 
 			return Compute<T>.Matrix_Adjoint(matrix);
 		};
 		#endregion
 
 		/// <summary>Returns the transpose of a matrix.</summary>
-		public static Compute<T>.delegates.Matrix_Transpose Matrix_Transpose = (Matrix<T> matrix) =>
+		public static Compute<T>.Delegates.Matrix_Transpose Matrix_Transpose = (Matrix<T> matrix) =>
 		#region code
 		{
 			#region pre-optimization
@@ -5756,14 +5769,14 @@ namespace Seven.Mathematics
 			#endregion
 
 			Compute<T>.Matrix_Transpose =
-				Meta.Compile<Compute<T>.delegates.Matrix_Transpose>(Matrix_Transpose_string);
+				Meta.Compile<Compute<T>.Delegates.Matrix_Transpose>(Matrix_Transpose_string);
 
 			return Compute<T>.Matrix_Transpose(matrix);
 		};
 		#endregion
 
 		/// <summary>Decomposes a matrix into lower-upper reptresentation.</summary>
-		public static Compute<T>.delegates.Matrix_DecomposeLU Matrix_DecomposeLU = (Matrix<T> matrix, out Matrix<T> lower, out Matrix<T> upper) =>
+		public static Compute<T>.Delegates.Matrix_DecomposeLU Matrix_DecomposeLU = (Matrix<T> matrix, out Matrix<T> lower, out Matrix<T> upper) =>
 		#region code
 		{
 			#region pre-optimization
@@ -5928,14 +5941,14 @@ namespace Seven.Mathematics
 			#endregion
 
 			Compute<T>.Matrix_DecomposeLU =
-				Meta.Compile<Compute<T>.delegates.Matrix_DecomposeLU>(Matrix_DecomposeLU_string);
+				Meta.Compile<Compute<T>.Delegates.Matrix_DecomposeLU>(Matrix_DecomposeLU_string);
 
 			Compute<T>.Matrix_DecomposeLU(matrix, out lower, out upper);
 		};
 		#endregion
 
 		/// <summary>Does a value equality check.</summary>
-		public static Compute<T>.delegates.Matrix_EqualsByValue Matrix_EqualsByValue = (Matrix<T> left, Matrix<T> right) =>
+		public static Compute<T>.Delegates.Matrix_EqualsByValue Matrix_EqualsByValue = (Matrix<T> left, Matrix<T> right) =>
 		#region code
 		{
 			#region pre-optimization
@@ -6001,14 +6014,14 @@ namespace Seven.Mathematics
 			#endregion
 
 			Compute<T>.Matrix_EqualsByValue =
-				Meta.Compile<Compute<T>.delegates.Matrix_EqualsByValue>(Matrix_EqualsByValue_string);
+				Meta.Compile<Compute<T>.Delegates.Matrix_EqualsByValue>(Matrix_EqualsByValue_string);
 
 			return Compute<T>.Matrix_EqualsByValue(left, right);
 		};
 		#endregion
 
 		/// <summary>Does a value equality check with leniency.</summary>
-		public static Compute<T>.delegates.Matrix_EqualsByValue_leniency Matrix_EqualsByValue_leniency = (Matrix<T> left, Matrix<T> right, T leniency) =>
+		public static Compute<T>.Delegates.Matrix_EqualsByValue_leniency Matrix_EqualsByValue_leniency = (Matrix<T> left, Matrix<T> right, T leniency) =>
 		#region code
 		{
 			#region pre-optimization
@@ -6074,13 +6087,13 @@ namespace Seven.Mathematics
 			#endregion
 
 			Compute<T>.Matrix_EqualsByValue_leniency =
-				Meta.Compile<Compute<T>.delegates.Matrix_EqualsByValue_leniency>(Matrix_EqualsByValue_leniency_string);
+				Meta.Compile<Compute<T>.Delegates.Matrix_EqualsByValue_leniency>(Matrix_EqualsByValue_leniency_string);
 
 			return Compute<T>.Matrix_EqualsByValue_leniency(left, right, leniency);
 		};
 		#endregion
 
-		public static Compute<T>.delegates.Matrix_RowMultiplication Matrix_RowMultiplication = (Matrix<T> matrix, int row, T scalar) =>
+		public static Compute<T>.Delegates.Matrix_RowMultiplication Matrix_RowMultiplication = (Matrix<T> matrix, int row, T scalar) =>
 		#region code
 		{
 			#region pre-optimization
@@ -6113,13 +6126,13 @@ namespace Seven.Mathematics
 			#endregion
 
 			Compute<T>.Matrix_RowMultiplication =
-				Meta.Compile<Compute<T>.delegates.Matrix_RowMultiplication>(Matrix_RowMultiplication_string);
+				Meta.Compile<Compute<T>.Delegates.Matrix_RowMultiplication>(Matrix_RowMultiplication_string);
 
 			Compute<T>.Matrix_RowMultiplication(matrix, row, scalar);
 		};
 		#endregion
 
-		public static Compute<T>.delegates.Matrix_RowAddition Matrix_RowAddition = (Matrix<T> matrix, int target, int second, T scalar) =>
+		public static Compute<T>.Delegates.Matrix_RowAddition Matrix_RowAddition = (Matrix<T> matrix, int target, int second, T scalar) =>
 		#region code
 		{
 			#region pre-optimization
@@ -6152,13 +6165,13 @@ namespace Seven.Mathematics
 			#endregion
 
 			Compute<T>.Matrix_RowAddition =
-				Meta.Compile<Compute<T>.delegates.Matrix_RowAddition>(Matrix_RowAddition_string);
+				Meta.Compile<Compute<T>.Delegates.Matrix_RowAddition>(Matrix_RowAddition_string);
 
 			Compute<T>.Matrix_RowAddition(matrix, target, second, scalar);
 		};
 		#endregion
 
-		public static Compute<T>.delegates.Matrix_SwapRows Matrix_SwapRows = (Matrix<T> matrix, int row1, int row2) =>
+		public static Compute<T>.Delegates.Matrix_SwapRows Matrix_SwapRows = (Matrix<T> matrix, int row1, int row2) =>
 		#region code
 		{
 			#region pre-optimization
@@ -6203,7 +6216,7 @@ namespace Seven.Mathematics
 			#endregion
 
 			Compute<T>.Matrix_SwapRows =
-				Meta.Compile<Compute<T>.delegates.Matrix_SwapRows>(Matrix_SwapRows_string);
+				Meta.Compile<Compute<T>.Delegates.Matrix_SwapRows>(Matrix_SwapRows_string);
 
 			Compute<T>.Matrix_SwapRows(matrix, row1, row2);
 		};
@@ -6619,7 +6632,7 @@ namespace Seven.Mathematics
 		#region quaternion
 
 		/// <summary>Computes the length of quaternion.</summary>
-		public static Compute<T>.delegates.Quaternion_Magnitude Quaternion_Magnitude = (Quaternion<T> quaternion) =>
+		public static Compute<T>.Delegates.Quaternion_Magnitude Quaternion_Magnitude = (Quaternion<T> quaternion) =>
 		#region code
 		{
 			#region generic
@@ -6665,14 +6678,14 @@ namespace Seven.Mathematics
 			#endregion
 
 			Compute<T>.Quaternion_Magnitude =
-				Meta.Compile<Compute<T>.delegates.Quaternion_Magnitude>(Quaternion_Magnitude_string);
+				Meta.Compile<Compute<T>.Delegates.Quaternion_Magnitude>(Quaternion_Magnitude_string);
 
 			return Compute<T>.Quaternion_Magnitude(quaternion);
 		};
 		#endregion
 
 		/// <summary>Computes the length of a quaternion, but doesn't square root it.</summary>
-		public static Compute<T>.delegates.Quaternion_MagnitudeSquared Quaternion_MagnitudeSquared = (Quaternion<T> quaternion) =>
+		public static Compute<T>.Delegates.Quaternion_MagnitudeSquared Quaternion_MagnitudeSquared = (Quaternion<T> quaternion) =>
 		#region code
 		{
 			#region generic
@@ -6718,14 +6731,14 @@ namespace Seven.Mathematics
 			#endregion
 
 			Compute<T>.Quaternion_MagnitudeSquared =
-				Meta.Compile<Compute<T>.delegates.Quaternion_MagnitudeSquared>(Quaternion_MagnitudeSquared_string);
+				Meta.Compile<Compute<T>.Delegates.Quaternion_MagnitudeSquared>(Quaternion_MagnitudeSquared_string);
 
 			return Compute<T>.Quaternion_MagnitudeSquared(quaternion);
 		};
 		#endregion
 
 		/// <summary>Gets the conjugate of the quaternion.</summary>
-		public static Compute<T>.delegates.Quaternion_Conjugate Quaternion_Conjugate = (Quaternion<T> quaternion) =>
+		public static Compute<T>.Delegates.Quaternion_Conjugate Quaternion_Conjugate = (Quaternion<T> quaternion) =>
 		#region code
 		{
 			#region generic
@@ -6771,14 +6784,14 @@ namespace Seven.Mathematics
 			#endregion
 
 			Compute<T>.Quaternion_Conjugate =
-				Meta.Compile<Compute<T>.delegates.Quaternion_Conjugate>(Quaternion_Conjugate_string);
+				Meta.Compile<Compute<T>.Delegates.Quaternion_Conjugate>(Quaternion_Conjugate_string);
 
 			return Compute<T>.Quaternion_Conjugate(quaternion);
 		};
 		#endregion
 
 		/// <summary>Adds two quaternions together.</summary>
-		public static Compute<T>.delegates.Quaternion_Add Quaternion_Add = (Quaternion<T> left, Quaternion<T> right) =>
+		public static Compute<T>.Delegates.Quaternion_Add Quaternion_Add = (Quaternion<T> left, Quaternion<T> right) =>
 		#region code
 		{
 			#region generic
@@ -6828,14 +6841,14 @@ namespace Seven.Mathematics
 			#endregion
 
 			Compute<T>.Quaternion_Add =
-				Meta.Compile<Compute<T>.delegates.Quaternion_Add>(Quaternion_Add_string);
+				Meta.Compile<Compute<T>.Delegates.Quaternion_Add>(Quaternion_Add_string);
 
 			return Compute<T>.Quaternion_Add(left, right);
 		};
 		#endregion
 
 		/// <summary>Subtracts two quaternions.</summary>
-		public static Compute<T>.delegates.Quaternion_Subtract Quaternion_Subtract = (Quaternion<T> left, Quaternion<T> right) =>
+		public static Compute<T>.Delegates.Quaternion_Subtract Quaternion_Subtract = (Quaternion<T> left, Quaternion<T> right) =>
 		#region code
 		{
 			#region generic
@@ -6885,14 +6898,14 @@ namespace Seven.Mathematics
 			#endregion
 
 			Compute<T>.Quaternion_Subtract =
-				Meta.Compile<Compute<T>.delegates.Quaternion_Subtract>(Quaternion_Subtract_string);
+				Meta.Compile<Compute<T>.Delegates.Quaternion_Subtract>(Quaternion_Subtract_string);
 
 			return Compute<T>.Quaternion_Subtract(left, right);
 		};
 		#endregion
 
 		/// <summary>Multiplies two quaternions together.</summary>
-		public static Compute<T>.delegates.Quaternion_Multiply Quaternion_Multiply = (Quaternion<T> left, Quaternion<T> right) =>
+		public static Compute<T>.Delegates.Quaternion_Multiply Quaternion_Multiply = (Quaternion<T> left, Quaternion<T> right) =>
 		#region code
 		{
 			#region generic
@@ -6942,14 +6955,14 @@ namespace Seven.Mathematics
 			#endregion
 
 			Compute<T>.Quaternion_Multiply =
-				Meta.Compile<Compute<T>.delegates.Quaternion_Multiply>(Quaternion_Multiply_string);
+				Meta.Compile<Compute<T>.Delegates.Quaternion_Multiply>(Quaternion_Multiply_string);
 
 			return Compute<T>.Quaternion_Multiply(left, right);
 		};
 		#endregion
 
 		/// <summary>Multiplies all the values of the quaternion by a scalar value.</summary>
-		public static Compute<T>.delegates.Quaternion_Multiply_scalar Quaternion_Multiply_scalar = (Quaternion<T> left, T right) =>
+		public static Compute<T>.Delegates.Quaternion_Multiply_scalar Quaternion_Multiply_scalar = (Quaternion<T> left, T right) =>
 		#region code
 		{
 			#region generic
@@ -6995,14 +7008,14 @@ namespace Seven.Mathematics
 			#endregion
 
 			Compute<T>.Quaternion_Multiply_scalar =
-				Meta.Compile<Compute<T>.delegates.Quaternion_Multiply_scalar>(Quaternion_Multiply_scalar_string);
+				Meta.Compile<Compute<T>.Delegates.Quaternion_Multiply_scalar>(Quaternion_Multiply_scalar_string);
 
 			return Compute<T>.Quaternion_Multiply_scalar(left, right);
 		};
 		#endregion
 
 		/// <summary>Pre-multiplies a 3-component vector by a quaternion.</summary>
-		public static Compute<T>.delegates.Quaternion_Multiply_Vector Quaternion_Multiply_Vector = (Quaternion<T> left, Vector<T> right) =>
+		public static Compute<T>.Delegates.Quaternion_Multiply_Vector Quaternion_Multiply_Vector = (Quaternion<T> left, Vector<T> right) =>
 		#region code
 		{
 			#region generic
@@ -7056,14 +7069,14 @@ namespace Seven.Mathematics
 			#endregion
 
 			Compute<T>.Quaternion_Multiply_Vector =
-				Meta.Compile<Compute<T>.delegates.Quaternion_Multiply_Vector>(Quaternion_Multiply_Vector_string);
+				Meta.Compile<Compute<T>.Delegates.Quaternion_Multiply_Vector>(Quaternion_Multiply_Vector_string);
 
 			return Compute<T>.Quaternion_Multiply_Vector(left, right);
 		};
 		#endregion
 
 		/// <summary>Normalizes the quaternion.</summary>
-		public static Compute<T>.delegates.Quaternion_Normalize Quaternion_Normalize = (Quaternion<T> quaternion) =>
+		public static Compute<T>.Delegates.Quaternion_Normalize Quaternion_Normalize = (Quaternion<T> quaternion) =>
 		#region code
 		{
 			#region generic
@@ -7109,14 +7122,14 @@ namespace Seven.Mathematics
 			#endregion
 
 			Compute<T>.Quaternion_Normalize =
-				Meta.Compile<Compute<T>.delegates.Quaternion_Normalize>(Quaternion_Normalize_string);
+				Meta.Compile<Compute<T>.Delegates.Quaternion_Normalize>(Quaternion_Normalize_string);
 
 			return Compute<T>.Quaternion_Normalize(quaternion);
 		};
 		#endregion
 
 		/// <summary>Inverts a quaternion.</summary>
-		public static Compute<T>.delegates.Quaternion_Invert Quaternion_Invert = (Quaternion<T> quaternion) =>
+		public static Compute<T>.Delegates.Quaternion_Invert Quaternion_Invert = (Quaternion<T> quaternion) =>
 		#region code
 		{
 			#region generic
@@ -7170,14 +7183,14 @@ namespace Seven.Mathematics
 			#endregion
 
 			Compute<T>.Quaternion_Invert =
-				Meta.Compile<Compute<T>.delegates.Quaternion_Invert>(Quaternion_Invert_string);
+				Meta.Compile<Compute<T>.Delegates.Quaternion_Invert>(Quaternion_Invert_string);
 
 			return Compute<T>.Quaternion_Normalize(quaternion);
 		};
 		#endregion
 
 		/// <summary>Lenearly interpolates between two quaternions.</summary>
-		public static Compute<T>.delegates.Quaternion_Lerp Quaternion_Lerp = (Quaternion<T> left, Quaternion<T> right, T blend) =>
+		public static Compute<T>.Delegates.Quaternion_Lerp Quaternion_Lerp = (Quaternion<T> left, Quaternion<T> right, T blend) =>
 		#region code
 		{
 			#region generic
@@ -7257,14 +7270,14 @@ namespace Seven.Mathematics
 			#endregion
 
 			Compute<T>.Quaternion_Lerp =
-				Meta.Compile<Compute<T>.delegates.Quaternion_Lerp>(Quaternion_Lerp_string);
+				Meta.Compile<Compute<T>.Delegates.Quaternion_Lerp>(Quaternion_Lerp_string);
 
 			return Compute<T>.Quaternion_Lerp(left, right, blend);
 		};
 		#endregion
 
 		/// <summary>Sphereically interpolates between two quaternions.</summary>
-		public static Compute<T>.delegates.Quaternion_Slerp Quaternion_Slerp = (Quaternion<T> left, Quaternion<T> right, T blend) =>
+		public static Compute<T>.Delegates.Quaternion_Slerp Quaternion_Slerp = (Quaternion<T> left, Quaternion<T> right, T blend) =>
 		#region code
 		{
 			throw new Error("not yet implemented");
@@ -7289,7 +7302,7 @@ namespace Seven.Mathematics
 		#endregion
 
 		/// <summary>Rotates a vector by a quaternion [v' = qvq'].</summary>
-		public static Compute<T>.delegates.Quaternion_Rotate Quaternion_Rotate = (Quaternion<T> rotation, Vector<T> vector) =>
+		public static Compute<T>.Delegates.Quaternion_Rotate Quaternion_Rotate = (Quaternion<T> rotation, Vector<T> vector) =>
 		#region code
 		{
 			#region generic
@@ -7343,14 +7356,14 @@ namespace Seven.Mathematics
 			#endregion
 
 			Compute<T>.Quaternion_Rotate =
-				Meta.Compile<Compute<T>.delegates.Quaternion_Rotate>(Quaternion_Rotate_string);
+				Meta.Compile<Compute<T>.Delegates.Quaternion_Rotate>(Quaternion_Rotate_string);
 
 			return Compute<T>.Quaternion_Rotate(rotation, vector);
 		};
 		#endregion
 
 		/// <summary>Does a value equality check.</summary>
-		public static Compute<T>.delegates.Quaternion_EqualsValue Quaternion_EqualsValue = (Quaternion<T> left, Quaternion<T> right) =>
+		public static Compute<T>.Delegates.Quaternion_EqualsValue Quaternion_EqualsValue = (Quaternion<T> left, Quaternion<T> right) =>
 		#region code
 		{
 			#region generic
@@ -7398,14 +7411,14 @@ namespace Seven.Mathematics
 			#endregion
 
 			Compute<T>.Quaternion_EqualsValue =
-				Meta.Compile<Compute<T>.delegates.Quaternion_EqualsValue>(Quaternion_EqualsValue_string);
+				Meta.Compile<Compute<T>.Delegates.Quaternion_EqualsValue>(Quaternion_EqualsValue_string);
 
 			return Compute<T>.Quaternion_EqualsValue(left, right);
 		};
 		#endregion
 
 		/// <summary>Does a value equality check with leniency.</summary>
-		public static Compute<T>.delegates.Quaternion_EqualsValue_leniency Quaternion_EqualsValue_leniency = (Quaternion<T> left, Quaternion<T> right, T leniency) =>
+		public static Compute<T>.Delegates.Quaternion_EqualsValue_leniency Quaternion_EqualsValue_leniency = (Quaternion<T> left, Quaternion<T> right, T leniency) =>
 		#region code
 		{
 			#region generic
@@ -7451,7 +7464,7 @@ namespace Seven.Mathematics
 			#endregion
 
 			Compute<T>.Quaternion_EqualsValue_leniency =
-				Meta.Compile<Compute<T>.delegates.Quaternion_EqualsValue_leniency>(Quaternion_EqualsValue_leniency_string);
+				Meta.Compile<Compute<T>.Delegates.Quaternion_EqualsValue_leniency>(Quaternion_EqualsValue_leniency_string);
 
 			return Compute<T>.Quaternion_EqualsValue_leniency(left, right, leniency);
 		};
@@ -7518,7 +7531,7 @@ namespace Seven.Mathematics
 		#region combinatorics
 
 		/// <summary>Computes: [ N! ].</summary>
-		public static Compute<T>.delegates.Factorial Factorial = (T value) =>
+		public static Compute<T>.Delegates.Factorial Factorial = (T value) =>
 		{
 #if show_Numeric
 			Compute<Numeric>.delegates.Factorial compile_testing =
@@ -7546,7 +7559,7 @@ namespace Seven.Mathematics
 #endif
 
 			Compute<T>.Factorial =
-				Meta.Compile<Compute<T>.delegates.Factorial>(
+				Meta.Compile<Compute<T>.Delegates.Factorial>(
 					string.Concat(
 @"(", Type_String, @" N) =>
 {
@@ -7564,7 +7577,7 @@ namespace Seven.Mathematics
 		};
 
 		/// <summary>Computes: [ N! / (n[0]! + n[1]! + n[3]! ...) ].</summary>
-		public static Compute<T>.delegates.Combinations Combinations = (T N, T[] n) =>
+		public static Compute<T>.Delegates.Combinations Combinations = (T N, T[] n) =>
 		{
 #if show_Numeric
 			Compute<Numeric>.delegates.Combinations compile_testing =
@@ -7589,7 +7602,7 @@ namespace Seven.Mathematics
 #endif
 
 			Compute<T>.Combinations =
-				Meta.Compile<Compute<T>.delegates.Combinations>(
+				Meta.Compile<Compute<T>.Delegates.Combinations>(
 					string.Concat(
 @"(", Type_String, " _N, ", Type_String, @"[] _n) =>
 {
@@ -7614,7 +7627,7 @@ namespace Seven.Mathematics
 		};
 
 		/// <summary>Computes: [ N! / (N - n)! ]</summary>
-		public static Compute<T>.delegates.Choose Choose = (T N, T n) =>
+		public static Compute<T>.Delegates.Choose Choose = (T N, T n) =>
 		{
 #if show_Numeric
 			Compute<Numeric>.delegates.Choose compile_testing =
@@ -7631,7 +7644,7 @@ namespace Seven.Mathematics
 #endif
 
 			Compute<T>.Choose =
-				Meta.Compile<Compute<T>.delegates.Choose>(
+				Meta.Compile<Compute<T>.Delegates.Choose>(
 					string.Concat(
 @"(", Type_String, " _N, ", Type_String, @" _n) =>
 {
@@ -7653,7 +7666,7 @@ namespace Seven.Mathematics
 		#region statistics
 
 		/// <summary>Finds the number of occurences for each item and sorts them into a heap.</summary>
-		public static Compute<T>.delegates.Mode Mode = (Stepper<T> stepper) =>
+		public static Compute<T>.Delegates.Mode Mode = (Stepper<T> stepper) =>
 		{
 #if show_Numeric
 			// This is just a compile test. Vector_Add_string (see below) should match this code exactly.
@@ -7689,7 +7702,7 @@ namespace Seven.Mathematics
 #endif
 
 			Compute<T>.Mode =
-				Meta.Compile<Compute<T>.delegates.Mode>(
+				Meta.Compile<Compute<T>.Delegates.Mode>(
 					string.Concat(
 @"(Stepper<", Type_String, @"> stepper) =>
 {
@@ -7724,7 +7737,7 @@ namespace Seven.Mathematics
 		};
 
 		/// <summary>Computes the mean (or average) between multiple values.</summary>
-		public static Compute<T>.delegates.Mean Mean = (Stepper<T> stepper) =>
+		public static Compute<T>.Delegates.Mean Mean = (Stepper<T> stepper) =>
 		{
 #if show_Numeric
 			Compute<Numeric>.delegates.Mean compile_testing =
@@ -7738,7 +7751,7 @@ namespace Seven.Mathematics
 #endif
 
 			Compute<T>.Mean =
-				Meta.Compile<Compute<T>.delegates.Mean>(
+				Meta.Compile<Compute<T>.Delegates.Mean>(
 					string.Concat(
 @"(Stepper<", Type_String, @"> stepper) =>
 {
@@ -7752,7 +7765,7 @@ namespace Seven.Mathematics
 		};
 
 		/// <summary>Computes the median of a set of values.</summary>
-		public static Compute<T>.delegates.Median Median = (Stepper<T> stepper) =>
+		public static Compute<T>.Delegates.Median Median = (Stepper<T> stepper) =>
 		{
 #if show_Numeric
 			Compute<Numeric>.delegates.Median compile_testing =
@@ -7795,7 +7808,7 @@ namespace Seven.Mathematics
 #endif
 
 			Compute<T>.Median =
-				Meta.Compile<Compute<T>.delegates.Median>(
+				Meta.Compile<Compute<T>.Delegates.Median>(
 					string.Concat(
 @"(Stepper<", Type_String, @"> _stepper) =>
 {
@@ -7838,7 +7851,7 @@ namespace Seven.Mathematics
 		};
 
 		/// <summary>Computes the median of a set of values.</summary>
-		public static Compute<T>.delegates.GeometricMean GeometricMean = (Stepper<T> stepper) =>
+		public static Compute<T>.Delegates.GeometricMean GeometricMean = (Stepper<T> stepper) =>
 		{
 #if show_Numeric
 			Compute<Numeric>.delegates.GeometricMean compile_testing =
@@ -7856,7 +7869,7 @@ namespace Seven.Mathematics
 #endif
 
 			Compute<T>.GeometricMean =
-				Meta.Compile<Compute<T>.delegates.GeometricMean>(
+				Meta.Compile<Compute<T>.Delegates.GeometricMean>(
 					string.Concat(
 @"(Stepper<", Type_String, @"> _stepper) =>
 {
@@ -7874,7 +7887,7 @@ namespace Seven.Mathematics
 		};
 
 		/// <summary>Computes the variance of a set of values.</summary>
-		public static Compute<T>.delegates.Variance Variance = (Stepper<T> stepper) =>
+		public static Compute<T>.Delegates.Variance Variance = (Stepper<T> stepper) =>
 		{
 #if show_Numeric
 			Compute<Numeric>.delegates.Variance compile_testing =
@@ -7900,7 +7913,7 @@ namespace Seven.Mathematics
 #endif
 
 			Compute<T>.Variance =
-				Meta.Compile<Compute<T>.delegates.Variance>(
+				Meta.Compile<Compute<T>.Delegates.Variance>(
 					"(Stepper<" + Type_String + "> _stepper) =>" +
 					"{" +
 #if no_error_checking
@@ -7925,7 +7938,7 @@ namespace Seven.Mathematics
 		};
 
 		/// <summary>Computes the standard deviation of a set of values.</summary>
-		public static Compute<T>.delegates.StandardDeviation StandardDeviation = (Stepper<T> stepper) =>
+		public static Compute<T>.Delegates.StandardDeviation StandardDeviation = (Stepper<T> stepper) =>
 		{
 #if show_Numeric
 			Compute<Numeric>.delegates.StandardDeviation compile_testing =
@@ -7942,7 +7955,7 @@ namespace Seven.Mathematics
 #endif
 
 			Compute<T>.StandardDeviation =
-				Meta.Compile<Compute<T>.delegates.StandardDeviation>(
+				Meta.Compile<Compute<T>.Delegates.StandardDeviation>(
 					string.Concat(
 @"(Stepper<", Type_String, @"> _stepper) =>
 {",
@@ -7961,7 +7974,7 @@ namespace Seven.Mathematics
 		/// <summary>Computes the mean deviation of a set of values.</summary>
 		/// <see cref="Seven.Mathematics.Logic<T>.abs"/>
 		/// <see cref="Seven.Mathematics.Compute<T>.Mean"/>
-		public static Compute<T>.delegates.MeanDeviation MeanDeviation = (Stepper<T> stepper) =>
+		public static Compute<T>.Delegates.MeanDeviation MeanDeviation = (Stepper<T> stepper) =>
 		{
 #if show_Numeric
 			Compute<Numeric>.delegates.MeanDeviation compile_testing =
@@ -7980,7 +7993,7 @@ namespace Seven.Mathematics
 #endif
 
 			Compute<T>.MeanDeviation =
-				Meta.Compile<Compute<T>.delegates.MeanDeviation>(
+				Meta.Compile<Compute<T>.Delegates.MeanDeviation>(
 					string.Concat(
 @"(Stepper<", Type_String, @"> _stepper) =>
 {
@@ -7999,7 +8012,7 @@ namespace Seven.Mathematics
 		};
 
 		/// <summary>Computes the standard deviation of a set of values.</summary>
-		public static Compute<T>.delegates.Range Range = (out T min, out T max, Stepper<T> stepper) =>
+		public static Compute<T>.Delegates.Range Range = (out T min, out T max, Stepper<T> stepper) =>
 		{
 #if show_Numeric
 			Compute<Numeric>.delegates.Range compile_testing =
@@ -8028,7 +8041,7 @@ namespace Seven.Mathematics
 #endif
 
 			Compute<T>.Range =
-				Meta.Compile<Compute<T>.delegates.Range>(
+				Meta.Compile<Compute<T>.Delegates.Range>(
 					string.Concat(
 @"(out ", Type_String, " _min, out ", Type_String, " _max, Stepper<", Type_String, @"> _stepper) =>
 {
@@ -8057,7 +8070,7 @@ namespace Seven.Mathematics
 		};
 
 		/// <summary>Computes the quantiles of a set of values.</summary>
-		public static Compute<T>.delegates.Quantiles Quantiles = (int quantiles, Stepper<T> stepper) =>
+		public static Compute<T>.Delegates.Quantiles Quantiles = (int quantiles, Stepper<T> stepper) =>
 		{
 #if show_Numeric
 			Compute<Numeric>.delegates.Quantiles compile_testing =
@@ -8093,7 +8106,7 @@ namespace Seven.Mathematics
 #endif
 
 			Compute<T>.Quantiles =
-				Meta.Compile<Compute<T>.delegates.Quantiles>(
+				Meta.Compile<Compute<T>.Delegates.Quantiles>(
 					string.Concat(
 @"(int _quantiles, Stepper<", Type_String, @"> _stepper) =>
 {",
@@ -8129,7 +8142,7 @@ namespace Seven.Mathematics
 		};
 
 		/// <summary>Computes the median of a set of values.</summary>
-		public static Compute<T>.delegates.Correlation Correlation = (Stepper<T> a, Stepper<T> b) =>
+		public static Compute<T>.Delegates.Correlation Correlation = (Stepper<T> a, Stepper<T> b) =>
 		{
 			throw new Error("I introduced an error here when I removed the stepref off of structure. will fix soon - seven");
 
@@ -8167,7 +8180,7 @@ namespace Seven.Mathematics
 #endif
 
 			Compute<T>.Correlation =
-				Meta.Compile<Compute<T>.delegates.Correlation>(
+				Meta.Compile<Compute<T>.Delegates.Correlation>(
 					string.Concat(
 @"(Stepper<", Type_String, "> _a, Stepper<", Type_String, @"> _b) =>
 {
@@ -8206,7 +8219,7 @@ namespace Seven.Mathematics
 		#region trigonometry
 
 		/// <summary>Computes the ratio [length of the side opposite to the angle / hypotenuse] in a right triangle.</summary>
-		public static Compute<T>.delegates.Sine Sine = (Angle<T> angle) =>
+		public static Compute<T>.Delegates.Sine Sine = (Angle<T> angle) =>
 		{
 			if (typeof(T) == typeof(double)) // double optimization
 				Compute<double>.Sine = (Angle<double> _angle) => { return System.Math.Sin(_angle.Radians); };
@@ -8249,7 +8262,7 @@ namespace Seven.Mathematics
 #endif
 
 				Compute<T>.Sine =
-					Meta.Compile<Compute<T>.delegates.Sine>(
+					Meta.Compile<Compute<T>.Delegates.Sine>(
 						string.Concat(
 @"(", Type_String, @" _angle) =>
 {
@@ -8283,7 +8296,7 @@ QuandrantSkip:
 		};
 
 		/// <summary>Computes the ratio [length of the side adjacent to the angle / hypotenuse] in a right triangle.</summary>
-		public static Compute<T>.delegates.Cosine Cosine = (Angle<T> angle) =>
+		public static Compute<T>.Delegates.Cosine Cosine = (Angle<T> angle) =>
 		{
 			// rather than computing cos, you could do a phase shift and use sin
 			// return Sin(angle + (Pi / 2));
@@ -8330,7 +8343,7 @@ QuandrantSkip:
 #endif
 
 				Compute<T>.Cosine =
-					Meta.Compile<Compute<T>.delegates.Cosine>(
+					Meta.Compile<Compute<T>.Delegates.Cosine>(
 					string.Concat(
 @"(", Type_String, @" _angle) =>
 {
@@ -8365,7 +8378,7 @@ QuandrantSkip:
 		};
 
 		/// <summary>Computes the ratio [length of the side opposite to the angle / length of the side adjacent to the angle] in a right triangle.</summary>
-		public static Compute<T>.delegates.Tangent Tangent = (Angle<T> angle) =>
+		public static Compute<T>.Delegates.Tangent Tangent = (Angle<T> angle) =>
 		{
 			if (typeof(T) == typeof(double)) // double optimization
 				Compute<double>.Tangent = (Angle<double> _angle) => { return System.Math.Tan(_angle.Radians); };
@@ -8410,7 +8423,7 @@ QuandrantSkip:
 #endif
 
 				Compute<T>.Tangent =
-					Meta.Compile<Compute<T>.delegates.Tangent>(
+					Meta.Compile<Compute<T>.Delegates.Tangent>(
 						"(" + Type_String + " _angle) =>" +
 						"{" +
 						"	// get the angle into the positive unit circle" +
@@ -8446,7 +8459,7 @@ QuandrantSkip:
 		};
 
 		/// <summary>Computes the ratio [hypotenuse / length of the side opposite to the angle] in a right triangle.</summary>
-		public static Compute<T>.delegates.Cosecant Cosecant = (Angle<T> angle) =>
+		public static Compute<T>.Delegates.Cosecant Cosecant = (Angle<T> angle) =>
 		{
 			// Series: csc(x) = x^-1 + x/6 + 7x^3/360 + 31x^5/15120 ...
 			// more terms in computation inproves accuracy
@@ -8459,7 +8472,7 @@ QuandrantSkip:
 #endif
 
 			Compute<T>.Cosecant =
-				Meta.Compile<Compute<T>.delegates.Cosecant>(
+				Meta.Compile<Compute<T>.Delegates.Cosecant>(
 					"(" + Type_String + " _angle) =>" +
 					"{" +
 					"	return (" + Type_String + ")1 / Compute<" + Type_String + ">.Sine(_angle);" +
@@ -8469,7 +8482,7 @@ QuandrantSkip:
 		};
 
 		/// <summary>Computes the ratio [hypotenuse / length of the side adjacent to the angle] in a right triangle.</summary>
-		public static Compute<T>.delegates.Secant Secant = (Angle<T> angle) =>
+		public static Compute<T>.Delegates.Secant Secant = (Angle<T> angle) =>
 		{
 			// Series: sec(x) = ...
 			// more terms in computation inproves accuracy
@@ -8482,7 +8495,7 @@ QuandrantSkip:
 #endif
 
 			Compute<T>.Secant =
-				Meta.Compile<Compute<T>.delegates.Secant>(
+				Meta.Compile<Compute<T>.Delegates.Secant>(
 					"(" + Type_String + " _angle) =>" +
 					"{" +
 					"	return (" + Type_String + ")1 / Compute<" + Type_String + ">.Cosine(_angle);" +
@@ -8492,7 +8505,7 @@ QuandrantSkip:
 		};
 
 		/// <summary>Computes the ratio [length of the side adjacent to the angle / length of the side opposite to the angle] in a right triangle.</summary>
-		public static Compute<T>.delegates.Cotangent Cotangent = (Angle<T> angle) =>
+		public static Compute<T>.Delegates.Cotangent Cotangent = (Angle<T> angle) =>
 		{
 			// Series: cot(x) = ...
 			// more terms in computation inproves accuracy
@@ -8505,7 +8518,7 @@ QuandrantSkip:
 #endif
 
 			Compute<T>.Cotangent =
-				Meta.Compile<Compute<T>.delegates.Cotangent>(
+				Meta.Compile<Compute<T>.Delegates.Cotangent>(
 					"(" + Type_String + " _angle) =>" +
 					"{" +
 					"	return (" + Type_String + ")1 / Compute<" + Type_String + ">.Tangent(_angle);" +
@@ -8514,7 +8527,7 @@ QuandrantSkip:
 			return Compute<T>.Cotangent(angle);
 		};
 
-		public static Compute<T>.delegates.InverseSine InverseSine = (T ratio) =>
+		public static Compute<T>.Delegates.InverseSine InverseSine = (T ratio) =>
 		{
 			if (typeof(T) == typeof(double))
 				Compute<double>.InverseSine = (double _ratio) => { return Angle<double>.Factory_Radians(System.Math.Asin(_ratio)); };
@@ -8526,7 +8539,7 @@ QuandrantSkip:
 			return Compute<T>.InverseSine(ratio);
 		};
 
-		public static Compute<T>.delegates.InverseCosine InverseCosine = (T ratio) =>
+		public static Compute<T>.Delegates.InverseCosine InverseCosine = (T ratio) =>
 		{
 			if (typeof(T) == typeof(double))
 				Compute<double>.InverseCosine = (double _ratio) => { return Angle<double>.Factory_Radians(System.Math.Acos(_ratio)); };
@@ -8538,7 +8551,7 @@ QuandrantSkip:
 			return Compute<T>.InverseCosine(ratio);
 		};
 
-		public static Compute<T>.delegates.InverseTangent InverseTangent = (T ratio) =>
+		public static Compute<T>.Delegates.InverseTangent InverseTangent = (T ratio) =>
 		{
 			if (typeof(T) == typeof(double))
 				Compute<double>.InverseTangent = (double _ratio) => { return Angle<double>.Factory_Radians(System.Math.Atan(_ratio)); };
@@ -8550,7 +8563,7 @@ QuandrantSkip:
 			return Compute<T>.InverseTangent(ratio);
 		};
 
-		public static Compute<T>.delegates.InverseCosecant InverseCosecant = (T ratio) =>
+		public static Compute<T>.Delegates.InverseCosecant InverseCosecant = (T ratio) =>
 		{
 			if (typeof(T) == typeof(double))
 				Compute<double>.InverseCosecant = (double _ratio) => { return Angle<double>.Factory_Radians(System.Math.Asin(1d / _ratio)); };
@@ -8562,7 +8575,7 @@ QuandrantSkip:
 			return Compute<T>.InverseCosecant(ratio);
 		};
 
-		public static Compute<T>.delegates.InverseSecant InverseSecant = (T ratio) =>
+		public static Compute<T>.Delegates.InverseSecant InverseSecant = (T ratio) =>
 		{
 			if (typeof(T) == typeof(double))
 				Compute<double>.InverseSecant = (double _ratio) => { return Angle<double>.Factory_Radians(System.Math.Acos(1d / _ratio)); };
@@ -8574,7 +8587,7 @@ QuandrantSkip:
 			return Compute<T>.InverseSecant(ratio);
 		};
 
-		public static Compute<T>.delegates.InverseCotangent InverseCotangent = (T ratio) =>
+		public static Compute<T>.Delegates.InverseCotangent InverseCotangent = (T ratio) =>
 		{
 			if (typeof(T) == typeof(double))
 				Compute<double>.InverseCotangent = (double _ratio) => { return Angle<double>.Factory_Radians(System.Math.Atan(1d / _ratio)); };
@@ -8586,7 +8599,7 @@ QuandrantSkip:
 			return Compute<T>.InverseCotangent(ratio);
 		};
 
-		public static Compute<T>.delegates.HyperbolicSine HyperbolicSine = (Angle<T> angle) =>
+		public static Compute<T>.Delegates.HyperbolicSine HyperbolicSine = (Angle<T> angle) =>
 		{
 			if (typeof(T) == typeof(double))
 				Compute<double>.HyperbolicSine = (Angle<double> _angle) => { return System.Math.Sinh(_angle.Radians); };
@@ -8598,7 +8611,7 @@ QuandrantSkip:
 			return Compute<T>.HyperbolicSine(angle);
 		};
 
-		public static Compute<T>.delegates.HyperbolicCosine HyperbolicCosine = (Angle<T> angle) =>
+		public static Compute<T>.Delegates.HyperbolicCosine HyperbolicCosine = (Angle<T> angle) =>
 		{
 			if (typeof(T) == typeof(double))
 				Compute<double>.HyperbolicCosine = (Angle<double> _angle) => { return System.Math.Cosh(_angle.Radians); };
@@ -8610,7 +8623,7 @@ QuandrantSkip:
 			return Compute<T>.HyperbolicCosine(angle);
 		};
 
-		public static Compute<T>.delegates.HyperbolicTangent HyperbolicTangent = (Angle<T> angle) =>
+		public static Compute<T>.Delegates.HyperbolicTangent HyperbolicTangent = (Angle<T> angle) =>
 		{
 			if (typeof(T) == typeof(double))
 				Compute<double>.HyperbolicTangent = (Angle<double> _angle) => { return System.Math.Tanh(_angle.Radians); };
@@ -8622,7 +8635,7 @@ QuandrantSkip:
 			return Compute<T>.HyperbolicTangent(angle);
 		};
 
-		public static Compute<T>.delegates.HyperbolicSecant HyperbolicSecant = (Angle<T> angle) =>
+		public static Compute<T>.Delegates.HyperbolicSecant HyperbolicSecant = (Angle<T> angle) =>
 		{
 			if (typeof(T) == typeof(double))
 				Compute<double>.HyperbolicSecant = (Angle<double> _angle) => { return 1d / System.Math.Cosh(_angle.Radians); };
@@ -8634,7 +8647,7 @@ QuandrantSkip:
 			return Compute<T>.HyperbolicSecant(angle);
 		};
 
-		public static Compute<T>.delegates.HyperbolicCosecant HyperbolicCosecant = (Angle<T> angle) =>
+		public static Compute<T>.Delegates.HyperbolicCosecant HyperbolicCosecant = (Angle<T> angle) =>
 		{
 			if (typeof(T) == typeof(double))
 				Compute<double>.HyperbolicCosecant = (Angle<double> _angle) => { return 1d / System.Math.Sinh(_angle.Radians); };
@@ -8646,7 +8659,7 @@ QuandrantSkip:
 			return Compute<T>.HyperbolicCosecant(angle);
 		};
 
-		public static Compute<T>.delegates.HyperbolicCotangent HyperbolicCotangent = (Angle<T> angle) =>
+		public static Compute<T>.Delegates.HyperbolicCotangent HyperbolicCotangent = (Angle<T> angle) =>
 		{
 			if (typeof(T) == typeof(double))
 				Compute<double>.HyperbolicCotangent = (Angle<double> _angle) => { return 1d / System.Math.Tanh(_angle.Radians); };
@@ -8658,32 +8671,32 @@ QuandrantSkip:
 			return Compute<T>.HyperbolicCotangent(angle);
 		};
 
-		public static Compute<T>.delegates.InverseHyperbolicSine InverseHyperbolicSine = (T ratio) =>
+		public static Compute<T>.Delegates.InverseHyperbolicSine InverseHyperbolicSine = (T ratio) =>
 		{
 			throw new Error("not implemented");
 		};
 
-		public static Compute<T>.delegates.InverseHyperbolicCosine InverseHyperbolicCosine = (T ratio) =>
+		public static Compute<T>.Delegates.InverseHyperbolicCosine InverseHyperbolicCosine = (T ratio) =>
 		{
 			throw new Error("not implemented");
 		};
 
-		public static Compute<T>.delegates.InverseHyperbolicTangent InverseHyperbolicTangent = (T ratio) =>
+		public static Compute<T>.Delegates.InverseHyperbolicTangent InverseHyperbolicTangent = (T ratio) =>
 		{
 			throw new Error("not implemented");
 		};
 
-		public static Compute<T>.delegates.InverseHyperbolicCosecant InverseHyperbolicCosecant = (T ratio) =>
+		public static Compute<T>.Delegates.InverseHyperbolicCosecant InverseHyperbolicCosecant = (T ratio) =>
 		{
 			throw new Error("not implemented");
 		};
 
-		public static Compute<T>.delegates.InverseHyperbolicSecant InverseHyperbolicSecant = (T ratio) =>
+		public static Compute<T>.Delegates.InverseHyperbolicSecant InverseHyperbolicSecant = (T ratio) =>
 		{
 			throw new Error("not implemented");
 		};
 
-		public static Compute<T>.delegates.InverseHyperbolicCotangent InverseHyperbolicCotangent = (T ratio) =>
+		public static Compute<T>.Delegates.InverseHyperbolicCotangent InverseHyperbolicCotangent = (T ratio) =>
 		{
 			throw new Error("not implemented");
 		};

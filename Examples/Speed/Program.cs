@@ -13,12 +13,6 @@ namespace Speed
 	{
 		static void Main(string[] args)
 		{
-			DateTime compile_start = DateTime.Now;
-			Compute<Task>.Compile();
-			DateTime compile_end = DateTime.Now;
-			Console.WriteLine("Time to compile: " + (compile_start - compile_start));
-			Console.ReadLine();
-
 			Console.WriteLine("This example is mainly for speed testing during development.");
 			Console.WriteLine("See the other examples provided for clearer usage examples.");
 			Console.WriteLine();
@@ -31,7 +25,7 @@ namespace Speed
 			Type[] types;
 			DateTime reflection_start0 = DateTime.Now;
 			for (int i = 0; i < reflection_iterations; i++)
-				types = typeof(Syntax<double>).GetNestedTypes();
+				types = typeof(Symbolics<double>).GetNestedTypes();
 			DateTime reflection_end0 = DateTime.Now;
 			Console.WriteLine("Reflection test: \t\t" + (reflection_end0 - reflection_start0));
 			Console.ReadLine();

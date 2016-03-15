@@ -374,25 +374,25 @@ namespace Tutorial_Mathematics
 			Console.WriteLine();
 
 			Expression<Func<double, double>> expression1 = (x) => 2 * (x / 7);
-			var syntax1 = Syntax<double>.Parse(expression1);
+			var syntax1 = Symbolics<double>.Parse(expression1);
 			Console.WriteLine("    Expression 1: " + syntax1.ToString());
 			Console.WriteLine("      Simplified: " + syntax1.Simplify().ToString());
 			Console.WriteLine("      Plugin(5): " + syntax1.Assign("x", 5).Simplify().ToString());
 
 			Expression<Func<double, double>> expression2 = (x) => 2 * x / 7;
-			var syntax2 = Syntax<double>.Parse(expression2);
+			var syntax2 = Symbolics<double>.Parse(expression2);
 			Console.WriteLine("    Expression 2: " + syntax2.ToString());
 			Console.WriteLine("      Simplified: " + syntax2.Simplify().ToString());
 			Console.WriteLine("      Plugin(5): " + syntax2.Assign("x", 5).Simplify().ToString());
 
 			Expression<Func<double, double>> expression3 = (x) => 2 - x + 7;
-			var syntax3 = Syntax<double>.Parse(expression3);
+			var syntax3 = Symbolics<double>.Parse(expression3);
 			Console.WriteLine("    Expression 3: " + syntax3.ToString());
 			Console.WriteLine("      Simplified: " + syntax3.Simplify().ToString());
 			Console.WriteLine("      Plugin(5): " + syntax3.Assign("x", 5).Simplify().ToString());
 
 			Expression<Func<double, double>> expression4 = (x) => 2 + (x - 7);
-			var syntax4 = Syntax<double>.Parse(expression4);
+			var syntax4 = Symbolics<double>.Parse(expression4);
 			Console.WriteLine("    Expression 4: " + syntax4.ToString());
 			Console.WriteLine("      Simplified: " + syntax4.Simplify().ToString());
 			Console.WriteLine("      Plugin(5): " + syntax3.Assign("x", 5).Simplify().ToString());
