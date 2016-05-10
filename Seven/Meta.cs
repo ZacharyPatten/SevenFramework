@@ -3,7 +3,9 @@
 // LISCENSE: See "LISCENSE.md" in th root project directory.
 // SUPPORT: See "SUPPORT.md" in the root project directory.
 
-using System; // needed for the reflection extension methods
+using Seven.Structures; // needed for the reflection extension methods
+using System;
+using System.Linq.Expressions;
 
 namespace Seven
 {
@@ -20,7 +22,7 @@ namespace Seven
 		/// <param name="_unsafe">Is unsafe code allowed?</param>
 		/// <param name="references">The required assembly references.</param>
 		/// <returns>The generated object.</returns>
-		public static T Compile<T>(
+		internal static T Compile<T>(
 			string code, string method, string _class, string _namespace, bool _unsafe, string[] name_spaces, string[] references)
 		{
 #if no_error_shecking
@@ -46,19 +48,19 @@ namespace Seven
 			full_code += "public class " + _class + " {";
 			full_code += "public static object " + method + "() { return " + code + "; } } }";
 
-			System.CodeDom.Compiler.CompilerParameters parameters = 
+			System.CodeDom.Compiler.CompilerParameters parameters =
 					new System.CodeDom.Compiler.CompilerParameters();
 
 			if (references != null)
 				foreach (string reference in references)
 					parameters.ReferencedAssemblies.Add(reference);
-			
+
 			parameters.GenerateInMemory = true;
 
 			if (_unsafe)
 				parameters.CompilerOptions = "/optimize /unsafe";
 
-			System.CodeDom.Compiler.CompilerResults results = 
+			System.CodeDom.Compiler.CompilerResults results =
 					new Microsoft.CSharp.CSharpCodeProvider().CompileAssemblyFromSource(parameters, full_code);
 
 			if (results.Errors.HasErrors)
@@ -81,7 +83,7 @@ namespace Seven
 		/// <typeparam name="T">The type of the generic object to create.</typeparam>
 		/// <param name="code">The object to generate.</param>
 		/// <returns>The generated object.</returns>
-		public static T Compile<T>(string code)
+		internal static T Compile<T>(string code)
 		{
 #if no_error_shecking
 			// nothing
@@ -92,7 +94,7 @@ namespace Seven
 
 			string type_string = Meta.ConvertTypeToCsharpSource(typeof(T));
 
-			string full_code = 
+			string full_code =
 				string.Concat(
 @"using Seven;
 using Seven.Structures;
@@ -228,327 +230,491 @@ namespace Seven.Generated
 			}
 		}
 
-		public class Validate
+		internal delegate Expression UnaryOperationHelperDelegate(Expression operand, LabelTarget returnLabel);
+
+		internal static Delegate UnaryOperationHelper<Delegate, Operand, Return>(UnaryOperationHelperDelegate operation)
 		{
-			public class Operator
+			// shared expressions
+			ParameterExpression _operand = Expression.Parameter(typeof(Operand));
+			LabelTarget _label = Expression.Label(typeof(Return));
+			// code builder
+			List_Linked<Expression> expressions = new List_Linked<Expression>();
+			// null checks
+			if (!typeof(Operand).IsValueType) // is nullable?
 			{
-				/// <summary>Checks if an implicit cast exists from type A to type B.</summary>
-				/// <param name="A">The parameter of the implicit cast to check for.</param>
-				/// <param name="B">The return type of the implicit cast to check for.</param>
-				/// <returns>True if the implicit cast exists. False if not.</returns>
-				public static bool ImplicitCast(Type A, Type B)
-				{
-					System.Reflection.MethodInfo[] methods = A.GetMethods(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
-					foreach (System.Reflection.MethodInfo method in methods)
-					{
-						if (method.Name != "op_Implicit")
-						 continue;
-						System.Reflection.ParameterInfo[] parameters = method.GetParameters();
-						if (parameters.Length != 1 && parameters[0].ParameterType != A)
-							continue;
-						if (method.ReturnParameter.ParameterType != B)
-							continue;
-						if (!method.IsSpecialName)
-							continue;
-						return true;
-					}
-					return false;
-				}
+				expressions.Add(
+					Expression.IfThen(
+						Expression.Equal(_operand, Expression.Constant(null, typeof(Operand))),
+						Expression.Throw(Expression.New(typeof(System.ArgumentNullException).GetConstructor(new System.Type[] { typeof(string) }), Expression.Constant("operand")))));
+			}
+			// code
+			expressions.Add(operation(_operand, _label));
+			expressions.Add(Expression.Label(_label, Expression.Constant(default(Return))));
+			// build
+			return Expression.Lambda<Delegate>(
+				Expression.Block(expressions.ToArray()),
+				_operand).Compile();
+		}
 
-				/// <summary>Checks if an explicit cast exists from type A to type B.</summary>
-				/// <param name="A">The parameter of the explicit cast to check for.</param>
-				/// <param name="B">The return type of the explicit cast to check for.</param>
-				/// <returns>True if the explicit cast exists. False if not.</returns>
-				public static bool ExplicitCast(Type A, Type B)
-				{
-					if (A.IsPrimitive && !(A is bool) && B.IsPrimitive && !(B is bool))
-						return true;
+		internal delegate Expression BinaryOperationHelperDelegate(Expression left, Expression right, LabelTarget returnLabel);
 
-					System.Reflection.MethodInfo[] methods = A.GetMethods(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
-					foreach (System.Reflection.MethodInfo method in methods)
-					{
-						if (method.Name != "op_Explicit")
-							continue;
-						System.Reflection.ParameterInfo[] parameters = method.GetParameters();
-						if (parameters.Length != 1 && parameters[0].ParameterType != A)
-							continue;
-						if (method.ReturnParameter.ParameterType != B)
-							continue;
-						if (!method.IsSpecialName)
-							continue;
-						return true;
-					}
-					return false;
-				}
+		internal static Delegate BinaryOperationHelper<Delegate, Left, Right, Return>(BinaryOperationHelperDelegate operation)
+		{
+			// shared expressions
+			ParameterExpression _left = Expression.Parameter(typeof(Left));
+			ParameterExpression _right = Expression.Parameter(typeof(Right));
+			LabelTarget _label = Expression.Label(typeof(Return));
+			// code builder
+			List_Linked<Expression> expressions = new List_Linked<Expression>();
+			// null checks
+			if (!typeof(Left).IsValueType) // is nullable?
+			{
+				expressions.Add(
+					Expression.IfThen(
+						Expression.Equal(_left, Expression.Constant(null, typeof(Left))),
+						Expression.Throw(Expression.New(typeof(System.ArgumentNullException).GetConstructor(new System.Type[] { typeof(string) }), Expression.Constant("left")))));
+			}
+			if (!typeof(Right).IsValueType) // is nullable?
+			{
+				expressions.Add(
+					Expression.IfThen(
+						Expression.Equal(_right, Expression.Constant(null, typeof(Right))),
+						Expression.Throw(Expression.New(typeof(System.ArgumentNullException).GetConstructor(new System.Type[] { typeof(string) }), Expression.Constant("right")))));
+			}
+			// code
+			expressions.Add(operation(_left, _right, _label));
+			expressions.Add(Expression.Label(_label, Expression.Constant(default(Return), typeof(Return))));
+			// build expression
+			Expression expression = Expression.Block(expressions.ToArray());
+			// compile
+			return Expression.Lambda<Delegate>(expression, _left, _right).Compile();
+		}
 
-				/// <summary>Checks for the existence of a valid binary operator described by the arguments.</summary>
-				/// <param name="methodName">The name of the operator as a compiled method.</param>
-				/// <param name="operandType">The expected type of the operand.</param>
-				/// <param name="returnType">The expected return type.</param>
-				/// <returns>True if the expected operator exists; False if not.</returns>
-				private static bool Unary(string methodName, System.Type operandType, System.Type returnType)
-				{
-					var op_Addition = operandType.GetMethod(methodName, new Type[] { operandType });
-					if (op_Addition == null) return false;
-					if (op_Addition.ReturnParameter.ParameterType != returnType) return false;
-					if (!op_Addition.IsSpecialName) return false;
+		#region Unary
 
-					return true;
-				}
+		#region Convert
 
-				/// <summary>Checks for the existence of a valid unary negation operator described by the arguments.</summary>
-				/// <param name="operandType">The expected type of the left hand operand.</param>
-				/// <param name="returnType">The expected return type.</param>
-				/// <returns>True if the expected operator exists; False if not.</returns>
-				public static bool UnaryNegation(System.Type operandType, System.Type returnType)
-				{
-					return Unary("op_UnaryNegation", operandType, returnType);
-				}
+		public static bool ValidateConvert<T>()
+		{
+			return ValidateConvert<T, T>();
+		}
 
-				/// <summary>Checks for the existence of a valid unary plus operator described by the arguments.</summary>
-				/// <param name="operandType">The expected type of the left hand operand.</param>
-				/// <param name="returnType">The expected return type.</param>
-				/// <returns>True if the expected operator exists; False if not.</returns>
-				public static bool UnaryPlus(System.Type operandType, System.Type returnType)
-				{
-					return Unary("op_UnaryPlus", operandType, returnType);
-				}
-
-				/// <summary>Checks for the existence of a valid logical not operator described by the arguments.</summary>
-				/// <param name="operandType">The expected type of the left hand operand.</param>
-				/// <param name="returnType">The expected return type.</param>
-				/// <returns>True if the expected operator exists; False if not.</returns>
-				public static bool LogicalNot(System.Type operandType, System.Type returnType)
-				{
-					return Unary("op_LogicalNot", operandType, returnType);
-				}
-
-				/// <summary>Checks for the existence of a valid ones complement operator described by the arguments.</summary>
-				/// <param name="operandType">The expected type of the left hand operand.</param>
-				/// <param name="returnType">The expected return type.</param>
-				/// <returns>True if the expected operator exists; False if not.</returns>
-				public static bool OnesComplement(System.Type operandType, System.Type returnType)
-				{
-					return Unary("op_OnesComplement", operandType, returnType);
-				}
-
-				/// <summary>Checks for the existence of a valid false operator described by the arguments.</summary>
-				/// <param name="operandType">The expected type of the left hand operand.</param>
-				/// <param name="returnType">The expected return type.</param>
-				/// <returns>True if the expected operator exists; False if not.</returns>
-				public static bool False(System.Type operandType, System.Type returnType)
-				{
-					return Unary("op_False", operandType, returnType);
-				}
-
-				/// <summary>Checks for the existence of a valid true operator described by the arguments.</summary>
-				/// <param name="operandType">The expected type of the left hand operand.</param>
-				/// <param name="returnType">The expected return type.</param>
-				/// <returns>True if the expected operator exists; False if not.</returns>
-				public static bool True(System.Type operandType, System.Type returnType)
-				{
-					return Unary("op_True", operandType, returnType);
-				}
-
-				/// <summary>Checks for the existence of a valid increment operator described by the arguments.</summary>
-				/// <param name="operandType">The expected type of the left hand operand.</param>
-				/// <param name="returnType">The expected return type.</param>
-				/// <returns>True if the expected operator exists; False if not.</returns>
-				public static bool Increment(System.Type operandType, System.Type returnType)
-				{
-					return Unary("op_Increment", operandType, returnType);
-				}
-
-				/// <summary>Checks for the existence of a valid decrement operator described by the arguments.</summary>
-				/// <param name="operandType">The expected type of the left hand operand.</param>
-				/// <param name="returnType">The expected return type.</param>
-				/// <returns>True if the expected operator exists; False if not.</returns>
-				public static bool Decrement(System.Type operandType, System.Type returnType)
-				{
-					return Unary("op_Decrement", operandType, returnType);
-				}
-
-				/// <summary>Checks for the existence of a valid binary operator described by the arguments.</summary>
-				/// <param name="methodName">The name of the operator as a compiled method.</param>
-				/// <param name="leftOperandType">The expected type of the left hand operand.</param>
-				/// <param name="rightOperandType">The expected type of the right hand operand.</param>
-				/// <param name="returnType">The expected return type.</param>
-				/// <returns>True if the expected operator exists; False if not.</returns>
-				private static bool Binary(string methodName, System.Type leftOperandType, System.Type rightOperandType, System.Type returnType)
-				{
-					// Primitives: Boolean, Byte, SByte, Int16, UInt16, Int32, UInt32, Int64, UInt64, IntPtr, UIntPtr, Char, Double, and Single.
-					if (leftOperandType.IsPrimitive && rightOperandType.IsPrimitive && returnType.IsPrimitive)
-						return true;
-					var operation =
-						leftOperandType.GetMethod(methodName, new Type[] { leftOperandType, rightOperandType })
-						??
-						rightOperandType.GetMethod(methodName, new Type[] { leftOperandType, rightOperandType });
-					if (operation == null) return false;
-					if (operation.ReturnParameter.ParameterType != returnType) return false;
-					if (!operation.IsSpecialName) return false;
-					return true;
-				}
-
-				/// <summary>Checks for the existence of a valid addition operator described by the arguments.</summary>
-				/// <param name="leftOperandType">The expected type of the left hand operand.</param>
-				/// <param name="rightOperandType">The expected type of the right hand operand.</param>
-				/// <param name="returnType">The expected return type.</param>
-				/// <returns>True if the expected operator exists; False if not.</returns>
-				public static bool Addition(System.Type leftOperandType, System.Type rightOperandType, System.Type returnType)
-				{
-					return Binary("op_Addition", leftOperandType, rightOperandType, returnType);
-				}
-
-				/// <summary>Checks for the existence of a valid subtraction operator described by the arguments.</summary>
-				/// <param name="leftOperandType">The expected type of the left hand operand.</param>
-				/// <param name="rightOperandType">The expected type of the right hand operand.</param>
-				/// <param name="returnType">The expected return type.</param>
-				/// <returns>True if the expected operator exists; False if not.</returns>
-				public static bool Subtraction(System.Type leftOperandType, System.Type rightOperandType, System.Type returnType)
-				{
-					return Binary("op_Subtraction", leftOperandType, rightOperandType, returnType);
-				}
-
-				/// <summary>Checks for the existence of a valid multiplication operator described by the arguments.</summary>
-				/// <param name="leftOperandType">The expected type of the left hand operand.</param>
-				/// <param name="rightOperandType">The expected type of the right hand operand.</param>
-				/// <param name="returnType">The expected return type.</param>
-				/// <returns>True if the expected operator exists; False if not.</returns>
-				public static bool Multiplication(System.Type leftOperandType, System.Type rightOperandType, System.Type returnType)
-				{
-					return Binary("op_Multiply", leftOperandType, rightOperandType, returnType);
-				}
-
-				/// <summary>Checks for the existence of a valid division operator described by the arguments.</summary>
-				/// <param name="leftOperandType">The expected type of the left hand operand.</param>
-				/// <param name="rightOperandType">The expected type of the right hand operand.</param>
-				/// <param name="returnType">The expected return type.</param>
-				/// <returns>True if the expected operator exists; False if not.</returns>
-				public static bool Division(System.Type leftOperandType, System.Type rightOperandType, System.Type returnType)
-				{
-					return Binary("op_Division", leftOperandType, rightOperandType, returnType);
-				}
-
-				/// <summary>Checks for the existence of a valid modulus operator described by the arguments.</summary>
-				/// <param name="leftOperandType">The expected type of the left hand operand.</param>
-				/// <param name="rightOperandType">The expected type of the right hand operand.</param>
-				/// <param name="returnType">The expected return type.</param>
-				/// <returns>True if the expected operator exists; False if not.</returns>
-				public static bool Modulus(System.Type leftOperandType, System.Type rightOperandType, System.Type returnType)
-				{
-					return Binary("op_Modulus", leftOperandType, rightOperandType, returnType);
-				}
-
-				/// <summary>Checks for the existence of a valid equality operator described by the arguments.</summary>
-				/// <param name="leftOperandType">The expected type of the left hand operand.</param>
-				/// <param name="rightOperandType">The expected type of the right hand operand.</param>
-				/// <param name="returnType">The expected return type.</param>
-				/// <returns>True if the expected operator exists; False if not.</returns>
-				public static bool Equality(System.Type leftOperandType, System.Type rightOperandType, System.Type returnType)
-				{
-					return Binary("op_Equality", leftOperandType, rightOperandType, returnType);
-				}
-
-				/// <summary>Checks for the existence of a valid inequality operator described by the arguments.</summary>
-				/// <param name="leftOperandType">The expected type of the left hand operand.</param>
-				/// <param name="rightOperandType">The expected type of the right hand operand.</param>
-				/// <param name="returnType">The expected return type.</param>
-				/// <returns>True if the expected operator exists; False if not.</returns>
-				public static bool Inequality(System.Type leftOperandType, System.Type rightOperandType, System.Type returnType)
-				{
-					return Binary("op_Inequality", leftOperandType, rightOperandType, returnType);
-				}
-
-				/// <summary>Checks for the existence of a valid greater than operator described by the arguments.</summary>
-				/// <param name="leftOperandType">The expected type of the left hand operand.</param>
-				/// <param name="rightOperandType">The expected type of the right hand operand.</param>
-				/// <param name="returnType">The expected return type.</param>
-				/// <returns>True if the expected operator exists; False if not.</returns>
-				public static bool GreaterThan(System.Type leftOperandType, System.Type rightOperandType, System.Type returnType)
-				{
-					return Binary("op_GreaterThan", leftOperandType, rightOperandType, returnType);
-				}
-
-				/// <summary>Checks for the existence of a valid less than operator described by the arguments.</summary>
-				/// <param name="leftOperandType">The expected type of the left hand operand.</param>
-				/// <param name="rightOperandType">The expected type of the right hand operand.</param>
-				/// <param name="returnType">The expected return type.</param>
-				/// <returns>True if the expected operator exists; False if not.</returns>
-				public static bool LessThan(System.Type leftOperandType, System.Type rightOperandType, System.Type returnType)
-				{
-					return Binary("op_LessThan", leftOperandType, rightOperandType, returnType);
-				}
-
-				/// <summary>Checks for the existence of a valid greater than or equal operator described by the arguments.</summary>
-				/// <param name="leftOperandType">The expected type of the left hand operand.</param>
-				/// <param name="rightOperandType">The expected type of the right hand operand.</param>
-				/// <param name="returnType">The expected return type.</param>
-				/// <returns>True if the expected operator exists; False if not.</returns>
-				public static bool GreaterThanOrEqual(System.Type leftOperandType, System.Type rightOperandType, System.Type returnType)
-				{
-					return Binary("op_GreaterThanOrEqual", leftOperandType, rightOperandType, returnType);
-				}
-
-				/// <summary>Checks for the existence of a valid less than or equal operator described by the arguments.</summary>
-				/// <param name="leftOperandType">The expected type of the left hand operand.</param>
-				/// <param name="rightOperandType">The expected type of the right hand operand.</param>
-				/// <param name="returnType">The expected return type.</param>
-				/// <returns>True if the expected operator exists; False if not.</returns>
-				public static bool LessThanOrEqual(System.Type leftOperandType, System.Type rightOperandType, System.Type returnType)
-				{
-					return Binary("op_LessThanOrEqual", leftOperandType, rightOperandType, returnType);
-				}
-
-				/// <summary>Checks for the existence of a valid bitwise and operator described by the arguments.</summary>
-				/// <param name="leftOperandType">The expected type of the left hand operand.</param>
-				/// <param name="rightOperandType">The expected type of the right hand operand.</param>
-				/// <param name="returnType">The expected return type.</param>
-				/// <returns>True if the expected operator exists; False if not.</returns>
-				public static bool BitwiseAnd(System.Type leftOperandType, System.Type rightOperandType, System.Type returnType)
-				{
-					return Binary("op_BitwiseAnd", leftOperandType, rightOperandType, returnType);
-				}
-
-				/// <summary>Checks for the existence of a valid bitwise or operator described by the arguments.</summary>
-				/// <param name="leftOperandType">The expected type of the left hand operand.</param>
-				/// <param name="rightOperandType">The expected type of the right hand operand.</param>
-				/// <param name="returnType">The expected return type.</param>
-				/// <returns>True if the expected operator exists; False if not.</returns>
-				public static bool BitwiseOr(System.Type leftOperandType, System.Type rightOperandType, System.Type returnType)
-				{
-					return Binary("op_BitwiseOr", leftOperandType, rightOperandType, returnType);
-				}
-
-				/// <summary>Checks for the existence of a valid left shift operator described by the arguments.</summary>
-				/// <param name="leftOperandType">The expected type of the left hand operand.</param>
-				/// <param name="rightOperandType">The expected type of the right hand operand.</param>
-				/// <param name="returnType">The expected return type.</param>
-				/// <returns>True if the expected operator exists; False if not.</returns>
-				public static bool LeftShift(System.Type leftOperandType, System.Type rightOperandType, System.Type returnType)
-				{
-					return Binary("op_LeftShift", leftOperandType, rightOperandType, returnType);
-				}
-
-				/// <summary>Checks for the existence of a valid right shift operator described by the arguments.</summary>
-				/// <param name="leftOperandType">The expected type of the left hand operand.</param>
-				/// <param name="rightOperandType">The expected type of the right hand operand.</param>
-				/// <param name="returnType">The expected return type.</param>
-				/// <returns>True if the expected operator exists; False if not.</returns>
-				public static bool RightShift(System.Type leftOperandType, System.Type rightOperandType, System.Type returnType)
-				{
-					return Binary("op_RightShift", leftOperandType, rightOperandType, returnType);
-				}
-
-				/// <summary>Checks for the existence of a valid exclusive or operator described by the arguments.</summary>
-				/// <param name="leftOperandType">The expected type of the left hand operand.</param>
-				/// <param name="rightOperandType">The expected type of the right hand operand.</param>
-				/// <param name="returnType">The expected return type.</param>
-				/// <returns>True if the expected operator exists; False if not.</returns>
-				public static bool ExclusiveOr(System.Type leftOperandType, System.Type rightOperandType, System.Type returnType)
-				{
-					return Binary("op_ExclusiveOr", leftOperandType, rightOperandType, returnType);
-				}
+		public static bool ValidateConvert<A, B>()
+		{
+			try
+			{
+				Expression.Lambda<Func<B>>(
+					Expression.Convert(
+						Expression.Default(typeof(A)), typeof(B))).Compile();
+				return true;
+			}
+			catch
+			{
+				return false;
 			}
 		}
+
+		#endregion
+
+		#region Negate
+
+		public static bool ValidateNegate<T>()
+		{
+			return ValidateNegate<T, T>();
+		}
+
+		public static bool ValidateNegate<A, B>()
+		{
+			try
+			{
+				Expression.Lambda<Func<B>>(
+					Expression.Negate(
+						Expression.Default(typeof(A)))).Compile();
+				return true;
+			}
+			catch
+			{
+				return false;
+			}
+		}
+
+		#endregion
+
+		#region UnaryPlus
+
+		public static bool ValidateUnaryPlus<T>()
+		{
+			return ValidateUnaryPlus<T, T>();
+		}
+
+		public static bool ValidateUnaryPlus<A, B>()
+		{
+			try
+			{
+				Expression.Lambda<Func<B>>(
+					Expression.UnaryPlus(
+						Expression.Default(typeof(A)))).Compile();
+				return true;
+			}
+			catch
+			{
+				return false;
+			}
+		}
+
+		#endregion
+
+		#region LogicalNot
+
+		public static bool ValidateLogicalNot<T>()
+		{
+			return ValidateLogicalNot<T, T>();
+		}
+
+		public static bool ValidateLogicalNot<A, B>()
+		{
+			try
+			{
+				Expression.Lambda<Func<B>>(
+					Expression.Not(
+						Expression.Default(typeof(A)))).Compile();
+				return true;
+			}
+			catch
+			{
+				return false;
+			}
+		}
+
+		#endregion
+
+		#region Increment
+
+		public static bool ValidateIncrement<T>()
+		{
+			return ValidateIncrement<T, T>();
+		}
+
+		public static bool ValidateIncrement<A, B>()
+		{
+			try
+			{
+				Expression.Lambda<Func<B>>(
+					Expression.Increment(
+						Expression.Default(typeof(A)))).Compile();
+				return true;
+			}
+			catch
+			{
+				return false;
+			}
+		}
+
+		#endregion
+
+		#region Decrement
+
+		public static bool ValidateDecrement<T>()
+		{
+			return ValidateDecrement<T, T>();
+		}
+
+		public static bool ValidateDecrement<A, B>()
+		{
+			try
+			{
+				Expression.Lambda<Func<B>>(
+					Expression.Decrement(
+						Expression.Default(typeof(A)))).Compile();
+				return true;
+			}
+			catch
+			{
+				return false;
+			}
+		}
+
+		#endregion
+
+		#endregion
+
+		#region Binary
+
+		#region Add
+
+		public static bool ValidateAdd<T>()
+		{
+			return ValidateAdd<T, T, T>();
+		}
+
+		public static bool ValidateAdd<A, B, C>()
+		{
+			try
+			{
+				Expression.Lambda<Func<C>>(
+					Expression.Add(
+						Expression.Default(typeof(A)),
+						Expression.Default(typeof(B)))).Compile();
+				return true;
+			}
+			catch
+			{
+				return false;
+			}
+		}
+
+		#endregion
+
+		#region Subtract
+
+		public static bool ValidateSubtract<T>()
+		{
+			return ValidateSubtract<T, T, T>();
+		}
+
+		public static bool ValidateSubtract<A, B, C>()
+		{
+			try
+			{
+				Expression.Lambda<Func<C>>(
+					Expression.Subtract(
+						Expression.Default(typeof(A)),
+						Expression.Default(typeof(B)))).Compile();
+				return true;
+			}
+			catch
+			{
+				return false;
+			}
+		}
+
+		#endregion
+
+		#region Multiply
+
+		public static bool ValidateMultiply<T>()
+		{
+			return ValidateMultiply<T, T, T>();
+		}
+
+		public static bool ValidateMultiply<A, B, C>()
+		{
+			try
+			{
+				Expression.Lambda<Func<C>>(
+					Expression.Multiply(
+						Expression.Default(typeof(A)),
+						Expression.Default(typeof(B)))).Compile();
+				return true;
+			}
+			catch
+			{
+				return false;
+			}
+		}
+
+		#endregion
+
+		#region Divide
+
+		public static bool ValidateDivide<T>()
+		{
+			return ValidateDivide<T, T, T>();
+		}
+
+		public static bool ValidateDivide<A, B, C>()
+		{
+			try
+			{
+				Expression.Lambda<Func<C>>(
+					Expression.Divide(
+						Expression.Default(typeof(A)),
+						Expression.Default(typeof(B)))).Compile();
+				return true;
+			}
+			catch
+			{
+				return false;
+			}
+		}
+
+		#endregion
+
+		#region Modulo
+
+		public static bool ValidateModulo<T>()
+		{
+			return ValidateModulo<T, T, T>();
+		}
+
+		public static bool ValidateModulo<A, B, C>()
+		{
+			try
+			{
+				Expression.Lambda<Func<C>>(
+					Expression.Modulo(
+						Expression.Default(typeof(A)),
+						Expression.Default(typeof(B)))).Compile();
+				return true;
+			}
+			catch
+			{
+				return false;
+			}
+		}
+
+		#endregion
+
+		#region Equal
+
+		public static bool ValidateEqual<T>()
+		{
+			return ValidateEqual<T, T>();
+		}
+
+		public static bool ValidateEqual<A, B>()
+		{
+			try
+			{
+				Expression.Lambda<Func<bool>>(
+					Expression.Equal(
+						Expression.Default(typeof(A)),
+						Expression.Default(typeof(B)))).Compile();
+				return true;
+			}
+			catch
+			{
+				return false;
+			}
+		}
+
+		#endregion
+
+		#region NotEqual
+
+		public static bool ValidateNotEqual<T>()
+		{
+			return ValidateNotEqual<T, T>();
+		}
+
+		public static bool ValidateNotEqual<A, B>()
+		{
+			try
+			{
+				Expression.Lambda<Func<bool>>(
+					Expression.NotEqual(
+						Expression.Default(typeof(A)),
+						Expression.Default(typeof(B)))).Compile();
+				return true;
+			}
+			catch
+			{
+				return false;
+			}
+		}
+
+		#endregion
+
+		#region GreaterThan
+
+		public static bool ValidateGreaterThan<T>()
+		{
+			return ValidateGreaterThan<T, T>();
+		}
+
+		public static bool ValidateGreaterThan<A, B>()
+		{
+			try
+			{
+				Expression.Lambda<Func<bool>>(
+					Expression.GreaterThan(
+						Expression.Default(typeof(A)),
+						Expression.Default(typeof(B)))).Compile();
+				return true;
+			}
+			catch
+			{
+				return false;
+			}
+		}
+
+		#endregion
+
+		#region LessThan
+
+		public static bool ValidateLessThan<T>()
+		{
+			return ValidateLessThan<T, T>();
+		}
+
+		public static bool ValidateLessThan<A, B>()
+		{
+			try
+			{
+				Expression.Lambda<Func<bool>>(
+					Expression.LessThan(
+						Expression.Default(typeof(A)),
+						Expression.Default(typeof(B)))).Compile();
+				return true;
+			}
+			catch
+			{
+				return false;
+			}
+		}
+
+		#endregion
+
+		#region GreaterThanOrEqual
+
+		public static bool ValidateGreaterThanOrEqual<T>()
+		{
+			return ValidateGreaterThanOrEqual<T, T>();
+		}
+
+		public static bool ValidateGreaterThanOrEqual<A, B>()
+		{
+			try
+			{
+				Expression.Lambda<Func<bool>>(
+					Expression.GreaterThanOrEqual(
+						Expression.Default(typeof(A)),
+						Expression.Default(typeof(B)))).Compile();
+				return true;
+			}
+			catch
+			{
+				return false;
+			}
+		}
+
+		#endregion
+
+		#region LessThanOrEqual
+
+		public static bool ValidateLessThanOrEqual<T>()
+		{
+			return ValidateLessThanOrEqual<T, T>();
+		}
+
+		public static bool ValidateLessThanOrEqual<A, B>()
+		{
+			try
+			{
+				Expression.Lambda<Func<bool>>(
+					Expression.LessThanOrEqual(
+						Expression.Default(typeof(A)),
+						Expression.Default(typeof(B)))).Compile();
+				return true;
+			}
+			catch
+			{
+				return false;
+			}
+		}
+
+		#endregion
+
+		#endregion
 	}
 }

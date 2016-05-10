@@ -194,7 +194,7 @@ namespace Seven.Mathematics
 				if (this._right is Addition || this._right is Subtraction || this._left is Multiplication || this._left is Division)
 					right = string.Concat("(", right, ")");
 				if (this._right is Constant && Compute<T>.Compare(this._right as Constant, Compute<T>.Zero) == Comparison.Less)
-					return string.Concat(left, " - ", Compute<T>.Multiply(this._right as Constant, Compute<T>.IntCast(-1)));
+					return string.Concat(left, " - ", Compute<T>.Multiply(this._right as Constant, Compute<T>.FromInt32(-1)));
 				return string.Concat(left, " + ", right);
 			}
 		}

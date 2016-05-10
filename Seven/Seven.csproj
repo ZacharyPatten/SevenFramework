@@ -88,11 +88,13 @@
     <Compile Include="Algorithms\GraphSearch\Greedy.cs" />
     <Compile Include="Algorithms\Search.cs" />
     <Compile Include="Delegate.cs" />
+    <Compile Include="Integer.cs" />
     <Compile Include="Logic\Logic.cs" />
     <Compile Include="Mathematics\Angle.cs" />
     <Compile Include="Mathematics\Compute.cs" />
+    <Compile Include="Mathematics\Constants.cs" />
     <Compile Include="Mathematics\Matrix.cs" />
-    <Compile Include="Mathematics\Numeric.cs" />
+    <Compile Include="Mathematics\Space.cs" />
     <Compile Include="Meta.cs" />
     <Compile Include="Diagnostics\Performance.cs" />
     <Compile Include="Equate.cs" />

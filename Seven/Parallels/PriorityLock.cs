@@ -1,6 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿// Seven
+// https://github.com/53V3N1X/SevenFramework
+// LISCENSE: See "LISCENSE.md" in th root project directory.
+// SUPPORT: See "SUPPORT.md" in the root project directory.
+
 using Seven.Structures;
 using System.Threading;
 

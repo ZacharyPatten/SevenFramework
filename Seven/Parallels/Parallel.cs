@@ -1,9 +1,10 @@
-﻿using System;
-using System.ComponentModel;
+﻿// Seven
+// https://github.com/53V3N1X/SevenFramework
+// LISCENSE: See "LISCENSE.md" in th root project directory.
+// SUPPORT: See "SUPPORT.md" in the root project directory.
+
+using System;
 using System.Threading;
-using System.Threading.Tasks;
-using Seven.Mathematics;
-using Seven.Structures;
 
 namespace Seven.Parallels
 {
