@@ -14,7 +14,9 @@ namespace Seven.Structures
 		// Structure Properties
 		Structure.Countable<T>,
 		Structure.Addable<T>,
-		Structure.Clearable<T>
+		Structure.Clearable<T>,
+		Structure.Removable<T>,
+		Structure.Equating<T>
 	{
 		// properties
 		#region Get<M> Origin
@@ -351,6 +353,7 @@ namespace Seven.Structures
 		//fields
 		private Omnitree.Locate<T, M> _locate;
 		private Omnitree.Average<M> _average;
+		private Equate<T> _equate;
 		private Compare<M> _compare;
 		private int _dimensions;
 		private int _children;
@@ -437,6 +440,7 @@ namespace Seven.Structures
 			int dimensions,
 			Get<M> min, Get<M> max,
 			Omnitree.Locate<T, M> locate,
+			Equate<T> equate,
 			Compare<M> compare,
 			Omnitree.Average<M> average)
 		{
@@ -445,6 +449,8 @@ namespace Seven.Structures
 				throw new Error("null reference on location delegate during Omnitree construction");
 			if (compare == null)
 				throw new Error("null reference on compare delegate during Omnitree construction");
+			if (equate == null)
+				throw new Error("null reference on equate delegate during Omnitree construction");
 
 			// Check the min/max values
 			if (min == null)
@@ -467,6 +473,7 @@ namespace Seven.Structures
 
 			this._locate = locate;
 			this._average = average;
+			this._equate = equate;
 			this._compare = compare;
 			this._dimensions = dimensions;
 			this._children = 1 << this._dimensions;
@@ -495,12 +502,37 @@ namespace Seven.Structures
 		/// <param name="average">A function for computing the average between two items of the axis types.</param>
 		public OmnitreeLinkedArrayLists(M[] min, M[] max,
 			Omnitree.Locate<T, M> locate,
+			Equate<T> equate,
 			Compare<M> compare,
 			Omnitree.Average<M> average) :
 			this(min.Length,
 			Accessor.Get(min),
 			Accessor.Get(max),
 			locate,
+			equate,
+			compare,
+			average)
+		{
+			if (min.Length != max.Length)
+				throw new Error("invalid min/max dimensions when constructing an Omnitree_Array");
+		}
+		#endregion
+		#region public Omnitree_LinkedArrayLists(M[] min, M[] max, Omnitree.Locate<T, M> locate, Compare<M> compare, Omnitree.Average<M> average)
+		/// <summary>Constructor for an Omnitree_Linked.</summary>
+		/// <param name="min">The minimum values of the tree.</param>
+		/// <param name="max">The maximum values of the tree.</param>
+		/// <param name="locate">A function for locating an item along the provided dimensions.</param>
+		/// <param name="compare">A function for comparing two items of the types of the axis.</param>
+		/// <param name="average">A function for computing the average between two items of the axis types.</param>
+		public OmnitreeLinkedArrayLists(M[] min, M[] max,
+			Omnitree.Locate<T, M> locate,
+			Compare<M> compare,
+			Omnitree.Average<M> average) :
+			this(min.Length,
+			Accessor.Get(min),
+			Accessor.Get(max),
+			locate,
+			Seven.Equate.Default,
 			compare,
 			average)
 		{
@@ -540,6 +572,10 @@ namespace Seven.Structures
 		#region public Omnitree.Average<M> Average
 		/// <summary>The average function the Omnitree is using.</summary>
 		public Omnitree.Average<M> Average { get { return this._average; } }
+		#endregion
+		#region public Equate<T> Equate
+		/// <summary>The function for equating keys in this table.</summary>
+		public Equate<T> Equate { get { return this._equate; } }
 		#endregion
 		// methods
 		#region private void Add(T addition, Node node, Get<M> ms, int depth)
@@ -1488,7 +1524,7 @@ namespace Seven.Structures
 			OmnitreeLinkedArrayLists<T, M> clone = new OmnitreeLinkedArrayLists<T, M>(
 				this._dimensions,
 				this._top.Min,this._top.Max,
-				this._locate, this._compare, this._average);
+				this._locate, this._equate, this._compare, this._average);
 			this.Stepper(new Step<T>(clone.Add));
 			return clone;
 		}
@@ -1614,6 +1650,14 @@ namespace Seven.Structures
 
 			this._previousAddition = this._top;
 			this._previousAdditionDepth = 0;
+		}
+		#endregion
+		#region public void Remove(T removal)
+		/// <summary>Removes all the items in a given space validated by a predicate.</summary>
+		public void Remove(T removal)
+		{
+			Get<M> location = this.Locate(removal);
+			this.Remove(location, location, (T item) => { return this._equate(item, removal); });
 		}
 		#endregion
 		#region public void Stepper(Step<T> function, Get<M> min, Get<M> max)
@@ -1826,6 +1870,22 @@ namespace Seven.Structures
 		//       branches.
 		#endregion
 
+		// fields
+		private Omnitree.Locate<T, M> _locate;
+		private Omnitree.Average<M> _average;
+		private Equate<T> _equate;
+		private Compare<M> _compare;
+		private int _dimensions;
+		private int _children;
+		private Get<M> _origin;
+		private Node _top;
+		private int _count;
+		private int _load; // count ^ (1 / dimensions)
+		private int _loadPowered; // load ^ dimensions
+		private int _loadPlusOnePowered; // (load + 1) ^ dimensions
+		private Node _previousAddition; // leaf depth of previous addition (sequencial addition optimization)
+		private int _previousAdditionDepth; // tree depth of previous addition (sequencial addition optimization)
+		private const int _defaultLoad = 2;
 		// nested types
 		#region private abstract class Node
 		/// <summary>Can be a leaf or a branch.</summary>
@@ -1911,23 +1971,8 @@ namespace Seven.Structures
 				: base(min, max, parent, index) { }
 		}
 		#endregion
-		// fields
-		private Omnitree.Locate<T, M> _locate;
-		private Omnitree.Average<M> _average;
-		private Compare<M> _compare;
-		private int _dimensions;
-		private int _children;
-		private Get<M> _origin;
-		private Node _top;
-		private int _count;
-		private int _load; // count ^ (1 / dimensions)
-		private int _loadPowered; // load ^ dimensions
-		private int _loadPlusOnePowered; // (load + 1) ^ dimensions
-		private Node _previousAddition; // leaf depth of previous addition (sequencial addition optimization)
-		private int _previousAdditionDepth; // tree depth of previous addition (sequencial addition optimization)
-		private const int _defaultLoad = 2;
 		// constructors
-		#region public Omnitree_LinkedLinkedLists(int dimensions, Get<M> min, Get<M> max, Omnitree.Locate<T, M> locate, Compare<M> compare, Omnitree.Average<M> average)
+		#region public OmnitreeLinkedLinkedLists(int dimensions, Get<M> min, Get<M> max, Omnitree.Locate<T, M> locate, Equate<T> equate, Compare<M> compare, Omnitree.Average<M> average)
 		/// <summary>Constructor for an Omnitree_Linked2.</summary>
 		/// <param name="min">The minimum values of the tree.</param>
 		/// <param name="max">The maximum values of the tree.</param>
@@ -1938,6 +1983,7 @@ namespace Seven.Structures
 			int dimensions,
 			Get<M> min, Get<M> max,
 			Omnitree.Locate<T, M> locate,
+			Equate<T> equate,
 			Compare<M> compare,
 			Omnitree.Average<M> average)
 		{
@@ -1946,6 +1992,8 @@ namespace Seven.Structures
 				throw new Error("null reference on location delegate during Omnitree construction");
 			if (compare == null)
 				throw new Error("null reference on compare delegate during Omnitree construction");
+			if (equate == null)
+				throw new Error("null reference on equate delegate during Omnitree construction");
 
 			// Check the min/max values
 			if (min == null)
@@ -1966,6 +2014,7 @@ namespace Seven.Structures
 
 			this._locate = locate;
 			this._average = average;
+			this._equate = equate;
 			this._compare = compare;
 			this._dimensions = dimensions;
 			this._children = 1 << this._dimensions;
@@ -1985,6 +2034,31 @@ namespace Seven.Structures
 			this._previousAdditionDepth = 0;
 		}
 		#endregion
+		#region public OmnitreeLinkedLinkedLists(M[] min, M[] max, Omnitree.Locate<T, M> locate, Equate<T> equate, Compare<M> compare, Omnitree.Average<M> average)
+		/// <summary>Constructor for an Omnitree_Linked2.</summary>
+		/// <param name="min">The minimum values of the tree.</param>
+		/// <param name="max">The maximum values of the tree.</param>
+		/// <param name="locate">A function for locating an item along the provided dimensions.</param>
+		/// <param name="compare">A function for comparing two items of the types of the axis.</param>
+		/// <param name="average">A function for computing the average between two items of the axis types.</param>
+		public OmnitreeLinkedLinkedLists(M[] min, M[] max,
+			Omnitree.Locate<T, M> locate,
+			Equate<T> equate,
+			Compare<M> compare,
+			Omnitree.Average<M> average) :
+			this(
+				min.Length,
+				Accessor.Get(min),
+				Accessor.Get(max),
+				locate,
+				equate,
+				compare = Compute<M>.Compare,
+				average)
+		{
+			if (min.Length != max.Length)
+				throw new Error("invalid min/max dimensions when constructing an Omnitree_Linked");
+		}
+		#endregion
 		#region public Omnitree_LinkedLinkedLists(M[] min, M[] max, Omnitree.Locate<T, M> locate, Compare<M> compare, Omnitree.Average<M> average)
 		/// <summary>Constructor for an Omnitree_Linked2.</summary>
 		/// <param name="min">The minimum values of the tree.</param>
@@ -2001,7 +2075,8 @@ namespace Seven.Structures
 				Accessor.Get(min),
 				Accessor.Get(max),
 				locate,
-				compare = Compute<M>.Compare,
+				Seven.Equate.Default,
+				compare,
 				average)
 		{
 			if (min.Length != max.Length)
@@ -2040,6 +2115,10 @@ namespace Seven.Structures
 		#region public Omnitree.Average<M> Average
 		/// <summary>The average function the Omnitree is using.</summary>
 		public Omnitree.Average<M> Average { get { return this._average; } }
+		#endregion
+		#region public Equate<T> Equate
+		/// <summary>The function for equating keys in this table.</summary>
+		public Equate<T> Equate { get { return this._equate; } }
 		#endregion
 		// methods
 		#region private void Add(T addition, Node node, Get<M> ms, int depth)
@@ -2490,6 +2569,14 @@ namespace Seven.Structures
 
 				return removals;
 			}
+		}
+		#endregion
+		#region public void Remove(T removal)
+		/// <summary>Removes all the items in a given space validated by a predicate.</summary>
+		public void Remove(T removal)
+		{
+			Get<M> location = this.Locate(removal);
+			this.Remove(location, location, (T item) => { return this._equate(item, removal); });
 		}
 		#endregion
 		#region private Branch GrowBranch(Branch branch, Get<M> min, Get<M> max, int child)
@@ -3076,6 +3163,7 @@ namespace Seven.Structures
 				this._dimensions,
 				this._top.Min, this._top.Max,
 				this._locate,
+				this._equate,
 				this._compare,
 				this._average);
 			this.Stepper(new Step<T>(clone.Add));
