@@ -351,7 +351,6 @@ namespace Seven.Structures
 		// fields
 		internal T[] _list;
 		internal int _count;
-		internal int _minimumCapacity;
 		internal Equate<T> _equate;
 		// constructors
 		#region public List_Array()
@@ -363,18 +362,29 @@ namespace Seven.Structures
 		/// <summary>Creates an instance of a ListArray, and sets it's minimum capacity.</summary>
 		/// <param name="minimumCapacity">The initial and smallest array size allowed by this list.</param>
 		/// <remarks>Runtime: O(1).</remarks>
-		public ListArray(int minimumCapacity) : this(minimumCapacity, Seven.Equate.Default) { }
+		public ListArray(int expectedCount) : this(expectedCount, Seven.Equate.Default) { }
 		#endregion
-		#region public List_Array(int minimumCapacity, Equa)
+		#region public ListArray(int expectedCount, Equate<T> equate)
 		/// <summary>Creates an instance of a ListArray, and sets it's minimum capacity.</summary>
-		/// <param name="minimumCapacity">The initial and smallest array size allowed by this list.</param>
+		/// <param name="expectedCount">The initial and smallest array size allowed by this list.</param>
 		/// <remarks>Runtime: O(1).</remarks>
-		public ListArray(int minimumCapacity, Equate<T> equate)
+		public ListArray(int expectedCount, Equate<T> equate)
 		{
+			if (expectedCount < 1)
+				throw new System.ArgumentOutOfRangeException("expectedCount", "expectedCount must be greater than 0");
 			this._equate = equate;
-			_list = new T[minimumCapacity];
+			_list = new T[expectedCount];
 			_count = 0;
-			_minimumCapacity = minimumCapacity;
+		}
+		#endregion
+		#region internal ListArray(ListArray<T> listArray)
+		internal ListArray(ListArray<T> listArray)
+		{
+			this._list = new T[listArray._list.Length];
+			for (int i = 0; i < this._list.Length; i++)
+				this._list[i] = listArray._list[i];
+			this._equate = listArray._equate;
+			this._count = listArray._count;
 		}
 		#endregion
 		// properties
@@ -412,31 +422,6 @@ namespace Seven.Structures
 		/// <summary>Gets the current capacity of the list.</summary>
 		/// <remarks>Runtime: O(1).</remarks>
 		public int CurrentCapacity { get { return _list.Length; } }
-		#endregion
-		#region public int MinimumCapacity
-		/// <summary>Allows you to adjust the minimum capacity of this list.</summary>
-		/// <remarks>Runtime: O(n), Omega(1).</remarks>
-		public int MinimumCapacity
-		{
-			get
-			{
-				int returnValue = _minimumCapacity;
-				return returnValue;
-			}
-			set
-			{
-				if (value < 1)
-					throw new Error("Attempting to set a minimum capacity to a negative or zero value.");
-				else if (value > _list.Length)
-				{
-					T[] newList = new T[value];
-					_list.CopyTo(newList, 0);
-					_list = newList;
-				}
-				else
-					_minimumCapacity = value;
-			}
-		}
 		#endregion
 		#region public Equate<T> Equate
 		public Equate<T> Equate { get { return this._equate; } }
@@ -483,7 +468,7 @@ namespace Seven.Structures
 		/// <remarks>Runtime: O(1).</remarks>
 		public void Clear()
 		{
-			_list = new T[_minimumCapacity];
+			_list = new T[1];
 			_count = 0;
 		}
 		#endregion
@@ -492,10 +477,7 @@ namespace Seven.Structures
 		/// <returns>A shallow clone of this data structure.</returns>
 		public ListArray<T> Clone()
 		{
-			ListArray<T> clone = new ListArray<T>(this._minimumCapacity);
-			for (int i = 0; i < this._count; i++)
-				clone.Add(this._list[i]);
-			return clone;
+			return new ListArray<T>(this);
 		}
 		#endregion
 		#region System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
@@ -524,7 +506,7 @@ namespace Seven.Structures
 		{
 			if (index < 0 || index > this._count)
 				throw new Error("Attempting to remove an index outside the ListArray's current size.");
-			if (_count < this._list.Length / 4 && this._list.Length / 2 > this._minimumCapacity)
+			if (_count < this._list.Length / 2)
 			{
 				T[] newList = new T[this._list.Length / 2];
 				for (int i = 0; i < this._count; i++)
@@ -551,7 +533,7 @@ namespace Seven.Structures
 				else
 					this._list[i - removed] = this._list[i];
 			this._count -= removed;
-			if (_count < _list.Length / 4 && _list.Length / 2 > _minimumCapacity)
+			if (_count < _list.Length / 2)
 			{
 				T[] newList = new T[_list.Length / 2];
 				for (int i = 0; i < this._count; i++)
