@@ -139,7 +139,7 @@ namespace Algorithms
 			Console.WriteLine();
 
 			// make a graph
-			Graph<int> graph = new Graph_SetOmnitree<int>(
+			Graph<int> graph = new GraphSetOmnitree<int>(
 				Compute<int>.Compare, 
 				Hash.Default, 
 				0, 3, 

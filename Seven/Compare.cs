@@ -86,5 +86,21 @@ namespace Seven
 			else
 				return Comparison.Equal;
 		}
+
+		public static Compare<T> FromComparer<T>(System.Collections.Generic.Comparer<T> comparer)
+		{
+			return (T a, T b) =>
+			{
+				int result = comparer.Compare(a, b);
+				if (result == 0)
+					return Comparison.Equal;
+				else if (result < 0)
+					return Comparison.Less;
+				else if (result > 0)
+					return Comparison.Greater;
+				else
+					throw new System.NotImplementedException();
+			};
+		}
 	}
 }

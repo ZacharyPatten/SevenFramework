@@ -3,6 +3,7 @@
 // LISCENSE: See "LISCENSE.md" in th root project directory.
 // SUPPORT: See "SUPPORT.md" in the root project directory.
 
+using Seven;
 using Seven.Structures;
 using System.Linq.Expressions;
 
@@ -186,7 +187,7 @@ namespace Seven.Mathematics
 			/// <param name="min">The found minimum value.</param>
 			/// <param name="max">The found maximum value.</param>
 			/// <returns>The computed range from the set of values.</returns>
-			public delegate void Range(out T min, out T max, Stepper<T> stepper);
+			public delegate Range<T> Range(Stepper<T> stepper);
 			/// <summary>Computes the quantiles of a set of values.</summary>
 			/// <param name="quantiles">The number of quntiles to split the set by.</param>
 			/// <param name="stepper">The values to compute the quantiles of.</param>
@@ -319,7 +320,7 @@ namespace Seven.Mathematics
 			ParameterExpression _value = Expression.Parameter(typeof(int));
 			LabelTarget _label = Expression.Label(typeof(T));
 			// code builder
-			List_Linked<Expression> expressions = new List_Linked<Expression>();
+			ListLinked<Expression> expressions = new ListLinked<Expression>();
 			// null checks
 			if (!typeof(T).IsValueType) // is nullable?
 			{
@@ -383,7 +384,7 @@ namespace Seven.Mathematics
 			ParameterExpression _value = Expression.Parameter(typeof(T));
 			LabelTarget _label = Expression.Label(typeof(T));
 			// code builder
-			List_Linked<Expression> expressions = new List_Linked<Expression>();
+			ListLinked<Expression> expressions = new ListLinked<Expression>();
 			// null checks
 			if (!typeof(T).IsValueType) // is nullable?
 			{
@@ -1031,7 +1032,7 @@ namespace Seven.Mathematics
 			ParameterExpression _maximum = Expression.Parameter(typeof(T));
 			LabelTarget _label = Expression.Label(typeof(T));
 			// code builder
-			List_Linked<Expression> expressions = new List_Linked<Expression>();
+			ListLinked<Expression> expressions = new ListLinked<Expression>();
 			// null checks
 			if (!typeof(T).IsValueType) // is nullable?
 			{
@@ -1092,7 +1093,7 @@ namespace Seven.Mathematics
 			ParameterExpression _leniency = Expression.Parameter(typeof(T));
 			LabelTarget _label = Expression.Label(typeof(bool));
 			// code builder
-			List_Linked<Expression> expressions = new List_Linked<Expression>();
+			ListLinked<Expression> expressions = new ListLinked<Expression>();
 			// null checks
 			if (!typeof(T).IsValueType) // is nullable?
 			{
@@ -1600,13 +1601,15 @@ namespace Seven.Mathematics
 		/// <summary>Finds the number of occurences for each item and sorts them into a heap.</summary>
 		public static Compute<T>.Delegates.Mode Mode = (Stepper<T> stepper) =>
 		{
+			string heap_type = typeof(HeapArray<Link<T, int>>).ToCsharpSource();
+			string link_type = typeof(Link<T, int>).ToCsharpSource();
 			Compute<T>.Mode =
 				Meta.Compile<Compute<T>.Delegates.Mode>(
 					string.Concat(
 @"(Stepper<", T_source, @"> stepper) =>
 {
-	Heap_Array<Link<", T_source, @", int>> heap =
-		new Heap_Array<Link<", T_source, @", int>>(
+	", heap_type, @" heap =
+		new ", heap_type, @"(
 			(Link<", T_source, ", int> left, Link<", T_source, @", int> right) =>
 			{
 				return Compute<", T_source, @">.Compare(left.One, right.One);
@@ -1614,7 +1617,7 @@ namespace Seven.Mathematics
 	stepper((", T_source, @" step) =>
 	{
 		bool contains = false;
-		heap.Stepper((Link<", T_source, @", int> nested_step) =>
+		heap.Stepper((", link_type, @" nested_step) =>
 		{
 			if (Compute<", T_source, @">.Equate(nested_step.One, step))
 			{
@@ -1627,7 +1630,7 @@ namespace Seven.Mathematics
 				return StepStatus.Continue;
 		});
 		if (!contains)
-			heap.Enqueue(new Link<", T_source, @", int>(step, 1));
+			heap.Enqueue(new ", link_type, @"(step, 1));
 	});
 	return heap;
 }"));
@@ -1734,12 +1737,8 @@ namespace Seven.Mathematics
 				Meta.Compile<Compute<T>.Delegates.Variance>(
 					"(Stepper<" + T_source + "> _stepper) =>" +
 					"{" +
-#if no_error_checking
-						// nothing
-#else
  "	if (_stepper == null)" +
 					"		throw new Error(\"null reference: _stepper\");" +
-#endif
  "	" + T_source + " mean = Compute<" + T_source + ">.Mean(_stepper);" +
 					"	" + T_source + " variance = 0;" +
 					"	int count = 0;" +
@@ -1765,12 +1764,8 @@ namespace Seven.Mathematics
 					string.Concat(
 @"(Stepper<", T_source, @"> _stepper) =>
 {",
-#if no_error_checking
-	// nothing
-#else
 @"	if (_stepper == null)
 		throw new Error(", "\"null reference: _stepper\");",
-#endif
 @"	return Compute<", T_source, ">.SquareRoot(Compute<", T_source, @">.Variance(_stepper));
 }"));
 
@@ -1806,12 +1801,12 @@ namespace Seven.Mathematics
 
 		#region Range
 		/// <summary>Computes the standard deviation of a set of values.</summary>
-		public static Compute<T>.Delegates.Range Range = (out T min, out T max, Stepper<T> stepper) =>
+		public static Compute<T>.Delegates.Range Range = (Stepper<T> stepper) =>
 		{
 			Compute<T>.Range =
 				Meta.Compile<Compute<T>.Delegates.Range>(
 					string.Concat(
-@"(out ", T_source, " _min, out ", T_source, " _max, Stepper<", T_source, @"> _stepper) =>
+@"(Stepper<", T_source, @"> _stepper) =>
 {
 	bool set = false;
 	", T_source, @" temp_min = 0;
@@ -1830,11 +1825,10 @@ namespace Seven.Mathematics
 			temp_max = i > temp_max ? i : temp_max;
 		}
 	});
-	_min = temp_min;
-	_max = temp_max;
+	return new Range<", T_source, @">(temp_min, temp_max);
 }"));
 
-			Compute<T>.Range(out min, out max, stepper);
+			return Compute<T>.Range(stepper);
 		};
 		#endregion
 
@@ -1847,14 +1841,10 @@ namespace Seven.Mathematics
 					string.Concat(
 @"(int _quantiles, Stepper<", T_source, @"> _stepper) =>
 {",
-#if no_error_checking
-	// nothing
-#else
 @"	if (_stepper == null)
 		throw new Error(", "\"null reference: _stepper\"", @");
 	if (_quantiles < 1)
 		throw new Error(", "\"invalid numer of dimensions on Quantile division\");",
-#endif
 @"	int count = 0;
 	_stepper((", T_source, @" i) => { count++; });
 	", T_source, "[] ordered = new ", T_source, @"[count];

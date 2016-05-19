@@ -80,39 +80,39 @@ namespace Tutorial_Mathematics
 
 			#region Range
 
-			Console.WriteLine("  Range---------------------------------------------");
-			Console.WriteLine();
+			//Console.WriteLine("  Range---------------------------------------------");
+			//Console.WriteLine();
 
-			Console.WriteLine("   1D int");
+			//Console.WriteLine("   1D int");
 
-			{
-				Range<int> range1 = new Range<int>(1, 7);
-				Console.WriteLine("    range1: " + range1.Min[0] + "-" + range1.Max[0]);
-				Range<int> range2 = new Range<int>(4, 10);
-				Console.WriteLine("    range2: " + range2.Min[0] + "-" + range2.Max[0]);
-				Range<int> range3 = range1 ^ range2;
-				Console.WriteLine("    range1 ^ range2 (Complement): " + range3.Min[0] + "-" + range3.Max[0]);
-				Range<int> range4 = range1 | range2;
-				Console.WriteLine("    range1 | range2 (Union): " + range4.Min[0] + "-" + range4.Max[0]);
-				Range<int> range5 = range1 & range2;
-				Console.WriteLine("    range1 & range2 (Intersection): " + range5.Min[0] + "-" + range5.Max[0]);
-			}
+			//{
+				//Range<int> range1 = new Range<int>(1, 7);
+				//Console.WriteLine("    range1: " + range1);
+				//Range<int> range2 = new Range<int>(4, 10);
+				//Console.WriteLine("    range2: " + range2);
+				//Range<int>[] range3 = range1 ^ range2;
+				//Console.WriteLine("    range1 ^ range2 (Complement): " + range3[0]);
+				//Range<int>[] range4 = range1 | range2;
+				//Console.WriteLine("    range1 | range2 (Union): " + range4[0]);
+				//Range<int> range5 = range1 & range2;
+				//Console.WriteLine("    range1 & range2 (Intersection): " + range5);
+			//}
 
-			Console.WriteLine("   2D double");
+			//Console.WriteLine("   2D double");
 
-			{
-				Range<double> range1 = new Range<double>(new Vector<double>(1, 2), new Vector<double>(7, 8));
-				Console.WriteLine("    range1: (" + range1.Min[0] + "," + range1.Min[1] + ")-(" + range1.Max[0] + "," + range1.Min[1] + ")");
-				Range<double> range2 = new Range<double>(new Vector<double>(4, 5), new Vector<double>(10, 11));
-				Console.WriteLine("    range2: (" + range2.Min[0] + "," + range2.Min[1] + ")-(" + range2.Max[0] + "," + range2.Min[1] + ")");
-				Range<double> range3 = range1 ^ range2;
-				Console.WriteLine("    range1 ^ range2 (Complement): (" + range3.Min[0] + "," + range3.Min[1] + ")-(" + range3.Max[0] + "," + range3.Min[1] + ")");
-				Range<double> range4 = range1 | range2;
-				Console.WriteLine("    range1 | range2 (Union): (" + range4.Min[0] + "," + range4.Min[1] + ")-(" + range4.Max[0] + "," + range4.Min[1] + ")");
-				Range<double> range5 = range1 & range2;
-				Console.WriteLine("    range1 & range2 (Intersection): (" + range5.Min[0] + "," + range5.Min[1] + ")-(" + range5.Max[0] + "," + range5.Min[1] + ")");
-			}
-			Console.WriteLine();
+			//{
+				//Range<double> range1 = new Range<double>(new Vector<double>(1, 2), new Vector<double>(7, 8));
+				//Console.WriteLine("    range1: " + range1);
+				//Range<double> range2 = new Range<double>(new Vector<double>(4, 5), new Vector<double>(10, 11));
+				//Console.WriteLine("    range2: " + range2);
+				//Range<double>[] range3 = range1 ^ range2;
+				//Console.WriteLine("    range1 ^ range2 (Complement): Not Yet Implemented");
+				//Range<double>[] range4 = range1 | range2;
+				//Console.WriteLine("    range1 | range2 (Union): Not Yet Implemented");// + range4);
+				//Range<double> range5 = range1 & range2;
+				//Console.WriteLine("    range1 & range2 (Intersection): " + range5);
+			//}
+			//Console.WriteLine();
 
 			#endregion
 
@@ -205,9 +205,8 @@ namespace Tutorial_Mathematics
 			Console.WriteLine("    Geometric Mean(data): " + string.Format("{0:0.00}", Compute<double>.GeometricMean(statistics_data.Stepper())));
 
 			// Range
-			double range_min, range_max;
-			Compute<double>.Range(out range_min, out range_max, statistics_data.Stepper());
-			Console.WriteLine("    Range(data): " + string.Format("{0:0.00}", range_min) + "-" + string.Format("{0:0.00}", range_max));
+			Range<double> range = Compute<double>.Range(statistics_data.Stepper());
+			Console.WriteLine("    Range(data): " + string.Format("{0:0.00}", range.Min) + "-" + string.Format("{0:0.00}", range.Max));
 
 			// Variance
 			Console.WriteLine("    Variance(data): " + string.Format("{0:0.00}", Compute<double>.Variance(statistics_data.Stepper())));

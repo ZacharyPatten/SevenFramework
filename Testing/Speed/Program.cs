@@ -1,12 +1,14 @@
 ﻿using Seven;
 using Seven.Mathematics;
+using Seven.Structures;
+
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
+//using System.Diagnostics;
 using System.Linq;
-using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
+//using System.Linq.Expressions;
+//using System.Text;
+//using System.Threading.Tasks;
 
 namespace Speed
 {
@@ -64,60 +66,183 @@ namespace Speed
 		{
 			return new IntegerClass(integer);
 		}
+
+		public override int GetHashCode()
+		{
+			return this._int % 10;
+			//return base.GetHashCode();
+		}
 	}
 
 	class Program
 	{
 
+		//internal static int GetPrime(int min) {
+		//				Debug.Assert(min >= 0, "min less than zero; handle overflow checking before calling HashHelpers"); 
+ 
+		//				for (int i = 0; i < primes.Length; i++) { 
+		//						int prime = primes[i]; 
+		//						if (prime >= min) {
+		//								return prime; 
+		//						}
+		//				}
+ 
+		//				// Outside of our predefined table. Compute the hard way. 
+		//				for (int i = (min | 1); i < Int32.MaxValue; i += 2) {
+		//						if (IsPrime(i)) { 
+		//								return i; 
+		//						}
+		//				} 
+		//				return min;
+		//		}
+ 
+		//		internal static int GetMinPrime() { 
+		//				return primes[0];
+		//		} 
+		//} 
+ 
+
 		static void Main(string[] args)
 		{
-			Console.WriteLine("This example is mainly for speed testing during development.");
-			Console.WriteLine("See the other examples provided for clearer usage examples.");
-			Console.WriteLine();
+			//Console.WriteLine("This example is mainly for speed testing during development.");
+			//Console.WriteLine("See the other examples provided for clearer usage examples.");
+			//Console.WriteLine();
 
-			Console.WriteLine("Negate:         " + (Compute<int>.Negate(7) == -7));
-			Console.WriteLine("Add:            " + (Compute<int>.Add(7, 7) == 14));
-			Console.WriteLine("Subtract:       " + (Compute<int>.Subtract(14, 7) == 7));
-			Console.WriteLine("Multiply:       " + (Compute<int>.Multiply(7, 7) == 49));
-			Console.WriteLine("Divide:         " + (Compute<int>.Divide(14, 7) == 2));
-			Console.WriteLine("AbsoluteValue:  " + (Compute<int>.AbsoluteValue(7) == 7 && Compute<int>.AbsoluteValue(-7) == 7));
-			Console.WriteLine("Clamp:          " + (Compute<int>.Clamp(7, 6, 8) == 7));
-			Console.WriteLine("Maximum:        " + (Compute<int>.Maximum((Step<int> step) => { step(1); step(2); step(3); }) == 3));
-			Console.WriteLine("Minimum:        " + (Compute<int>.Minimum((Step<int> step) => { step(1); step(2); step(3); }) == 1));
-			Console.WriteLine("LessThan:       " + (Compute<int>.LessThan(1, 2) == true && Compute<int>.LessThan(2, 1) == false));
-			Console.WriteLine("GreaterThan:    " + (Compute<int>.GreaterThan(2, 1) == true && Compute<int>.GreaterThan(1, 2) == false));
-			Console.WriteLine("Compare:        " + (Compute<int>.Compare(2, 1) == Comparison.Greater && Compute<int>.Compare(1, 2) == Comparison.Less && Compute<int>.Compare(1, 1) == Comparison.Equal));
-			Console.WriteLine("Equate:         " + (Compute<int>.Equate(2, 1) == false && Compute<int>.Equate(1, 1) == true));
-			Console.WriteLine("EqualsLeniency: " + (Compute<int>.EqualsLeniency(2, 1, 1) == true && Compute<int>.EqualsLeniency(2, 1, 0) == false && Compute<int>.EqualsLeniency(1, 1, 0) == true));
-			Console.WriteLine();
+			//IntegerClass[] array = new IntegerClass[] { 0, 1, 2, null, 3, null, 4 };
+			//array.
 
-			Console.WriteLine("Range Testing------------------------------");
+			#region Set Tests
 			{
-				Console.WriteLine(" One Dimensional:");
-				Range<int> range1 = new Range<int>(1, 7);
-				Console.WriteLine("  range1............................" + range1);// + range1.Min[0] + "-" + range1.Max[0]);
-				Range<int> range2 = new Range<int>(4, 10);
-				Console.WriteLine("  range2............................" + range2);// + range2.Min[0] + "-" + range2.Max[0]);
-				Range<int> range3 = range1 ^ range2;
-				Console.WriteLine("  range1 ^ range2 (Complement)......" + range3);// + range3.Min[0] + "-" + range3.Max[0]);
-				Range<int> range4 = range1 | range2;
-				Console.WriteLine("  range1 | range2 (Union)..........." + range4);// + range4.Min[0] + "-" + range4.Max[0]);
-				Range<int> range5 = range1 & range2;
-				Console.WriteLine("  range1 & range2 (Intersection)...." + range5);// + range5.Min[0] + "-" + range5.Max[0]);
+				int iterations = int.MaxValue / 1000;
+
+				HashSet<int> validation = new HashSet<int>();
+				//for (int i = 0; i < interations; i++)
+				//	validation.Add(i);
+
+				{
+					HashSet<int> set0 = new HashSet<int>();
+					SetHashList<int> set1 = new SetHashList<int>();
+					SetHashArray<int> set2 = new SetHashArray<int>();
+
+					for (int i = 0; i < iterations; i++) set0.Add(i);
+					for (int i = 0; i < iterations; i++) set1.Add(i);
+					for (int i = 0; i < iterations; i++) set2.Add(i);
+					for (int i = 0; i < iterations; i++)
+						validation.Add(i);
+					foreach (int i in set0) { validation.Remove(i); }
+					for (int i = 0; i < iterations; i++)
+						validation.Add(i);
+					set1.Stepper((int i) => { validation.Remove(i); });
+					for (int i = 0; i < iterations; i++)
+						validation.Add(i);
+					set2.Stepper((int i) => { validation.Remove(i); });
+					for (int i = 0; i < iterations; i++) set0.Contains(i);
+					for (int i = 0; i < iterations; i++) set1.Contains(i);
+					for (int i = 0; i < iterations; i++) set2.Contains(i);
+					for (int i = 0; i < iterations; i++) set0.Remove(i);
+					for (int i = 0; i < iterations; i++) set1.Remove(i);
+					for (int i = 0; i < iterations; i++) set2.Remove(i);
+
+					Console.WriteLine("Adding HashSet:               " + Seven.Diagnostics.Performance.Time(() => { for (int i = 0; i < iterations; i++) set0.Add(i); }));
+					Console.WriteLine("Adding Set_HashLinkedList:    " + Seven.Diagnostics.Performance.Time(() => { for (int i = 0; i < iterations; i++) set1.Add(i); }));
+					Console.WriteLine("Adding SetHash:               " + Seven.Diagnostics.Performance.Time(() => { for (int i = 0; i < iterations; i++) set2.Add(i); }));
+
+					for (int i = 0; i < iterations; i++)
+						validation.Add(i);
+					foreach (int i in set0) { validation.Remove(i); }
+					Console.WriteLine("Validate HashSet:             " + (validation.Count == 0));
+
+					for (int i = 0; i < iterations; i++)
+						validation.Add(i);
+					set1.Stepper((int i) => { validation.Remove(i); });
+					Console.WriteLine("Validate Set_HashLinkedList:  " + (validation.Count == 0));
+
+					for (int i = 0; i < iterations; i++)
+						validation.Add(i);
+					set2.Stepper((int i) => { validation.Remove(i); });
+					Console.WriteLine("Validate SetHas:              " + (validation.Count == 0));
+
+					Console.WriteLine("Size HashSet:                 " + (typeof(HashSet<int>).GetField("m_buckets", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance).GetValue(set0) as int[]).Length);
+					Console.WriteLine("Size Set_HashLinkedList:      " + set1.TableSize);
+					Console.WriteLine("Size SetHash:                 " + set2.TableSize);
+
+					Console.WriteLine("Constains HashSet:            " + Seven.Diagnostics.Performance.Time(() => { for (int i = 0; i < iterations; i++) set0.Contains(i); }));
+					Console.WriteLine("Constains Set_HashLinkedList: " + Seven.Diagnostics.Performance.Time(() => { for (int i = 0; i < iterations; i++) set1.Contains(i); }));
+					Console.WriteLine("Constains SetHash:            " + Seven.Diagnostics.Performance.Time(() => { for (int i = 0; i < iterations; i++) set2.Contains(i); }));
+
+					//Console.WriteLine("Removed HashSet:              " + Seven.Diagnostics.Performance.Time(() => { for (int i = 0; i < iterations; i++) set0.Remove(i); }));
+					//Console.WriteLine("Removed Set_HashLinkedList:   " + Seven.Diagnostics.Performance.Time(() => { for (int i = 0; i < iterations; i++) set1.Remove(i); }));
+					//Console.WriteLine("Remove SetHash:               " + Seven.Diagnostics.Performance.Time(() => { for (int i = 0; i < iterations; i++) set2.Remove(i); }));
+
+					Console.WriteLine("Removed HashSet:              " + Seven.Diagnostics.Performance.Time(() => { for (int i = iterations - 1; i >= 0; i--) set0.Remove(i); }));
+					Console.WriteLine("Removed Set_HashLinkedList:   " + Seven.Diagnostics.Performance.Time(() => { for (int i = iterations - 1; i >= 0; i--) set1.Remove(i); }));
+					Console.WriteLine("Remove SetHash:               " + Seven.Diagnostics.Performance.Time(() => { for (int i = iterations - 1; i >= 0; i--) set2.Remove(i); }));
+
+					Console.WriteLine("Size HashSet:                 " + (typeof(HashSet<int>).GetField("m_buckets", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance).GetValue(set0) as int[]).Length);
+					Console.WriteLine("Size Set_HashLinkedList:      " + set1.TableSize);
+					Console.WriteLine("Size SetHash:                 " + set2.TableSize);
+				}
+
+				Console.WriteLine();
 			}
+			#endregion
+
+			#region Map/Dictionary
 			{
-				Console.WriteLine(" Two Dimensional:");
-				Range<double> range1 = new Range<double>(new Vector<double>(1, 2), new Vector<double>(7, 8));
-				Console.WriteLine("  range1............................" + range1);// + range1.Min[0] + "," + range1.Min[1] + ")-(" + range1.Max[0] + "," + range1.Max[1] + ")");
-				Range<double> range2 = new Range<double>(new Vector<double>(4, 5), new Vector<double>(10, 11));
-				Console.WriteLine("  range2............................" + range2);// + range2.Min[0] + "," + range2.Min[1] + ")-(" + range2.Max[0] + "," + range2.Max[1] + ")");
-				Range<double> range3 = range1 ^ range2;
-				Console.WriteLine("  range1 ^ range2 (Complement)......" + range3);// + range3.Min[0] + "," + range3.Min[1] + ")-(" + range3.Max[0] + "," + range3.Max[1] + ")");
-				Range<double> range4 = range1 | range2;
-				Console.WriteLine("  range1 | range2 (Union)..........." + range4);// + range4.Min[0] + "," + range4.Min[1] + ")-(" + range4.Max[0] + "," + range4.Max[1] + ")");
-				Range<double> range5 = range1 & range2;
-				Console.WriteLine("  range1 & range2 (Intersection)...." + range5);// + range5.Min[0] + "," + range5.Min[1] + ")-(" + range5.Max[0] + "," + range5.Max[1] + ")");
+				int iterations = int.MaxValue / 10000;
+
+				HashSet<int> validation = new HashSet<int>();
+				//for (int i = 0; i < interations; i++)
+				//	validation.Add(i);
+
+				{
+					Dictionary<int, int> map0 = new Dictionary<int, int>();
+					//MapSetHashList<int, int> map1 = new MapSetHashList<int, int>();
+					MapHashLinked<int, int> map2 = new MapHashLinked<int, int>();
+					MapHashArray<int, int> map3 = new MapHashArray<int, int>();
+
+
+					Console.WriteLine("Adding 0:    " + Seven.Diagnostics.Performance.Time(() => { for (int i = 0; i < iterations; i++) map0.Add(i, i); }));
+					//Console.WriteLine("Adding 1:    " + Seven.Diagnostics.Performance.Time(() => { for (int i = 0; i < iterations; i++) map1.Add(i, i); }));
+					Console.WriteLine("Adding 2:    " + Seven.Diagnostics.Performance.Time(() => { for (int i = 0; i < iterations; i++) map2.Add(i, i); }));
+					Console.WriteLine("Adding 3:    " + Seven.Diagnostics.Performance.Time(() => { for (int i = 0; i < iterations; i++) map3.Add(i, i); }));
+
+					for (int i = 0; i < iterations; i++)
+						validation.Add(i);
+					foreach (KeyValuePair<int, int> i in map0) { validation.Remove(i.Key); }
+					Console.WriteLine("Validate 0:  " + (validation.Count == 0));
+
+					//for (int i = 0; i < iterations; i++)
+					//	validation.Add(i);
+					////foreach (int i in map1) { validation.Remove(i); }
+					//map1.Stepper((int i) => { validation.Remove(i); });
+					//Console.WriteLine("Validate 1:  " + (validation.Count == 0));
+
+					for (int i = 0; i < iterations; i++)
+						validation.Add(i);
+					//foreach (int i in map1) { validation.Remove(i); }
+					map2.Stepper((int i) => { validation.Remove(i); });
+					Console.WriteLine("Validate 2:  " + (validation.Count == 0));
+
+					for (int i = 0; i < iterations; i++)
+						validation.Add(i);
+					//foreach (int i in map1) { validation.Remove(i); }
+					map3.Stepper((int i) => { validation.Remove(i); });
+					Console.WriteLine("Validate 3:  " + (validation.Count == 0));
+
+					int temp;
+					Console.WriteLine("Get 0:       " + Seven.Diagnostics.Performance.Time(() => { for (int i = 0; i < iterations; i++) temp = map0[i]; }));
+					//Console.WriteLine("Get 1:       " + Seven.Diagnostics.Performance.Time(() => { for (int i = 0; i < iterations; i++) temp = map1[i]; }));
+					Console.WriteLine("Get 2:       " + Seven.Diagnostics.Performance.Time(() => { for (int i = 0; i < iterations; i++) temp = map2[i]; }));
+					Console.WriteLine("Get 3:       " + Seven.Diagnostics.Performance.Time(() => { for (int i = 0; i < iterations; i++) temp = map3[i]; }));
+
+					Console.WriteLine("Removed 0:   " + Seven.Diagnostics.Performance.Time(() => { for (int i = 0; i < iterations; i++) map0.Remove(i); }));
+					//Console.WriteLine("Removed 1:   " + Seven.Diagnostics.Performance.Time(() => { for (int i = 0; i < iterations; i++) map1.Remove(i); }));
+					Console.WriteLine("Removed 2:   " + Seven.Diagnostics.Performance.Time(() => { for (int i = 0; i < iterations; i++) map2.Remove(i); }));
+					Console.WriteLine("Removed 3:   " + Seven.Diagnostics.Performance.Time(() => { for (int i = 0; i < iterations; i++) map3.Remove(i); }));
+				}
 			}
+			#endregion
 
 			#region Vector Test
 

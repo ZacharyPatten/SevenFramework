@@ -11,126 +11,119 @@ namespace Seven.Structures
 		// for those who can't live without their IEnumerables... shame on you
 		System.Collections.Generic.IEnumerable<T>
 	{
-		#region member
-
+		#region void Stepper(Step<T> step_delegate);
 		/// <summary>Invokes a delegate for each entry in the data structure.</summary>
 		/// <param name="step_delegate">The delegate to invoke on each item in the structure.</param>
 		void Stepper(Step<T> step_delegate);
-		///// <summary>Invokes a delegate for each entry in the data structure.</summary>
-		///// <param name="step_delegate">The delegate to invoke on each item in the structure.</param>
-		//void Stepper(StepRef<T> step_delegate);
+		#endregion
+		#region StepStatus Stepper(StepBreak<T> step_delegate);
 		/// <summary>Invokes a delegate for each entry in the data structure.</summary>
 		/// <param name="step_delegate">The delegate to invoke on each item in the structure.</param>
 		/// <returns>The resulting status of the iteration.</returns>
 		StepStatus Stepper(StepBreak<T> step_delegate);
-		///// <summary>Invokes a delegate for each entry in the data structure.</summary>
-		///// <param name="step_delegate">The delegate to invoke on each item in the structure.</param>
-		///// <returns>The resulting status of the iteration.</returns>
-		//StepStatus Stepper(StepRefBreak<T> step_delegate);
-
 		#endregion
 	}
 
 	/// <summary>Contains extension methods for the Structure interface.</summary>
 	public static class Structure
 	{
-		#region extensions
-
-		/// <summary>Checks to see if a given object is in this data structure.</summary>
-		/// <typeparam name="T">The generic type stored in the structure.</typeparam>
-		/// <param name="structure">The structure to check against.</param>
-		/// <param name="check">The item to check for.</param>
-		/// <param name="equate">Delegate for equating two instances of the same type.</param>
-		/// <returns>true if the item is in this structure; false if not.</returns>
-		public static bool Contains<T>(this Structure<T> structure, T check, Equate<T> equate)
+		// Structure Properties (as interfaces)
+		#region public interface Auditable<T>
+		/// <summary>Property of a data structure (does it have a contains method).</summary>
+		public interface Auditable<T>
 		{
-			bool contains = false;
-			structure.Stepper((T step) =>
-			{
-				if (equate(step, check))
-				{
-					contains = true;
-					return StepStatus.Break;
-				}
-				return StepStatus.Continue;
-			});
-			return contains;
+			bool Contains(T value);
 		}
-
-		/// <summary>Checks to see if a given object is in this data structure.</summary>
-		/// <typeparam name="T">The generic type stored in the structure.</typeparam>
-		/// <typeparam name="K">The type of the key to look up.</typeparam>
-		/// <param name="structure">The structure to check against.</param>
-		/// <param name="key">The key to check for.</param>
-		/// <param name="equate">Delegate for equating two instances of different types.</param>
-		/// <returns>true if the item is in this structure; false if not.</returns>
-		public static bool Contains<T, K>(this Structure<T> structure, K key, Equate<T, K> equate)
+		#endregion
+		#region public interface Hashing<T>
+		/// <summary>Property of a data structure (does it have a Hash property).</summary>
+		public interface Hashing<T>
 		{
-			bool contains = false;
-			structure.Stepper((T step) =>
-			{
-				if (equate(step, key))
-				{
-					contains = true;
-					return StepStatus.Break;
-				}
-				return StepStatus.Continue;
-			});
-			return contains;
+			Hash<T> Hash { get; }
 		}
-
-		/// <summary>Looks up an item this structure by a given key.</summary>
-		/// <typeparam name="T">The generic type stored in the structure.</typeparam>
-		/// <typeparam name="K">The type of the key to look up.</typeparam>
-		/// <param name="structure">The structure to check against.</param>
-		/// <param name="key">The key to look up.</param>
-		/// <param name="equate">Delegate for equating two instances of different types.</param>
-		/// <returns>The item with the corresponding to the given key.</returns>
-		public static T Get<T, K>(this Structure<T> structure, K key, Equate<T, K> equate)
+		#endregion
+		#region public interface Comparing<T>
+		/// <summary>Property of a data structure (does it have a Compare property).</summary>
+		public interface Comparing<T>
 		{
-			bool contains = false;
-			T item = default(T);
-			structure.Stepper((T step) =>
-			{
-				if (equate(step, key))
-				{
-					contains = true;
-					item = step;
-					return StepStatus.Break;
-				}
-				return StepStatus.Continue;
-			});
-			if (contains == false)
-				throw new Error("item not found in structure");
-			return item;
+			Compare<T> Compare { get; }
 		}
-
-		/// <summary>Trys to look up an item this structure by a given key.</summary>
-		/// <typeparam name="T">The generic type stored in the structure.</typeparam>
-		/// <typeparam name="K">The type of the key to look up.</typeparam>
-		/// <param name="structure">The structure to check against.</param>
-		/// <param name="key">The key to look up.</param>
-		/// <param name="equate">Delegate for equating two instances of different types.</param>
-		/// <param name="item">The item if it was found or null if not the default(Type) value.</param>
-		/// <returns>true if the key was found; false if the key was not found.</returns>
-		public static bool TryGet<T, K>(this Structure<T> structure, K key, Equate<T, K> equate, out T item)
+		#endregion
+		#region public interface Addable<T>
+		/// <summary>Property of a data structure (does it have a Add method).</summary>
+		public interface Addable<T>
 		{
-			bool contains = false;
-			T temp = default(T);
-			structure.Stepper((T step) =>
-			{
-				if (equate(step, key))
-				{
-					contains = true;
-					temp = step;
-					return StepStatus.Break;
-				}
-				return StepStatus.Continue;
-			});
-			item = temp;
-			return contains;
+			void Add(T value);
 		}
-
+		#endregion
+		#region public interface Removable<T>
+		/// <summary>Property of a data structure (does it have a Romove method).</summary>
+		public interface Removable<T>
+		{
+			/// <summary>Removes the first instance found in the data structure.</summary>
+			/// <param name="removal">The value to be removed.</param>
+			void Remove(T removal);
+		}
+		#endregion
+		#region public interface Countable<T>
+		/// <summary>Property of a data structure (does it have a Count method).</summary>
+		public interface Countable<T>
+		{
+			int Count { get; }
+		}
+		#endregion
+		#region public interface Clearable<T>
+		/// <summary>Property of a data structure (does it have a Clear method).</summary>
+		public interface Clearable<T>
+		{
+			void Clear();
+		}
+		#endregion
+		#region public interface Equating<T>
+		/// <summary>Property of a data structure (does it have a Equate property).</summary>
+		public interface Equating<T>
+		{
+			Equate<T> Equate { get; }
+		}
+		#endregion
+		// extenstions
+		#region public static bool TryAdd<T>(this Addable<T> structure, T addition)
+		/// <summary>Wrapper for the "Add" method to help with exceptions.</summary>
+		/// <typeparam name="T">The generic type of the structure.</typeparam>
+		/// <param name="redBlackTree">The structure.</param>
+		/// <param name="addition">The item to be added.</param>
+		/// <returns>True if successful, False if not.</returns>
+		public static bool TryAdd<T>(this Addable<T> structure, T addition)
+		{
+			try
+			{
+				structure.Add(addition);
+				return true;
+			}
+			catch
+			{
+				return false;
+			}
+		}
+		#endregion
+		#region public static bool TryRemove<T>(this Removable<T> structure, T removal)
+		/// <summary>Wrapper for the "Remove" method to help with exceptions.</summary>
+		/// <typeparam name="T">The generic type of the structure.</typeparam>
+		/// <param name="structure">The structure.</param>
+		/// <param name="removal">The item to be removed.</param>
+		/// <returns>True if successful, False if not.</returns>
+		public static bool TryRemove<T>(this Removable<T> structure, T removal)
+		{
+			try
+			{
+				structure.Remove(removal);
+				return true;
+			}
+			catch
+			{
+				return false;
+			}
+		}
 		#endregion
 	}
 }

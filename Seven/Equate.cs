@@ -36,4 +36,11 @@ namespace Seven
 		/// <returns>True if deemed equal; False if not.</returns>
 		public static bool Default<T>(T a, T b) { return a.Equals(b); }
 	}
+
+	/// <summary>Used for optional parameters.</summary>
+	/// <typeparam name="T">The generic type of the equality check.</typeparam>
+	public static class Equate_CompileTimeConstant<T>
+	{
+		public static Equate<T> Default { get { return (T a, T b) => { return a.Equals(b); }; } }
+	}
 }

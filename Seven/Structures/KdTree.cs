@@ -23,8 +23,6 @@ namespace Seven.Structures
 	/// <summary>Contains extensions methods for the KdTree interface.</summary>
 	public static class KdTree
 	{
-		#region delegate
-
 		public delegate T Add<T>(T left, T right);
 		public delegate T Subtract<T>(T left, T right);
 		public delegate T Multiply<T>(T left, T right);
@@ -35,8 +33,6 @@ namespace Seven.Structures
 		/// <param name="item">The item to be located.</param>
 		/// <returns>A delegate for getting the location along a given axis.</returns>
 		public delegate Get<M> Locate<T, M>(T item);
-
-		#endregion
 	}
 
 	/// <summary>A binary tree data structure for sorting items along multiple dimensions.</summary>
@@ -44,8 +40,55 @@ namespace Seven.Structures
 	/// <typeparam name="K">The type of the axis dimensions to sort the "T" values upon.</typeparam>
 	public class KdTree_Linked<T, K> : KdTree<K, T>
 	{
-		#region Node
+		private Compare<K> _compareKey;
+		private K _minValue;
+		private K _maxValue;
+		private K _zero;
+		private KdTree.Add<K> _add;
+		private KdTree.Subtract<K> _subtract;
+		private KdTree.Multiply<K> _multiply;
+		private KdTree.Locate<T, K> _locate;
+		private int _dimensions;
+		private Node _root;
+		private int _count;
 
+		// 1. Search for the target
+		// 
+		//   1.1 Start by splitting the specified hyper rect
+		//       on the specified node's point along the current
+		//       dimension so that we end up with 2 sub hyper rects
+		//       (current dimension = depth % dimensions)
+		//   
+		//	 1.2 Check what sub rectangle the the target point resides in
+		//	     under the current dimension
+		//	     
+		//   1.3 Set that rect to the nearer rect and also the corresponding 
+		//       child node to the nearest rect and node and the other rect 
+		//       and child node to the further rect and child node (for use later)
+		//       
+		//   1.4 Travel into the nearer rect and node by calling function
+		//       recursively with nearer rect and node and incrementing 
+		//       the depth
+		// 
+		// 2. Add leaf to list of nearest neighbours
+		// 
+		// 3. Walk back up tree and at each level:
+		// 
+		//    3.1 Add node to nearest neighbours if
+		//        we haven't filled our nearest neighbour
+		//        list yet or if it has a distance to target less
+		//        than any of the distances in our current nearest 
+		//        neighbours.
+		//        
+		//    3.2 If there is any point in the further rectangle that is closer to
+		//        the target than our furtherest nearest neighbour then travel into
+		//        that rect and node
+		// 
+		//  That's it, when it finally finishes traversing the branches 
+		//  it needs to we'll have our list!
+
+		// nested types
+		#region Node
 		/// <summary>Can be a leaf or a branch.</summary>
 		public class Node
 		{
@@ -63,33 +106,9 @@ namespace Seven.Structures
 				this._value = value;
 			}
 		}
-
 		#endregion
-
-		#region fields
-
-		private Compare<K> _compareKey;
-		private K _minValue;
-		private K _maxValue;
-		private K _zero;
-		private KdTree.Add<K> _add;
-		private KdTree.Subtract<K> _subtract;
-		private KdTree.Multiply<K> _multiply;
-		private KdTree.Locate<T, K> _locate;
-		private int _dimensions;
-		private Node _root;
-		private int _count;
-
-		#endregion
-
-		#region property
-
-		public int Count { get { return this._count; } }
-
-		#endregion
-
-		#region constructor
-
+		// constructors
+		#region public KdTree_Linked(int dimensions, Compare<K> compareKey, K minValue, K maxValue, K zero, KdTree.Add<K> add, KdTree.Subtract<K> subtract, KdTree.Multiply<K> multiply, KdTree.Locate<T, K> locate) 
 		public KdTree_Linked(int dimensions,
 			Compare<K> compareKey,
 			K minValue,
@@ -112,11 +131,13 @@ namespace Seven.Structures
 			this._dimensions = dimensions;
 			this._count = 0;
 		}
-
 		#endregion
-
-		#region KdTree_Linked<T, K>
-
+		// properties
+		#region public int Count
+		public int Count { get { return this._count; } }
+		#endregion
+		// methods
+		#region public bool Add(Get<K> point, T value)
 		public bool Add(Get<K> point, T value)
 		{
 			var nodeToAdd = new Node(value);
@@ -170,7 +191,8 @@ namespace Seven.Structures
 			this._count++;
 			return true;
 		}
-
+		#endregion
+		#region private void ReaddChildNodes(Node removedNode)
 		private void ReaddChildNodes(Node removedNode)
 		{
 			// Leaf Check
@@ -217,7 +239,8 @@ namespace Seven.Structures
 				Add(this._locate(nodeToReadd.Value), nodeToReadd.Value);
 			}
 		}
-
+		#endregion
+		#region public bool AreEqual(Get<K> a, Get<K> b)
 		public bool AreEqual(Get<K> a, Get<K> b)
 		{
 			for (var index = 0; index < this._dimensions; index++)
@@ -228,7 +251,8 @@ namespace Seven.Structures
 
 			return true;
 		}
-
+		#endregion
+		#region public void RemoveAt(Get<K> point)
 		public void RemoveAt(Get<K> point)
 		{
 			// Is tree empty?
@@ -291,7 +315,8 @@ namespace Seven.Structures
 			}
 			while (node != null);
 		}
-
+		#endregion
+		#region public Node[] GetNearestNeighbours(Get<K> point, int count)
 		public Node[] GetNearestNeighbours(Get<K> point, int count)
 		{
 			if (count > Count)
@@ -322,44 +347,8 @@ namespace Seven.Structures
 
 			return neighbourArray;
 		}
-
-		/*
-		 * 1. Search for the target
-		 * 
-		 *   1.1 Start by splitting the specified hyper rect
-		 *       on the specified node's point along the current
-		 *       dimension so that we end up with 2 sub hyper rects
-		 *       (current dimension = depth % dimensions)
-		 *   
-		 *	 1.2 Check what sub rectangle the the target point resides in
-		 *	     under the current dimension
-		 *	     
-		 *   1.3 Set that rect to the nearer rect and also the corresponding 
-		 *       child node to the nearest rect and node and the other rect 
-		 *       and child node to the further rect and child node (for use later)
-		 *       
-		 *   1.4 Travel into the nearer rect and node by calling function
-		 *       recursively with nearer rect and node and incrementing 
-		 *       the depth
-		 * 
-		 * 2. Add leaf to list of nearest neighbours
-		 * 
-		 * 3. Walk back up tree and at each level:
-		 * 
-		 *    3.1 Add node to nearest neighbours if
-		 *        we haven't filled our nearest neighbour
-		 *        list yet or if it has a distance to target less
-		 *        than any of the distances in our current nearest 
-		 *        neighbours.
-		 *        
-		 *    3.2 If there is any point in the further rectangle that is closer to
-		 *        the target than our furtherest nearest neighbour then travel into
-		 *        that rect and node
-		 * 
-		 *  That's it, when it finally finishes traversing the branches 
-		 *  it needs to we'll have our list!
-		 */
-
+		#endregion
+		#region private void AddNearestNeighbours(Node node, Get<K> target, HyperRect<K> rect, int depth, NearestNeighbourList<Node, K> nearestNeighbours, K maxSearchRadiusSquared)
 		private void AddNearestNeighbours(
 			Node node,
 			Get<K> target,
@@ -457,7 +446,8 @@ namespace Seven.Structures
 			if (this._compareKey(distanceSquaredToTarget, maxSearchRadiusSquared) == (Comparison.Less | Comparison.Equal))
 				nearestNeighbours.Add(node, distanceSquaredToTarget);
 		}
-
+		#endregion
+		#region private K DistanceSquaredBetweenPoints(Get<K> a, Get<K> b)
 		private K DistanceSquaredBetweenPoints(Get<K> a, Get<K> b)
 		{
 			K distance = this._zero;
@@ -473,7 +463,8 @@ namespace Seven.Structures
 
 			return distance;
 		}
-
+		#endregion
+		#region public Node[] RadialSearch(Get<K> center, K radius, int count)
 		public Node[] RadialSearch(Get<K> center, K radius, int count)
 		{
 			var nearestNeighbours = new NearestNeighbourList<Node, K>(count, this._minValue, this._compareKey);
@@ -495,7 +486,8 @@ namespace Seven.Structures
 
 			return neighbourArray;
 		}
-
+		#endregion
+		#region public bool TryFindValueAt(Get<K> point, out T value)
 		public bool TryFindValueAt(Get<K> point, out T value)
 		{
 			var parent = _root;
@@ -523,7 +515,8 @@ namespace Seven.Structures
 			}
 			while (true);
 		}
-
+		#endregion
+		#region public T FindValueAt(Get<K> point)
 		public T FindValueAt(Get<K> point)
 		{
 			T value;
@@ -532,7 +525,8 @@ namespace Seven.Structures
 			else
 				return default(T);
 		}
-
+		#endregion
+		#region public bool TryFindValue(T value, out Get<K> point)
 		public bool TryFindValue(T value, out Get<K> point)
 		{
 			if (_root == null)
@@ -567,7 +561,8 @@ namespace Seven.Structures
 			point = null;
 			return false;
 		}
-
+		#endregion
+		#region public Get<K> FindValue(T value)
 		public Get<K> FindValue(T value)
 		{
 			Get<K> point;
@@ -576,7 +571,8 @@ namespace Seven.Structures
 			else
 				return null;
 		}
-
+		#endregion
+		#region private void AddNodesToList(Node node, System.Collections.Generic.List<Node> nodes)
 		private void AddNodesToList(Node node, System.Collections.Generic.List<Node> nodes)
 		{
 			if (node == null)
@@ -595,7 +591,8 @@ namespace Seven.Structures
 				node.RightChild = null;
 			}
 		}
-
+		#endregion
+		#region private void SortNodesArray(Node[] nodes, int byDimension, int fromIndex, int toIndex)
 		private void SortNodesArray(Node[] nodes, int byDimension, int fromIndex, int toIndex)
 		{
 			for (var index = fromIndex + 1; index <= toIndex; index++)
@@ -616,7 +613,8 @@ namespace Seven.Structures
 				}
 			}
 		}
-
+		#endregion
+		#region private void AddNodesBalanced(Node[] nodes, int byDimension, int fromIndex, int toIndex)
 		private void AddNodesBalanced(Node[] nodes, int byDimension, int fromIndex, int toIndex)
 		{
 			if (fromIndex == toIndex)
@@ -645,7 +643,8 @@ namespace Seven.Structures
 			if (toIndex > midIndex)
 				AddNodesBalanced(nodes, nextDimension, midIndex + 1, toIndex);
 		}
-
+		#endregion
+		#region public void Balance()
 		public void Balance()
 		{
 			var nodeList = new System.Collections.Generic.List<Node>();
@@ -655,7 +654,8 @@ namespace Seven.Structures
 
 			AddNodesBalanced(nodeList.ToArray(), 0, 0, nodeList.Count - 1);
 		}
-
+		#endregion
+		#region private void RemoveChildNodes(Node node)
 		private void RemoveChildNodes(Node node)
 		{
 			if (node.LeftChild != null)
@@ -669,31 +669,13 @@ namespace Seven.Structures
 				node.RightChild = null;
 			}
 		}
-
+		#endregion
+		#region public void Clear()
 		public void Clear()
 		{
 			if (_root != null)
 				RemoveChildNodes(_root);
 		}
-
-		#endregion
-
-		#region IKdTree<T, K>
-
-
-
-		#endregion
-
-		#region Structure<T>
-
-
-
-		#endregion
-
-		#region IEnumerator<T>
-
-		
-
 		#endregion
 	}
 

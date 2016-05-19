@@ -23,69 +23,19 @@ namespace Seven.Structures
 	///	 Created by: Leslie Sanford (08/27/2003)
 	///	 Contact: jabberdabber@hotmail.com
 	/// </citation>
-	public class SkipList_Linked<T> : System.Collections.IEnumerable, System.Collections.IDictionary, SkipList<T>
+	public class SkipListLinked<T> : System.Collections.IEnumerable
 	{
-		/// <summary>Invokes a delegate for each entry in the data structure.</summary>
-		/// <param name="function">The delegate to invoke on each item in the structure.</param>
-		public void Stepper(Step<T> function)
-		{
-			throw new System.NotImplementedException();
-		}
-
-		/// <summary>Invokes a delegate for each entry in the data structure.</summary>
-		/// <param name="function">The delegate to invoke on each item in the structure.</param>
-		public void Stepper(StepRef<T> function)
-		{
-			throw new System.NotImplementedException();
-		}
-
-		/// <summary>Invokes a delegate for each entry in the data structure.</summary>
-		/// <param name="function">The delegate to invoke on each item in the structure.</param>
-		/// <returns>The resulting status of the iteration.</returns>
-		public StepStatus Stepper(StepBreak<T> function)
-		{
-			throw new System.NotImplementedException();
-		}
-
-		/// <summary>Invokes a delegate for each entry in the data structure.</summary>
-		/// <param name="function">The delegate to invoke on each item in the structure.</param>
-		/// <returns>The resulting status of the iteration.</returns>
-		public StepStatus Stepper(StepRefBreak<T> function)
-		{
-			throw new System.NotImplementedException();
-		}
-
-		/// <summary>Creates a shallow clone of this data structure.</summary>
-		/// <returns>A shallow clone of this data structure.</returns>
-		public Structure<T> Clone()
-		{
-			throw new System.NotImplementedException();
-		}
-
-		/// <summary>Converts the structure into an array.</summary>
-		/// <returns>An array containing all the item in the structure.</returns>
-		public T[] ToArray()
-		{
-			throw new System.NotImplementedException();
-		}
-
-		//public struct DictionaryEntry
-		//{
-		//	private object _key;
-		//	private object _value;
-
-		//	public object Key { get { return this._key; } set { this._key = value; } }
-		//	public object Value { get { return this._value; } set { this._value = value; } }
-
-		//	public DictionaryEntry(object key, object value)
-		//	{
-		//		this._key = key;
-		//		this._value = value;
-		//	}
-		//}
-
-		/// <summary>Represents a node in the SkipList.</summary>
-		private class Node : System.IDisposable
+		// fields
+		private const int MaxLevel = 32; // Maximum level any node in a skip list can have
+		private const double Probability = 0.5; // Probability factor used to determine the node level
+		private Node header = new Node(MaxLevel); // The skip list header. It also serves as the NIL node.
+		private System.Collections.IComparer _comparer; // Comparer for comparing keys.
+		private System.Random _random = new System.Random(); // Random number generator for generating random node levels.
+		private int _listLevel; // Current maximum list level.
+		private int _count; // Current number of elements in the skip list.
+		// nested types
+		#region private class Node
+		private class Node
 		{
 			// References to nodes further along in the skip list.
 			public Node[] forward;
@@ -118,51 +68,9 @@ namespace Seven.Structures
 					forward[i] = null;
 			}
 		}
-
-		// Maximum level any node in a skip list can have
-		private const int MaxLevel = 32;
-
-		// Probability factor used to determine the node level
-		private const double Probability = 0.5;
-
-		// The skip list header. It also serves as the NIL node.
-		private Node header = new Node(MaxLevel);
-
-		// Comparer for comparing keys.
-		private System.Collections.IComparer _comparer;
-
-		// Random number generator for generating random node levels.
-		private System.Random _random = new System.Random();
-
-		// Current maximum list level.
-		private int _listLevel;
-
-		// Current number of elements in the skip list.
-		private int _count;
-
-		// Version of the skip list. Used for validation checks with 
-		// enumerators.
-		private long _version = 0;
-
-		// Resource manager for retrieving exception messages.
-		//private ResourceManager resManager;
-
-		///// <summary>
-		///// Initializes a new instance of the SkipList class that is empty and 
-		///// is sorted according to the IComparable interface implemented by 
-		///// each key added to the SkipList.
-		///// </summary>
-		///// <remarks>
-		///// Each key must implement the IComparable interface to be capable of 
-		///// comparisons with every other key in the SortedList. The elements 
-		///// are sorted according to the IComparable implementation of each key 
-		///// added to the SkipList.
-		///// </remarks>
-		//public SkipList()
-		//{
-		//	Initialize();
-		//}
-
+		#endregion
+		// constructors
+		#region public SkipList_Linked(System.Collections.IComparer comparer)
 		/// <summary>
 		/// Initializes a new instance of the SkipList class that is empty and 
 		/// is sorted according to the specified IComparer interface.
@@ -177,7 +85,7 @@ namespace Seven.Structures
 		/// implement the IComparable interface to be capable of comparisons 
 		/// with every other key in the SkipList.
 		/// </remarks>
-		public SkipList_Linked(System.Collections.IComparer comparer)
+		public SkipListLinked(System.Collections.IComparer comparer)
 		{
 			// Initialize comparer with the client provided comparer.
 			this._comparer = comparer;
@@ -190,9 +98,312 @@ namespace Seven.Structures
 			//		new ResourceManager("LSCollections.Resource",
 			//		this.GetType().Assembly);
 		}
+		#endregion
+		#region private class SkipListEnumerator
 
-		~SkipList_Linked() { Clear(); }
+		/// <summary>Enumerates the elements of a skip list.</summary>
+		private class SkipListEnumerator : System.Collections.IDictionaryEnumerator
+		{
+			// The skip list to enumerate.
+			private SkipListLinked<T> _skiplist;
 
+			// The current node.
+			private Node _current;
+
+			// The version of the skip list we are enumerating.
+			private long _version;
+
+			// Keeps track of previous move result so that we can know 
+			// whether or not we are at the end of the skip list.
+			private bool _moveResult = true;
+
+			/// <summary>Initializes an instance of a SkipListEnumerator.</summary>
+			/// <param name="list"></param>
+			public SkipListEnumerator(SkipListLinked<T> list)
+			{
+				this._skiplist = list;
+				_current = list.header;
+			}
+
+			/// <summary>Gets both the key and the value of the current dictionary entry.</summary>
+			public System.Collections.DictionaryEntry Entry
+			{
+				get
+				{
+					System.Collections.DictionaryEntry entry;
+
+					// Make sure we are not before the beginning or beyond the 
+					// end of the skip list.
+					if (_current == _skiplist.header)
+					{
+						//string msg = list.resManager.GetString("BadEnumAccess");
+						throw new Error("BadEnumAccess");
+					}
+					// Finally, all checks have passed. Get the current entry.
+					else
+					{
+						entry = _current.entry;
+					}
+
+					return entry;
+				}
+			}
+
+			/// <summary>Gets the key of the current dictionary entry.</summary>
+			public object Key { get { object key = Entry.Key; return key; } }
+
+			/// <summary>Gets the value of the current dictionary entry.</summary>
+			public object Value { get { object val = Entry.Value; return val; } }
+
+			/// <summary>Advances the enumerator to the next element of the skip list.</summary>
+			/// <returns>true if the enumerator was successfully advanced to the next element; false if the enumerator has passed the end of the skip list.</returns>
+			public bool MoveNext()
+			{
+				// If the result of the previous move operation was true
+				// we can still move forward in the skip list.
+				if (_moveResult)
+				{
+					// Move forward in the skip list.
+					_current = _current.forward[0];
+
+					// If we are at the end of the skip list.
+					if (_current == _skiplist.header)
+					{
+						// Indicate that we've reached the end of the skip 
+						// list.
+						_moveResult = false;
+					}
+				}
+
+				return _moveResult;
+			}
+
+			/// <summary>
+			/// Sets the enumerator to its initial position, which is before 
+			/// the first element in the skip list.
+			/// </summary>
+			public void Reset()
+			{
+				_current = _skiplist.header;
+				_moveResult = true;
+			}
+
+			/// <summary>Gets the current element in the skip list.</summary>
+			public object Current { get { return Value; } }
+		}
+
+		#endregion
+		// properties
+		#region public object this[object key]
+		/// <summary>Gets or sets the element with the specified key. This is the indexer for the SkipList.</summary>
+		public object this[object key]
+		{
+			get
+			{
+				object val = null;
+				Node curr;
+
+				if (Search(key, out curr))
+				{
+					val = curr.entry.Value;
+				}
+
+				return val;
+			}
+			set
+			{
+				Node[] update = new Node[MaxLevel];
+				Node curr;
+
+				// If the search key already exists in the skip list.
+				if (Search(key, out curr, update))
+				{
+					// Replace the current value with the new value.
+					curr.entry.Value = value;
+				}
+				// Else the key doesn't exist in the skip list.
+				else
+				{
+					// Insert the key and value into the skip list.
+					Insert(key, value, update);
+				}
+			}
+		}
+		#endregion
+		#region public int Count
+		/// <summary>Gets the number of elements contained in the SkipList.</summary>
+		public int Count { get { return _count; } }
+		#endregion
+		// methods (public)
+		#region public void Add(object key, object value)
+		/// <summary>Adds an element with the provided key and value to the SkipList.</summary>
+		/// <param name="key">The Object to use as the key of the element to add.</param>
+		/// <param name="value">The Object to use as the value of the element to add.</param>
+		public void Add(object key, object value)
+		{
+			Node[] update = new Node[MaxLevel];
+
+			// If key does not already exist in the skip list.
+			if (!Search(key, update))
+			{
+				// Inseart key/value pair into the skip list.
+				Insert(key, value, update);
+			}
+			// Else throw an exception. The IDictionary Add method throws an
+			// exception if an attempt is made to add a key that already 
+			// exists in the skip list.
+			else
+			{
+				//string msg = resManager.GetString("KeyExistsAdd");
+				throw new Error("KeyExistsAdd");
+			}
+		}
+		#endregion
+		#region public void Clear()
+		/// <summary>Removes all elements from the SkipList.</summary>
+		public void Clear()
+		{
+			// Start at the beginning of the skip list.
+			Node curr = header.forward[0];
+			Node prev;
+
+			// While we haven't reached the end of the skip list.
+			while (curr != header)
+			{
+				// Keep track of the previous node.
+				prev = curr;
+				// Move forward in the skip list.
+				curr = curr.forward[0];
+				// Dispose of the previous node.
+				prev.Dispose();
+			}
+
+			// Initialize skip list and indicate that it has been changed.
+			Initialize();
+		}
+		#endregion
+		#region public bool Contains(object key)
+		/// <summary>Determines whether the SkipList contains an element with the specified key.</summary>
+		/// <param name="key">The key to locate in the SkipList.</param>
+		/// <returns>true if the SkipList contains an element with the key; otherwise, false.</returns>
+		public bool Contains(object key)
+		{
+			return Search(key);
+		}
+		#endregion
+		#region public System.Collections.IDictionaryEnumerator GetEnumerator()
+		/// <summary>Returns an IDictionaryEnumerator for the SkipList.</summary>
+		/// <returns>An IDictionaryEnumerator for the SkipList.</returns>
+		public System.Collections.IDictionaryEnumerator GetEnumerator()
+		{
+			return new SkipListEnumerator(this);
+		}
+		#endregion
+		#region public void Remove(object key)
+		/// <summary>Removes the element with the specified key from the SkipList.</summary>
+		/// <param name="key">The key of the element to remove.</param>
+		public void Remove(object key)
+		{
+			Node[] update = new Node[MaxLevel];
+			Node curr;
+
+			if (Search(key, out curr, update))
+			{
+				// Take the forward references that point to the node to be 
+				// removed and reassign them to the nodes that come after it.
+				for (int i = 0; i < _listLevel &&
+						update[i].forward[i] == curr; i++)
+				{
+					update[i].forward[i] = curr.forward[i];
+				}
+
+				curr.Dispose();
+
+				// After removing the node, we may need to lower the current 
+				// skip list level if the node had the highest level of all of
+				// the nodes.
+				while (_listLevel > 1 && header.forward[_listLevel - 1] == header)
+				{
+					_listLevel--;
+				}
+
+				// Keep track of the number of nodes.
+				_count--;
+			}
+		}
+		#endregion
+		#region public void Stepper(Step<T> function)
+		/// <summary>Invokes a delegate for each entry in the data structure.</summary>
+		/// <param name="function">The delegate to invoke on each item in the structure.</param>
+		public void Stepper(Step<T> function)
+		{
+			throw new System.NotImplementedException();
+		}
+		#endregion
+		#region public void Stepper(StepRef<T> function)
+		/// <summary>Invokes a delegate for each entry in the data structure.</summary>
+		/// <param name="function">The delegate to invoke on each item in the structure.</param>
+		public void Stepper(StepRef<T> function)
+		{
+			throw new System.NotImplementedException();
+		}
+		#endregion
+		#region public StepStatus Stepper(StepBreak<T> function)
+		/// <summary>Invokes a delegate for each entry in the data structure.</summary>
+		/// <param name="function">The delegate to invoke on each item in the structure.</param>
+		/// <returns>The resulting status of the iteration.</returns>
+		public StepStatus Stepper(StepBreak<T> function)
+		{
+			throw new System.NotImplementedException();
+		}
+		#endregion
+		#region public StepStatus Stepper(StepRefBreak<T> function)
+		/// <summary>Invokes a delegate for each entry in the data structure.</summary>
+		/// <param name="function">The delegate to invoke on each item in the structure.</param>
+		/// <returns>The resulting status of the iteration.</returns>
+		public StepStatus Stepper(StepRefBreak<T> function)
+		{
+			throw new System.NotImplementedException();
+		}
+		#endregion
+		#region public Structure<T> Clone()
+		/// <summary>Creates a shallow clone of this data structure.</summary>
+		/// <returns>A shallow clone of this data structure.</returns>
+		public Structure<T> Clone()
+		{
+			throw new System.NotImplementedException();
+		}
+		#endregion
+		#region public T[] ToArray()
+		/// <summary>Converts the structure into an array.</summary>
+		/// <returns>An array containing all the item in the structure.</returns>
+		public T[] ToArray()
+		{
+			T[] array = new T[this._count];
+			int index = 0;
+			for (Node curr = header.forward[0]; curr != header; curr = curr.forward[0])
+				array[index++] = (T)curr.entry.Value;
+			return array;
+		}
+		#endregion
+		#region System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+		/// <summary>Returns an enumerator that can iterate through the SkipList.</summary>
+		/// <returns>An IEnumerator that can be used to iterate through the collection.</returns>
+		System.Collections.IEnumerator
+			System.Collections.IEnumerable.GetEnumerator()
+		{
+			return new SkipListEnumerator(this);
+		}
+		#endregion
+		#region System.Collections.Generic.IEnumerator<T> System.Collections.Generic.IEnumerable<T>.GetEnumerator()
+		//System.Collections.Generic.IEnumerator<T>
+		//	System.Collections.Generic.IEnumerable<T>.GetEnumerator()
+		//{
+		//	return new SkipListEnumerator(this);
+		//}
+		#endregion
+		// method (private)
+		#region private void Initialize()
 		/// <summary>
 		/// Initializes the SkipList.
 		/// </summary>
@@ -209,7 +420,8 @@ namespace Seven.Structures
 				header.forward[i] = header;
 			}
 		}
-
+		#endregion
+		#region private int GetNewLevel()
 		/// <summary>
 		/// Returns a level value for a new SkipList node.
 		/// </summary>
@@ -229,7 +441,8 @@ namespace Seven.Structures
 
 			return level;
 		}
-
+		#endregion
+		#region private bool Search(object key)
 		/// <summary>
 		/// Searches for the specified key.
 		/// </summary>
@@ -246,7 +459,8 @@ namespace Seven.Structures
 
 			return Search(key, out curr, dummy);
 		}
-
+		#endregion
+		#region private bool Search(object key, out Node curr)
 		/// <summary>
 		/// Searches for the specified key.
 		/// </summary>
@@ -266,8 +480,9 @@ namespace Seven.Structures
 
 			return Search(key, out curr, dummy);
 		}
-
-		/// <summary>
+		#endregion
+		#region private bool Search(object key, Node[] update)
+		/// <summary>	
 		/// Searches for the specified key.
 		/// </summary>
 		/// <param name="key">
@@ -286,7 +501,8 @@ namespace Seven.Structures
 
 			return Search(key, out curr, update);
 		}
-
+		#endregion
+		#region private bool Search(object key, out Node curr, Node[] update)
 		/// <summary>
 		/// Searches for the specified key.
 		/// </summary>
@@ -327,7 +543,8 @@ namespace Seven.Structures
 
 			return result;
 		}
-
+		#endregion
+		#region private bool SearchWithComparer(object key, out Node curr, Node[] update)
 		/// <summary>
 		/// Search for the specified key using a comparer.
 		/// </summary>
@@ -387,7 +604,8 @@ namespace Seven.Structures
 
 			return found;
 		}
-
+		#endregion
+		#region private bool SearchWithComparable(object key, out Node curr, Node[] update)
 		/// <summary>
 		/// Search for the specified key using the IComparable interface 
 		/// implemented by each key.
@@ -472,7 +690,8 @@ namespace Seven.Structures
 
 			return found;
 		}
-
+		#endregion
+		#region private void Insert(object key, object val, Node[] update)
 		/// <summary>Inserts a key/value pair into the SkipList.</summary>
 		/// <param name="key">The key to insert into the SkipList.</param>
 		/// <param name="val">The value to insert into the SkipList.</param>
@@ -519,273 +738,11 @@ namespace Seven.Structures
 
 			// Keep track of the number of nodes in the skip list.
 			_count++;
-			// Indicate that the skip list has changed.
-			_version++;
 		}
+		#endregion
 
-		/// <summary>Enumerates the elements of a skip list.</summary>
-		private class SkipListEnumerator : System.Collections.IDictionaryEnumerator
-		{
-			// The skip list to enumerate.
-			private SkipList_Linked<T> _skiplist;
-
-			// The current node.
-			private Node _current;
-
-			// The version of the skip list we are enumerating.
-			private long _version;
-
-			// Keeps track of previous move result so that we can know 
-			// whether or not we are at the end of the skip list.
-			private bool _moveResult = true;
-
-			/// <summary>Initializes an instance of a SkipListEnumerator.</summary>
-			/// <param name="list"></param>
-			public SkipListEnumerator(SkipList_Linked<T> list)
-			{
-				this._skiplist = list;
-				_version = list._version;
-				_current = list.header;
-			}
-
-			/// <summary>Gets both the key and the value of the current dictionary entry.</summary>
-			public System.Collections.DictionaryEntry Entry
-			{
-				get
-				{
-					System.Collections.DictionaryEntry entry;
-
-					// Make sure the skip list hasn't been modified since the
-					// enumerator was created.
-					if (_version != _skiplist._version)
-					{
-						//string msg = list.resManager.GetString("InvalidEnum");
-						throw new Error("InvalidEnum");
-					}
-					// Make sure we are not before the beginning or beyond the 
-					// end of the skip list.
-					else if (_current == _skiplist.header)
-					{
-						//string msg = list.resManager.GetString("BadEnumAccess");
-						throw new Error("BadEnumAccess");
-					}
-					// Finally, all checks have passed. Get the current entry.
-					else
-					{
-						entry = _current.entry;
-					}
-
-					return entry;
-				}
-			}
-
-			/// <summary>Gets the key of the current dictionary entry.</summary>
-			public object Key { get { object key = Entry.Key; return key; } }
-
-			/// <summary>Gets the value of the current dictionary entry.</summary>
-			public object Value { get { object val = Entry.Value; return val; } }
-
-			/// <summary>Advances the enumerator to the next element of the skip list.</summary>
-			/// <returns>true if the enumerator was successfully advanced to the next element; false if the enumerator has passed the end of the skip list.</returns>
-			public bool MoveNext()
-			{
-				// Make sure the skip list hasn't been modified since the
-				// enumerator was created.
-				if (_version == _skiplist._version)
-				{
-					// If the result of the previous move operation was true
-					// we can still move forward in the skip list.
-					if (_moveResult)
-					{
-						// Move forward in the skip list.
-						_current = _current.forward[0];
-
-						// If we are at the end of the skip list.
-						if (_current == _skiplist.header)
-						{
-							// Indicate that we've reached the end of the skip 
-							// list.
-							_moveResult = false;
-						}
-					}
-				}
-				// Else this version of the enumerator doesn't match that of 
-				// the skip list. The skip list has been modified since the 
-				// creation of the enumerator.
-				else
-				{
-					//string msg = list.resManager.GetString("InvalidEnum");
-					throw new Error("InvalidEnum");
-				}
-
-				return _moveResult;
-			}
-
-			/// <summary>
-			/// Sets the enumerator to its initial position, which is before 
-			/// the first element in the skip list.
-			/// </summary>
-			public void Reset()
-			{
-				// Make sure the skip list hasn't been modified since the
-				// enumerator was created.
-				if (_version == _skiplist._version)
-				{
-					_current = _skiplist.header;
-					_moveResult = true;
-				}
-				// Else this version of the enumerator doesn't match that of 
-				// the skip list. The skip list has been modified since the 
-				// creation of the enumerator.
-				else
-				{
-					//string msg = list.resManager.GetString("InvalidEnum");
-					throw new Error("InvalidEnum");
-				}
-			}
-
-			/// <summary>Gets the current element in the skip list.</summary>
-			public object Current { get { return Value; } }
-		}
-
-		/// <summary>Adds an element with the provided key and value to the SkipList.</summary>
-		/// <param name="key">The Object to use as the key of the element to add.</param>
-		/// <param name="value">The Object to use as the value of the element to add.</param>
-		public void Add(object key, object value)
-		{
-			Node[] update = new Node[MaxLevel];
-
-			// If key does not already exist in the skip list.
-			if (!Search(key, update))
-			{
-				// Inseart key/value pair into the skip list.
-				Insert(key, value, update);
-			}
-			// Else throw an exception. The IDictionary Add method throws an
-			// exception if an attempt is made to add a key that already 
-			// exists in the skip list.
-			else
-			{
-				//string msg = resManager.GetString("KeyExistsAdd");
-				throw new Error("KeyExistsAdd");
-			}
-		}
-
-		/// <summary>Removes all elements from the SkipList.</summary>
-		public void Clear()
-		{
-			// Start at the beginning of the skip list.
-			Node curr = header.forward[0];
-			Node prev;
-
-			// While we haven't reached the end of the skip list.
-			while (curr != header)
-			{
-				// Keep track of the previous node.
-				prev = curr;
-				// Move forward in the skip list.
-				curr = curr.forward[0];
-				// Dispose of the previous node.
-				prev.Dispose();
-			}
-
-			// Initialize skip list and indicate that it has been changed.
-			Initialize();
-			_version++;
-		}
-
-		/// <summary>Determines whether the SkipList contains an element with the specified key.</summary>
-		/// <param name="key">The key to locate in the SkipList.</param>
-		/// <returns>true if the SkipList contains an element with the key; otherwise, false.</returns>
-		public bool Contains(object key)
-		{
-			return Search(key);
-		}
-
-		/// <summary>Returns an IDictionaryEnumerator for the SkipList.</summary>
-		/// <returns>An IDictionaryEnumerator for the SkipList.</returns>
-		public System.Collections.IDictionaryEnumerator GetEnumerator()
-		{
-			return new SkipListEnumerator(this);
-		}
-
-		/// <summary>Removes the element with the specified key from the SkipList.</summary>
-		/// <param name="key">The key of the element to remove.</param>
-		public void Remove(object key)
-		{
-			Node[] update = new Node[MaxLevel];
-			Node curr;
-
-			if (Search(key, out curr, update))
-			{
-				// Take the forward references that point to the node to be 
-				// removed and reassign them to the nodes that come after it.
-				for (int i = 0; i < _listLevel &&
-						update[i].forward[i] == curr; i++)
-				{
-					update[i].forward[i] = curr.forward[i];
-				}
-
-				curr.Dispose();
-
-				// After removing the node, we may need to lower the current 
-				// skip list level if the node had the highest level of all of
-				// the nodes.
-				while (_listLevel > 1 && header.forward[_listLevel - 1] == header)
-				{
-					_listLevel--;
-				}
-
-				// Keep track of the number of nodes.
-				_count--;
-				// Indicate that the skip list has changed.
-				_version++;
-			}
-		}
-
-		/// <summary>Gets a value indicating whether the SkipList has a fixed size.</summary>
-		public bool IsFixedSize { get { return false; } }
-
-		/// <summary>Gets a value indicating whether the IDictionary is read-only.</summary>
-		public bool IsReadOnly { get { return false; } }
-
-		/// <summary>Gets or sets the element with the specified key. This is the indexer for the SkipList.</summary>
-		public object this[object key]
-		{
-			get
-			{
-				object val = null;
-				Node curr;
-
-				if (Search(key, out curr))
-				{
-					val = curr.entry.Value;
-				}
-
-				return val;
-			}
-			set
-			{
-				Node[] update = new Node[MaxLevel];
-				Node curr;
-
-				// If the search key already exists in the skip list.
-				if (Search(key, out curr, update))
-				{
-					// Replace the current value with the new value.
-					curr.entry.Value = value;
-					// Indicate that the skip list has changed.
-					_version++;
-				}
-				// Else the key doesn't exist in the skip list.
-				else
-				{
-					// Insert the key and value into the skip list.
-					Insert(key, value, update);
-				}
-			}
-		}
-
+		// probably gonna die
+		#region public System.Collections.ICollection Keys
 		/// <summary>Gets an ICollection containing the keys of the SkipList.</summary>
 		public System.Collections.ICollection Keys
 		{
@@ -808,7 +765,8 @@ namespace Seven.Structures
 				return collection;
 			}
 		}
-
+		#endregion
+		#region public System.Collections.ICollection Values
 		/// <summary>Gets an ICollection containing the values of the SkipList.</summary>
 		public System.Collections.ICollection Values
 		{
@@ -831,60 +789,6 @@ namespace Seven.Structures
 				return collection;
 			}
 		}
-
-		/// <summary>Copies the elements of the SkipList to an Array, starting at a particular Array index.</summary>
-		/// <param name="array">The one-dimensional Array that is the destination of the elements copied from SkipList.</param>
-		/// <param name="index">The zero-based index in array at which copying begins.</param>
-		public void CopyTo(System.Array array, int index)
-		{
-			if (array == null)
-				throw new Error("NullArrayCopyTo");
-			else if (index < 0)
-				throw new Error("BadIndexCopyTo");
-			else if (index >= array.Length)
-				throw new Error("BadIndexCopyTo");
-			else if ((array.Length - index) < Count)
-				throw new Error("BadIndexCopyTo");
-			else
-			{
-				// Start at the beginning of the skip list.
-				Node curr = header.forward[0];
-
-				// While we haven't reached the end of the skip list.
-				while (curr != header)
-				{
-					// Copy current value into array.
-					array.SetValue(curr.entry.Value, index);
-
-					// Move forward in the skip list and array.
-					curr = curr.forward[0];
-					index++;
-				}
-			}
-		}
-
-		/// <summary>Gets the number of elements contained in the SkipList.</summary>
-		public int Count { get { return _count; } }
-
-		/// <summary> Gets a value indicating whether access to the SkipList is synchronized (thread-safe).</summary>
-		public bool IsSynchronized { get { return false; } }
-
-		/// <summary>Gets an object that can be used to synchronize access to the SkipList.</summary>
-		public object SyncRoot { get { return this; } }
-
-		/// <summary>Returns an enumerator that can iterate through the SkipList.</summary>
-		/// <returns>An IEnumerator that can be used to iterate through the collection.</returns>
-		System.Collections.IEnumerator
-			System.Collections.IEnumerable.GetEnumerator()
-		{
-			return new SkipListEnumerator(this);
-		}
-
-		System.Collections.Generic.IEnumerator<T>
-			System.Collections.Generic.IEnumerable<T>.GetEnumerator()
-		{
-			throw new System.NotImplementedException();
-			//return new SkipListEnumerator(this);
-		}
+		#endregion
 	}
 }

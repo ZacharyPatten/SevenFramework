@@ -138,14 +138,12 @@ namespace Seven.Algorithms.GraphSearch
 			Goal goal)
 		{
 			// using a heap (aka priority queue) to store nodes based on their computed A* f(n) value
-			Heap<Node> fringe = new Heap_Array<Node>(
+			Heap<Node> fringe = new HeapArray<Node>(
 				// NOTE: I just reversed the order of left and right because smaller values are higher priority
 				(Node left, Node right) => { return Compute<Math>.Compare(right.Priority, left.Priority); });
 
 			// using a map (aka dictionary) to store costs from start to current nodes
-			Map<Math, Node> computed_costs = new Map_Linked<Math, Node>(
-				(Node left, Node right) => { return object.ReferenceEquals(left, right); },
-				(Node node) => { return (node as object).GetHashCode(); });
+			Map<Math, Node> computed_costs = new MapHashArray<Math, Node>();
 
 			// construct the f(n) for this A* execution
 			function function = (T node, Node previous) =>

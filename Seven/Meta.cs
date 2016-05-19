@@ -230,6 +230,14 @@ namespace Seven.Generated
 			}
 		}
 
+		/// <summary>Converts a "System.Type" into a string as it would appear in C# source code.</summary>
+		/// <param name="type">The "System.Type" to convert to a string.</param>
+		/// <returns>The string as the "System.Type" would appear in C# source code.</returns>
+		public static string ToCsharpSource(this System.Type type)
+		{
+			return ConvertTypeToCsharpSource(type);
+		}
+
 		internal delegate Expression UnaryOperationHelperDelegate(Expression operand, LabelTarget returnLabel);
 
 		internal static Delegate UnaryOperationHelper<Delegate, Operand, Return>(UnaryOperationHelperDelegate operation)
@@ -238,7 +246,7 @@ namespace Seven.Generated
 			ParameterExpression _operand = Expression.Parameter(typeof(Operand));
 			LabelTarget _label = Expression.Label(typeof(Return));
 			// code builder
-			List_Linked<Expression> expressions = new List_Linked<Expression>();
+			ListLinked<Expression> expressions = new ListLinked<Expression>();
 			// null checks
 			if (!typeof(Operand).IsValueType) // is nullable?
 			{
@@ -265,7 +273,7 @@ namespace Seven.Generated
 			ParameterExpression _right = Expression.Parameter(typeof(Right));
 			LabelTarget _label = Expression.Label(typeof(Return));
 			// code builder
-			List_Linked<Expression> expressions = new List_Linked<Expression>();
+			ListLinked<Expression> expressions = new ListLinked<Expression>();
 			// null checks
 			if (!typeof(Left).IsValueType) // is nullable?
 			{

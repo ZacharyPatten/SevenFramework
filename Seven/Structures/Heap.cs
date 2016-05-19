@@ -9,28 +9,26 @@ namespace Seven.Structures
 {
 	/// <summary>Stores items based on priorities and allows access to the highest priority item.</summary>
 	/// <typeparam name="T">The generic type to be stored within the heap.</typeparam>
-	public interface Heap<T> : Structure<T>
+	public interface Heap<T> : Structure<T>,
+		// Structure Properties
+		Structure.Countable<T>,
+		Structure.Clearable<T>,
+		Structure.Comparing<T>
 	{
-		#region member
-
-		/// <summary>The comparison function </summary>
-		Compare<T> Compare { get; }
-
-		/// <summary>The number of items in the queue.</summary>
-		int Count { get; }
-
+		#region void Enqueue(T addition);
 		/// <summary>Enqueues an item into the heap.</summary>
 		/// <param name="addition"></param>
 		void Enqueue(T addition);
+		#endregion
+		#region T Dequeue();
 		/// <summary>Removes and returns the highest priority item.</summary>
 		/// <returns>The highest priority item from the queue.</returns>
 		T Dequeue();
+		#endregion
+		#region T Peek();
 		/// <summary>Returns the highest priority item.</summary>
 		/// <returns>The highest priority item in the queue.</returns>
 		T Peek();
-		/// <summary>Returns the heap to an empty state.</summary>
-		void Clear();
-
 		#endregion
 	}
 	
@@ -43,66 +41,60 @@ namespace Seven.Structures
 	/// been modified since its addition into the Seven framework.
 	/// </citation>
 	[System.Serializable]
-	public class Heap_Array<T> : Heap<T>
+	public class HeapArray<T> : Heap<T>
 	{
-		#region field
-
+		// fields
 		private Compare<T> _compare;
 		private T[] _heap;
 		private int _minimumCapacity;
 		private int _count;
-
-		#endregion
-
-		#region property
-
-		public Compare<T> Compare { get { return this._compare; } }
-
-		/// <summary>The maximum items the queue can hold.</summary>
-		/// <remarks>Runtime: O(1).</remarks>
-		public int CurrentCapacity { get { return this._heap.Length - 1; } }
-
-		/// <summary>The minumum capacity of this queue to limit low-level resizing.</summary>
-		public int MinimumCapacity { get { return this._minimumCapacity; } }
-
-		/// <summary>The number of items in the queue.</summary
-		/// <remarks>Runtime: O(1).</remarks>
-		public int Count { get { return this._count; } }
-
-		#endregion
-
-		#region construct
-
+		private const int _root = 1; // The root index of the heap.
+		// constructors
+		#region public Heap_Array(Compare<T> prioritize)
 		/// <summary>Generates a priority queue with a capacity of the parameter. Runtime O(1).</summary>
 		/// <param name="minimumCapacity">The capacity you want this priority queue to have.</param>
 		/// <remarks>Runtime: Theta(capacity).</remarks>
-		public Heap_Array(Compare<T> prioritize)
+		public HeapArray(Compare<T> prioritize)
 		{
 			this._compare = prioritize;
 			this._heap = new T[2];
 			this._minimumCapacity = 1;
 			this._count = 0;
 		}
-
+		#endregion
+		#region public Heap_Array(Compare<T> compare, int minimumCapacity)
 		/// <summary>Generates a priority queue with a capacity of the parameter. Runtime O(1).</summary>
 		/// <param name="compare">Delegate determining the comparison technique used for sorting.</param>
 		/// <param name="minimumCapacity">The capacity you want this priority queue to have.</param>
 		/// <remarks>Runtime: Theta(capacity).</remarks>
-		public Heap_Array(Compare<T> compare, int minimumCapacity)
+		public HeapArray(Compare<T> compare, int minimumCapacity)
 		{
 			this._compare = compare;
 			this._heap = new T[minimumCapacity + 1];
 			this._minimumCapacity = minimumCapacity;
 			this._count = 0;
 		}
-
 		#endregion
-
-		#region method
-
-		/// <summary>The root index of the heap.</summary>
-		private const int _root = 1;
-
+		// properties
+		#region public Compare<T> Compare
+		public Compare<T> Compare { get { return this._compare; } }
+		#endregion
+		#region public int CurrentCapacity
+		/// <summary>The maximum items the queue can hold.</summary>
+		/// <remarks>Runtime: O(1).</remarks>
+		public int CurrentCapacity { get { return this._heap.Length - 1; } }
+		#endregion
+		#region public int MinimumCapacity
+		/// <summary>The minumum capacity of this queue to limit low-level resizing.</summary>
+		public int MinimumCapacity { get { return this._minimumCapacity; } }
+		#endregion
+		#region public int Count
+		/// <summary>The number of items in the queue.</summary
+		/// <remarks>Runtime: O(1).</remarks>
+		public int Count { get { return this._count; } }
+		#endregion
+		// methods
+		#region private static int LeftChild(int parent)
 		/// <summary>Gets the index of the left child of the provided item.</summary>
 		/// <param name="parent">The item to find the left child of.</param>
 		/// <returns>The index of the left child of the provided item.</returns>
@@ -110,7 +102,8 @@ namespace Seven.Structures
 		{
 			return parent * 2;
 		}
-
+		#endregion
+		#region private static int RightChild(int parent)
 		/// <summary>Gets the index of the right child of the provided item.</summary>
 		/// <param name="parent">The item to find the right child of.</param>
 		/// <returns>The index of the right child of the provided item.</returns>
@@ -118,7 +111,8 @@ namespace Seven.Structures
 		{
 			return parent * 2 + 1;
 		}
-
+		#endregion
+		#region private static int Parent(int child)
 		/// <summary>Gets the index of the parent of the provided item.</summary>
 		/// <param name="child">The item to find the parent of.</param>
 		/// <returns>The index of the parent of the provided item.</returns>
@@ -126,7 +120,8 @@ namespace Seven.Structures
 		{
 			return child / 2;
 		}
-
+		#endregion
+		#region public void Enqueue(T addition)
 		/// <summary>Enqueue an item into the priority queue and let it works its magic.</summary>
 		/// <param name="addition">The item to be added.</param>
 		/// <param name="priority">The priority of the addition. (LARGER PRIORITY -> HIGHER PRIORITY)</param>
@@ -146,7 +141,8 @@ namespace Seven.Structures
 			this._heap[this._count] = addition;
 			this.ShiftUp(this._count);
 		}
-
+		#endregion
+		#region public T Dequeue()
 		/// <summary>Dequeues the item with the highest priority.</summary>
 		/// <returns>The item of the highest priority.</returns>
 		/// <remarks>Runtime: Theta(ln(n)).</remarks>
@@ -162,7 +158,8 @@ namespace Seven.Structures
 			}
 			throw new Error("Attempting to remove from an empty priority queue.");
 		}
-
+		#endregion
+		#region public void Requeue(T item)
 		/// <summary>Requeues an item after a change has occured.</summary>
 		/// <param name="item">The item to requeue.</param>
 		/// <remarks>Runtime: O(n).</remarks>
@@ -177,7 +174,8 @@ namespace Seven.Structures
 			ShiftUp(i);
 			ShiftDown(i);
 		}
-
+		#endregion
+		#region public T Peek()
 		/// <summary>This lets you peek at the top priority WITHOUT REMOVING it.</summary>
 		/// <remarks>Runtime: O(1).</remarks>
 		public T Peek()
@@ -186,20 +184,8 @@ namespace Seven.Structures
 				return this._heap[_root];
 			throw new Error("Attempting to peek at an empty priority queue.");
 		}
-
-		//	/// <summary>Standard priority queue algorithm for up sifting.</summary>
-		//	/// <param name="index">The index to be up sifted.</param>
-		//	/// <remarks>Runtime: O(ln(n)), Omega(1).</remarks>
-		//	private void ShiftUp(int index)
-		//	{
-		//		// NOTE: "index * 2" is the index of the leftchild of the item at location "index"
-		//		while (_heapArray[index].Priority > _heapArray[index / 2].Priority)
-		//		{
-		//			ArraySwap(index, index / 2);
-		//			index = index / 2;
-		//		}
-		//	}
-
+		#endregion
+		#region private void ShiftUp(int index)
 		/// <summary>Standard priority queue algorithm for up sifting.</summary>
 		/// <param name="index">The index to be up sifted.</param>
 		/// <remarks>Runtime: O(ln(n)), Omega(1).</remarks>
@@ -214,7 +200,8 @@ namespace Seven.Structures
 				index = parent;
 			}
 		}
-
+		#endregion
+		#region private void ShiftDown(int index)
 		/// <summary>Standard priority queue algorithm for sifting down.</summary>
 		/// <param name="index">The index to be down sifted.</param>
 		/// <remarks>Runtime: O(ln(n)), Omega(1).</remarks>
@@ -233,7 +220,8 @@ namespace Seven.Structures
 				index = down;
 			}
 		}
-
+		#endregion
+		#region private void ArraySwap(int indexOne, int indexTwo)
 		/// <summary>Standard array swap method.</summary>
 		/// <param name="indexOne">The first index of the swap.</param>
 		/// <param name="indexTwo">The second index of the swap.</param>
@@ -244,10 +232,128 @@ namespace Seven.Structures
 			this._heap[indexTwo] = this._heap[indexOne];
 			this._heap[indexOne] = temp;
 		}
-
+		#endregion
+		#region public void Clear()
 		/// <summary>Returns this queue to an empty state.</summary>
 		/// <remarks>Runtime: O(1).</remarks>
 		public void Clear() { this._count = 0; }
+		#endregion
+		#region public T[] ToArray()
+		/// <summary>Converts the heap into an array using pre-order traversal (WARNING: items are not ordered).</summary>
+		/// <returns>The array of priority-sorted items.</returns>
+		public T[] ToArray()
+		{
+			T[] array = new T[this._count];
+			for (int i = 1; i <= this._count; i++)
+				array[i] = this._heap[i];
+			return array;
+		}
+		#endregion
+		#region System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+		/// <summary>FOR COMPATIBILITY ONLY. AVOID IF POSSIBLE.</summary>
+		System.Collections.IEnumerator
+			System.Collections.IEnumerable.GetEnumerator()
+		{
+			for (int i = 0; i <= _count; i++)
+				yield return this._heap[i];
+		}
+		#endregion
+		#region System.Collections.Generic.IEnumerator<T> System.Collections.Generic.IEnumerable<T>.GetEnumerator()
+		/// <summary>FOR COMPATIBILITY ONLY. AVOID IF POSSIBLE.</summary>
+		System.Collections.Generic.IEnumerator<T>
+			System.Collections.Generic.IEnumerable<T>.GetEnumerator()
+		{
+			for (int i = 0; i <= _count; i++)
+				yield return this._heap[i];
+		}
+		#endregion
+		#region public bool Contains(T item, Compare<T> compare)
+		/// <summary>Checks to see if a given object is in this data structure.</summary>
+		/// <param name="item">The item to check for.</param>
+		/// <param name="compare">Delegate representing comparison technique.</param>
+		/// <returns>true if the item is in this structure; false if not.</returns>
+		public bool Contains(T item, Compare<T> compare)
+		{
+			for (int i = 1; i <= this._count; i++)
+				if (compare(this._heap[i], item) == Comparison.Equal)
+					return true;
+			return false;
+		}
+		#endregion
+		#region public bool Contains<Key>(Key key, Compare<T, Key> compare)
+		/// <summary>Checks to see if a given object is in this data structure.</summary>
+		/// <typeparam name="Key">The type of the key to check for.</typeparam>
+		/// <param name="key">The key to check for.</param>
+		/// <param name="compare">Delegate representing comparison technique.</param>
+		/// <returns>true if the item is in this structure; false if not.</returns>
+		public bool Contains<Key>(Key key, Compare<T, Key> compare)
+		{
+			for (int i = 1; i <= this._count; i++)
+				if (compare(this._heap[i], key) == Comparison.Equal)
+					return true;
+			return false;
+		}
+		#endregion
+		#region public void Stepper(Step<T> function)
+		/// <summary>Invokes a delegate for each entry in the data structure.</summary>
+		/// <param name="function">The delegate to invoke on each item in the structure.</param>
+		public void Stepper(Step<T> function)
+		{
+			for (int i = 1; i <= this._count; i++)
+				function(this._heap[i]);
+		}
+		#endregion
+		#region public void Stepper(StepRef<T> function)
+		/// <summary>Invokes a delegate for each entry in the data structure.</summary>
+		/// <param name="function">The delegate to invoke on each item in the structure.</param>
+		public void Stepper(StepRef<T> function)
+		{
+			for (int i = 1; i <= this._count; i++)
+				function(ref this._heap[i]);
+		}
+		#endregion
+		#region public StepStatus Stepper(StepBreak<T> function)
+		/// <summary>Invokes a delegate for each entry in the data structure.</summary>
+		/// <param name="function">The delegate to invoke on each item in the structure.</param>
+		/// <returns>The resulting status of the iteration.</returns>
+		public StepStatus Stepper(StepBreak<T> function)
+		{
+			for (int i = 1; i <= this._count; i++)
+				if (function(this._heap[i]) == StepStatus.Break)
+					return StepStatus.Break;
+			return StepStatus.Continue;
+		}
+		#endregion
+		#region public StepStatus Stepper(StepRefBreak<T> function)
+		/// <summary>Invokes a delegate for each entry in the data structure.</summary>
+		/// <param name="function">The delegate to invoke on each item in the structure.</param>
+		/// <returns>The resulting status of the iteration.</returns>
+		public StepStatus Stepper(StepRefBreak<T> function)
+		{
+			for (int i = 1; i <= this._count; i++)
+				if (function(ref this._heap[i]) == StepStatus.Break)
+					return StepStatus.Break;
+			return StepStatus.Continue;
+		}
+		#endregion
+		#region public Structure<T> Clone()
+		/// <summary>Creates a shallow clone of this data structure.</summary>
+		/// <returns>A shallow clone of this data structure.</returns>
+		public Structure<T> Clone()
+		{
+			HeapArray<T> clone =
+				new HeapArray<T>(this._compare);
+			T[] cloneItems = new T[this._heap.Length];
+			for (int i = 1; i <= this._count; i++)
+				cloneItems[i] = _heap[i];
+			clone._heap = cloneItems;
+			clone._count = this._count;
+			clone._minimumCapacity = this._minimumCapacity;
+			return clone;
+		}
+		#endregion
+
+		#region needs to be reviewed
 
 		///// <summary>Traversal function for a heap. Following a pre-order traversal.</summary>
 		///// <param name="traversalFunction">The function to perform per iteration.</param>
@@ -278,32 +384,6 @@ namespace Seven.Structures
 		//		traversalAction(_heapArray[i].Value);
 		//}
 
-		/// <summary>Converts the heap into an array using pre-order traversal (WARNING: items are not ordered).</summary>
-		/// <returns>The array of priority-sorted items.</returns>
-		public T[] ToArray()
-		{
-			T[] array = new T[this._count];
-			for (int i = 1; i <= this._count; i++)
-				array[i] = this._heap[i];
-			return array;
-		}
-
-		/// <summary>FOR COMPATIBILITY ONLY. AVOID IF POSSIBLE.</summary>
-		System.Collections.IEnumerator
-			System.Collections.IEnumerable.GetEnumerator()
-		{
-			for (int i = 0; i <= _count; i++)
-				yield return this._heap[i];
-		}
-
-		/// <summary>FOR COMPATIBILITY ONLY. AVOID IF POSSIBLE.</summary>
-		System.Collections.Generic.IEnumerator<T>
-			System.Collections.Generic.IEnumerable<T>.GetEnumerator()
-		{
-			for (int i = 0; i <= _count; i++)
-				yield return this._heap[i];
-		}
-
 		/// <summary>Pulls out all the values in the structure that are equivalent to the key.</summary>
 		/// <typeparam name="Key">The type of the key to check for.</typeparam>
 		/// <param name="key">The key to check for.</param>
@@ -320,86 +400,10 @@ namespace Seven.Structures
 		/// <returns>true if 1 or more values were found; false if no values were found.</returns>
 		//bool TryGetValues<Key>(Key key, Compare<Type, Key> compare, out Type[] values);
 
-		/// <summary>Checks to see if a given object is in this data structure.</summary>
-		/// <param name="item">The item to check for.</param>
-		/// <param name="compare">Delegate representing comparison technique.</param>
-		/// <returns>true if the item is in this structure; false if not.</returns>
-		public bool Contains(T item, Compare<T> compare)
-		{
-			for (int i = 1; i <= this._count; i++)
-				if (compare(this._heap[i], item) == Comparison.Equal)
-					return true;
-			return false;
-		}
-
-		/// <summary>Checks to see if a given object is in this data structure.</summary>
-		/// <typeparam name="Key">The type of the key to check for.</typeparam>
-		/// <param name="key">The key to check for.</param>
-		/// <param name="compare">Delegate representing comparison technique.</param>
-		/// <returns>true if the item is in this structure; false if not.</returns>
-		public bool Contains<Key>(Key key, Compare<T, Key> compare)
-		{
-			for (int i = 1; i <= this._count; i++)
-				if (compare(this._heap[i], key) == Comparison.Equal)
-					return true;
-			return false;
-		}
-
-		/// <summary>Invokes a delegate for each entry in the data structure.</summary>
-		/// <param name="function">The delegate to invoke on each item in the structure.</param>
-		public void Stepper(Step<T> function)
-		{
-			for (int i = 1; i <= this._count; i++)
-				function(this._heap[i]);
-		}
-
-		/// <summary>Invokes a delegate for each entry in the data structure.</summary>
-		/// <param name="function">The delegate to invoke on each item in the structure.</param>
-		public void Stepper(StepRef<T> function)
-		{
-			for (int i = 1; i <= this._count; i++)
-				function(ref this._heap[i]);
-		}
-
-		/// <summary>Invokes a delegate for each entry in the data structure.</summary>
-		/// <param name="function">The delegate to invoke on each item in the structure.</param>
-		/// <returns>The resulting status of the iteration.</returns>
-		public StepStatus Stepper(StepBreak<T> function)
-		{
-			for (int i = 1; i <= this._count; i++)
-				if (function(this._heap[i]) == StepStatus.Break)
-					return StepStatus.Break;
-			return StepStatus.Continue;
-		}
-
-		/// <summary>Invokes a delegate for each entry in the data structure.</summary>
-		/// <param name="function">The delegate to invoke on each item in the structure.</param>
-		/// <returns>The resulting status of the iteration.</returns>
-		public StepStatus Stepper(StepRefBreak<T> function)
-		{
-			for (int i = 1; i <= this._count; i++)
-				if (function(ref this._heap[i]) == StepStatus.Break)
-					return StepStatus.Break;
-			return StepStatus.Continue;
-		}
-
-		/// <summary>Creates a shallow clone of this data structure.</summary>
-		/// <returns>A shallow clone of this data structure.</returns>
-		public Structure<T> Clone()
-		{
-			Heap_Array<T> clone =
-				new Heap_Array<T>(this._compare);
-			T[] cloneItems = new T[this._heap.Length];
-			for (int i = 1; i <= this._count; i++)
-				cloneItems[i] = _heap[i];
-			clone._heap = cloneItems;
-			clone._count = this._count;
-			clone._minimumCapacity = this._minimumCapacity;
-			return clone;
-		}
-
 		#endregion
 	}
+
+	#region In Development
 
 	#region HeapLinkedStatic
 	/*
@@ -1318,5 +1322,7 @@ namespace Seven.Structures
 	//	}
 	//}
 	
+	#endregion
+
 	#endregion
 }

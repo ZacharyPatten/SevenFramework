@@ -4,6 +4,7 @@
 // SUPPORT: See "SUPPORT.md" in the root project directory.
 
 using System.Linq.Expressions;
+
 namespace Seven.Mathematics
 {
 	/// <summary>Represents a vector with an arbitrary number of components of a generic type.</summary>

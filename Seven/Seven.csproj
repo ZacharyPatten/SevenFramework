@@ -87,6 +87,7 @@
     <Compile Include="Algorithms\GraphSearch\AStar.cs" />
     <Compile Include="Algorithms\GraphSearch\Greedy.cs" />
     <Compile Include="Algorithms\Search.cs" />
+    <Compile Include="Construct.cs" />
     <Compile Include="Delegate.cs" />
     <Compile Include="Integer.cs" />
     <Compile Include="Logic\Logic.cs" />
@@ -94,7 +95,8 @@
     <Compile Include="Mathematics\Compute.cs" />
     <Compile Include="Mathematics\Constants.cs" />
     <Compile Include="Mathematics\Matrix.cs" />
-    <Compile Include="Mathematics\Space.cs" />
+    <Compile Include="Mathematics\SetTheory\PointRadius.cs" />
+    <Compile Include="Mathematics\SetTheory\Space.cs" />
     <Compile Include="Meta.cs" />
     <Compile Include="Diagnostics\Performance.cs" />
     <Compile Include="Equate.cs" />

@@ -10,108 +10,121 @@ namespace Seven.Structures
 	/// <typeparam name="M">The type of the axis dimensions to sort the "T" values upon.</typeparam>
 	public interface Octree<T, M> : Structure<T>
 	{
-		#region properties
-
+		// properties
+		#region M[] Origin
 		/// <summary>Gets the dimensions of the center point of the Octree.</summary>
 		M[] Origin { get; }
-
+		#endregion
+		#region M[] Min
 		/// <summary>The minimum dimensions of the Octree.</summary>
 		M[] Min { get; }
-
+		#endregion
+		#region M[] Max
 		/// <summary>The maximum dimensions of the Octree.</summary>
 		M[] Max { get; }
-
+		#endregion
+		#region Compare<M> Compare
 		/// <summary>The compare function the Octree is using.</summary>
 		Compare<M> Compare { get; }
-
+		#endregion
+		#region Octree.Locate<T, M> Locate
 		/// <summary>The location function the Octree is using.</summary>
 		Octree.Locate<T, M> Locate { get; }
-
+		#endregion
+		#region Octree.Average<M> Average
 		/// <summary>The average function the Octree is using.</summary>
 		Octree.Average<M> Average { get; }
-
+		#endregion
+		#region int Dimensions
 		/// <summary>The number of dimensions in this tree.</summary>
 		int Dimensions { get; }
-
+		#endregion
+		#region int Count
 		/// <summary>The current number of items in the tree.</summary>
 		int Count { get; }
-
 		#endregion
-
-		#region methods
-
+		// methods
+		#region void Add(T addition);
 		/// <summary>Adds an item to the tree.</summary>
 		/// <param name="addition">The item to be added.</param>
 		void Add(T addition);
-
+		#endregion
+		#region void Update();
 		/// <summary>Iterates through the entire tree and ensures each item is in the proper leaf.</summary>
 		void Update();
-
+		#endregion
+		#region void Update(M[] min, M[] max);
 		/// <summary>Iterates through the provided dimensions and ensures each item is in the proper leaf.</summary>
 		/// <param name="min">The minimum dimensions of the space to update.</param>
 		/// <param name="max">The maximum dimensions of the space to update.</param>
 		void Update(M[] min, M[] max);
-
+		#endregion
+		#region void Remove(M[] min, M[] max);
 		/// <summary>Removes all the items in a given space.</summary>
 		/// <param name="min">The minimum values of the space.</param>
 		/// <param name="max">The maximum values of the space.</param>
 		void Remove(M[] min, M[] max);
-
+		#endregion
+		#region void Remove(M[] min, M[] max, Predicate<T> where);
 		/// <summary>Removes all the items in a given space where equality is met.</summary>
 		/// <param name="min">The minimum values of the space.</param>
 		/// <param name="max">The maximum values of the space.</param>
 		/// <param name="where">The equality constraint of the removal.</param>
 		void Remove(M[] min, M[] max, Predicate<T> where);
-
+		#endregion
+		#region void Stepper(Step<T> function, M[] min, M[] max);
 		/// <summary>Performs and specialized traversal of the structure and performs a delegate on every node within the provided dimensions.</summary>
 		/// <param name="function">The delegate to perform on all items in the tree within the given bounds.</param>
 		/// <param name="min">The minimum dimensions of the traversal.</param>
 		/// <param name="max">The maximum dimensions of the traversal.</param>
 		void Stepper(Step<T> function, M[] min, M[] max);
-
+		#endregion
+		#region void Stepper(StepRef<T> function, M[] min, M[] max);
 		/// <summary>Performs and specialized traversal of the structure and performs a delegate on every node within the provided dimensions.</summary>
 		/// <param name="function">The delegate to perform on all items in the tree within the given bounds.</param>
 		/// <param name="min">The minimum dimensions of the traversal.</param>
 		/// <param name="max">The maximum dimensions of the traversal.</param>
 		void Stepper(StepRef<T> function, M[] min, M[] max);
-
+		#endregion
+		#region StepStatus Stepper(StepBreak<T> function, M[] min, M[] max);
 		/// <summary>Performs and specialized traversal of the structure and performs a delegate on every node within the provided dimensions.</summary>
 		/// <param name="function">The delegate to perform on all items in the tree within the given bounds.</param>
 		/// <param name="min">The minimum dimensions of the traversal.</param>
 		/// <param name="max">The maximum dimensions of the traversal.</param>
 		StepStatus Stepper(StepBreak<T> function, M[] min, M[] max);
-
+		#endregion
+		#region StepStatus Stepper(StepRefBreak<T> function, M[] min, M[] max);
 		/// <summary>Performs and specialized traversal of the structure and performs a delegate on every node within the provided dimensions.</summary>
 		/// <param name="function">The delegate to perform on all items in the tree within the given bounds.</param>
 		/// <param name="min">The minimum dimensions of the traversal.</param>
 		/// <param name="max">The maximum dimensions of the traversal.</param>
 		StepStatus Stepper(StepRefBreak<T> function, M[] min, M[] max);
-
+		#endregion
+		#region void Clear();
 		/// <summary>Returns the tree to an empty state.</summary>
 		void Clear();
-
 		#endregion
 	}
 
 	/// <summary>Extension class for the Octree interface.</summary>
 	public static class Octree
 	{
-		#region delegates
-
+		// delegates
+		#region public delegate void Locate<T, M>(T item, out M x, out M y, out M z);
 		/// <summary>Locates an item along the given dimensions.</summary>
 		/// <typeparam name="T">The type of the item to locate.</typeparam>
 		/// <typeparam name="M">The type of axis type of the Octree.</typeparam>
 		/// <param name="item">The item to be located.</param>
 		/// <param name="ms">The computed locations of the item.</param>
 		public delegate void Locate<T, M>(T item, out M x, out M y, out M z);
-
+		#endregion
+		#region public delegate M Average<M>(M left, M right);
 		/// <summary>Computes the average between two items.</summary>
 		/// <typeparam name="M">The type of items to average.</typeparam>
 		/// <param name="left">The first item of the average.</param>
 		/// <param name="right">The second item of the average.</param>
 		/// <returns>The computed average between the two items.</returns>
 		public delegate M Average<M>(M left, M right);
-
 		#endregion
 	}
 
@@ -119,7 +132,7 @@ namespace Seven.Structures
 	/// <typeparam name="T">The generice type of items to be stored in this octree.</typeparam>
 	/// <typeparam name="M">The type of the axis dimensions to sort the "T" values upon.</typeparam>
 	[System.Serializable]
-	public class Octree_Linked<T, M> : Octree<T, M>
+	public class OctreeLinked<T, M> : Octree<T, M>
 	{
 		#region class
 
@@ -180,13 +193,13 @@ namespace Seven.Structures
 		{
 			internal class Node
 			{
-				private Octree_Linked<T, M>.Node _value;
+				private OctreeLinked<T, M>.Node _value;
 				private Branch.Node _next;
 
-				public Octree_Linked<T, M>.Node Value { get { return this._value; } }
+				public OctreeLinked<T, M>.Node Value { get { return this._value; } }
 				public Branch.Node Next { get { return this._next; } set { this._next = value; } }
 
-				public Node(Octree_Linked<T, M>.Node value, Branch.Node next)
+				public Node(OctreeLinked<T, M>.Node value, Branch.Node next)
 				{
 					this._value = value;
 					this._next = next;
@@ -265,7 +278,7 @@ namespace Seven.Structures
 		/// <param name="locate">A function for locating an item along the provided dimensions.</param>
 		/// <param name="compare">A function for comparing two items of the types of the axis.</param>
 		/// <param name="average">A function for computing the average between two items of the axis types.</param>
-		public Octree_Linked(
+		public OctreeLinked(
 			M min_x, M min_y, M min_z,
 			M max_x, M max_y, M max_z,
 			Octree.Locate<T, M> locate,
@@ -275,10 +288,6 @@ namespace Seven.Structures
 			M[] min = new M[3] { min_x, min_y, min_z };
 			M[] max = new M[3] { max_x, max_y, max_z };
 
-			#region error
-#if no_error_checking
-			// nothing
-#else
 			// check the locate and compare delegates
 			if (locate == null)
 				throw new Error("null reference on location delegate during Octree construction");
@@ -305,8 +314,6 @@ namespace Seven.Structures
 			for (int i = 0; i < min.Length; i++)
 				if (compare(min[i], origin_test[i]) != Comparison.Less || compare(origin_test[i], max[i]) != Comparison.Less)
 					throw new Error("invalid average function. not all average values were computed to be between the min/max values.");
-#endif
-			#endregion
 
 			M[] origin = new M[min.Length];
 			for (int i = 0; i < min.Length; i++)
@@ -323,9 +330,9 @@ namespace Seven.Structures
 
 			this._load = _defaultLoad;
 			this._loadPlusOnePowered =
-				Octree_Linked<T, M>.Int_Power(this._load + 1, this._dimensions);
+				OctreeLinked<T, M>.Int_Power(this._load + 1, this._dimensions);
 			this._loadPowered =
-				Octree_Linked<T, M>.Int_Power(_load, _dimensions);
+				OctreeLinked<T, M>.Int_Power(_load, _dimensions);
 
 			this._origin = origin;
 
@@ -341,23 +348,17 @@ namespace Seven.Structures
 		/// <param name="addition">The item to be added.</param>
 		public void Add(T addition)
 		{
-			#region error
-#if no_error_checking
-			// nothing
-#else
 			if (this._count == int.MaxValue)
 				throw new Error("(Count == int.MaxValue) max Octree size reached (change ints to longs if you need to).");
-#endif
-			#endregion
 
 			// dynamic tree sizes
 			if (this._loadPlusOnePowered < this._count)
 			{
 				this._load++;
 				this._loadPlusOnePowered =
-					Octree_Linked<T, M>.Int_Power(this._load + 1, this._dimensions);
+					OctreeLinked<T, M>.Int_Power(this._load + 1, this._dimensions);
 				this._loadPowered =
-					Octree_Linked<T, M>.Int_Power(this._load, this._dimensions);
+					OctreeLinked<T, M>.Int_Power(this._load, this._dimensions);
 			}
 
 			M x, y, z;
@@ -410,7 +411,7 @@ namespace Seven.Structures
 				Leaf leaf = node as Leaf;
 				if (depth >= this._load || !(leaf.Count >= this._load))
 				{
-					Octree_Linked<T, M>.Leaf_Add(leaf, addition);
+					OctreeLinked<T, M>.Leaf_Add(leaf, addition);
 
 					this._previousAddition = leaf;
 					this._previousAdditionDepth = depth;
@@ -428,14 +429,8 @@ namespace Seven.Structures
 						this._locate(list.Value, out x, out y, out z);
 						M[] child_ms = new M[3] { x, y, z };
 
-						#region error
-#if no_error_checking
-						// nothing
-#else
 						if (child_ms == null || child_ms.Length != this._dimensions)
 							throw new Error("the location function for omnitree is invalid.");
-#endif
-						#endregion
 
 						if (EncapsulationCheck(growth.Min, growth.Max, child_ms))
 							Add(list.Value, growth, child_ms, depth);
@@ -465,7 +460,7 @@ namespace Seven.Structures
 				if (child_node == null)
 				{
 					Leaf leaf = GrowLeaf(branch, child);
-					Octree_Linked<T, M>.Leaf_Add(leaf, addition);
+					OctreeLinked<T, M>.Leaf_Add(leaf, addition);
 
 					this._previousAddition = leaf;
 					this._previousAdditionDepth = depth + 1;
@@ -556,9 +551,9 @@ namespace Seven.Structures
 			{
 				this._load--;
 				this._loadPlusOnePowered =
-					Octree_Linked<T, M>.Int_Power(_load + 1, _dimensions);
+					OctreeLinked<T, M>.Int_Power(_load + 1, _dimensions);
 				this._loadPowered =
-					Octree_Linked<T, M>.Int_Power(_load, _dimensions);
+					OctreeLinked<T, M>.Int_Power(_load, _dimensions);
 			}
 
 			this._previousAddition = this._top;
@@ -630,9 +625,9 @@ namespace Seven.Structures
 			{
 				this._load--;
 				this._loadPlusOnePowered =
-					Octree_Linked<T, M>.Int_Power(_load + 1, _dimensions);
+					OctreeLinked<T, M>.Int_Power(_load + 1, _dimensions);
 				this._loadPowered =
-					Octree_Linked<T, M>.Int_Power(_load, _dimensions);
+					OctreeLinked<T, M>.Int_Power(_load, _dimensions);
 			}
 
 			this._previousAddition = this._top;
@@ -763,9 +758,9 @@ namespace Seven.Structures
 			{
 				this._load--;
 				this._loadPlusOnePowered =
-					Octree_Linked<T, M>.Int_Power(_load + 1, _dimensions);
+					OctreeLinked<T, M>.Int_Power(_load + 1, _dimensions);
 				this._loadPowered =
-					Octree_Linked<T, M>.Int_Power(_load, _dimensions);
+					OctreeLinked<T, M>.Int_Power(_load, _dimensions);
 			}
 
 			this._previousAddition = this._top;
@@ -1326,12 +1321,8 @@ namespace Seven.Structures
 					this._locate(list.Value, out x, out y, out z);
 					M[] ms = new M[3] { x, y, z };
 
-#if no_error_checking
-					// nothing
-#else
 					if (ms == null || ms.Length != this._dimensions)
 						throw new Error("the location function for omnitree is invalid.");
-#endif
 
 					if (EncapsulationCheck(min, max, ms))
 						function(list.Value);
@@ -1372,12 +1363,8 @@ namespace Seven.Structures
 					this._locate(list.Value, out x, out y, out z);
 					M[] ms = new M[3] { x, y, z };
 
-#if no_error_checking
-					// nothing
-#else
 					if (ms == null || ms.Length != this._dimensions)
 						throw new Error("the location function for omnitree is invalid.");
-#endif
 
 					if (EncapsulationCheck(min, max, ms))
 						function(ref list._value);
@@ -1417,14 +1404,8 @@ namespace Seven.Structures
 					this._locate(list.Value, out x, out y, out z);
 					M[] ms = new M[3] { x, y, z };
 
-					#region error
-#if no_error_checking
-					// nothing
-#else
 					if (ms == null || ms.Length != this._dimensions)
 						throw new Error("the location function for omnitree is invalid.");
-#endif
-					#endregion
 
 					if (EncapsulationCheck(min, max, ms))
 						if (function(list.Value) == StepStatus.Break)
@@ -1460,14 +1441,8 @@ namespace Seven.Structures
 					this._locate(list.Value, out x, out y, out z);
 					M[] ms = new M[3] { x, y, z };
 
-					#region error
-#if no_error_checking
-					// nothing
-#else
 					if (ms == null || ms.Length != this._dimensions)
 						throw new Error("the location function for omnitree is invalid.");
-#endif
-					#endregion
 
 					if (EncapsulationCheck(min, max, ms))
 						if (function(ref list._value) == StepStatus.Break)
@@ -1515,7 +1490,7 @@ namespace Seven.Structures
 		public Structure<T> Clone()
 		{
 			// OPTIMIZATION NEEDED
-			Octree_Array<T, M> clone = new Octree_Array<T, M>(
+			OctreeArray<T, M> clone = new OctreeArray<T, M>(
 				this._top.Min[0], this._top.Min[1], this._top.Min[2],
 				this._top.Max[0], this._top.Max[1], this._top.Max[2],
 				this._locate,
@@ -1533,9 +1508,9 @@ namespace Seven.Structures
 
 			this._load = _defaultLoad;
 			this._loadPlusOnePowered =
-				Octree_Linked<T, M>.Int_Power(this._load + 1, this._dimensions);
+				OctreeLinked<T, M>.Int_Power(this._load + 1, this._dimensions);
 			this._loadPowered =
-				Octree_Linked<T, M>.Int_Power(_load, _dimensions);
+				OctreeLinked<T, M>.Int_Power(_load, _dimensions);
 		}
 
 		#endregion
@@ -1545,7 +1520,7 @@ namespace Seven.Structures
 	/// <typeparam name="T">The generice type of items to be stored in this octree.</typeparam>
 	/// <typeparam name="M">The type of the axis dimensions to sort the "T" values upon.</typeparam>
 	[System.Serializable]
-	public class Octree_Array<T, M> : Octree<T, M>
+	public class OctreeArray<T, M> : Octree<T, M>
 	{
 		#region class
 
@@ -1668,7 +1643,7 @@ namespace Seven.Structures
 		/// <param name="locate">A function for locating an item along the provided dimensions.</param>
 		/// <param name="compare">A function for comparing two items of the types of the axis.</param>
 		/// <param name="average">A function for computing the average between two items of the axis types.</param>
-		public Octree_Array(
+		public OctreeArray(
 			M min_x, M min_y, M min_z,
 			M max_x, M max_y, M max_z,
 			Octree.Locate<T, M> locate,
@@ -1716,9 +1691,9 @@ namespace Seven.Structures
 
 			this._load = _defaultLoad;
 			this._loadPlusOnePowered =
-				Octree_Array<T, M>.Int_Power(this._load + 1, this._dimensions);
+				OctreeArray<T, M>.Int_Power(this._load + 1, this._dimensions);
 			this._loadPowered =
-				Octree_Array<T, M>.Int_Power(_load, _dimensions);
+				OctreeArray<T, M>.Int_Power(_load, _dimensions);
 
 			this._origin = origin;
 
@@ -1742,9 +1717,9 @@ namespace Seven.Structures
 			{
 				this._load++;
 				this._loadPlusOnePowered =
-					Octree_Array<T, M>.Int_Power(this._load + 1, this._dimensions);
+					OctreeArray<T, M>.Int_Power(this._load + 1, this._dimensions);
 				this._loadPowered =
-					Octree_Array<T, M>.Int_Power(this._load, this._dimensions);
+					OctreeArray<T, M>.Int_Power(this._load, this._dimensions);
 			}
 
 			M x, y, z;
@@ -1800,7 +1775,7 @@ namespace Seven.Structures
 				Leaf leaf = node as Leaf;
 				if (depth >= this._load || !(leaf.Count >= this._load))
 				{
-					Octree_Array<T, M>.Leaf_Add(leaf, addition);
+					OctreeArray<T, M>.Leaf_Add(leaf, addition);
 
 					this._previousAddition = leaf;
 					this._previousAdditionDepth = depth;
@@ -1849,7 +1824,7 @@ namespace Seven.Structures
 				if (child_node == null)
 				{
 					Leaf leaf = GrowLeaf(branch, child);
-					Octree_Array<T, M>.Leaf_Add(leaf, addition);
+					OctreeArray<T, M>.Leaf_Add(leaf, addition);
 
 					this._previousAddition = leaf;
 					this._previousAdditionDepth = depth + 1;
@@ -1985,9 +1960,9 @@ namespace Seven.Structures
 			{
 				this._load--;
 				this._loadPlusOnePowered =
-					Octree_Array<T, M>.Int_Power(_load + 1, _dimensions);
+					OctreeArray<T, M>.Int_Power(_load + 1, _dimensions);
 				this._loadPowered =
-					Octree_Array<T, M>.Int_Power(_load, _dimensions);
+					OctreeArray<T, M>.Int_Power(_load, _dimensions);
 			}
 
 			this._previousAddition = this._top;
@@ -2059,9 +2034,9 @@ namespace Seven.Structures
 			{
 				this._load--;
 				this._loadPlusOnePowered =
-					Octree_Array<T, M>.Int_Power(_load + 1, _dimensions);
+					OctreeArray<T, M>.Int_Power(_load + 1, _dimensions);
 				this._loadPowered =
-					Octree_Array<T, M>.Int_Power(_load, _dimensions);
+					OctreeArray<T, M>.Int_Power(_load, _dimensions);
 			}
 
 			this._previousAddition = this._top;
@@ -2190,9 +2165,9 @@ namespace Seven.Structures
 			{
 				this._load--;
 				this._loadPlusOnePowered =
-					Octree_Array<T, M>.Int_Power(_load + 1, _dimensions);
+					OctreeArray<T, M>.Int_Power(_load + 1, _dimensions);
 				this._loadPowered =
-					Octree_Array<T, M>.Int_Power(_load, _dimensions);
+					OctreeArray<T, M>.Int_Power(_load, _dimensions);
 			}
 
 			this._previousAddition = this._top;
@@ -2884,7 +2859,7 @@ namespace Seven.Structures
 		public Structure<T> Clone()
 		{
 			// OPTIMIZATION NEEDED
-			Octree_Array<T, M> clone = new Octree_Array<T, M>(
+			OctreeArray<T, M> clone = new OctreeArray<T, M>(
 				this._top.Min[0], this._top.Min[1], this._top.Min[2],
 				this._top.Max[0], this._top.Max[1], this._top.Max[2],
 				this._locate,
@@ -2902,9 +2877,9 @@ namespace Seven.Structures
 
 			this._load = _defaultLoad;
 			this._loadPlusOnePowered =
-				Octree_Array<T, M>.Int_Power(this._load + 1, this._dimensions);
+				OctreeArray<T, M>.Int_Power(this._load + 1, this._dimensions);
 			this._loadPowered =
-				Octree_Array<T, M>.Int_Power(_load, _dimensions);
+				OctreeArray<T, M>.Int_Power(_load, _dimensions);
 		}
 
 		#endregion

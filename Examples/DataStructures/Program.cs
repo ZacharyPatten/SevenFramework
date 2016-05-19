@@ -33,11 +33,11 @@ namespace Testing
 			link.Stepper((dynamic current) => { Console.Write(current); });
 			Console.WriteLine();
 			// Saving to a file
-			string linklink_file = "link." + ToExtension(link.GetType());
-			Console.WriteLine("    File: \"" + linklink_file + "\"");
-			Console.WriteLine("    Serialized: " + Serialize(linklink_file, link));
-			Link<int, int, int, int, int, int> deserialized_linklink;
-			Console.WriteLine("    Deserialized: " + Deserialize(linklink_file, out deserialized_linklink));
+			//string linklink_file = "link." + ToExtension(link.GetType());
+			//Console.WriteLine("    File: \"" + linklink_file + "\"");
+			//Console.WriteLine("    Serialized: " + Serialize(linklink_file, link));
+			//Link<int, int, int, int, int, int> deserialized_linklink;
+			//Console.WriteLine("    Deserialized: " + Deserialize(linklink_file, out deserialized_linklink));
 			Console.WriteLine();
 
 			#endregion
@@ -45,18 +45,18 @@ namespace Testing
 			#region Array
 
 			Console.WriteLine("  Testing Array_Array<int>-------------------");
-			Array<int> array = new Array_Array<int>(test);
+			Array<int> array = new ArrayArray<int>(test);
 			for (int i = 0; i < test; i++)
 				array[i] = i;
 			Console.Write("    Traversal: ");
 			array.Stepper((int current) => { Console.Write(current); });
 			Console.WriteLine();
 			// Saving to a file
-			string arrayarray_file = "array." + ToExtension(array.GetType());
-			Console.WriteLine("    File: \"" + arrayarray_file + "\"");
-			Console.WriteLine("    Serialized: " + Serialize(arrayarray_file, array));
-			Array_Array<int> deserialized_arrayarray;
-			Console.WriteLine("    Deserialized: " + Deserialize(arrayarray_file, out deserialized_arrayarray));
+			//string arrayarray_file = "array." + ToExtension(array.GetType());
+			//Console.WriteLine("    File: \"" + arrayarray_file + "\"");
+			//Console.WriteLine("    Serialized: " + Serialize(arrayarray_file, array));
+			//ArrayArray<int> deserialized_arrayarray;
+			//Console.WriteLine("    Deserialized: " + Deserialize(arrayarray_file, out deserialized_arrayarray));
 			Console.WriteLine();
 
 			#endregion
@@ -64,33 +64,33 @@ namespace Testing
 			#region List
 
 			Console.WriteLine("  Testing List_Array<int>--------------------");
-			List<int> list_array = new List_Array<int>(test);
+			List<int> list_array = new ListArray<int>(test);
 			for (int i = 0; i < test; i++)
 				list_array.Add(i);
 			Console.Write("    Traversal: ");
 			list_array.Stepper((int current) => { Console.Write(current); });
 			Console.WriteLine();
 			// Saving to a file
-			string listarray_file = "list_array." + ToExtension(list_array.GetType());
-			Console.WriteLine("    File: \"" + listarray_file + "\"");
-			Console.WriteLine("    Serialized: " + Serialize(listarray_file, list_array));
-			List_Array<int> deserialized_listarray;
-			Console.WriteLine("    Deserialized: " + Deserialize(listarray_file, out deserialized_listarray));
+			//string listarray_file = "list_array." + ToExtension(list_array.GetType());
+			//Console.WriteLine("    File: \"" + listarray_file + "\"");
+			//Console.WriteLine("    Serialized: " + Serialize(listarray_file, list_array));
+			//ListArray<int> deserialized_listarray;
+			//Console.WriteLine("    Deserialized: " + Deserialize(listarray_file, out deserialized_listarray));
 			Console.WriteLine();
 
 			Console.WriteLine("  Testing List_Linked<int>-------------------");
-			List<int> list_linked = new List_Linked<int>();
+			List<int> list_linked = new ListLinked<int>();
 			for (int i = 0; i < test; i++)
 				list_linked.Add(i);
 			Console.Write("    Traversal: ");
 			list_linked.Stepper((int current) => { Console.Write(current); });
 			Console.WriteLine();
 			// Saving to a file
-			string listlinked_file = "list_linked." + ToExtension(list_linked.GetType());
-			Console.WriteLine("    File: \"" + listlinked_file + "\"");
-			Console.WriteLine("    Serialized: " + Serialize(listlinked_file, list_linked));
-			List_Linked<int> deserialized_listlinked;
-			Console.WriteLine("    Deserialized: " + Deserialize(listlinked_file, out deserialized_listlinked));
+			//string listlinked_file = "list_linked." + ToExtension(list_linked.GetType());
+			//Console.WriteLine("    File: \"" + listlinked_file + "\"");
+			//Console.WriteLine("    Serialized: " + Serialize(listlinked_file, list_linked));
+			//ListLinked<int> deserialized_listlinked;
+			//Console.WriteLine("    Deserialized: " + Deserialize(listlinked_file, out deserialized_listlinked));
 			Console.WriteLine();
 
 			#endregion
@@ -98,18 +98,18 @@ namespace Testing
 			#region Stack
 
 			Console.WriteLine("  Testing Stack_Linked<int>------------------");
-			Stack<int> stack_linked = new Stack_Linked<int>();
+			Stack<int> stack_linked = new StackLinked<int>();
 			for (int i = 0; i < test; i++)
 				stack_linked.Push(i);
 			Console.Write("    Traversal: ");
 			stack_linked.Stepper((int current) => { Console.Write(current); });
 			Console.WriteLine();
 			// Saving to a file
-			string stacklinked_file = "stack_linked." + ToExtension(stack_linked.GetType());
-			Console.WriteLine("    File: \"" + stacklinked_file + "\"");
-			Console.WriteLine("    Serialized: " + Serialize(stacklinked_file, stack_linked));
-			Stack_Linked<int> deserialized_stacklinked;
-			Console.WriteLine("    Deserialized: " + Deserialize(stacklinked_file, out deserialized_stacklinked));
+			//string stacklinked_file = "stack_linked." + ToExtension(stack_linked.GetType());
+			//Console.WriteLine("    File: \"" + stacklinked_file + "\"");
+			//Console.WriteLine("    Serialized: " + Serialize(stacklinked_file, stack_linked));
+			//StackLinked<int> deserialized_stacklinked;
+			//Console.WriteLine("    Deserialized: " + Deserialize(stacklinked_file, out deserialized_stacklinked));
 			Console.WriteLine();
 
 			#endregion
@@ -117,18 +117,18 @@ namespace Testing
 			#region Queue
 
 			Console.WriteLine("  Testing Queue_Linked<int>------------------");
-			Queue<int> queue_linked = new Queue_Linked<int>();
+			Queue<int> queue_linked = new QueueLinked<int>();
 			for (int i = 0; i < test; i++)
 				queue_linked.Enqueue(i);
 			Console.Write("    Traversal: ");
 			queue_linked.Stepper((int current) => { Console.Write(current); });
 			Console.WriteLine();
 			// Saving to a file
-			string queuelinked_file = "queue_linked." + ToExtension(queue_linked.GetType());
-			Console.WriteLine("    File: \"" + queuelinked_file + "\"");
-			Console.WriteLine("    Serialized: " + Serialize(queuelinked_file, queue_linked));
-			Queue_Linked<int> deserialized_queuelinked;
-			Console.WriteLine("    Deserialized: " + Deserialize(queuelinked_file, out deserialized_queuelinked));
+			//string queuelinked_file = "queue_linked." + ToExtension(queue_linked.GetType());
+			//Console.WriteLine("    File: \"" + queuelinked_file + "\"");
+			//Console.WriteLine("    Serialized: " + Serialize(queuelinked_file, queue_linked));
+			//QueueLinked<int> deserialized_queuelinked;
+			//Console.WriteLine("    Deserialized: " + Deserialize(queuelinked_file, out deserialized_queuelinked));
 			Console.WriteLine();
 
 			#endregion
@@ -136,18 +136,18 @@ namespace Testing
 			#region Heap
 
 			Console.WriteLine("  Testing Heap_Array<int>--------------------");
-			Heap<int> heap_array = new Heap_Array<int>(Compute<int>.Compare);
+			Heap<int> heap_array = new HeapArray<int>(Compute<int>.Compare);
 			for (int i = 0; i < test; i++)
 				heap_array.Enqueue(i);
 			Console.Write("    Delegate: ");
 			heap_array.Stepper((int current) => { Console.Write(current); });
 			Console.WriteLine();
 			// Saving to a file
-			string heaplinked_file = "heap_array." + ToExtension(heap_array.GetType());
-			Console.WriteLine("    File: \"" + heaplinked_file + "\"");
-			Console.WriteLine("    Serialized: " + Serialize(heaplinked_file, heap_array));
-			Heap_Array<int> deserialized_heaplinked;
-			Console.WriteLine("    Deserialized: " + Deserialize(heaplinked_file, out deserialized_heaplinked));
+			//string heaplinked_file = "heap_array." + ToExtension(heap_array.GetType());
+			//Console.WriteLine("    File: \"" + heaplinked_file + "\"");
+			//Console.WriteLine("    Serialized: " + Serialize(heaplinked_file, heap_array));
+			//HeapArray<int> deserialized_heaplinked;
+			//Console.WriteLine("    Deserialized: " + Deserialize(heaplinked_file, out deserialized_heaplinked));
 			Console.WriteLine();
 
 			#endregion
@@ -155,7 +155,7 @@ namespace Testing
 			#region Tree
 
 			Console.WriteLine("  Testing Tree_Map<int>----------------------");
-			Tree<int> tree_Map = new Tree_Map<int>(0, Compute<int>.Equate, Hash.Default);
+			Tree<int> tree_Map = new TreeMap<int>(0, Compute<int>.Equate, Hash.Default);
 			for (int i = 1; i < test; i++)
 				tree_Map.Add(i, i / (int)System.Math.Sqrt(test));
 			Console.Write("    Children of 0 (root): ");
@@ -168,11 +168,11 @@ namespace Testing
 			tree_Map.Stepper((int i) => { Console.Write(i + " "); });
 			Console.WriteLine();
 			// Saving to a file
-			string treelinked_file = "tree_Map." + ToExtension(tree_Map.GetType());
-			Console.WriteLine("    File: \"" + treelinked_file + "\"");
-			Console.WriteLine("    Serialized: " + Serialize(treelinked_file, tree_Map));
-			Tree_Map<int> deserialized_treelinked;
-			Console.WriteLine("    Deserialized: " + Deserialize(treelinked_file, out deserialized_treelinked));
+			//string treelinked_file = "tree_Map." + ToExtension(tree_Map.GetType());
+			//Console.WriteLine("    File: \"" + treelinked_file + "\"");
+			//Console.WriteLine("    Serialized: " + Serialize(treelinked_file, tree_Map));
+			//TreeMap<int> deserialized_treelinked;
+			//Console.WriteLine("    Deserialized: " + Deserialize(treelinked_file, out deserialized_treelinked));
 			Console.WriteLine();
 
 			#endregion
@@ -219,18 +219,18 @@ namespace Testing
 			#region Red-Black Tree
 
 			Console.WriteLine("  Testing RedBlack_Linked<int>---------------");
-			RedBlackTree<int> redBlackTree_linked = new RedBlackTree_Linked<int>(Compute<int>.Compare);
+			RedBlackTree<int> redBlackTree_linked = new RedBlackTreeLinked<int>(Compute<int>.Compare);
 			for (int i = 0; i < test; i++)
 				redBlackTree_linked.Add(i);
 			Console.Write("    Traversal: ");
 			redBlackTree_linked.Stepper((int current) => { Console.Write(current); });
 			Console.WriteLine();
 			// Saving to a file
-			string redblacktreelinked_file = "redBlackTree_linked." + ToExtension(redBlackTree_linked.GetType());
-			Console.WriteLine("    File: \"" + redblacktreelinked_file + "\"");
-			Console.WriteLine("    Serialized: " + Serialize(redblacktreelinked_file, redBlackTree_linked));
-			RedBlackTree_Linked<int> deserialized_redblacktreelinked;
-			Console.WriteLine("    Deserialized: " + Deserialize(redblacktreelinked_file, out deserialized_redblacktreelinked));
+			//string redblacktreelinked_file = "redBlackTree_linked." + ToExtension(redBlackTree_linked.GetType());
+			//Console.WriteLine("    File: \"" + redblacktreelinked_file + "\"");
+			//Console.WriteLine("    Serialized: " + Serialize(redblacktreelinked_file, redBlackTree_linked));
+			//RedBlackTreeLinked<int> deserialized_redblacktreelinked;
+			//Console.WriteLine("    Deserialized: " + Deserialize(redblacktreelinked_file, out deserialized_redblacktreelinked));
 			Console.WriteLine();
 
 			#endregion
@@ -259,26 +259,38 @@ namespace Testing
 
 			#endregion
 
-			#region Map
-			
-			Console.WriteLine("  Testing Map_Linked<int, int>---------------");
-			Map<int, int> map_linked = new Map_Linked<int, int>(Compute<int>.Equate, Hash.Default);
+			#region Set
+
+			Console.WriteLine("  Testing Set_Hash<int>----------------------");
+			Set<int> set_linked = new SetHashList<int>(Compute<int>.Equate, Hash.Default);
 			for (int i = 0; i < test; i++)
-				map_linked.Add(i, i);
+				set_linked.Add(i);
+			// Traversal
+			Console.Write("    Traversal: ");
+			set_linked.Stepper((int current) => { Console.Write(current); });
+			Console.WriteLine();
+			Console.Write("    Table Size: " + (set_linked as SetHashList<int>).TableSize);
+			Console.WriteLine();
+			Console.WriteLine();
+
+			#endregion
+
+			#region Map
+
+			Console.WriteLine("  Testing MapHashList<int, int>--------------");
+			Map<int, int> map_sethash = new MapHashLinked<int, int>(Compute<int>.Equate, Hash.Default);
+			for (int i = 0; i < test; i++)
+				map_sethash.Add(i, i);
 			Console.Write("    Look Ups: ");
 			for (int i = 0; i < test; i++)
-				Console.Write(map_linked[i]);
+				Console.Write(map_sethash[i]);
 			Console.WriteLine();
 			// Traversal
 			Console.Write("    Traversal: ");
-			map_linked.Stepper((int current) => { Console.Write(current); });
+			map_sethash.Stepper((int current) => { Console.Write(current); });
 			Console.WriteLine();
-			// Saving to a file
-			string maplinked_file = "map_linked." + ToExtension(map_linked.GetType());
-			Console.WriteLine("    File: \"" + maplinked_file + "\"");
-			Console.WriteLine("    Serialized: " + Serialize(maplinked_file, map_linked));
-			Map_Linked<int, int> deserialized_maplinked;
-			Console.WriteLine("    Deserialized: " + Deserialize(maplinked_file, out deserialized_maplinked));
+			Console.Write("    Table Size: " + (map_sethash as MapHashLinked<int, int>).TableSize);
+			Console.WriteLine();
 			Console.WriteLine();
 
 			#endregion
@@ -367,7 +379,7 @@ namespace Testing
 
 			Console.WriteLine("  Testing Omnitree_LinkedLinkedLists<int, double>-------");
 			// Construction
-			Omnitree<int, double> omnitree_linked = new Omnitree_LinkedLinkedLists<int, double>(
+			Omnitree<int, double> omnitree_linked = new OmnitreeLinkedLinkedLists<int, double>(
 				new double[] { -test - 1, -test - 1, -test - 1 }, // minimum dimensions of the omnitree
 				new double[] { test + 1, test + 1, test + 1 }, // maximum dimensions of the omnitree
 				(int index) => { return Accessor.Get(new double[] { index, index, index }); }, // "N-D" location function
@@ -411,16 +423,16 @@ namespace Testing
 			Console.WriteLine();
 			Console.WriteLine("      Count: " + omnitree_linked.Count);
 			// Saving to a file
-			string omnitreelinked_file = "omnitree_linkedlinkedlists." + ToExtension(omnitree_linked.GetType());
-			Console.WriteLine("    File: \"" + omnitreelinked_file + "\"");
-			Console.WriteLine("    Serialized: " + Serialize(omnitreelinked_file, omnitree_linked));
-			Omnitree_LinkedLinkedLists<int, double> deserialized_omnitreeLinked;
-			Console.WriteLine("    Deserialized: " + Deserialize(omnitreelinked_file, out deserialized_omnitreeLinked));
+			//string omnitreelinked_file = "omnitree_linkedlinkedlists." + ToExtension(omnitree_linked.GetType());
+			//Console.WriteLine("    File: \"" + omnitreelinked_file + "\"");
+			//Console.WriteLine("    Serialized: " + Serialize(omnitreelinked_file, omnitree_linked));
+			//OmnitreeLinkedLinkedLists<int, double> deserialized_omnitreeLinked;
+			//Console.WriteLine("    Deserialized: " + Deserialize(omnitreelinked_file, out deserialized_omnitreeLinked));
 			Console.WriteLine();
 
 			Console.WriteLine("  Testing Omnitree_LinkedArrayLists<int, double>--------");
 			// Construction
-			Omnitree<int, double> omnitree_array = new Omnitree_LinkedArrayLists<int, double>(
+			Omnitree<int, double> omnitree_array = new OmnitreeLinkedArrayLists<int, double>(
 				new double[] { -test - 1, -test - 1, -test - 1 }, // minimum dimensions of the omnitree
 				new double[] { test + 1, test + 1, test + 1 }, // maximum dimensions of the omnitree
 				(int index) => { return Accessor.Get(new double[] { index, index, index }); }, // "N-D" location function
@@ -464,11 +476,11 @@ namespace Testing
 			Console.WriteLine();
 			Console.WriteLine("      Count: " + omnitree_array.Count);
 			// Saving to a file
-			string omnitreearray_file = "omnitree_linkedarraylists." + ToExtension(omnitree_array.GetType());
-			Console.WriteLine("    File: \"" + omnitreearray_file + "\"");
-			Console.WriteLine("    Serialized: " + Serialize(omnitreearray_file, omnitree_array));
-			Omnitree_LinkedLinkedLists<int, double> deserialized_omnitreearray;
-			Console.WriteLine("    Deserialized: " + Deserialize(omnitreearray_file, out deserialized_omnitreearray));
+			//string omnitreearray_file = "omnitree_linkedarraylists." + ToExtension(omnitree_array.GetType());
+			//Console.WriteLine("    File: \"" + omnitreearray_file + "\"");
+			//Console.WriteLine("    Serialized: " + Serialize(omnitreearray_file, omnitree_array));
+			//OmnitreeLinkedLinkedLists<int, double> deserialized_omnitreearray;
+			//Console.WriteLine("    Deserialized: " + Deserialize(omnitreearray_file, out deserialized_omnitreearray));
 			Console.WriteLine();
 
 			#endregion
@@ -527,7 +539,7 @@ namespace Testing
 			#region Graph
 
 			Console.WriteLine("  Testing Graph_SetOmnitree<int>-------------");
-			Graph<int> graph = new Graph_SetOmnitree<int>(Compute<int>.Equate, Compute<int>.Compare, Hash.Default, 0, test, (int a, int b) => { return (a + b) / 2; });
+			Graph<int> graph = new GraphSetOmnitree<int>(Compute<int>.Equate, Compute<int>.Compare, Hash.Default, 0, test, (int a, int b) => { return (a + b) / 2; });
 			// add nodes
 			for (int i = 0; i < test; i++)
 				graph.Add(i);
@@ -551,11 +563,11 @@ namespace Testing
 						Console.WriteLine();
 					});
 			// Saving to a file
-			string graph_file = "graph." + ToExtension(graph.GetType());
-			Console.WriteLine("    File: \"" + graph_file + "\"");
-			Console.WriteLine("    Serialized: " + Serialize(graph_file, graph));
-			Graph_SetOmnitree<int> deserialized_graph;
-			Console.WriteLine("    Deserialized: " + Deserialize(graph_file, out deserialized_graph));
+			//string graph_file = "graph." + ToExtension(graph.GetType());
+			//Console.WriteLine("    File: \"" + graph_file + "\"");
+			//Console.WriteLine("    Serialized: " + Serialize(graph_file, graph));
+			//GraphSetOmnitree<int> deserialized_graph;
+			//Console.WriteLine("    Deserialized: " + Deserialize(graph_file, out deserialized_graph));
 			Console.WriteLine();
 
 			#endregion

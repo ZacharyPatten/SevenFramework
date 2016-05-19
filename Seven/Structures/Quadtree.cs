@@ -119,7 +119,7 @@ namespace Seven.Structures
 	/// <typeparam name="T">The generice type of items to be stored in this octree.</typeparam>
 	/// <typeparam name="M">The type of the axis dimensions to sort the "T" values upon.</typeparam>
 	[System.Serializable]
-	public class Quadtree_Linked<T, M> : Quadtree<T, M>
+	public class QuadtreeLinked<T, M> : Quadtree<T, M>
 	{
 		#region class
 
@@ -180,13 +180,13 @@ namespace Seven.Structures
 		{
 			internal class Node
 			{
-				private Quadtree_Linked<T, M>.Node _value;
+				private QuadtreeLinked<T, M>.Node _value;
 				private Branch.Node _next;
 
-				public Quadtree_Linked<T, M>.Node Value { get { return this._value; } }
+				public QuadtreeLinked<T, M>.Node Value { get { return this._value; } }
 				public Branch.Node Next { get { return this._next; } set { this._next = value; } }
 
-				public Node(Quadtree_Linked<T, M>.Node value, Branch.Node next)
+				public Node(QuadtreeLinked<T, M>.Node value, Branch.Node next)
 				{
 					this._value = value;
 					this._next = next;
@@ -265,7 +265,7 @@ namespace Seven.Structures
 		/// <param name="locate">A function for locating an item along the provided dimensions.</param>
 		/// <param name="compare">A function for comparing two items of the types of the axis.</param>
 		/// <param name="average">A function for computing the average between two items of the axis types.</param>
-		public Quadtree_Linked(
+		public QuadtreeLinked(
 			M min_x, M min_y,
 			M max_x, M max_y,
 			Quadtree.Locate<T, M> locate,
@@ -275,10 +275,6 @@ namespace Seven.Structures
 			M[] min = new M[2] { min_x, min_y, };
 			M[] max = new M[2] { max_x, max_y, };
 
-			#region error
-#if no_error_checking
-			// nothing
-#else
 			// check the locate and compare delegates
 			if (locate == null)
 				throw new Error("null reference on location delegate during Quadtree construction");
@@ -305,8 +301,6 @@ namespace Seven.Structures
 			for (int i = 0; i < min.Length; i++)
 				if (compare(min[i], origin2[i]) != Comparison.Less || compare(origin2[i], max[i]) != Comparison.Less)
 					throw new Error("invalid average function. not all average values were computed to be between the min/max values.");
-#endif
-			#endregion
 
 			M[] origin = new M[min.Length];
 			for (int i = 0; i < min.Length; i++)
@@ -323,9 +317,9 @@ namespace Seven.Structures
 
 			this._load = _defaultLoad;
 			this._loadPlusOnePowered =
-				Quadtree_Linked<T, M>.Int_Power(this._load + 1, this._dimensions);
+				QuadtreeLinked<T, M>.Int_Power(this._load + 1, this._dimensions);
 			this._loadPowered =
-				Quadtree_Linked<T, M>.Int_Power(_load, _dimensions);
+				QuadtreeLinked<T, M>.Int_Power(_load, _dimensions);
 
 			this._origin = origin;
 
@@ -341,23 +335,17 @@ namespace Seven.Structures
 		/// <param name="addition">The item to be added.</param>
 		public void Add(T addition)
 		{
-			#region error
-#if no_error_checking
-			// nothing
-#else
 			if (this._count == int.MaxValue)
 				throw new Error("(Count == int.MaxValue) max Quadtree size reached (change ints to longs if you need to).");
-#endif
-			#endregion
 
 			// dynamic tree sizes
 			if (this._loadPlusOnePowered < this._count)
 			{
 				this._load++;
 				this._loadPlusOnePowered =
-					Quadtree_Linked<T, M>.Int_Power(this._load + 1, this._dimensions);
+					QuadtreeLinked<T, M>.Int_Power(this._load + 1, this._dimensions);
 				this._loadPowered =
-					Quadtree_Linked<T, M>.Int_Power(this._load, this._dimensions);
+					QuadtreeLinked<T, M>.Int_Power(this._load, this._dimensions);
 			}
 
 			M x, y;
@@ -410,7 +398,7 @@ namespace Seven.Structures
 				Leaf leaf = node as Leaf;
 				if (depth >= this._load || !(leaf.Count >= this._load))
 				{
-					Quadtree_Linked<T, M>.Leaf_Add(leaf, addition);
+					QuadtreeLinked<T, M>.Leaf_Add(leaf, addition);
 
 					this._previousAddition = leaf;
 					this._previousAdditionDepth = depth;
@@ -428,14 +416,8 @@ namespace Seven.Structures
 						this._locate(list.Value, out x, out y);
 						M[] child_ms = new M[2] { x, y };
 
-						#region error
-#if no_error_checking
-						// nothing
-#else
 						if (child_ms == null || child_ms.Length != this._dimensions)
 							throw new Error("the location function for omnitree is invalid.");
-#endif
-						#endregion
 
 						if (EncapsulationCheck(growth.Min, growth.Max, child_ms))
 							Add(list.Value, growth, child_ms, depth);
@@ -465,7 +447,7 @@ namespace Seven.Structures
 				if (child_node == null)
 				{
 					Leaf leaf = GrowLeaf(branch, child);
-					Quadtree_Linked<T, M>.Leaf_Add(leaf, addition);
+					QuadtreeLinked<T, M>.Leaf_Add(leaf, addition);
 
 					this._previousAddition = leaf;
 					this._previousAdditionDepth = depth + 1;
@@ -556,9 +538,9 @@ namespace Seven.Structures
 			{
 				this._load--;
 				this._loadPlusOnePowered =
-					Quadtree_Linked<T, M>.Int_Power(_load + 1, _dimensions);
+					QuadtreeLinked<T, M>.Int_Power(_load + 1, _dimensions);
 				this._loadPowered =
-					Quadtree_Linked<T, M>.Int_Power(_load, _dimensions);
+					QuadtreeLinked<T, M>.Int_Power(_load, _dimensions);
 			}
 
 			this._previousAddition = this._top;
@@ -630,9 +612,9 @@ namespace Seven.Structures
 			{
 				this._load--;
 				this._loadPlusOnePowered =
-					Quadtree_Linked<T, M>.Int_Power(_load + 1, _dimensions);
+					QuadtreeLinked<T, M>.Int_Power(_load + 1, _dimensions);
 				this._loadPowered =
-					Quadtree_Linked<T, M>.Int_Power(_load, _dimensions);
+					QuadtreeLinked<T, M>.Int_Power(_load, _dimensions);
 			}
 
 			this._previousAddition = this._top;
@@ -763,9 +745,9 @@ namespace Seven.Structures
 			{
 				this._load--;
 				this._loadPlusOnePowered =
-					Quadtree_Linked<T, M>.Int_Power(_load + 1, _dimensions);
+					QuadtreeLinked<T, M>.Int_Power(_load + 1, _dimensions);
 				this._loadPowered =
-					Quadtree_Linked<T, M>.Int_Power(_load, _dimensions);
+					QuadtreeLinked<T, M>.Int_Power(_load, _dimensions);
 			}
 
 			this._previousAddition = this._top;
@@ -1326,12 +1308,8 @@ namespace Seven.Structures
 					this._locate(list.Value, out x, out y);
 					M[] ms = new M[2] { x, y };
 
-#if no_error_checking
-					// nothing
-#else
 					if (ms == null || ms.Length != this._dimensions)
 						throw new Error("the location function for omnitree is invalid.");
-#endif
 
 					if (EncapsulationCheck(min, max, ms))
 						function(list.Value);
@@ -1372,12 +1350,8 @@ namespace Seven.Structures
 					this._locate(list.Value, out x, out y);
 					M[] ms = new M[2] { x, y };
 
-#if no_error_checking
-					// nothing
-#else
 					if (ms == null || ms.Length != this._dimensions)
 						throw new Error("the location function for omnitree is invalid.");
-#endif
 
 					if (EncapsulationCheck(min, max, ms))
 						function(ref list._value);
@@ -1417,14 +1391,8 @@ namespace Seven.Structures
 					this._locate(list.Value, out x, out y);
 					M[] ms = new M[2] { x, y };
 
-					#region error
-#if no_error_checking
-					// nothing
-#else
 					if (ms == null || ms.Length != this._dimensions)
 						throw new Error("the location function for omnitree is invalid.");
-#endif
-					#endregion
 
 					if (EncapsulationCheck(min, max, ms))
 						if (function(list.Value) == StepStatus.Break)
@@ -1460,14 +1428,8 @@ namespace Seven.Structures
 					this._locate(list.Value, out x, out y);
 					M[] ms = new M[2] { x, y };
 
-					#region error
-#if no_error_checking
-					// nothing
-#else
 					if (ms == null || ms.Length != this._dimensions)
 						throw new Error("the location function for omnitree is invalid.");
-#endif
-					#endregion
 
 					if (EncapsulationCheck(min, max, ms))
 						if (function(ref list._value) == StepStatus.Break)
@@ -1515,7 +1477,7 @@ namespace Seven.Structures
 		public Structure<T> Clone()
 		{
 			// OPTIMIZATION NEEDED
-			Quadtree_Array<T, M> clone = new Quadtree_Array<T, M>(
+			QuadtreeArray<T, M> clone = new QuadtreeArray<T, M>(
 				this._top.Min[0], this._top.Min[1],
 				this._top.Max[0], this._top.Max[1],
 				this._locate,
@@ -1533,9 +1495,9 @@ namespace Seven.Structures
 
 			this._load = _defaultLoad;
 			this._loadPlusOnePowered =
-				Quadtree_Linked<T, M>.Int_Power(this._load + 1, this._dimensions);
+				QuadtreeLinked<T, M>.Int_Power(this._load + 1, this._dimensions);
 			this._loadPowered =
-				Quadtree_Linked<T, M>.Int_Power(_load, _dimensions);
+				QuadtreeLinked<T, M>.Int_Power(_load, _dimensions);
 		}
 
 		#endregion
@@ -1545,7 +1507,7 @@ namespace Seven.Structures
 	/// <typeparam name="T">The generice type of items to be stored in this octree.</typeparam>
 	/// <typeparam name="M">The type of the axis dimensions to sort the "T" values upon.</typeparam>
 	[System.Serializable]
-	public class Quadtree_Array<T, M> : Quadtree<T, M>
+	public class QuadtreeArray<T, M> : Quadtree<T, M>
 	{
 		#region class
 
@@ -1668,7 +1630,7 @@ namespace Seven.Structures
 		/// <param name="locate">A function for locating an item along the provided dimensions.</param>
 		/// <param name="compare">A function for comparing two items of the types of the axis.</param>
 		/// <param name="average">A function for computing the average between two items of the axis types.</param>
-		public Quadtree_Array(
+		public QuadtreeArray(
 			M min_x, M min_y,
 			M max_x, M max_y,
 			Quadtree.Locate<T, M> locate,
@@ -1716,9 +1678,9 @@ namespace Seven.Structures
 
 			this._load = _defaultLoad;
 			this._loadPlusOnePowered =
-				Quadtree_Array<T, M>.Int_Power(this._load + 1, this._dimensions);
+				QuadtreeArray<T, M>.Int_Power(this._load + 1, this._dimensions);
 			this._loadPowered =
-				Quadtree_Array<T, M>.Int_Power(_load, _dimensions);
+				QuadtreeArray<T, M>.Int_Power(_load, _dimensions);
 
 			this._origin = origin;
 
@@ -1742,9 +1704,9 @@ namespace Seven.Structures
 			{
 				this._load++;
 				this._loadPlusOnePowered =
-					Quadtree_Array<T, M>.Int_Power(this._load + 1, this._dimensions);
+					QuadtreeArray<T, M>.Int_Power(this._load + 1, this._dimensions);
 				this._loadPowered =
-					Quadtree_Array<T, M>.Int_Power(this._load, this._dimensions);
+					QuadtreeArray<T, M>.Int_Power(this._load, this._dimensions);
 			}
 
 			M x, y;
@@ -1800,7 +1762,7 @@ namespace Seven.Structures
 				Leaf leaf = node as Leaf;
 				if (depth >= this._load || !(leaf.Count >= this._load))
 				{
-					Quadtree_Array<T, M>.Leaf_Add(leaf, addition);
+					QuadtreeArray<T, M>.Leaf_Add(leaf, addition);
 
 					this._previousAddition = leaf;
 					this._previousAdditionDepth = depth;
@@ -1849,7 +1811,7 @@ namespace Seven.Structures
 				if (child_node == null)
 				{
 					Leaf leaf = GrowLeaf(branch, child);
-					Quadtree_Array<T, M>.Leaf_Add(leaf, addition);
+					QuadtreeArray<T, M>.Leaf_Add(leaf, addition);
 
 					this._previousAddition = leaf;
 					this._previousAdditionDepth = depth + 1;
@@ -1985,9 +1947,9 @@ namespace Seven.Structures
 			{
 				this._load--;
 				this._loadPlusOnePowered =
-					Quadtree_Array<T, M>.Int_Power(_load + 1, _dimensions);
+					QuadtreeArray<T, M>.Int_Power(_load + 1, _dimensions);
 				this._loadPowered =
-					Quadtree_Array<T, M>.Int_Power(_load, _dimensions);
+					QuadtreeArray<T, M>.Int_Power(_load, _dimensions);
 			}
 
 			this._previousAddition = this._top;
@@ -2059,9 +2021,9 @@ namespace Seven.Structures
 			{
 				this._load--;
 				this._loadPlusOnePowered =
-					Quadtree_Array<T, M>.Int_Power(_load + 1, _dimensions);
+					QuadtreeArray<T, M>.Int_Power(_load + 1, _dimensions);
 				this._loadPowered =
-					Quadtree_Array<T, M>.Int_Power(_load, _dimensions);
+					QuadtreeArray<T, M>.Int_Power(_load, _dimensions);
 			}
 
 			this._previousAddition = this._top;
@@ -2190,9 +2152,9 @@ namespace Seven.Structures
 			{
 				this._load--;
 				this._loadPlusOnePowered =
-					Quadtree_Array<T, M>.Int_Power(_load + 1, _dimensions);
+					QuadtreeArray<T, M>.Int_Power(_load + 1, _dimensions);
 				this._loadPowered =
-					Quadtree_Array<T, M>.Int_Power(_load, _dimensions);
+					QuadtreeArray<T, M>.Int_Power(_load, _dimensions);
 			}
 
 			this._previousAddition = this._top;
@@ -2884,7 +2846,7 @@ namespace Seven.Structures
 		public Structure<T> Clone()
 		{
 			// OPTIMIZATION NEEDED
-			Quadtree_Array<T, M> clone = new Quadtree_Array<T, M>(
+			QuadtreeArray<T, M> clone = new QuadtreeArray<T, M>(
 				this._top.Min[0], this._top.Min[1],
 				this._top.Max[0], this._top.Max[1],
 				this._locate,
@@ -2902,9 +2864,9 @@ namespace Seven.Structures
 
 			this._load = _defaultLoad;
 			this._loadPlusOnePowered =
-				Quadtree_Array<T, M>.Int_Power(this._load + 1, this._dimensions);
+				QuadtreeArray<T, M>.Int_Power(this._load + 1, this._dimensions);
 			this._loadPowered =
-				Quadtree_Array<T, M>.Int_Power(_load, _dimensions);
+				QuadtreeArray<T, M>.Int_Power(_load, _dimensions);
 		}
 
 		#endregion

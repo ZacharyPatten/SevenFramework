@@ -7,38 +7,47 @@ namespace Seven.Structures
 {
 	/// <summary>Implements First-In-First-Out queue data structure.</summary>
 	/// <typeparam name="T">The generic type within the structure.</typeparam>
-	public interface Queue<T> : Structure<T>
+	public interface Queue<T> : Structure<T>,
+		// Structure Properties
+		Structure.Countable<T>,
+		Structure.Clearable<T>
 	{
-		#region member
-
+		#region T Newest
 		/// <summary>The newest item currently in the queue.</summary>
 		T Newest { get; }
+		#endregion
+		#region T Oldest
 		/// <summary>The oldest item currently in the queue.</summary>
 		T Oldest { get; }
-		/// <summary>Returns the number of items in the queue.</summary>
-		int Count { get; }
+		#endregion
+		#region void Enqueue(T enqueue);
 		/// <summary>Adds an item to the back of the queue.</summary>
 		/// <param name="enqueue">The item to add to the queue.</param>
 		void Enqueue(T enqueue);
+		#endregion
+		#region T Peek();
 		/// <summary>Gets the next item in the queue without removing it.</summary>
 		/// <returns>The next item in the queue.</returns>
 		T Peek();
+		#endregion
+		#region T Dequeue();
 		/// <summary>Removes the oldest item in the queue.</summary>
 		/// <returns>The next item in the queue.</returns>
 		T Dequeue();
-		/// <summary>Resets the queue to an empty state.</summary>
-		void Clear();
-
 		#endregion
 	}
 
 	/// <summary>Implements First-In-First-Out queue data structure using a linked list.</summary>
 	/// <typeparam name="T">The generic type within the structure.</typeparam>
 	[System.Serializable]
-	public class Queue_Linked<T> : Queue<T>
+	public class QueueLinked<T> : Queue<T>
 	{
-		#region Node
-
+		// fields
+		private Node _head;
+		private Node _tail;
+		private int _count;
+		// nested types
+		#region private class Node
 		/// <summary>This class just holds the data for each individual node of the list.</summary>
 		[System.Serializable]
 		private class Node
@@ -51,33 +60,51 @@ namespace Seven.Structures
 
 			internal Node(T data) { _value = data; }
 		}
-
 		#endregion
-
-		#region Queue_Linked<T>
-
-		#region field
-
-		private Node _head;
-		private Node _tail;
-		private int _count;
-
-		#endregion
-
-		#region construct
-
+		// constructor
+		#region public Queue_Linked()
 		/// <summary>Creates an instance of a queue.</summary>
 		/// <remarks>Runtime: O(1).</remarks>
-		public Queue_Linked()
+		public QueueLinked()
 		{
 			_head = _tail = null;
 			_count = 0;
 		}
-
 		#endregion
-
-		#region method
-
+		// properties
+		#region public T Newest
+		/// <summary>The newest item currently in the queue.</summary>
+		public T Newest
+		{
+			get
+			{
+				if (this._count > 0)
+					return this._tail.Value;
+				else
+					throw new Error("attempting to get the newest item in an empty queue");
+			}
+		}
+		#endregion
+		#region public T Oldest
+		/// <summary>The oldest item currently in the queue.</summary>
+		public T Oldest
+		{
+			get
+			{
+				if (this._count > 0)
+					return this._head.Value;
+				else
+					throw new Error("attempting to get the oldet item in an empty queue");
+			}
+		}
+		#endregion
+		#region public int Count
+		/// <summary>Returns the number of items in the queue.</summary>
+		/// <remarks>Runtime: O(1).</remarks>
+		public int Count { get { return _count; } }
+		#endregion
+		// methods
+		#region public T[] ToArray()
 		/// <summary>Converts the list into a standard array.</summary>
 		/// <returns>A standard array of all the items.</returns>
 		/// /// <remarks>Runtime: Theta(n).</remarks>
@@ -94,10 +121,11 @@ namespace Seven.Structures
 			}
 			return array;
 		}
-
+		#endregion
+		#region public Queue_Linked<T> Clone()
 		/// <summary>Creates a shallow clone of this data structure.</summary>
 		/// <returns>A shallow clone of this data structure.</returns>
-		public Queue_Linked<T> Clone()
+		public QueueLinked<T> Clone()
 		{
 			Node head = new Node(this._head.Value);
 			Node current = this._head.Next;
@@ -108,47 +136,14 @@ namespace Seven.Structures
 				current_clone = current_clone.Next;
 				current = current.Next;
 			}
-			Queue_Linked<T> clone = new Queue_Linked<T>();
+			QueueLinked<T> clone = new QueueLinked<T>();
 			clone._head = head;
 			clone._tail = current_clone;
 			clone._count = this._count;
 			return clone;
 		}
-
 		#endregion
-
-		#endregion
-
-		#region Queue<T>
-
-		/// <summary>The newest item currently in the queue.</summary>
-		public T Newest
-		{
-			get
-			{
-				if (this._count > 0)
-					return this._tail.Value;
-				else
-					throw new Error("attempting to get the newest item in an empty queue");
-			}
-		}
-
-		/// <summary>The oldest item currently in the queue.</summary>
-		public T Oldest
-		{
-			get
-			{
-				if (this._count > 0)
-					return this._head.Value;
-				else
-					throw new Error("attempting to get the oldet item in an empty queue");
-			}
-		}
-
-		/// <summary>Returns the number of items in the queue.</summary>
-		/// <remarks>Runtime: O(1).</remarks>
-		public int Count { get { return _count; } }
-
+		#region public void Enqueue(T enqueue)
 		/// <summary>Adds an item to the back of the queue.</summary>
 		/// <param name="enqueue">The item to add to the queue.</param>
 		/// <remarks>Runtime: O(1).</remarks>
@@ -160,7 +155,8 @@ namespace Seven.Structures
 				_tail = _tail.Next = new Node(enqueue);
 			_count++;
 		}
-
+		#endregion
+		#region public T Dequeue()
 		/// <summary>Removes the oldest item in the queue.</summary>
 		/// <returns>The next item in the queue.</returns>
 		/// <remarks>Runtime: O(1).</remarks>
@@ -175,7 +171,8 @@ namespace Seven.Structures
 			_count--;
 			return value;
 		}
-
+		#endregion
+		#region public T Peek()
 		/// <summary>Gets the next item in the queue without removing it.</summary>
 		/// <returns>The next item in the queue.</returns>
 		public T Peek()
@@ -185,7 +182,8 @@ namespace Seven.Structures
 			T returnValue = _head.Value;
 			return returnValue;
 		}
-
+		#endregion
+		#region public void Clear()
 		/// <summary>Resets the queue to an empty state.</summary>
 		/// <remarks>Runtime: O(1).</remarks>
 		public void Clear()
@@ -193,11 +191,8 @@ namespace Seven.Structures
 			_head = _tail = null;
 			_count = 0;
 		}
-
 		#endregion
-
-		#region Structure<T>
-
+		#region public void Stepper(Step<T> function)
 		/// <summary>Invokes a delegate for each entry in the data structure.</summary>
 		/// <param name="function">The delegate to invoke on each item in the structure.</param>
 		public void Stepper(Step<T> function)
@@ -209,7 +204,8 @@ namespace Seven.Structures
 				current = current.Next;
 			}
 		}
-
+		#endregion
+		#region public void Stepper(StepRef<T> function)
 		/// <summary>Invokes a delegate for each entry in the data structure.</summary>
 		/// <param name="function">The delegate to invoke on each item in the structure.</param>
 		public void Stepper(StepRef<T> function)
@@ -223,7 +219,8 @@ namespace Seven.Structures
 				current = current.Next;
 			}
 		}
-
+		#endregion
+		#region public StepStatus Stepper(StepBreak<T> function)
 		/// <summary>Invokes a delegate for each entry in the data structure.</summary>
 		/// <param name="function">The delegate to invoke on each item in the structure.</param>
 		/// <returns>The resulting status of the iteration.</returns>
@@ -247,7 +244,8 @@ namespace Seven.Structures
 			}
 			return StepStatus.Continue;
 		}
-
+		#endregion
+		#region public StepStatus Stepper(StepRefBreak<T> function)
 		/// <summary>Invokes a delegate for each entry in the data structure.</summary>
 		/// <param name="function">The delegate to invoke on each item in the structure.</param>
 		/// <returns>The resulting status of the iteration.</returns>
@@ -275,11 +273,8 @@ namespace Seven.Structures
 			}
 			return StepStatus.Continue;
 		}
-		
 		#endregion
-
-		#region IEnumerable<T>
-
+		#region System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 		/// <summary>FOR COMPATIBILITY ONLY. AVOID IF POSSIBLE.</summary>
 		System.Collections.IEnumerator
 			System.Collections.IEnumerable.GetEnumerator()
@@ -291,7 +286,8 @@ namespace Seven.Structures
 				current = current.Next;
 			}
 		}
-
+		#endregion
+		#region System.Collections.Generic.IEnumerator<T> System.Collections.Generic.IEnumerable<T>.GetEnumerator()
 		/// <summary>FOR COMPATIBILITY ONLY. AVOID IF POSSIBLE.</summary>
 		System.Collections.Generic.IEnumerator<T>
 			System.Collections.Generic.IEnumerable<T>.GetEnumerator()
@@ -303,50 +299,54 @@ namespace Seven.Structures
 				current = current.Next;
 			}
 		}
-
 		#endregion
 	}
 
 	/// <summary>Implements First-In-First-Out queue data structure using an array.</summary>
 	/// <typeparam name="T">The generic type within the structure.</typeparam>
 	[System.Serializable]
-	public class Queue_Array<T> : Queue<T>
+	public class QueueArray<T> : Queue<T>
 	{
-		#region Queue_Array<T>
-
-		#region fields
-
+		// fields
 		private T[] _queue;
 		private int _start;
 		private int _count;
 		private int _minimumCapacity;
-
+		// constructors
+		#region public Queue_Array()
+		/// <summary>Creates an instance of a ListArray, and sets it's minimum capacity.</summary>
+		/// <param name="minimumCapacity">The initial and smallest array size allowed by this list.</param>
+		/// <remarks>Runtime: O(1).</remarks>
+		public QueueArray()
+		{
+			_queue = new T[1];
+			_count = 0;
+			_minimumCapacity = 1;
+		}
 		#endregion
-
-		#region property
-
+		#region public Queue_Array(int minimumCapacity)
+		/// <summary>Creates an instance of a ListArray, and sets it's minimum capacity.</summary>
+		/// <param name="minimumCapacity">The initial and smallest array size allowed by this list.</param>
+		/// <remarks>Runtime: O(1).</remarks>
+		public QueueArray(int minimumCapacity)
+		{
+			_queue = new T[minimumCapacity];
+			_count = 0;
+			_minimumCapacity = minimumCapacity;
+		}
+		#endregion
+		// properties
+		#region public int Count
 		/// <summary>Gets the number of items in the list.</summary>
 		/// <remarks>Runtime: O(1).</remarks>
-		public int Count
-		{
-			get
-			{
-				int returnValue = _count;
-				return returnValue;
-			}
-		}
-
+		public int Count { get { return this._count; } }
+		#endregion
+		#region public int CurrentCapacity
 		/// <summary>Gets the current capacity of the list.</summary>
 		/// <remarks>Runtime: O(1).</remarks>
-		public int CurrentCapacity
-		{
-			get
-			{
-				int returnValue = _queue.Length;
-				return returnValue;
-			}
-		}
-
+		public int CurrentCapacity { get { return this._queue.Length; } }
+		#endregion
+		#region public int MinimumCapacity
 		/// <summary>Allows you to adjust the minimum capacity of this list.</summary>
 		/// <remarks>Runtime: O(n), Omega(1).</remarks>
 		public int MinimumCapacity
@@ -370,67 +370,8 @@ namespace Seven.Structures
 					_minimumCapacity = value;
 			}
 		}
-
 		#endregion
-
-		#region construct
-
-		/// <summary>Creates an instance of a ListArray, and sets it's minimum capacity.</summary>
-		/// <param name="minimumCapacity">The initial and smallest array size allowed by this list.</param>
-		/// <remarks>Runtime: O(1).</remarks>
-		public Queue_Array()
-		{
-			_queue = new T[1];
-			_count = 0;
-			_minimumCapacity = 1;
-		}
-
-		/// <summary>Creates an instance of a ListArray, and sets it's minimum capacity.</summary>
-		/// <param name="minimumCapacity">The initial and smallest array size allowed by this list.</param>
-		/// <remarks>Runtime: O(1).</remarks>
-		public Queue_Array(int minimumCapacity)
-		{
-			_queue = new T[minimumCapacity];
-			_count = 0;
-			_minimumCapacity = minimumCapacity;
-		}
-
-		#endregion
-
-		#region method
-
-		/// <summary>Converts the list array into a standard array.</summary>
-		/// <returns>A standard array of all the elements.</returns>
-		public T[] ToArray()
-		{
-			T[] array = new T[_count];
-			for (int i = 0; i < _count; i++)
-				array[i] = _queue[i];
-			return array;
-		}
-
-
-		/// <summary>Creates a shallow clone of this data structure.</summary>
-		/// <returns>A shallow clone of this data structure.</returns>
-		public Structure<T> Clone()
-		{
-			Queue_Array<T> clone = new Queue_Array<T>();
-			clone._queue = new T[this._queue.Length];
-			for (int i = 0; i < this._count; i++)
-				clone._queue[i] = this._queue[i];
-			clone._minimumCapacity = this._minimumCapacity;
-			clone._count = this._count;
-			clone._start = this._start;
-			return clone;
-		}
-
-		#endregion
-
-		#endregion
-
-		#region Queue<T>
-
-
+		#region public T Newest
 		/// <summary>The newest item currently in the queue.</summary>
 		public T Newest
 		{
@@ -442,7 +383,8 @@ namespace Seven.Structures
 					throw new Error("attempting to get the newest item in an empty queue");
 			}
 		}
-
+		#endregion
+		#region public T Oldest
 		/// <summary>The oldest item currently in the queue.</summary>
 		public T Oldest
 		{
@@ -454,8 +396,35 @@ namespace Seven.Structures
 					throw new Error("attempting to get the oldet item in an empty queue");
 			}
 		}
-
-
+		#endregion
+		// methods
+		#region public T[] ToArray()
+		/// <summary>Converts the list array into a standard array.</summary>
+		/// <returns>A standard array of all the elements.</returns>
+		public T[] ToArray()
+		{
+			T[] array = new T[_count];
+			for (int i = 0; i < _count; i++)
+				array[i] = _queue[i];
+			return array;
+		}
+		#endregion
+		#region public Structure<T> Clone()
+		/// <summary>Creates a shallow clone of this data structure.</summary>
+		/// <returns>A shallow clone of this data structure.</returns>
+		public Structure<T> Clone()
+		{
+			QueueArray<T> clone = new QueueArray<T>();
+			clone._queue = new T[this._queue.Length];
+			for (int i = 0; i < this._count; i++)
+				clone._queue[i] = this._queue[i];
+			clone._minimumCapacity = this._minimumCapacity;
+			clone._count = this._count;
+			clone._start = this._start;
+			return clone;
+		}
+		#endregion
+		#region public void Enqueue(T addition)
 		/// <summary>Adds an item to the end of the list.</summary>
 		/// <param name="addition">The item to be added.</param>
 		/// <remarks>Runtime: O(n), EstAvg(1). </remarks>
@@ -475,7 +444,8 @@ namespace Seven.Structures
 			}
 			_queue[(_start + _count++) % _queue.Length] = addition;
 		}
-
+		#endregion
+		#region public T Dequeue()
 		/// <summary>Removes the item at a specific index.</summary>
 		/// <remarks>Runtime: Theta(n - index).</remarks>
 		public T Dequeue()
@@ -496,13 +466,15 @@ namespace Seven.Structures
 				_start = 0;
 			return returnValue;
 		}
-
+		#endregion
+		#region public T Peek()
 		public T Peek()
 		{
 			T returnValue = _queue[_start];
 			return returnValue;
 		}
-
+		#endregion
+		#region public void Clear()
 		/// <summary>Empties the list back and reduces it back to its original capacity.</summary>
 		/// <remarks>Runtime: O(1).</remarks>
 		public void Clear()
@@ -510,11 +482,8 @@ namespace Seven.Structures
 			_queue = new T[_minimumCapacity];
 			_count = 0;
 		}
-
 		#endregion
-
-		#region Structure<T>
-
+		#region public void Stepper(Step<T> step_function)
 		/// <summary>Invokes a delegate for each entry in the data structure.</summary>
 		/// <param name="step_function">The delegate to invoke on each item in the structure.</param>
 		public void Stepper(Step<T> step_function)
@@ -522,7 +491,8 @@ namespace Seven.Structures
 			for (int i = 0; i < this._queue.Length; i++)
 				step_function(this._queue[i]);
 		}
-
+		#endregion
+		#region public void Stepper(StepRef<T> step_function)
 		/// <summary>Invokes a delegate for each entry in the data structure.</summary>
 		/// <param name="step_function">The delegate to invoke on each item in the structure.</param>
 		public void Stepper(StepRef<T> step_function)
@@ -530,7 +500,8 @@ namespace Seven.Structures
 			for (int i = 0; i < this._queue.Length; i++)
 				step_function(ref this._queue[i]);
 		}
-
+		#endregion
+		#region public StepStatus Stepper(StepBreak<T> step_function)
 		/// <summary>Invokes a delegate for each entry in the data structure.</summary>
 		/// <param name="step_function">The delegate to invoke on each item in the structure.</param>
 		/// <returns>The resulting status of the iteration.</returns>
@@ -548,7 +519,8 @@ namespace Seven.Structures
 				}
 			return StepStatus.Continue;
 		}
-
+		#endregion
+		#region public StepStatus Stepper(StepRefBreak<T> step_function)
 		/// <summary>Invokes a delegate for each entry in the data structure.</summary>
 		/// <param name="step_function">The delegate to invoke on each item in the structure.</param>
 		/// <returns>The resulting status of the iteration.</returns>
@@ -566,11 +538,8 @@ namespace Seven.Structures
 				}
 			return StepStatus.Continue;
 		}
-		
 		#endregion
-
-		#region IEnumerable<T>
-
+		#region System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 		/// <summary>FOR COMPATIBILITY ONLY. AVOID IF POSSIBLE.</summary>
 		System.Collections.IEnumerator
 			System.Collections.IEnumerable.GetEnumerator()
@@ -578,7 +547,8 @@ namespace Seven.Structures
 			for (int i = 0; i < this._count; i++)
 				yield return this._queue[i];
 		}
-
+		#endregion
+		#region System.Collections.Generic.IEnumerator<T> System.Collections.Generic.IEnumerable<T>.GetEnumerator()
 		/// <summary>FOR COMPATIBILITY ONLY. AVOID IF POSSIBLE.</summary>
 		System.Collections.Generic.IEnumerator<T>
 			System.Collections.Generic.IEnumerable<T>.GetEnumerator()
@@ -586,7 +556,6 @@ namespace Seven.Structures
 			for (int i = 0; i < this._count; i++)
 				yield return this._queue[i];
 		}
-
 		#endregion
 	}
 }

@@ -28,7 +28,7 @@ namespace Seven.Parallels
 			this._lock = new object();
 			this._current = default(T);
 			this._count = 0;
-			this._pending = new AvlTree_Linked<Link<T, int>>((Link<T, int> left, Link<T, int> right) => { return compare(left.One, right.One); });
+			this._pending = new AvlTreeLinked<Link<T, int>>((Link<T, int> left, Link<T, int> right) => { return compare(left.One, right.One); });
 			this._compareWrapper += (Link<T, int> left, T right) => { return compare(left.One, right); };
 		}
 		

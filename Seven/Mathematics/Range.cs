@@ -6,7 +6,7 @@
 namespace Seven.Mathematics
 {
 	/// <summary>Represents a range denoted by a minimum and maximum point.</summary>
-	/// <typeparam name="T"></typeparam>
+	/// <typeparam name="T">The generic type </typeparam>
 	public class Range<T>
 	{
 		#region fields
@@ -176,63 +176,67 @@ namespace Seven.Mathematics
 			return new Range<T>(min, max);
 		}
 
-		public static Range<T> Union(Range<T> a, Range<T> b)
+		public static Range<T>[] Union(Range<T> a, Range<T> b)
 		{
-			if (object.ReferenceEquals(null, a))
-				throw new System.ArgumentNullException("a");
-			if (object.ReferenceEquals(null, b))
-				throw new System.ArgumentNullException("b");
-			if (a.Dimensions != b.Dimensions)
-				throw new System.ArithmeticException("dimension mismatch during range union");
-			if (!Range<T>.Overlaps(a, b))
-				throw new System.ArithmeticException("attempting to union non-overlapping ranges");
-			Vector<T> min = new Vector<T>(a.Dimensions);
-			Vector<T> max = new Vector<T>(a.Dimensions);
-			for (int i = 0; i < a.Dimensions; i++)
-			{
-				if (Compute<T>.LessThan(a._min[i], b._min[i]))
-					min[i] = a._min[i];
-				else
-					min[i] = b._min[i];
-				if (Compute<T>.GreaterThan(a._max[i], b._max[i]))
-					max[i] = a._max[i];
-				else
-					max[i] = b._max[i];
-			}
-			return new Range<T>(min, max);
+			throw new System.NotImplementedException();
+			//if (object.ReferenceEquals(null, a))
+			//	throw new System.ArgumentNullException("a");
+			//if (object.ReferenceEquals(null, b))
+			//	throw new System.ArgumentNullException("b");
+			//if (a.Dimensions != b.Dimensions)
+			//	throw new System.ArithmeticException("dimension mismatch during range union");
+			//if (!Range<T>.Overlaps(a, b))
+			//	throw new System.ArithmeticException("attempting to union non-overlapping ranges");
+			//if (!Range<T>.IsContiguous(a, b))
+			//	throw new System.ArithmeticException("attempting to union non-contiguous ranges");
+			//Vector<T> min = new Vector<T>(a.Dimensions);
+			//Vector<T> max = new Vector<T>(a.Dimensions);
+			//for (int i = 0; i < a.Dimensions; i++)
+			//{
+			//	if (Compute<T>.LessThan(a._min[i], b._min[i]))
+			//		min[i] = a._min[i];
+			//	else
+			//		min[i] = b._min[i];
+			//	if (Compute<T>.GreaterThan(a._max[i], b._max[i]))
+			//		max[i] = a._max[i];
+			//	else
+			//		max[i] = b._max[i];
+			//}
+			//return new Range<T>(min, max);
 		}
 
-		public static Range<T> Complement(Range<T> a, Range<T> b)
+		public static Range<T>[] Complement(Range<T> a, Range<T> b)
 		{
-			if (object.ReferenceEquals(null, a))
-				throw new System.ArgumentNullException("a");
-			if (object.ReferenceEquals(null, b))
-				throw new System.ArgumentNullException("b");
-			if (a.Dimensions != b.Dimensions)
-				throw new System.ArithmeticException("dimension mismatch during range complement");
-			if (!Range<T>.Overlaps(a, b))
-				return a;
-			if (a._min == b._min && a._max == b._max)
-				//throw new System.ArithmeticException("attempting to complement identical ranges");
-				return null;
-			Vector<T> min = new Vector<T>(a.Dimensions);
-			Vector<T> max = new Vector<T>(a.Dimensions);
-			for (int i = 0; i < a.Dimensions; i++)
-			{
-				if (Compute<T>.LessThan(a._min[i], b._min[i]) && Compute<T>.GreaterThan(a._max[i], b._max[i]))
-					throw new System.ArithmeticException("range compement has a sandwiched complement");
-				if (Compute<T>.LessThan(a._min[i], b._min[i]))
-				{
-					min[i] = a._min[i];
-					max[i] = b._min[i];
-				}
-				else
-				{
-					min[i] = b._max[i];
-					max[i] = a._max[i];
-				}
-			}
-			return new Range<T>(min, max);
+			throw new System.NotImplementedException();
+			//if (object.ReferenceEquals(null, a))
+			//	throw new System.ArgumentNullException("a");
+			//if (object.ReferenceEquals(null, b))
+			//	throw new System.ArgumentNullException("b");
+			//if (a.Dimensions != b.Dimensions)
+			//	throw new System.ArithmeticException("dimension mismatch during range complement");
+			//if (!Range<T>.Overlaps(a, b))
+			//	return a;
+			//if (a._min == b._min && a._max == b._max)
+			//	//throw new System.ArithmeticException("attempting to complement identical ranges");
+			//	return null;
+			//Vector<T> min = new Vector<T>(a.Dimensions);
+			//Vector<T> max = new Vector<T>(a.Dimensions);
+			//for (int i = 0; i < a.Dimensions; i++)
+			//{
+			//	if (Compute<T>.LessThan(a._min[i], b._min[i]) && Compute<T>.GreaterThan(a._max[i], b._max[i]))
+			//		throw new System.ArithmeticException("range compement has a sandwiched complement");
+			//	if (Compute<T>.LessThan(a._min[i], b._min[i]))
+			//	{
+			//		min[i] = a._min[i];
+			//		max[i] = b._min[i];
+			//	}
+			//	else
+			//	{
+			//		min[i] = b._max[i];
+			//		max[i] = a._max[i];
+			//	}
+			//}
+			//return new Range<T>(min, max);
 		}
 
 		public static Range<T>[] Split(Range<T> range, bool inclusiveEdges, params Vector<T>[] vectors)
@@ -249,9 +253,9 @@ namespace Seven.Mathematics
 				throw new System.ArgumentNullException("b");
 			if (a.Dimensions != b.Dimensions)
 				throw new System.ArithmeticException("dimension mismatch during range contiguous check");
-			if (Range<T>.Overlaps(a, b))
+			if (a.Dimensions == 1 && Range<T>.Overlaps(a, b))
 				return true;
-			return a._min == b._max || a._max == b._min;
+			return Range<T>.Contains(a, b) || Range<T>.Contains(b, a) || a._min == b._max || a._max == b._min;
 		}
 
 		public new static bool Equals(Range<T> a, Range<T> b)
@@ -277,9 +281,9 @@ namespace Seven.Mathematics
 		{ return Range<T>.Overlaps(this, b); }
 		public Range<T> Intersect(Range<T> b)
 		{ return Range<T>.Intersect(this, b); }
-		public Range<T> Union(Range<T> b)
+		public Range<T>[] Union(Range<T> b)
 		{ return Range<T>.Union(this, b); }
-		public Range<T> Complement(Range<T> b)
+		public Range<T>[] Complement(Range<T> b)
 		{ return Range<T>.Complement(this, b); }
 		public Range<T>[] Split(bool inclusiveEdges, params Vector<T>[] vectors)
 		{ return Range<T>.Split(this, inclusiveEdges, vectors); }
@@ -295,10 +299,10 @@ namespace Seven.Mathematics
 		public static bool operator !=(Range<T> a, Range<T> b)
 		{ return !Equals(a, b); }
 		/// <summary>Complement</summary>
-		public static Range<T> operator ^(Range<T> a, Range<T> b)
+		public static Range<T>[] operator ^(Range<T> a, Range<T> b)
 		{ return Range<T>.Complement(a, b); }
 		/// <summary>Union</summary>
-		public static Range<T> operator |(Range<T> a, Range<T> b)
+		public static Range<T>[] operator |(Range<T> a, Range<T> b)
 		{ return Range<T>.Union(a, b); }
 		/// <summary>Intersection</summary>
 		public static Range<T> operator &(Range<T> a, Range<T> b)

@@ -122,7 +122,7 @@ namespace Seven.Algorithms.GraphSearch
 			Goal goal)
 		{
 			// using a heap (aka priority queue) to store nodes based on their computed heuristic value
-			Heap<Node> fringe = new Heap_Array<Node>(
+			Heap<Node> fringe = new HeapArray<Node>(
 				// NOTE: I just reversed the order of left and right because smaller values are higher priority
 				(Node left, Node right) => { return Compute<Math>.Compare(right.Priority, left.Priority); });
 

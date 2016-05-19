@@ -2,34 +2,32 @@
 {
 	/// <summary>A self sorting binary tree using the red-black tree algorithms.</summary>
 	/// <typeparam name="T">The generic type of the structure.</typeparam>
-	public interface RedBlackTree<T> : Structure<T>
+	public interface RedBlackTree<T> : Structure<T>,
+		// Structure Properties
+		Structure.Addable<T>,
+		Structure.Removable<T>,
+		Structure.Countable<T>,
+		Structure.Clearable<T>,
+		Structure.Comparing<T>,
+		Structure.Auditable<T>
 	{
-		#region member
-
+		#region T CurrentLeast
 		/// <summary>Gets the current least item in the avl tree.</summary>
 		T CurrentLeast { get; }
+		#endregion
+		#region T CurrentGreatest
 		/// <summary>Gets the current greated item in the avl tree.</summary>
 		T CurrentGreatest { get; }
-
-		/// <summary>The sorting technique used in this instance.</summary>
-		Compare<T> Compare { get; }
-		/// <summary>The current number of items in the structure.</summary>
-		int Count { get; }
-
-		/// <summary>Adds an item to the structure.</summary>
-		/// <param name="addition">The item to be added.</param>
-		/// <exception cref="Seven.Error">Thrown when adding an already existing item to the structure.</exception>
-		void Add(T addition);
-		/// <summary>Removes an item from the structure.</summary>
-		/// <param name="removal">The item to be removed.</param>
-		/// <exception cref="Seven.Error">Thrown when removing a non-existing item to the structure.</exception>
-		void Remove(T removal);
+		#endregion
+		#region bool Contains<Key>(Key key, Compare<T, Key> comparison);
 		/// <summary>Determines if this structure contains a given item.</summary>
 		/// <typeparam name="Key">The type of the key.</typeparam>
 		/// <param name="key">The key of the item to check.</param>
 		/// <param name="comparison">Comparison technique (must match the sorting technique of the structure).</param>
 		/// <returns>True if contained, False if not.</returns>
 		bool Contains<Key>(Key key, Compare<T, Key> comparison);
+		#endregion
+		#region T Get<Key>(Key get, Compare<T, Key> comparison);
 		/// <summary>Gets an item based on a given key.</summary>
 		/// <typeparam name="Key">The type of the key.</typeparam>
 		/// <param name="get">The key of the item to get.</param>
@@ -37,59 +35,22 @@
 		/// <returns>The found item.</returns>
 		/// <exception cref="Seven.Error">Thrown when getting a non-existing item to the structure.</exception>
 		T Get<Key>(Key get, Compare<T, Key> comparison);
+		#endregion
+		#region void Remove<Key>(Key removal, Compare<T, Key> comparison);
 		/// <summary>Removes and item based on a given key.</summary>
 		/// <typeparam name="Key">The type of the key.</typeparam>
 		/// <param name="removal">The key of the item to be removed.</param>
 		/// <param name="comparison">Comparison technique (must match the sorting technique of the structure).</param>
 		/// <exception cref="Seven.Error">Thrown when removing a non-existing item to the structure.</exception>
 		void Remove<Key>(Key removal, Compare<T, Key> comparison);
-		/// <summary>Returns the structure to an empty state.</summary>
-		void Clear();
-
 		#endregion
 	}
 
 	/// <summary>Contains extension methods for the RedBlackTree<T> interface.</summary>
 	public static class RedBlackTree
 	{
-		#region RedBlackTree<T> extensions
-
-		/// <summary>Wrapper for the "Add" method to help with exceptions.</summary>
-		/// <typeparam name="T">The generic type of the structure.</typeparam>
-		/// <param name="redBlackTree">The structure.</param>
-		/// <param name="addition">The item to be added.</param>
-		/// <returns>True if successful, False if not.</returns>
-		public static bool TryAdd<T>(this RedBlackTree<T> redBlackTree, T addition)
-		{
-			try
-			{
-				redBlackTree.Add(addition);
-				return true;
-			}
-			catch
-			{
-				return false;
-			}
-		}
-
-		/// <summary>Wrapper for the "Remove" method to help with exceptions.</summary>
-		/// <typeparam name="T">The generic type of the structure.</typeparam>
-		/// <param name="redBlackTree">The structure.</param>
-		/// <param name="removal">The item to be removed.</param>
-		/// <returns>True if successful, False if not.</returns>
-		public static bool TryRemove<T>(this RedBlackTree<T> redBlackTree, T removal)
-		{
-			try
-			{
-				redBlackTree.Remove(removal);
-				return true;
-			}
-			catch
-			{
-				return false;
-			}
-		}
-
+		// extensions
+		#region public static bool TryGet<T, Key>(this RedBlackTree<T> redBlackTree, Key get, Compare<T, Key> comparison, out T item)
 		/// <summary>Wrapper for the "Add" method to help with exceptions.</summary>
 		/// <typeparam name="T">The generic type of the structure.</typeparam>
 		/// <typeparam name="Key">The type of the key.</typeparam>
@@ -111,7 +72,8 @@
 				return false;
 			}
 		}
-
+		#endregion
+		#region public static bool TryRemove<T, Key>(this RedBlackTree<T> redBlackTree, Key removal, Compare<T, Key> comparison)
 		/// <summary>Wrapper for the "Remove" method to help with exceptions.</summary>
 		/// <typeparam name="T">The generic type of the structure.</typeparam>
 		/// <typeparam name="Key">The type of the key.</typeparam>
@@ -131,7 +93,6 @@
 				return false;
 			}
 		}
-
 		#endregion
 	}
 
@@ -145,10 +106,17 @@
 	/// http://www.codeproject.com/Articles/8287/Red-Black-Trees-in-C
 	/// </citation>
 	[System.Serializable]
-	public class RedBlackTree_Linked<T> : RedBlackTree<T>
+	public class RedBlackTreeLinked<T> : RedBlackTree<T>
 	{
-		#region Node
-
+		// fields
+		protected const bool Red = true;
+		protected const bool Black = false;
+		protected Compare<T, T> _compare_function;
+		private int _count;
+		private Node _root;
+		private static Node _sentinelNode;
+		// nested types
+		#region private class Node
 		[System.Serializable]
 		private class Node
 		{
@@ -169,38 +137,54 @@
 				_color = Red;
 			}
 		}
-
 		#endregion
-
-		#region RedBlackTree_Linked<T>
-
-		#region field
-
-		protected const bool Red = true;
-		protected const bool Black = false;
-
-		protected Compare<T, T> _compare_function;
-
-		private int _count;
-		private Node _root;
-		private static Node _sentinelNode;
-
-		#endregion
-
-		#region construct
-
-		public RedBlackTree_Linked(Compare<T> compare_function)
+		// constructors
+		#region public RedBlackTree_Linked(Compare<T> compare_function)
+		public RedBlackTreeLinked(Compare<T> compare_function)
 		{
 			_sentinelNode = new Node();
 			_sentinelNode.Color = Black;
 			this._root = _sentinelNode;
 			this._compare_function = new Compare<T, T>(compare_function);
 		}
-
 		#endregion
-
-		#region method
-
+		// properties
+		#region public T CurrentLeast
+		/// <summary>Gets the current least item in the avl tree.</summary>
+		public T CurrentLeast
+		{
+			get
+			{
+				RedBlackTreeLinked<T>.Node node = this._root;
+				while (node.LeftChild != null)
+					node = node.LeftChild;
+				return node.Value;
+			}
+		}
+		#endregion
+		#region public T CurrentGreatest
+		/// <summary>Gets the current greated item in the avl tree.</summary>
+		public T CurrentGreatest
+		{
+			get
+			{
+				RedBlackTreeLinked<T>.Node node = this._root;
+				while (node.RightChild != null)
+					node = node.RightChild;
+				return node.Value;
+			}
+		}
+		#endregion
+		#region public int Count
+		/// <summary>The number of items in this data structure.</summary>
+		public int Count { get { return _count; } }
+		#endregion
+		#region public Compare<T> Compare
+		/// <summary>The sorting technique.</summary>
+		public Compare<T> Compare { get { return new Compare<T>(this._compare_function); } }
+		#endregion
+		// methods
+		#region private void BalanceAddition(Node balancing)
 		private void BalanceAddition(Node balancing)
 		{
 			Node temp;
@@ -253,7 +237,8 @@
 			}
 			_root.Color = Black;
 		}
-
+		#endregion
+		#region private void RotateLeft(Node redBlackTree)
 		private void RotateLeft(Node redBlackTree)
 		{
 			Node temp = redBlackTree.RightChild;
@@ -275,7 +260,8 @@
 			if (redBlackTree != _sentinelNode)
 				redBlackTree.Parent = temp;
 		}
-
+		#endregion
+		#region private void RotateRight(Node redBlacktree)
 		private void RotateRight(Node redBlacktree)
 		{
 			Node temp = redBlacktree.LeftChild;
@@ -297,7 +283,8 @@
 			if (redBlacktree != _sentinelNode)
 				redBlacktree.Parent = temp;
 		}
-
+		#endregion
+		#region private void Remove(Node removal)
 		private void Remove(Node removal)
 		{
 			Node x = new Node();
@@ -326,7 +313,8 @@
 				removal.Value = temp.Value;
 			if (temp.Color == Black) BalanceRemoval(x);
 		}
-
+		#endregion
+		#region private void BalanceRemoval(Node balancing)
 		private void BalanceRemoval(Node balancing)
 		{
 			Node temp;
@@ -397,7 +385,8 @@
 			}
 			balancing.Color = Black;
 		}
-
+		#endregion
+		#region private void StepperInOrder(Step<T> function, Node node)
 		private void StepperInOrder(Step<T> function, Node node)
 		{
 			if (node != null && node.LeftChild != null && node.RightChild != null)
@@ -407,7 +396,8 @@
 				StepperInOrder(function, node.RightChild);
 			}
 		}
-
+		#endregion
+		#region private void StepperInOrder(StepRef<T> function, Node node)
 		private void StepperInOrder(StepRef<T> function, Node node)
 		{
 			if (node != null && node.LeftChild != null && node.RightChild != null)
@@ -419,7 +409,8 @@
 				StepperInOrder(function, node.RightChild);
 			}
 		}
-
+		#endregion
+		#region private StepStatus StepperInOrder(StepBreak<T> function, Node node)
 		private StepStatus StepperInOrder(StepBreak<T> function, Node node)
 		{
 			if (node != null && node.LeftChild != null && node.RightChild != null)
@@ -433,7 +424,8 @@
 			}
 			return StepStatus.Continue;
 		}
-
+		#endregion
+		#region private StepStatus StepperInOrder(StepRefBreak<T> function, Node node)
 		private StepStatus StepperInOrder(StepRefBreak<T> function, Node node)
 		{
 			if (node != null && node.LeftChild != null && node.RightChild != null)
@@ -450,52 +442,19 @@
 			}
 			return StepStatus.Continue;
 		}
-
+		#endregion
+		#region public RedBlackTree_Linked<T> Clone()
 		/// <summary>Creates a shallow clone of this data structure.</summary>
 		/// <returns>A shallow clone of this data structure.</returns>
-		public RedBlackTree_Linked<T> Clone()
+		public RedBlackTreeLinked<T> Clone()
 		{
 			throw new System.NotImplementedException();
 		}
-
 		#endregion
-
-		#endregion
-
-		#region RedBlackTree<T>
-
-		/// <summary>Gets the current least item in the avl tree.</summary>
-		public T CurrentLeast
-		{
-			get
-			{
-				RedBlackTree_Linked<T>.Node node = this._root;
-				while (node.LeftChild != null)
-					node = node.LeftChild;
-				return node.Value;
-			}
-		}
-		/// <summary>Gets the current greated item in the avl tree.</summary>
-		public T CurrentGreatest
-		{
-			get
-			{
-				RedBlackTree_Linked<T>.Node node = this._root;
-				while (node.RightChild != null)
-					node = node.RightChild;
-				return node.Value;
-			}
-		}
-
-		/// <summary>The number of items in this data structure.</summary>
-		public int Count { get { return _count; } }
-
-		/// <summary>The sorting technique.</summary>
-		public Compare<T> Compare { get { return new Compare<T>(this._compare_function); } }
-
+		#region public T Get<Key>(Key key, Compare<T, Key> comparison)
 		public T Get<Key>(Key key, Compare<T, Key> comparison)
 		{
-			RedBlackTree_Linked<T>.Node treeNode = _root;
+			RedBlackTreeLinked<T>.Node treeNode = _root;
 			while (treeNode != _sentinelNode)
 			{
 				switch (comparison(treeNode.Value, key))
@@ -514,11 +473,12 @@
 			}
 			throw new Error("attempting to get a non-existing value.");
 		}
-
+		#endregion
+		#region public void Add(T data)
 		public void Add(T data)
 		{
-			RedBlackTree_Linked<T>.Node addition = new RedBlackTree_Linked<T>.Node();
-			RedBlackTree_Linked<T>.Node temp = _root;
+			RedBlackTreeLinked<T>.Node addition = new RedBlackTreeLinked<T>.Node();
+			RedBlackTreeLinked<T>.Node temp = _root;
 			while (temp != _sentinelNode)
 			{
 				addition.Parent = temp;
@@ -559,15 +519,17 @@
 			BalanceAddition(addition);
 			_count = _count + 1;
 		}
-
+		#endregion
+		#region public void Remove(T value)
 		public void Remove(T value)
 		{
 			this.Remove<T>(value, this._compare_function);
 		}
-
+		#endregion
+		#region public void Remove<Key>(Key key, Compare<T, Key> function)
 		public void Remove<Key>(Key key, Compare<T, Key> function)
 		{
-			RedBlackTree_Linked<T>.Node node;
+			RedBlackTreeLinked<T>.Node node;
 			node = _root;
 			while (node != _sentinelNode)
 			{
@@ -590,15 +552,17 @@
 				}
 			}
 		}
-
+		#endregion
+		#region public bool Contains(T item)
 		public bool Contains(T item)
 		{
 			return Contains<T>(item, this._compare_function);
 		}
-
+		#endregion
+		#region public bool Contains<Key>(Key key, Compare<T, Key> comparison)
 		public bool Contains<Key>(Key key, Compare<T, Key> comparison)
 		{
-			RedBlackTree_Linked<T>.Node treeNode = _root;
+			RedBlackTreeLinked<T>.Node treeNode = _root;
 			while (treeNode != _sentinelNode)
 			{
 				switch (comparison(treeNode.Value, key))
@@ -617,16 +581,18 @@
 			}
 			return false;
 		}
-
+		#endregion
+		#region public void Clear()
 		public void Clear()
 		{
 			_root = _sentinelNode;
 			_count = 0;
 		}
-
+		#endregion
+		#region public T GetMin()
 		public T GetMin()
 		{
-			RedBlackTree_Linked<T>.Node treeNode = _root;
+			RedBlackTreeLinked<T>.Node treeNode = _root;
 			if (treeNode == null || treeNode == _sentinelNode)
 				throw new Error("attempting to get the minimum value from an empty tree.");
 			while (treeNode.LeftChild != _sentinelNode)
@@ -634,10 +600,11 @@
 			T returnValue = treeNode.Value;
 			return returnValue;
 		}
-
+		#endregion
+		#region public T GetMax()
 		public T GetMax()
 		{
-			RedBlackTree_Linked<T>.Node treeNode = _root;
+			RedBlackTreeLinked<T>.Node treeNode = _root;
 			if (treeNode == null || treeNode == _sentinelNode)
 			{
 				throw (new Error("attempting to get the maximum value from an empty tree."));
@@ -647,32 +614,32 @@
 			T returnValue = treeNode.Value;
 			return returnValue;
 		}
-
+		#endregion
+		#region public void StepperInOrder(Step<T> function)
 		/// <summary>Invokes a delegate for each entry in the data structure (least to greatest).</summary>
 		/// <param name="function">The delegate to invoke on each item in the structure.</param>
 		public void StepperInOrder(Step<T> function)
 		{
 			StepperInOrder(function, _root);
 		}
-
 		#endregion
-
-		#region Structure<T>
-
+		#region public void Stepper(Step<T> function)
 		/// <summary>Invokes a delegate for each entry in the data structure (least to greatest).</summary>
 		/// <param name="function">The delegate to invoke on each item in the structure.</param>
 		public void Stepper(Step<T> function)
 		{
 			StepperInOrder(function);
 		}
-
+		#endregion
+		#region public void Stepper(StepRef<T> function)
 		/// <summary>Invokes a delegate for each entry in the data structure.</summary>
 		/// <param name="function">The delegate to invoke on each item in the structure.</param>
 		public void Stepper(StepRef<T> function)
 		{
 			StepperInOrder(function, this._root);
 		}
-
+		#endregion
+		#region public StepStatus Stepper(StepBreak<T> function)
 		/// <summary>Invokes a delegate for each entry in the data structure.</summary>
 		/// <param name="function">The delegate to invoke on each item in the structure.</param>
 		/// <returns>The resulting status of the iteration.</returns>
@@ -680,7 +647,8 @@
 		{
 			return StepperInOrder(function, this._root);
 		}
-
+		#endregion
+		#region public StepStatus Stepper(StepRefBreak<T> function)
 		/// <summary>Invokes a delegate for each entry in the data structure.</summary>
 		/// <param name="function">The delegate to invoke on each item in the structure.</param>
 		/// <returns>The resulting status of the iteration.</returns>
@@ -688,17 +656,14 @@
 		{
 			return StepperInOrder(function, this._root);
 		}
-
 		#endregion
-
-		#region IEnumerable<T>
-
+		#region System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 		/// <summary>FOR COMPATIBILITY ONLY. AVOID IF POSSIBLE.</summary>
 		System.Collections.IEnumerator
 			System.Collections.IEnumerable.GetEnumerator()
 		{
-			Stack<RedBlackTree_Linked<T>.Node> forks = new Stack_Linked<RedBlackTree_Linked<T>.Node>();
-			RedBlackTree_Linked<T>.Node current = _root;
+			Stack<RedBlackTreeLinked<T>.Node> forks = new StackLinked<RedBlackTreeLinked<T>.Node>();
+			RedBlackTreeLinked<T>.Node current = _root;
 			while (current != null && current.LeftChild != null && current.RightChild != null || forks.Count > 0)
 			{
 				if (current != null)
@@ -715,13 +680,14 @@
 				}
 			}
 		}
-
+		#endregion
+		#region System.Collections.Generic.IEnumerator<T> System.Collections.Generic.IEnumerable<T>.GetEnumerator()
 		/// <summary>FOR COMPATIBILITY ONLY. AVOID IF POSSIBLE.</summary>
 		System.Collections.Generic.IEnumerator<T>
 			System.Collections.Generic.IEnumerable<T>.GetEnumerator()
 		{
-			Stack<RedBlackTree_Linked<T>.Node> forks = new Stack_Linked<RedBlackTree_Linked<T>.Node>();
-			RedBlackTree_Linked<T>.Node current = _root;
+			Stack<RedBlackTreeLinked<T>.Node> forks = new StackLinked<RedBlackTreeLinked<T>.Node>();
+			RedBlackTreeLinked<T>.Node current = _root;
 			while (current != null && current.LeftChild != null && current.RightChild != null || forks.Count > 0)
 			{
 				if (current != null)
@@ -738,8 +704,6 @@
 				}
 			}
 		}
-
-
 		#endregion
 	}
 }
