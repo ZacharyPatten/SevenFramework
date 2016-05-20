@@ -12,6 +12,15 @@ namespace Seven.Algorithms
 
 		/// <summary>Sorts an entire array in non-decreasing order using the bubble sort algorithm.</summary>
 		/// <typeparam name="T">The type of objects stored within the array.</typeparam>
+		/// <param name="array">the array to be sorted</param>
+		/// <remarks>Runtime: Omega(n), average(n^2), O(n^2). Memory: in place. Stability: yes.</remarks>
+		public static void Bubble(T[] array)
+		{
+			Sort<T>.Bubble(Compare.Default, array, 0, array.Length);
+		}
+
+		/// <summary>Sorts an entire array in non-decreasing order using the bubble sort algorithm.</summary>
+		/// <typeparam name="T">The type of objects stored within the array.</typeparam>
 		/// <param name="compare">The compare function (returns a positive value if left is greater than right).</param>
 		/// <param name="array">the array to be sorted</param>
 		/// <remarks>Runtime: Omega(n), average(n^2), O(n^2). Memory: in place. Stability: yes.</remarks>
@@ -62,10 +71,19 @@ namespace Seven.Algorithms
 
 		/// <summary>Sorts an entire array in non-decreasing order using the selection sort algoritm.</summary>
 		/// <typeparam name="T">The type of objects stored within the array.</typeparam>
+		/// <param name="array">the array to be sorted</param>
+		/// <remarks>Runtime: Omega(n^2), average(n^2), O(n^2). Memory: in place. Stablity: no.</remarks>
+		public static void Selection(T[] array)
+		{
+			Sort<T>.Selection(Compare.Default, array, 0, array.Length);
+		}
+
+		/// <summary>Sorts an entire array in non-decreasing order using the selection sort algoritm.</summary>
+		/// <typeparam name="T">The type of objects stored within the array.</typeparam>
 		/// <param name="compare">Returns negative if the left is less than the right.</param>
 		/// <param name="array">the array to be sorted</param>
 		/// <remarks>Runtime: Omega(n^2), average(n^2), O(n^2). Memory: in place. Stablity: no.</remarks>
-		public static void Selection<T>(Compare<T> compare, T[] array)
+		public static void Selection(Compare<T> compare, T[] array)
 		{
 			Sort<T>.Selection(compare, array, 0, array.Length);
 		}
@@ -111,6 +129,15 @@ namespace Seven.Algorithms
 		#endregion
 
 		#region Insertion
+
+		/// <summary>Sorts an entire array in non-decreasing order using the insertion sort algorithm.</summary>
+		/// <typeparam name="T">The type of objects stored within the array.</typeparam>
+		/// <param name="array">the array to be sorted</param>
+		/// <remarks>Runtime: Omega(n), average(n^2), O(n^2). Memory: in place. Stablity: yes.</remarks>
+		public static void Insertion(T[] array)
+		{
+			Sort<T>.Insertion(Compare.Default, array, 0, array.Length);
+		}
 
 		/// <summary>Sorts an entire array in non-decreasing order using the insertion sort algorithm.</summary>
 		/// <typeparam name="T">The type of objects stored within the array.</typeparam>
@@ -162,6 +189,15 @@ namespace Seven.Algorithms
 
 		/// <summary>Sorts an entire array in non-decreasing order using the quick sort algorithm.</summary>
 		/// <typeparam name="T">The type of objects stored within the array.</typeparam>
+		/// <param name="array">The array to be sorted</param>
+		/// <remarks>Runtime: Omega(n*ln(n)), average(n*ln(n)), O(n^2). Memory: ln(n). Stablity: no.</remarks>
+		public static void Quick(T[] array)
+		{
+			Sort<T>.Quick(Compare.Default, array, 0, array.Length);
+		}
+
+		/// <summary>Sorts an entire array in non-decreasing order using the quick sort algorithm.</summary>
+		/// <typeparam name="T">The type of objects stored within the array.</typeparam>
 		/// <param name="compare">The method of compare to be sorted by.</param>
 		/// <param name="array">The array to be sorted</param>
 		/// <remarks>Runtime: Omega(n*ln(n)), average(n*ln(n)), O(n^2). Memory: ln(n). Stablity: no.</remarks>
@@ -181,7 +217,7 @@ namespace Seven.Algorithms
 		{
 			Get<T> get = (int index) => { return array[index]; };
 			Assign<T> set = (int index, T value) => { array[index] = value; };
-			Sort<T>.Quick(compare, array, start, end - start);
+			Sort<T>.Quick(compare, Accessor.Get(array), Accessor.Assign(array), start, end - start);
 		}
 
 		/// <summary>Sorts an entire array in non-decreasing order using the quick sort algorithm.</summary>
@@ -236,7 +272,17 @@ namespace Seven.Algorithms
 		/// <param name="compare">Returns zero or negative if the left is less than or equal to the right.</param>
 		/// <param name="array">The array to be sorted</param>
 		/// <remarks>Runtime: Omega(n*ln(n)), average(n*ln(n)), O(n*ln(n)). Memory: n. Stablity: yes.</remarks>
-		public static void Merge<T>(Compare<T> compare, T[] array)
+		public static void Merge(T[] array)
+		{
+			Sort<T>.Merge(Compare.Default, array, 0, array.Length);
+		}
+
+		/// <summary>Sorts up to an array in non-decreasing order using the merge sort algorithm.</summary>
+		/// <typeparam name="T">The type of objects stored within the array.</typeparam>
+		/// <param name="compare">Returns zero or negative if the left is less than or equal to the right.</param>
+		/// <param name="array">The array to be sorted</param>
+		/// <remarks>Runtime: Omega(n*ln(n)), average(n*ln(n)), O(n*ln(n)). Memory: n. Stablity: yes.</remarks>
+		public static void Merge(Compare<T> compare, T[] array)
 		{
 			Sort<T>.Merge(compare, array, 0, array.Length);
 		}
@@ -248,7 +294,7 @@ namespace Seven.Algorithms
 		/// <param name="start">The starting index of the sort.</param>
 		/// <param name="end">The ending index of the sort.</param>
 		/// <remarks>Runtime: Omega(n*ln(n)), average(n*ln(n)), O(n*ln(n)). Memory: n. Stablity: yes.</remarks>
-		public static void Merge<T>(Compare<T> compare, T[] array, int start, int end)
+		public static void Merge(Compare<T> compare, T[] array, int start, int end)
 		{
 			Get<T> get = (int index) => { return array[index]; };
 			Assign<T> set = (int index, T value) => { array[index] = value; };
@@ -301,6 +347,15 @@ namespace Seven.Algorithms
 
 		/// <summary>Sorts an entire array in non-decreasing order using the heap sort algorithm.</summary>
 		/// <typeparam name="T">The type of objects stored within the array.</typeparam>
+		/// <param name="array">The array to be sorted</param>
+		/// <remarks>Runtime: Omega(n*ln(n)), average(n*ln(n)), O(n^2). Memory: in place. Stablity: no.</remarks>
+		public static void Heap(T[] array)
+		{
+			Sort<T>.Heap(Compare.Default, array, 0, array.Length);
+		}
+
+		/// <summary>Sorts an entire array in non-decreasing order using the heap sort algorithm.</summary>
+		/// <typeparam name="T">The type of objects stored within the array.</typeparam>
 		/// <param name="compare">The method of compare for the sort.</param>
 		/// <param name="array">The array to be sorted</param>
 		/// <remarks>Runtime: Omega(n*ln(n)), average(n*ln(n)), O(n^2). Memory: in place. Stablity: no.</remarks>
@@ -331,7 +386,7 @@ namespace Seven.Algorithms
 		/// <param name="start">The starting index of the sort.</param>
 		/// <param name="end">The ending index of the sort.</param>
 		/// <remarks>Runtime: Omega(n*ln(n)), average(n*ln(n)), O(n^2). Memory: in place. Stablity: no.</remarks>
-		public static void Heap<T>(Compare<T> compare, Get<T> get, Assign<T> set, int start, int end)
+		public static void Heap(Compare<T> compare, Get<T> get, Assign<T> set, int start, int end)
 		{
 			int heapSize = end - start;
 			for (int i = (heapSize - 1) / 2; i >= 0; i--)
@@ -346,7 +401,7 @@ namespace Seven.Algorithms
 			}
 		}
 
-		private static void MaxHeapify<T>(Compare<T> compare, Get<T> get, Assign<T> set, int heapSize, int index)
+		private static void MaxHeapify(Compare<T> compare, Get<T> get, Assign<T> set, int heapSize, int index)
 		{
 			int left = (index + 1) * 2 - 1;
 			int right = (index + 1) * 2;
@@ -372,10 +427,19 @@ namespace Seven.Algorithms
 
 		/// <summary>Sorts an entire array in non-decreasing order using the odd-even sort algorithm.</summary>
 		/// <typeparam name="T">The type of objects stored within the array.</typeparam>
+		/// <param name="array">The array to be sorted</param>
+		/// <remarks>Runtime: Omega(n), average(n^2), O(n^2). Memory: in place. Stablity: yes.</remarks>
+		public static void OddEven(T[] array)
+		{
+			Sort<T>.OddEven(Compare.Default, array, 0, array.Length);
+		}
+
+		/// <summary>Sorts an entire array in non-decreasing order using the odd-even sort algorithm.</summary>
+		/// <typeparam name="T">The type of objects stored within the array.</typeparam>
 		/// <param name="compare">The method of compare for the sort.</param>
 		/// <param name="array">The array to be sorted</param>
 		/// <remarks>Runtime: Omega(n), average(n^2), O(n^2). Memory: in place. Stablity: yes.</remarks>
-		public static void OddEven<T>(Compare<T> compare, T[] array)
+		public static void OddEven(Compare<T> compare, T[] array)
 		{
 			Sort<T>.OddEven(compare, array, 0, array.Length);
 		}
@@ -385,7 +449,7 @@ namespace Seven.Algorithms
 		/// <param name="compare">The method of compare for the sort.</param>
 		/// <param name="array">The array to be sorted</param>
 		/// <remarks>Runtime: Omega(n), average(n^2), O(n^2). Memory: in place. Stablity: yes.</remarks>
-		public static void OddEven<T>(Compare<T> compare, T[] array, int start, int end)
+		public static void OddEven(Compare<T> compare, T[] array, int start, int end)
 		{
 			Get<T> get = (int index) => { return array[index]; };
 			Assign<T> set = (int index, T value) => { array[index] = value; };
@@ -540,6 +604,15 @@ namespace Seven.Algorithms
 
 		/// <summary>Sorts an entire array in non-decreasing order using the slow sort algorithm.</summary>
 		/// <typeparam name="T">The type of objects stored within the array.</typeparam>
+		/// <param name="array">The array to be sorted.</param>
+		/// <remarks>Runtime: Omega(n), average(n*n!), O(infinity). Memory: in place. Stablity: no.</remarks>
+		public static void Bogo(T[] array)
+		{
+			Sort<T>.Bogo(Compare.Default, array, 0, array.Length);
+		}
+
+		/// <summary>Sorts an entire array in non-decreasing order using the slow sort algorithm.</summary>
+		/// <typeparam name="T">The type of objects stored within the array.</typeparam>
 		/// <param name="compare">The method of compare for the sort.</param>
 		/// <param name="array">The array to be sorted.</param>
 		/// <remarks>Runtime: Omega(n), average(n*n!), O(infinity). Memory: in place. Stablity: no.</remarks>
@@ -582,6 +655,15 @@ namespace Seven.Algorithms
 		#endregion
 
 		#region Slow
+
+		/// <summary>Sorts an entire array of in non-decreasing order using the slow sort algorithm.</summary>
+		/// <typeparam name="T">The type of objects stored within the array.</typeparam>
+		/// <param name="array">The array to be sorted</param>
+		/// <remarks>Runtime: Omega(n), average(n*n!), O(n*n!). Memory: in place. Stablity: N/A (not yet analyzed).</remarks>
+		public static void Slow(T[] array)
+		{
+			Sort<T>.Slow(Compare.Default, array, 0, array.Length);
+		}
 
 		/// <summary>Sorts an entire array of in non-decreasing order using the slow sort algorithm.</summary>
 		/// <typeparam name="T">The type of objects stored within the array.</typeparam>

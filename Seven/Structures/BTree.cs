@@ -38,15 +38,11 @@ namespace Seven.Structures
 		/// <param name="compare">The comparison technique (must synchronize with the sorting of this data structure).</param>
 		void Remove<Key>(Key removal, Compare<T, Key> compare);
 		#endregion
+
 		#region void StepperReverse(Step<T> step_delegate);
 		/// <summary>Invokes a delegate for each entry in the data structure (right to left).</summary>
 		/// <param name="step_delegate">The delegate to invoke on each item in the structure.</param>
 		void StepperReverse(Step<T> step_delegate);
-		#endregion
-		#region void StepperReverse(StepRef<T> step_delegate);
-		/// <summary>Invokes a delegate for each entry in the data structure (right to left).</summary>
-		/// <param name="step_delegate">The delegate to invoke on each item in the structure.</param>
-		void StepperReverse(StepRef<T> step_delegate);
 		#endregion
 		#region StepStatus StepperReverse(StepBreak<T> step_delegate);
 		/// <summary>Invokes a delegate for each entry in the data structure (right to left).</summary>
@@ -54,25 +50,13 @@ namespace Seven.Structures
 		/// <returns>The resulting status of the iteration.</returns>
 		StepStatus StepperReverse(StepBreak<T> step_delegate);
 		#endregion
-		#region StepStatus StepperReverse(StepRefBreak<T> step_delegate);
-		/// <summary>Invokes a delegate for each entry in the data structure (right to left).</summary>
-		/// <param name="step_delegate">The delegate to invoke on each item in the structure.</param>
-		/// <returns>The resulting status of the iteration.</returns>
-		StepStatus StepperReverse(StepRefBreak<T> step_delegate);
-		#endregion
+
 		#region void Stepper(Step<T> step_function, T minimum, T maximum);
 		/// <summary>Does an optimized step function (left to right) for sorted binary search trees.</summary>
 		/// <param name="step_function">The step function.</param>
 		/// <param name="minimum">The minimum step value.</param>
 		/// <param name="maximum">The maximum step value.</param>
 		void Stepper(Step<T> step_function, T minimum, T maximum);
-		#endregion
-		#region void Stepper(StepRef<T> step_function, T minimum, T maximum);
-		/// <summary>Does an optimized step function (left to right) for sorted binary search trees.</summary>
-		/// <param name="step_function">The step function.</param>
-		/// <param name="minimum">The minimum step value.</param>
-		/// <param name="maximum">The maximum step value.</param>
-		void Stepper(StepRef<T> step_function, T minimum, T maximum);
 		#endregion
 		#region StepStatus Stepper(StepBreak<T> step_function, T minimum, T maximum);
 		/// <summary>Does an optimized step function (left to right) for sorted binary search trees.</summary>
@@ -82,27 +66,13 @@ namespace Seven.Structures
 		/// <returns>The result status of the stepper function.</returns>
 		StepStatus Stepper(StepBreak<T> step_function, T minimum, T maximum);
 		#endregion
-		#region StepStatus Stepper(StepRefBreak<T> step_function, T minimum, T maximum);
-		/// <summary>Does an optimized step function (left to right) for sorted binary search trees.</summary>
-		/// <param name="step_function">The step function.</param>
-		/// <param name="minimum">The minimum step value.</param>
-		/// <param name="maximum">The maximum step value.</param>
-		/// <returns>The result status of the stepper function.</returns>
-		StepStatus Stepper(StepRefBreak<T> step_function, T minimum, T maximum);
-		#endregion
+
 		#region void StepperReverse(Step<T> step_function, T minimum, T maximum);
 		/// <summary>Does an optimized step function (right to left) for sorted binary search trees.</summary>
 		/// <param name="step_function">The step function.</param>
 		/// <param name="minimum">The minimum step value.</param>
 		/// <param name="maximum">The maximum step value.</param>
 		void StepperReverse(Step<T> step_function, T minimum, T maximum);
-		#endregion
-		#region void StepperReverse(StepRef<T> step_function, T minimum, T maximum);
-		/// <summary>Does an optimized step function (right to left) for sorted binary search trees.</summary>
-		/// <param name="step_function">The step function.</param>
-		/// <param name="minimum">The minimum step value.</param>
-		/// <param name="maximum">The maximum step value.</param>
-		void StepperReverse(StepRef<T> step_function, T minimum, T maximum);
 		#endregion
 		#region StepStatus StepperReverse(StepBreak<T> step_function, T minimum, T maximum);
 		/// <summary>Does an optimized step function (right to left) for sorted binary search trees.</summary>
@@ -111,14 +81,6 @@ namespace Seven.Structures
 		/// <param name="maximum">The maximum step value.</param>
 		/// <returns>The result status of the stepper function.</returns>
 		StepStatus StepperReverse(StepBreak<T> step_function, T minimum, T maximum);
-		#endregion
-		#region StepStatus StepperReverse(StepRefBreak<T> step_function, T minimum, T maximum);
-		/// <summary>Does an optimized step function (right to left) for sorted binary search trees.</summary>
-		/// <param name="step_function">The step function.</param>
-		/// <param name="minimum">The minimum step value.</param>
-		/// <param name="maximum">The maximum step value.</param>
-		/// <returns>The result status of the stepper function.</returns>
-		StepStatus StepperReverse(StepRefBreak<T> step_function, T minimum, T maximum);
 		#endregion
 	}
 
@@ -177,6 +139,7 @@ namespace Seven.Structures
 	[System.Serializable]
 	public class BTreeLinkedArray<T> : BTree<T>
 	{
+		// fields
 		Node _root;
 		int _count;
 		int _height;
@@ -227,7 +190,7 @@ namespace Seven.Structures
 		/// <summary>The number of items in this structure.</summary>
 		public int Count { get { return this._count; } }
 		#endregion
-		// methods
+		// methods (public)
 		#region public bool Contains(T item)
 		/// <summary>Determines if this structure contains a given item.</summary>
 		/// <param name="item">The item to be removed.</param>
@@ -248,31 +211,6 @@ namespace Seven.Structures
 			return this.Contains(this._root, key, compare);
 		}
 		#endregion
-		#region private bool Contains<K>(Node node, K key, Compare<T, K> compare)
-		private bool Contains<K>(Node node, K key, Compare<T, K> compare)
-		{
-			int loc = 0;
-			for (int i = 0; i < node.ItemCount; i++)
-				switch (compare(node.Items[i], key))
-				{
-					case Comparison.Less:
-						loc++;
-						continue;
-					case Comparison.Equal:
-						goto break_for;
-					case Comparison.Greater:
-						goto break_for;
-					default:
-						throw new Error("not implemented");
-				}
-		break_for:
-			if (loc < node.ItemCount && compare(node.Items[loc], key) == Comparison.Equal)
-				return true;
-			if (node.ChildCount == 0)
-				return false;
-			return this.Contains(node.Children[loc], key, compare);
-		}
-		#endregion
 		#region public T Get<K>(K key, Compare<T, K> compare)
 		/// <summary>Gets an item from this structure based on a given key.</summary>
 		/// <typeparam name="K">The type of the key.</typeparam>
@@ -282,31 +220,6 @@ namespace Seven.Structures
 		public T Get<K>(K key, Compare<T, K> compare)
 		{
 			return this.Get(this._root, key, compare);
-		}
-		#endregion
-		#region private T Get<K>(Node node, K key, Compare<T, K> compare)
-		private T Get<K>(Node node, K key, Compare<T, K> compare)
-		{
-			int loc = 0;
-			for (int i = 0; i < node.ItemCount; i++)
-				switch (compare(node.Items[i], key))
-				{
-					case Comparison.Less:
-						loc++;
-						continue;
-					case Comparison.Equal:
-						goto break_for;
-					case Comparison.Greater:
-						goto break_for;
-					default:
-						throw new Error("not implemented");
-				}
-			break_for:
-			if (loc < node.ItemCount && compare(node.Items[loc], key) == Comparison.Equal)
-				return node.Items[loc];
-			if (node.ChildCount == 0)
-				throw new Error("getting a non-existing item");
-			return this.Get(node.Children[loc], key, compare);
 		}
 		#endregion
 		#region public void Add(T addition)
@@ -329,75 +242,6 @@ namespace Seven.Structures
 
 			this._height++;
 			this._count++;
-		}
-		#endregion
-		#region private void Add_SplitChild(Node parentNode, int nodeToBeSplitIndex, Node nodeToBeSplit)
-		private void Add_SplitChild(Node parentNode, int nodeToBeSplitIndex, Node nodeToBeSplit)
-		{
-			Node newNode = new Node(this._node_size);
-			for (int i = nodeToBeSplitIndex; i < parentNode.ItemCount; i++)
-				parentNode.Items[i] = parentNode.Items[i + 1];
-			parentNode.Items[nodeToBeSplitIndex] = nodeToBeSplit.Items[this._node_size - 1];
-			for (int i = nodeToBeSplitIndex + 1; i < parentNode.ChildCount; i++)
-				parentNode.Children[i] = parentNode.Children[i + 1];
-			parentNode.Children[nodeToBeSplitIndex] = newNode;
-			//int end_range = this._node_size + this._node_size - 1;
-			//for (int i = this._node_size; i < end_range; i++)
-			//	newNode.Items[newNode.ItemCount++] = nodeToBeSplit.Items[i];
-
-			int end_range = this._node_size;
-			for (int i = 0; i < end_range; i++)
-				newNode.Items[newNode.ItemCount++] = nodeToBeSplit.Items[i];
-
-			nodeToBeSplit.ItemCount -= this._node_size;
-			if (!(nodeToBeSplit.ChildCount == 0))
-			{
-				int end_range_2 = this._node_size * 2;
-				for (int i = this._node_size; i < end_range_2; i++)
-					newNode.Children[newNode.ChildCount++] = nodeToBeSplit.Children[i];
-				nodeToBeSplit.ChildCount -= this._node_size;
-			}
-		}
-		#endregion
-		#region private void Add_NonFull(Node node, T addition)
-		private void Add_NonFull(Node node, T addition)
-		{
-			int positionToInsert = 0;
-			for (int i = 0; i < node.ItemCount; i++)
-				switch (this._compare(addition, node.Items[i]))
-				{
-					case Comparison.Less:
-						goto break_for;
-					case Comparison.Equal:
-						positionToInsert++;
-						continue;
-					case Comparison.Greater:
-						positionToInsert++;
-						continue;
-					default:
-						throw new Error("not implemented");
-				}
-		break_for:
-			if (node.ChildCount == 0) // leaf node
-			{
-				for (int i = positionToInsert; i < node.ItemCount; i++)
-					node.Items[i] = node.Items[i + 1];
-				node.Items[positionToInsert] = addition;
-				node.ItemCount++;
-				return;
-			}
-			Node child = node.Children[positionToInsert];
-			if (child.ItemCount == this._node_size)// (2 * this._node_size) - 1) // non-leaf
-			{
-				this.Add_SplitChild(node, positionToInsert, child);
-				if (this._compare(addition, node.Items[positionToInsert]) == Comparison.Greater)
-				{
-					positionToInsert++;
-				}
-			}
-			//if (node.Children[positionToInsert] == null)
-			//	node.Children[positionToInsert] = new Node(this._node_size);
-			this.Add_NonFull(node.Children[positionToInsert], addition);
 		}
 		#endregion
 		#region public void Remove(T removal)
@@ -429,6 +273,253 @@ namespace Seven.Structures
 			this._count--;
 		}
 		#endregion
+		#region public void StepperReverse(Step<T> step_delegate)
+		/// <summary>Invokes a delegate for each entry in the data structure (right to left).</summary>
+		/// <param name="step_delegate">The delegate to invoke on each item in the structure.</param>
+		public void StepperReverse(Step<T> step_delegate)
+		{
+			this.StepperReverse(step_delegate, this._root);
+		}
+		#endregion
+		#region public void StepperReverse(StepRef<T> step_delegate)
+		/// <summary>Invokes a delegate for each entry in the data structure (right to left).</summary>
+		/// <param name="step_delegate">The delegate to invoke on each item in the structure.</param>
+		public void StepperReverse(StepRef<T> step_delegate)
+		{
+			this.StepperReverse(step_delegate, this._root);
+		}
+		#endregion
+		#region public StepStatus StepperReverse(StepBreak<T> step_delegate)
+		/// <summary>Invokes a delegate for each entry in the data structure (right to left).</summary>
+		/// <param name="step_delegate">The delegate to invoke on each item in the structure.</param>
+		/// <returns>The resulting status of the iteration.</returns>
+		public StepStatus StepperReverse(StepBreak<T> step_delegate)
+		{
+			return this.StepperReverse(step_delegate, this._root);
+		}
+		#endregion
+		#region public StepStatus StepperReverse(StepRefBreak<T> step_delegate)
+		/// <summary>Invokes a delegate for each entry in the data structure (right to left).</summary>
+		/// <param name="step_delegate">The delegate to invoke on each item in the structure.</param>
+		/// <returns>The resulting status of the iteration.</returns>
+		public StepStatus StepperReverse(StepRefBreak<T> step_delegate)
+		{
+			return this.StepperReverse(step_delegate, this._root);
+		}
+		#endregion
+		#region public void Stepper(Step<T> step_function, T minimum, T maximum)
+		/// <summary>Does an optimized step function (left to right) for sorted binary search trees.</summary>
+		/// <param name="step_function">The step function.</param>
+		/// <param name="minimum">The minimum step value.</param>
+		/// <param name="maximum">The maximum step value.</param>
+		public void Stepper(Step<T> step_function, T minimum, T maximum)
+		{
+			throw new Error("not implemented");
+		}
+		#endregion
+		#region public void Stepper(StepRef<T> step_function, T minimum, T maximum)
+		/// <summary>Does an optimized step function (left to right) for sorted binary search trees.</summary>
+		/// <param name="step_function">The step function.</param>
+		/// <param name="minimum">The minimum step value.</param>
+		/// <param name="maximum">The maximum step value.</param>
+		public void Stepper(StepRef<T> step_function, T minimum, T maximum)
+		{
+			throw new Error("not implemented");
+		}
+		#endregion
+		#region public StepStatus Stepper(StepBreak<T> step_function, T minimum, T maximum)
+		/// <summary>Does an optimized step function (left to right) for sorted binary search trees.</summary>
+		/// <param name="step_function">The step function.</param>
+		/// <param name="minimum">The minimum step value.</param>
+		/// <param name="maximum">The maximum step value.</param>
+		/// <returns>The result status of the stepper function.</returns>
+		public StepStatus Stepper(StepBreak<T> step_function, T minimum, T maximum)
+		{
+			throw new Error("not implemented");
+		}
+		#endregion
+		#region public StepStatus Stepper(StepRefBreak<T> step_function, T minimum, T maximum)
+		/// <summary>Does an optimized step function (left to right) for sorted binary search trees.</summary>
+		/// <param name="step_function">The step function.</param>
+		/// <param name="minimum">The minimum step value.</param>
+		/// <param name="maximum">The maximum step value.</param>
+		/// <returns>The result status of the stepper function.</returns>
+		public StepStatus Stepper(StepRefBreak<T> step_function, T minimum, T maximum)
+		{
+			throw new Error("not implemented");
+		}
+		#endregion
+		#region public void StepperReverse(Step<T> step_function, T minimum, T maximum)
+		/// <summary>Does an optimized step function (right to left) for sorted binary search trees.</summary>
+		/// <param name="step_function">The step function.</param>
+		/// <param name="minimum">The minimum step value.</param>
+		/// <param name="maximum">The maximum step value.</param>
+		public void StepperReverse(Step<T> step_function, T minimum, T maximum)
+		{
+			throw new Error("not implemented");
+		}
+		#endregion
+		#region public void StepperReverse(StepRef<T> step_function, T minimum, T maximum)
+		/// <summary>Does an optimized step function (right to left) for sorted binary search trees.</summary>
+		/// <param name="step_function">The step function.</param>
+		/// <param name="minimum">The minimum step value.</param>
+		/// <param name="maximum">The maximum step value.</param>
+		public void StepperReverse(StepRef<T> step_function, T minimum, T maximum)
+		{
+			throw new Error("not implemented");
+		}
+		#endregion
+		#region public StepStatus StepperReverse(StepBreak<T> step_function, T minimum, T maximum)
+		/// <summary>Does an optimized step function (right to left) for sorted binary search trees.</summary>
+		/// <param name="step_function">The step function.</param>
+		/// <param name="minimum">The minimum step value.</param>
+		/// <param name="maximum">The maximum step value.</param>
+		/// <returns>The result status of the stepper function.</returns>
+		public StepStatus StepperReverse(StepBreak<T> step_function, T minimum, T maximum)
+		{
+			throw new Error("not implemented");
+		}
+		#endregion
+		#region public StepStatus StepperReverse(StepRefBreak<T> step_function, T minimum, T maximum)
+		/// <summary>Does an optimized step function (right to left) for sorted binary search trees.</summary>
+		/// <param name="step_function">The step function.</param>
+		/// <param name="minimum">The minimum step value.</param>
+		/// <param name="maximum">The maximum step value.</param>
+		/// <returns>The result status of the stepper function.</returns>
+		public StepStatus StepperReverse(StepRefBreak<T> step_function, T minimum, T maximum)
+		{
+			throw new Error("not implemented");
+		}
+		#endregion
+		#region public void Clear()
+		/// <summary>Returns the structure to an empty state.</summary>
+		public void Clear()
+		{
+			this._root = new Node(this._node_size);
+			this._count = 0;
+		}
+		#endregion
+		#region public void Stepper(Step<T> step_delegate)
+		/// <summary>Invokes a delegate for each entry in the data structure.</summary>
+		/// <param name="step_delegate">The delegate to invoke on each item in the structure.</param>
+		public void Stepper(Step<T> step_delegate)
+		{
+			Stepper(step_delegate, this._root);
+		}
+		#endregion
+		#region public void Stepper(StepRef<T> step_delegate)
+		/// <summary>Invokes a delegate for each entry in the data structure.</summary>
+		/// <param name="step_delegate">The delegate to invoke on each item in the structure.</param>
+		public void Stepper(StepRef<T> step_delegate)
+		{
+			Stepper(step_delegate, this._root);
+		}
+		#endregion
+		#region public StepStatus Stepper(StepBreak<T> step_delegate)
+		/// <summary>Invokes a delegate for each entry in the data structure.</summary>
+		/// <param name="step_delegate">The delegate to invoke on each item in the structure.</param>
+		/// <returns>The resulting status of the iteration.</returns>
+		public StepStatus Stepper(StepBreak<T> step_delegate)
+		{
+			return Stepper(step_delegate, this._root);
+		}
+		#endregion
+		#region public StepStatus Stepper(StepRefBreak<T> step_delegate)
+		/// <summary>Invokes a delegate for each entry in the data structure.</summary>
+		/// <param name="step_delegate">The delegate to invoke on each item in the structure.</param>
+		/// <returns>The resulting status of the iteration.</returns>
+		public StepStatus Stepper(StepRefBreak<T> step_delegate)
+		{
+			return Stepper(step_delegate, this._root);
+		}
+		#endregion
+		#region System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+		/// <summary>FOR COMPATIBILITY ONLY. AVOID IF POSSIBLE.</summary>
+		System.Collections.IEnumerator
+			System.Collections.IEnumerable.GetEnumerator()
+		{
+			return this.GetEnumerator();
+		}
+		#endregion
+		#region public System.Collections.Generic.IEnumerator<T> GetEnumerator()
+		/// <summary>FOR COMPATIBILITY ONLY. AVOID IF POSSIBLE.</summary>
+		public System.Collections.Generic.IEnumerator<T> GetEnumerator()
+		{
+			Stack<Link<Node, int, bool>> forks = new StackLinked<Link<Node, int, bool>>();
+			forks.Push(new Link<Node, int, bool>(this._root, 0, false));
+			while (forks.Count > 0)
+			{
+				Link<Node, int, bool> link = forks.Pop();
+				if (link.One == null)
+					continue;
+				else if (!link.Three)
+				{
+					link.Three = true;
+					forks.Push(link);
+					Node child = link.One.Children[link.Two];
+					forks.Push(new Link<Node, int, bool>(child, 0, false));
+				}
+				else if (link.Two < link.One.ItemCount)
+				{
+					yield return link.One.Items[link.Two];
+					link.Two++;
+					link.Three = false;
+					forks.Push(link);
+				}
+			}
+		}
+		#endregion
+		// methods (internal)
+		#region private bool Contains<K>(Node node, K key, Compare<T, K> compare)
+		private bool Contains<K>(Node node, K key, Compare<T, K> compare)
+		{
+			int loc = 0;
+			for (int i = 0; i < node.ItemCount; i++)
+				switch (compare(node.Items[i], key))
+				{
+					case Comparison.Less:
+						loc++;
+						continue;
+					case Comparison.Equal:
+						goto break_for;
+					case Comparison.Greater:
+						goto break_for;
+					default:
+						throw new Error("not implemented");
+				}
+		break_for:
+			if (loc < node.ItemCount && compare(node.Items[loc], key) == Comparison.Equal)
+				return true;
+			if (node.ChildCount == 0)
+				return false;
+			return this.Contains(node.Children[loc], key, compare);
+		}
+		#endregion
+		#region private T Get<K>(Node node, K key, Compare<T, K> compare)
+		private T Get<K>(Node node, K key, Compare<T, K> compare)
+		{
+			int loc = 0;
+			for (int i = 0; i < node.ItemCount; i++)
+				switch (compare(node.Items[i], key))
+				{
+					case Comparison.Less:
+						loc++;
+						continue;
+					case Comparison.Equal:
+						goto break_for;
+					case Comparison.Greater:
+						goto break_for;
+					default:
+						throw new Error("not implemented");
+				}
+		break_for:
+			if (loc < node.ItemCount && compare(node.Items[loc], key) == Comparison.Equal)
+				return node.Items[loc];
+			if (node.ChildCount == 0)
+				throw new Error("getting a non-existing item");
+			return this.Get(node.Children[loc], key, compare);
+		}
+		#endregion
 		#region private void Remove<K>(Node node, K key, Compare<T, K> compare)
 		private void Remove<K>(Node node, K key, Compare<T, K> compare)
 		{
@@ -446,7 +537,7 @@ namespace Seven.Structures
 					default:
 						throw new Error("not implemented");
 				}
-			break_for:
+		break_for:
 			if (loc < node.ItemCount && compare(node.Items[loc], key) == Comparison.Equal)
 			{
 				this.RemoveKeyFromNode(node, key, compare, loc);
@@ -649,12 +740,73 @@ namespace Seven.Structures
 			return this.RemovePredecessor(node.Children[0]);
 		}
 		#endregion
-		#region public void StepperReverse(Step<T> step_delegate)
-		/// <summary>Invokes a delegate for each entry in the data structure (right to left).</summary>
-		/// <param name="step_delegate">The delegate to invoke on each item in the structure.</param>
-		public void StepperReverse(Step<T> step_delegate)
+		#region private void Add_SplitChild(Node parentNode, int nodeToBeSplitIndex, Node nodeToBeSplit)
+		private void Add_SplitChild(Node parentNode, int nodeToBeSplitIndex, Node nodeToBeSplit)
 		{
-			this.StepperReverse(step_delegate, this._root);
+			Node newNode = new Node(this._node_size);
+			for (int i = nodeToBeSplitIndex; i < parentNode.ItemCount; i++)
+				parentNode.Items[i] = parentNode.Items[i + 1];
+			parentNode.Items[nodeToBeSplitIndex] = nodeToBeSplit.Items[this._node_size - 1];
+			for (int i = nodeToBeSplitIndex + 1; i < parentNode.ChildCount; i++)
+				parentNode.Children[i] = parentNode.Children[i + 1];
+			parentNode.Children[nodeToBeSplitIndex] = newNode;
+			//int end_range = this._node_size + this._node_size - 1;
+			//for (int i = this._node_size; i < end_range; i++)
+			//	newNode.Items[newNode.ItemCount++] = nodeToBeSplit.Items[i];
+
+			int end_range = this._node_size;
+			for (int i = 0; i < end_range; i++)
+				newNode.Items[newNode.ItemCount++] = nodeToBeSplit.Items[i];
+
+			nodeToBeSplit.ItemCount -= this._node_size;
+			if (!(nodeToBeSplit.ChildCount == 0))
+			{
+				int end_range_2 = this._node_size * 2;
+				for (int i = this._node_size; i < end_range_2; i++)
+					newNode.Children[newNode.ChildCount++] = nodeToBeSplit.Children[i];
+				nodeToBeSplit.ChildCount -= this._node_size;
+			}
+		}
+		#endregion
+		#region private void Add_NonFull(Node node, T addition)
+		private void Add_NonFull(Node node, T addition)
+		{
+			int positionToInsert = 0;
+			for (int i = 0; i < node.ItemCount; i++)
+				switch (this._compare(addition, node.Items[i]))
+				{
+					case Comparison.Less:
+						goto break_for;
+					case Comparison.Equal:
+						positionToInsert++;
+						continue;
+					case Comparison.Greater:
+						positionToInsert++;
+						continue;
+					default:
+						throw new Error("not implemented");
+				}
+		break_for:
+			if (node.ChildCount == 0) // leaf node
+			{
+				for (int i = positionToInsert; i < node.ItemCount; i++)
+					node.Items[i] = node.Items[i + 1];
+				node.Items[positionToInsert] = addition;
+				node.ItemCount++;
+				return;
+			}
+			Node child = node.Children[positionToInsert];
+			if (child.ItemCount == this._node_size)// (2 * this._node_size) - 1) // non-leaf
+			{
+				this.Add_SplitChild(node, positionToInsert, child);
+				if (this._compare(addition, node.Items[positionToInsert]) == Comparison.Greater)
+				{
+					positionToInsert++;
+				}
+			}
+			//if (node.Children[positionToInsert] == null)
+			//	node.Children[positionToInsert] = new Node(this._node_size);
+			this.Add_NonFull(node.Children[positionToInsert], addition);
 		}
 		#endregion
 		#region private void StepperReverse(Step<T> step_delegate, Node node)
@@ -670,14 +822,6 @@ namespace Seven.Structures
 			}
 		}
 		#endregion
-		#region public void StepperReverse(StepRef<T> step_delegate)
-		/// <summary>Invokes a delegate for each entry in the data structure (right to left).</summary>
-		/// <param name="step_delegate">The delegate to invoke on each item in the structure.</param>
-		public void StepperReverse(StepRef<T> step_delegate)
-		{
-			this.StepperReverse(step_delegate, this._root);
-		}
-		#endregion
 		#region private void StepperReverse(StepRef<T> step_delegate, Node node)
 		private void StepperReverse(StepRef<T> step_delegate, Node node)
 		{
@@ -689,15 +833,6 @@ namespace Seven.Structures
 				step_delegate(ref node.Items[i]);
 				Stepper(step_delegate, node.Children[i]);
 			}
-		}
-		#endregion
-		#region public StepStatus StepperReverse(StepBreak<T> step_delegate)
-		/// <summary>Invokes a delegate for each entry in the data structure (right to left).</summary>
-		/// <param name="step_delegate">The delegate to invoke on each item in the structure.</param>
-		/// <returns>The resulting status of the iteration.</returns>
-		public StepStatus StepperReverse(StepBreak<T> step_delegate)
-		{
-			return this.StepperReverse(step_delegate, this._root);
 		}
 		#endregion
 		#region private StepStatus StepperReverse(StepBreak<T> step_delegate, Node node)
@@ -738,15 +873,6 @@ namespace Seven.Structures
 			return StepStatus.Continue;
 		}
 		#endregion
-		#region public StepStatus StepperReverse(StepRefBreak<T> step_delegate)
-		/// <summary>Invokes a delegate for each entry in the data structure (right to left).</summary>
-		/// <param name="step_delegate">The delegate to invoke on each item in the structure.</param>
-		/// <returns>The resulting status of the iteration.</returns>
-		public StepStatus StepperReverse(StepRefBreak<T> step_delegate)
-		{
-			return this.StepperReverse(step_delegate, this._root);
-		}
-		#endregion
 		#region private StepStatus StepperReverse(StepRefBreak<T> step_delegate, Node node)
 		private StepStatus StepperReverse(StepRefBreak<T> step_delegate, Node node)
 		{
@@ -785,106 +911,6 @@ namespace Seven.Structures
 			return StepStatus.Continue;
 		}
 		#endregion
-		#region public void Stepper(Step<T> step_function, T minimum, T maximum)
-		/// <summary>Does an optimized step function (left to right) for sorted binary search trees.</summary>
-		/// <param name="step_function">The step function.</param>
-		/// <param name="minimum">The minimum step value.</param>
-		/// <param name="maximum">The maximum step value.</param>
-		public void Stepper(Step<T> step_function, T minimum, T maximum)
-		{
-			throw new Error("not implemented");
-		}
-		#endregion
-		#region public void Stepper(StepRef<T> step_function, T minimum, T maximum)
-		/// <summary>Does an optimized step function (left to right) for sorted binary search trees.</summary>
-		/// <param name="step_function">The step function.</param>
-		/// <param name="minimum">The minimum step value.</param>
-		/// <param name="maximum">The maximum step value.</param>
-		public void Stepper(StepRef<T> step_function, T minimum, T maximum)
-		{
-			throw new Error("not implemented");
-		}
-		#endregion
-		#region public StepStatus Stepper(StepBreak<T> step_function, T minimum, T maximum)
-		/// <summary>Does an optimized step function (left to right) for sorted binary search trees.</summary>
-		/// <param name="step_function">The step function.</param>
-		/// <param name="minimum">The minimum step value.</param>
-		/// <param name="maximum">The maximum step value.</param>
-		/// <returns>The result status of the stepper function.</returns>
-		public StepStatus Stepper(StepBreak<T> step_function, T minimum, T maximum)
-		{
-			throw new Error("not implemented");
-		}
-		#endregion
-		#region public StepStatus Stepper(StepRefBreak<T> step_function, T minimum, T maximum)
-		/// <summary>Does an optimized step function (left to right) for sorted binary search trees.</summary>
-		/// <param name="step_function">The step function.</param>
-		/// <param name="minimum">The minimum step value.</param>
-		/// <param name="maximum">The maximum step value.</param>
-		/// <returns>The result status of the stepper function.</returns>
-		public StepStatus Stepper(StepRefBreak<T> step_function, T minimum, T maximum)
-		{
-			throw new Error("not implemented");
-		}
-		#endregion
-		#region public void StepperReverse(Step<T> step_function, T minimum, T maximum)
-		/// <summary>Does an optimized step function (right to left) for sorted binary search trees.</summary>
-		/// <param name="step_function">The step function.</param>
-		/// <param name="minimum">The minimum step value.</param>
-		/// <param name="maximum">The maximum step value.</param>
-		public void StepperReverse(Step<T> step_function, T minimum, T maximum)
-		{
-			throw new Error("not implemented");
-		}
-		#endregion
-		#region public void StepperReverse(StepRef<T> step_function, T minimum, T maximum)
-		/// <summary>Does an optimized step function (right to left) for sorted binary search trees.</summary>
-		/// <param name="step_function">The step function.</param>
-		/// <param name="minimum">The minimum step value.</param>
-		/// <param name="maximum">The maximum step value.</param>
-		public void StepperReverse(StepRef<T> step_function, T minimum, T maximum)
-		{
-			throw new Error("not implemented");
-		}
-		#endregion
-		#region public StepStatus StepperReverse(StepBreak<T> step_function, T minimum, T maximum)
-		/// <summary>Does an optimized step function (right to left) for sorted binary search trees.</summary>
-		/// <param name="step_function">The step function.</param>
-		/// <param name="minimum">The minimum step value.</param>
-		/// <param name="maximum">The maximum step value.</param>
-		/// <returns>The result status of the stepper function.</returns>
-		public StepStatus StepperReverse(StepBreak<T> step_function, T minimum, T maximum)
-		{
-			throw new Error("not implemented");
-		}
-		#endregion
-		#region public StepStatus StepperReverse(StepRefBreak<T> step_function, T minimum, T maximum)
-		/// <summary>Does an optimized step function (right to left) for sorted binary search trees.</summary>
-		/// <param name="step_function">The step function.</param>
-		/// <param name="minimum">The minimum step value.</param>
-		/// <param name="maximum">The maximum step value.</param>
-		/// <returns>The result status of the stepper function.</returns>
-		public StepStatus StepperReverse(StepRefBreak<T> step_function, T minimum, T maximum)
-		{
-			throw new Error("not implemented");
-		}
-		#endregion
-		#region public void Clear()
-		/// <summary>Returns the structure to an empty state.</summary>
-		public void Clear()
-		{
-			this._root = new Node(this._node_size);
-			this._count = 0;
-		}
-		#endregion
-		#region public void Stepper(Step<T> step_delegate)
-		/// <summary>Invokes a delegate for each entry in the data structure.</summary>
-		/// <param name="step_delegate">The delegate to invoke on each item in the structure.</param>
-		public void Stepper(Step<T> step_delegate)
-		{
-			Stepper(step_delegate, this._root);
-		}
-		#endregion
 		#region private void Stepper(Step<T> step_delegate, Node node)
 		private void Stepper(Step<T> step_delegate, Node node)
 		{
@@ -898,14 +924,6 @@ namespace Seven.Structures
 			Stepper(step_delegate, node.Children[node.ItemCount]);
 		}
 		#endregion
-		#region public void Stepper(StepRef<T> step_delegate)
-		/// <summary>Invokes a delegate for each entry in the data structure.</summary>
-		/// <param name="step_delegate">The delegate to invoke on each item in the structure.</param>
-		public void Stepper(StepRef<T> step_delegate)
-		{
-			Stepper(step_delegate, this._root);
-		}
-		#endregion
 		#region private void Stepper(StepRef<T> step_delegate, Node node)
 		private void Stepper(StepRef<T> step_delegate, Node node)
 		{
@@ -917,15 +935,6 @@ namespace Seven.Structures
 				step_delegate(ref node.Items[i]);
 			}
 			Stepper(step_delegate, node.Children[node.ItemCount]);
-		}
-		#endregion
-		#region public StepStatus Stepper(StepBreak<T> step_delegate)
-		/// <summary>Invokes a delegate for each entry in the data structure.</summary>
-		/// <param name="step_delegate">The delegate to invoke on each item in the structure.</param>
-		/// <returns>The resulting status of the iteration.</returns>
-		public StepStatus Stepper(StepBreak<T> step_delegate)
-		{
-			return Stepper(step_delegate, this._root);
 		}
 		#endregion
 		#region private StepStatus Stepper(StepBreak<T> step_delegate, Node node)
@@ -957,15 +966,6 @@ namespace Seven.Structures
 			return Stepper(step_delegate, node.Children[node.ItemCount]);
 		}
 		#endregion
-		#region public StepStatus Stepper(StepRefBreak<T> step_delegate)
-		/// <summary>Invokes a delegate for each entry in the data structure.</summary>
-		/// <param name="step_delegate">The delegate to invoke on each item in the structure.</param>
-		/// <returns>The resulting status of the iteration.</returns>
-		public StepStatus Stepper(StepRefBreak<T> step_delegate)
-		{
-			return Stepper(step_delegate, this._root);
-		}
-		#endregion
 		#region private StepStatus Stepper(StepRefBreak<T> step_delegate, Node node)
 		private StepStatus Stepper(StepRefBreak<T> step_delegate, Node node)
 		{
@@ -993,64 +993,6 @@ namespace Seven.Structures
 				}
 			}
 			return Stepper(step_delegate, node.Children[node.ItemCount]);
-		}
-		#endregion
-		#region System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
-		/// <summary>FOR COMPATIBILITY ONLY. AVOID IF POSSIBLE.</summary>
-		System.Collections.IEnumerator
-			System.Collections.IEnumerable.GetEnumerator()
-		{
-			Stack<Link<Node, int, bool>> forks = new StackLinked<Link<Node, int, bool>>();
-			forks.Push(new Link<Node, int, bool>(this._root, 0, false));
-			while (forks.Count > 0)
-			{
-				Link<Node, int, bool> link = forks.Pop();
-				if (link.One == null)
-					continue;
-				else if (!link.Three)
-				{
-					link.Three = true;
-					forks.Push(link);
-					Node child = link.One.Children[link.Two];
-					forks.Push(new Link<Node, int, bool>(child, 0, false));
-				}
-				else if (link.Two < link.One.ItemCount)
-				{
-					yield return link.One.Items[link.Two];
-					link.Two++;
-					link.Three = false;
-					forks.Push(link);
-				}
-			}
-		}
-		#endregion
-		#region System.Collections.Generic.IEnumerator<T> System.Collections.Generic.IEnumerable<T>.GetEnumerator()
-		/// <summary>FOR COMPATIBILITY ONLY. AVOID IF POSSIBLE.</summary>
-		System.Collections.Generic.IEnumerator<T>
-			System.Collections.Generic.IEnumerable<T>.GetEnumerator()
-		{
-			Stack<Link<Node, int, bool>> forks = new StackLinked<Link<Node, int, bool>>();
-			forks.Push(new Link<Node, int, bool>(this._root, 0, false));
-			while (forks.Count > 0)
-			{
-				Link<Node, int, bool> link = forks.Pop();
-				if (link.One == null)
-					continue;
-				else if (!link.Three)
-				{
-					link.Three = true;
-					forks.Push(link);
-					Node child = link.One.Children[link.Two];
-					forks.Push(new Link<Node, int, bool>(child, 0, false));
-				}
-				else if (link.Two < link.One.ItemCount)
-				{
-					yield return link.One.Items[link.Two];
-					link.Two++;
-					link.Three = false;
-					forks.Push(link);
-				}
-			}
 		}
 		#endregion
 	}

@@ -28,12 +28,13 @@ namespace Algorithms
 				Console.Write(", " + dataSet[i]);
 			Console.WriteLine();
 
+			// if you want to sort non-array types, see the overloads using Get<int> and Assign<int>
 			// Delegates
-			Get<int> get = (int index) => { return dataSet[index]; };
-			Assign<int> assign = (int index, int value) => { dataSet[index] = value; };
+			//Get<int> get = (int index) => { return dataSet[index]; };
+			//Assign<int> assign = (int index, int value) => { dataSet[index] = value; };
 			
 			// Shuffling (Randomizing)
-			Sort<int>.Shuffle(get, assign, 0, dataSet.Length);
+			Sort<int>.Shuffle(dataSet);
 			Console.Write("Shuffle (Randomizing): ");
 			Console.Write(dataSet[0]);
 			for (int i = 1; i < dataSet.Length; i++)
@@ -41,67 +42,73 @@ namespace Algorithms
 			Console.WriteLine();
 			
 			// Bubble
-			Sort<int>.Bubble(Compute<int>.Compare, get, assign, 0, dataSet.Length);
+			Sort<int>.Bubble(dataSet);
 			Console.Write("Bubble: ");
 			Console.Write(dataSet[0]);
 			for (int i = 1; i < dataSet.Length; i++)
 				Console.Write(", " + dataSet[i]);
 			Console.WriteLine();
 
-			Sort<int>.Shuffle(get, assign, 0, dataSet.Length);
+			Console.WriteLine("shuffling dataSet...");
+			Sort<int>.Shuffle(dataSet);
 
 			// Selection
-			Sort<int>.Selection(Compute<int>.Compare, get, assign, 0, dataSet.Length);
+			Sort<int>.Selection(dataSet);
 			Console.Write("Selection: ");
 			Console.Write(dataSet[0]);
 			for (int i = 1; i < dataSet.Length; i++)
 				Console.Write(", " + dataSet[i]);
 			Console.WriteLine();
 
-			Sort<int>.Shuffle(get, assign, 0, dataSet.Length);
+			Console.WriteLine("shuffling dataSet...");
+			Sort<int>.Shuffle(dataSet);
 
 			// Insertion
-			Sort<int>.Insertion(Compute<int>.Compare, get, assign, 0, dataSet.Length);
+			Sort<int>.Insertion(dataSet);
 			Console.Write("Insertion: ");
 			Console.Write(dataSet[0]);
 			for (int i = 1; i < dataSet.Length; i++)
 				Console.Write(", " + dataSet[i]);
 			Console.WriteLine();
 
-			Sort<int>.Shuffle(get, assign, 0, dataSet.Length);
+			Console.WriteLine("shuffling dataSet...");
+			Sort<int>.Shuffle(dataSet);
 
 			// Quick
-			Sort<int>.Quick(Compute<int>.Compare, get, assign, 0, dataSet.Length);
+			Sort<int>.Quick(dataSet);
 			Console.Write("Quick: ");
 			Console.Write(dataSet[0]);
 			for (int i = 1; i < dataSet.Length; i++)
 				Console.Write(", " + dataSet[i]);
 			Console.WriteLine();
 
-			Sort<int>.Shuffle(get, assign, 0, dataSet.Length);
+			Console.WriteLine("shuffling dataSet...");
+			Sort<int>.Shuffle(dataSet);
 
 			// Merge
-			Sort<int>.Merge(Compute<int>.Compare, get, assign, 0, dataSet.Length);
+			Sort<int>.Merge(Compute<int>.Compare, dataSet);
 			Console.Write("Merge: ");
 			Console.Write(dataSet[0]);
 			for (int i = 1; i < dataSet.Length; i++)
 				Console.Write(", " + dataSet[i]);
 			Console.WriteLine();
 
-			Sort<int>.Shuffle(get, assign, 0, dataSet.Length);
+			Console.WriteLine("shuffling dataSet...");
+			Sort<int>.Shuffle(dataSet);
 
 			// Heap
-			Sort<int>.Heap(Compute<int>.Compare, get, assign, 0, dataSet.Length);
+			Sort<int>.Heap(Compute<int>.Compare, dataSet);
 			Console.Write("Heap: ");
 			Console.Write(dataSet[0]);
 			for (int i = 1; i < dataSet.Length; i++)
 				Console.Write(", " + dataSet[i]);
 			Console.WriteLine();
 
-			Sort<int>.Shuffle(get, assign, 0, dataSet.Length);
+			Console.WriteLine("shuffling dataSet...");
+			Sort<int>.Shuffle(dataSet);
 
 			// OddEven
-			Sort<int>.OddEven(Compute<int>.Compare, get, assign, 0, dataSet.Length);
+			Sort<int>.OddEven(Compute<int>.Compare, dataSet);
 			Console.Write("OddEven: ");
 			Console.Write(dataSet[0]);
 			for (int i = 1; i < dataSet.Length; i++)
@@ -118,7 +125,7 @@ namespace Algorithms
 			//	Console.Write(", " + dataSet[i]);
 			//Console.WriteLine();
 
-			Sort<int>.Shuffle(get, assign, 0, dataSet.Length);
+			Sort<int>.Shuffle(dataSet);
 
 			// Bogo
 			//Sort<int>.Bogo(Logic.compare, get, set, 0, dataSet.Length);

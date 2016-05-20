@@ -46,7 +46,7 @@
 		#endregion
 	}
 
-	/// <summary>Contains extension methods for the RedBlackTree<T> interface.</summary>
+	/// <summary>Contains extension methods for the RedBlackTree interface.</summary>
 	public static class RedBlackTree
 	{
 		// extensions
@@ -183,7 +183,253 @@
 		/// <summary>The sorting technique.</summary>
 		public Compare<T> Compare { get { return new Compare<T>(this._compare_function); } }
 		#endregion
-		// methods
+		// methods (public)
+		#region public RedBlackTree_Linked<T> Clone()
+		/// <summary>Creates a shallow clone of this data structure.</summary>
+		/// <returns>A shallow clone of this data structure.</returns>
+		public RedBlackTreeLinked<T> Clone()
+		{
+			throw new System.NotImplementedException();
+		}
+		#endregion
+		#region public T Get<Key>(Key key, Compare<T, Key> comparison)
+		public T Get<Key>(Key key, Compare<T, Key> comparison)
+		{
+			RedBlackTreeLinked<T>.Node treeNode = _root;
+			while (treeNode != _sentinelNode)
+			{
+				switch (comparison(treeNode.Value, key))
+				{
+					case Comparison.Equal:
+						return treeNode.Value;
+					case Comparison.Greater:
+						treeNode = treeNode.LeftChild;
+						break;
+					case Comparison.Less:
+						treeNode = treeNode.RightChild;
+						break;
+					default:
+						throw new Error("not implemeted");
+				}
+			}
+			throw new Error("attempting to get a non-existing value.");
+		}
+		#endregion
+		#region public void Add(T data)
+		public void Add(T data)
+		{
+			RedBlackTreeLinked<T>.Node addition = new RedBlackTreeLinked<T>.Node();
+			RedBlackTreeLinked<T>.Node temp = _root;
+			while (temp != _sentinelNode)
+			{
+				addition.Parent = temp;
+
+				switch (this._compare_function(data, temp.Value))
+				{
+					case Comparison.Equal:
+						throw (new Error("A Node with the same key already exists"));
+					case Comparison.Greater:
+						temp = temp.RightChild;
+						break;
+					case Comparison.Less:
+						temp = temp.LeftChild;
+						break;
+					default:
+						throw new Error("not implemented");
+				}
+			}
+			addition.Value = data;
+			addition.LeftChild = _sentinelNode;
+			addition.RightChild = _sentinelNode;
+			if (addition.Parent != null)
+			{
+				switch (this._compare_function(addition.Value, addition.Parent.Value))
+				{
+					case Comparison.Greater:
+						addition.Parent.RightChild = addition;
+						break;
+					case Comparison.Less:
+						addition.Parent.LeftChild = addition;
+						break;
+					default:
+						throw new Error("not implemented");
+				}
+			}
+			else
+				_root = addition;
+			BalanceAddition(addition);
+			_count = _count + 1;
+		}
+		#endregion
+		#region public void Remove(T value)
+		public void Remove(T value)
+		{
+			this.Remove<T>(value, this._compare_function);
+		}
+		#endregion
+		#region public void Remove<Key>(Key key, Compare<T, Key> function)
+		public void Remove<Key>(Key key, Compare<T, Key> function)
+		{
+			RedBlackTreeLinked<T>.Node node;
+			node = _root;
+			while (node != _sentinelNode)
+			{
+				switch (function(node.Value, key))
+				{
+					case Comparison.Equal:
+						if (node == _sentinelNode)
+							return;
+						this.Remove(node);
+						this._count = _count - 1;
+						return;
+					case Comparison.Greater:
+						node = node.LeftChild;
+						break;
+					case Comparison.Less:
+						node = node.RightChild;
+						break;
+					default:
+						throw new Error("not implemented");
+				}
+			}
+		}
+		#endregion
+		#region public bool Contains(T item)
+		public bool Contains(T item)
+		{
+			return Contains<T>(item, this._compare_function);
+		}
+		#endregion
+		#region public bool Contains<Key>(Key key, Compare<T, Key> comparison)
+		public bool Contains<Key>(Key key, Compare<T, Key> comparison)
+		{
+			RedBlackTreeLinked<T>.Node treeNode = _root;
+			while (treeNode != _sentinelNode)
+			{
+				switch (comparison(treeNode.Value, key))
+				{
+					case Comparison.Equal:
+						return true;
+					case Comparison.Greater:
+						treeNode = treeNode.LeftChild;
+						break;
+					case Comparison.Less:
+						treeNode = treeNode.RightChild;
+						break;
+					default:
+						throw new Error("not implemeted");
+				}
+			}
+			return false;
+		}
+		#endregion
+		#region public void Clear()
+		public void Clear()
+		{
+			_root = _sentinelNode;
+			_count = 0;
+		}
+		#endregion
+		#region public T GetMin()
+		public T GetMin()
+		{
+			RedBlackTreeLinked<T>.Node treeNode = _root;
+			if (treeNode == null || treeNode == _sentinelNode)
+				throw new Error("attempting to get the minimum value from an empty tree.");
+			while (treeNode.LeftChild != _sentinelNode)
+				treeNode = treeNode.LeftChild;
+			T returnValue = treeNode.Value;
+			return returnValue;
+		}
+		#endregion
+		#region public T GetMax()
+		public T GetMax()
+		{
+			RedBlackTreeLinked<T>.Node treeNode = _root;
+			if (treeNode == null || treeNode == _sentinelNode)
+			{
+				throw (new Error("attempting to get the maximum value from an empty tree."));
+			}
+			while (treeNode.RightChild != _sentinelNode)
+				treeNode = treeNode.RightChild;
+			T returnValue = treeNode.Value;
+			return returnValue;
+		}
+		#endregion
+		#region public void StepperInOrder(Step<T> function)
+		/// <summary>Invokes a delegate for each entry in the data structure (least to greatest).</summary>
+		/// <param name="function">The delegate to invoke on each item in the structure.</param>
+		public void StepperInOrder(Step<T> function)
+		{
+			StepperInOrder(function, _root);
+		}
+		#endregion
+		#region public void Stepper(Step<T> function)
+		/// <summary>Invokes a delegate for each entry in the data structure (least to greatest).</summary>
+		/// <param name="function">The delegate to invoke on each item in the structure.</param>
+		public void Stepper(Step<T> function)
+		{
+			StepperInOrder(function);
+		}
+		#endregion
+		#region public void Stepper(StepRef<T> function)
+		/// <summary>Invokes a delegate for each entry in the data structure.</summary>
+		/// <param name="function">The delegate to invoke on each item in the structure.</param>
+		public void Stepper(StepRef<T> function)
+		{
+			StepperInOrder(function, this._root);
+		}
+		#endregion
+		#region public StepStatus Stepper(StepBreak<T> function)
+		/// <summary>Invokes a delegate for each entry in the data structure.</summary>
+		/// <param name="function">The delegate to invoke on each item in the structure.</param>
+		/// <returns>The resulting status of the iteration.</returns>
+		public StepStatus Stepper(StepBreak<T> function)
+		{
+			return StepperInOrder(function, this._root);
+		}
+		#endregion
+		#region public StepStatus Stepper(StepRefBreak<T> function)
+		/// <summary>Invokes a delegate for each entry in the data structure.</summary>
+		/// <param name="function">The delegate to invoke on each item in the structure.</param>
+		/// <returns>The resulting status of the iteration.</returns>
+		public StepStatus Stepper(StepRefBreak<T> function)
+		{
+			return StepperInOrder(function, this._root);
+		}
+		#endregion
+		#region System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+		/// <summary>FOR COMPATIBILITY ONLY. AVOID IF POSSIBLE.</summary>
+		System.Collections.IEnumerator
+			System.Collections.IEnumerable.GetEnumerator()
+		{
+			return this.GetEnumerator();
+		}
+		#endregion
+		#region public System.Collections.Generic.IEnumerator<T> GetEnumerator()
+		/// <summary>FOR COMPATIBILITY ONLY. AVOID IF POSSIBLE.</summary>
+		public System.Collections.Generic.IEnumerator<T> GetEnumerator()
+		{
+			Stack<RedBlackTreeLinked<T>.Node> forks = new StackLinked<RedBlackTreeLinked<T>.Node>();
+			RedBlackTreeLinked<T>.Node current = _root;
+			while (current != null && current.LeftChild != null && current.RightChild != null || forks.Count > 0)
+			{
+				if (current != null)
+				{
+					forks.Push(current);
+					current = current.LeftChild;
+				}
+				else if (forks.Count > 0)
+				{
+					current = forks.Pop();
+					if (current.LeftChild != null && current.RightChild != null)
+						yield return current.Value;
+					current = current.RightChild;
+				}
+			}
+		}
+		#endregion
+		// methods (private)
 		#region private void BalanceAddition(Node balancing)
 		private void BalanceAddition(Node balancing)
 		{
@@ -441,268 +687,6 @@
 					return StepStatus.Break;
 			}
 			return StepStatus.Continue;
-		}
-		#endregion
-		#region public RedBlackTree_Linked<T> Clone()
-		/// <summary>Creates a shallow clone of this data structure.</summary>
-		/// <returns>A shallow clone of this data structure.</returns>
-		public RedBlackTreeLinked<T> Clone()
-		{
-			throw new System.NotImplementedException();
-		}
-		#endregion
-		#region public T Get<Key>(Key key, Compare<T, Key> comparison)
-		public T Get<Key>(Key key, Compare<T, Key> comparison)
-		{
-			RedBlackTreeLinked<T>.Node treeNode = _root;
-			while (treeNode != _sentinelNode)
-			{
-				switch (comparison(treeNode.Value, key))
-				{
-					case Comparison.Equal:
-						return treeNode.Value;
-					case Comparison.Greater:
-						treeNode = treeNode.LeftChild;
-						break;
-					case Comparison.Less:
-						treeNode = treeNode.RightChild;
-						break;
-					default:
-						throw new Error("not implemeted");
-				}
-			}
-			throw new Error("attempting to get a non-existing value.");
-		}
-		#endregion
-		#region public void Add(T data)
-		public void Add(T data)
-		{
-			RedBlackTreeLinked<T>.Node addition = new RedBlackTreeLinked<T>.Node();
-			RedBlackTreeLinked<T>.Node temp = _root;
-			while (temp != _sentinelNode)
-			{
-				addition.Parent = temp;
-
-				switch (this._compare_function(data, temp.Value))
-				{
-					case Comparison.Equal:
-						throw (new Error("A Node with the same key already exists"));
-					case Comparison.Greater:
-						temp = temp.RightChild;
-						break;
-					case Comparison.Less:
-						temp = temp.LeftChild;
-						break;
-					default:
-						throw new Error("not implemented");
-				}
-			}
-			addition.Value = data;
-			addition.LeftChild = _sentinelNode;
-			addition.RightChild = _sentinelNode;
-			if (addition.Parent != null)
-			{
-				switch (this._compare_function(addition.Value, addition.Parent.Value))
-				{
-					case Comparison.Greater:
-						addition.Parent.RightChild = addition;
-						break;
-					case Comparison.Less:
-						addition.Parent.LeftChild = addition;
-						break;
-					default:
-						throw new Error("not implemented");
-				}
-			}
-			else
-				_root = addition;
-			BalanceAddition(addition);
-			_count = _count + 1;
-		}
-		#endregion
-		#region public void Remove(T value)
-		public void Remove(T value)
-		{
-			this.Remove<T>(value, this._compare_function);
-		}
-		#endregion
-		#region public void Remove<Key>(Key key, Compare<T, Key> function)
-		public void Remove<Key>(Key key, Compare<T, Key> function)
-		{
-			RedBlackTreeLinked<T>.Node node;
-			node = _root;
-			while (node != _sentinelNode)
-			{
-				switch (function(node.Value, key))
-				{
-					case Comparison.Equal:
-						if (node == _sentinelNode)
-							return;
-						this.Remove(node);
-						this._count = _count - 1;
-						return;
-					case Comparison.Greater:
-						node = node.LeftChild;
-						break;
-					case Comparison.Less:
-						node = node.RightChild;
-						break;
-					default:
-						throw new Error("not implemented");
-				}
-			}
-		}
-		#endregion
-		#region public bool Contains(T item)
-		public bool Contains(T item)
-		{
-			return Contains<T>(item, this._compare_function);
-		}
-		#endregion
-		#region public bool Contains<Key>(Key key, Compare<T, Key> comparison)
-		public bool Contains<Key>(Key key, Compare<T, Key> comparison)
-		{
-			RedBlackTreeLinked<T>.Node treeNode = _root;
-			while (treeNode != _sentinelNode)
-			{
-				switch (comparison(treeNode.Value, key))
-				{
-					case Comparison.Equal:
-						return true;
-					case Comparison.Greater:
-						treeNode = treeNode.LeftChild;
-						break;
-					case Comparison.Less:
-						treeNode = treeNode.RightChild;
-						break;
-					default:
-						throw new Error("not implemeted");
-				}
-			}
-			return false;
-		}
-		#endregion
-		#region public void Clear()
-		public void Clear()
-		{
-			_root = _sentinelNode;
-			_count = 0;
-		}
-		#endregion
-		#region public T GetMin()
-		public T GetMin()
-		{
-			RedBlackTreeLinked<T>.Node treeNode = _root;
-			if (treeNode == null || treeNode == _sentinelNode)
-				throw new Error("attempting to get the minimum value from an empty tree.");
-			while (treeNode.LeftChild != _sentinelNode)
-				treeNode = treeNode.LeftChild;
-			T returnValue = treeNode.Value;
-			return returnValue;
-		}
-		#endregion
-		#region public T GetMax()
-		public T GetMax()
-		{
-			RedBlackTreeLinked<T>.Node treeNode = _root;
-			if (treeNode == null || treeNode == _sentinelNode)
-			{
-				throw (new Error("attempting to get the maximum value from an empty tree."));
-			}
-			while (treeNode.RightChild != _sentinelNode)
-				treeNode = treeNode.RightChild;
-			T returnValue = treeNode.Value;
-			return returnValue;
-		}
-		#endregion
-		#region public void StepperInOrder(Step<T> function)
-		/// <summary>Invokes a delegate for each entry in the data structure (least to greatest).</summary>
-		/// <param name="function">The delegate to invoke on each item in the structure.</param>
-		public void StepperInOrder(Step<T> function)
-		{
-			StepperInOrder(function, _root);
-		}
-		#endregion
-		#region public void Stepper(Step<T> function)
-		/// <summary>Invokes a delegate for each entry in the data structure (least to greatest).</summary>
-		/// <param name="function">The delegate to invoke on each item in the structure.</param>
-		public void Stepper(Step<T> function)
-		{
-			StepperInOrder(function);
-		}
-		#endregion
-		#region public void Stepper(StepRef<T> function)
-		/// <summary>Invokes a delegate for each entry in the data structure.</summary>
-		/// <param name="function">The delegate to invoke on each item in the structure.</param>
-		public void Stepper(StepRef<T> function)
-		{
-			StepperInOrder(function, this._root);
-		}
-		#endregion
-		#region public StepStatus Stepper(StepBreak<T> function)
-		/// <summary>Invokes a delegate for each entry in the data structure.</summary>
-		/// <param name="function">The delegate to invoke on each item in the structure.</param>
-		/// <returns>The resulting status of the iteration.</returns>
-		public StepStatus Stepper(StepBreak<T> function)
-		{
-			return StepperInOrder(function, this._root);
-		}
-		#endregion
-		#region public StepStatus Stepper(StepRefBreak<T> function)
-		/// <summary>Invokes a delegate for each entry in the data structure.</summary>
-		/// <param name="function">The delegate to invoke on each item in the structure.</param>
-		/// <returns>The resulting status of the iteration.</returns>
-		public StepStatus Stepper(StepRefBreak<T> function)
-		{
-			return StepperInOrder(function, this._root);
-		}
-		#endregion
-		#region System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
-		/// <summary>FOR COMPATIBILITY ONLY. AVOID IF POSSIBLE.</summary>
-		System.Collections.IEnumerator
-			System.Collections.IEnumerable.GetEnumerator()
-		{
-			Stack<RedBlackTreeLinked<T>.Node> forks = new StackLinked<RedBlackTreeLinked<T>.Node>();
-			RedBlackTreeLinked<T>.Node current = _root;
-			while (current != null && current.LeftChild != null && current.RightChild != null || forks.Count > 0)
-			{
-				if (current != null)
-				{
-					forks.Push(current);
-					current = current.LeftChild;
-				}
-				else if (forks.Count > 0)
-				{
-					current = forks.Pop();
-					if (current.LeftChild != null && current.RightChild != null)
-						yield return current.Value;
-					current = current.RightChild;
-				}
-			}
-		}
-		#endregion
-		#region System.Collections.Generic.IEnumerator<T> System.Collections.Generic.IEnumerable<T>.GetEnumerator()
-		/// <summary>FOR COMPATIBILITY ONLY. AVOID IF POSSIBLE.</summary>
-		System.Collections.Generic.IEnumerator<T>
-			System.Collections.Generic.IEnumerable<T>.GetEnumerator()
-		{
-			Stack<RedBlackTreeLinked<T>.Node> forks = new StackLinked<RedBlackTreeLinked<T>.Node>();
-			RedBlackTreeLinked<T>.Node current = _root;
-			while (current != null && current.LeftChild != null && current.RightChild != null || forks.Count > 0)
-			{
-				if (current != null)
-				{
-					forks.Push(current);
-					current = current.LeftChild;
-				}
-				else if (forks.Count > 0)
-				{
-					current = forks.Pop();
-					if (current.LeftChild != null && current.RightChild != null)
-						yield return current.Value;
-					current = current.RightChild;
-				}
-			}
 		}
 		#endregion
 	}

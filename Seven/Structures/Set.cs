@@ -26,15 +26,6 @@ namespace Seven.Structures
 		Structure.Hashing<T>
 	{
 		// fields
-		internal static readonly int[] _tableSizes = {
-			3, 7, 11, 17, 23, 29, 37, 47, 59, 71, 89, 107, 131, 163, 197, 239, 293, 353, 431, 521, 631, 761, 919, 
-			1103, 1327, 1597, 1931, 2333, 2801, 3371, 4049, 4861, 5839, 7013, 8419, 10103, 12143, 14591, 17519,
-			21023, 25229, 30293, 36353, 43627, 52361, 62851, 75431, 90523, 108631, 130363, 156437, 187751, 225307,
-			270371, 324449, 389357, 467237, 560689, 672827, 807403, 968897, 1162687, 1395263, 1674319, 2009191,
-			2411033, 2893249, 3471899, 4166287, 4999559, 5999471, 7199369, 8639243, 10367097, 12440522, 14928634,
-			17914370, 21497255, 25796719, 30956079, 37147314, 44576800, 53492188, 64190659, 77028831, 92434645,
-			110921632, 133106028, 159727317, 191672881, 230007578, 276009239, 331211261, 397453722, 476944718,
-			572333963, 686801118, 824161776, 988994653, 1186794210, 1424153803, 1708985465, 2050783640, int.MaxValue };
 		internal const float _maxLoadFactor = .7f;
 		internal const float _minLoadFactor = .3f;
 		internal Equate<T> _equate;
@@ -89,7 +80,7 @@ namespace Seven.Structures
 			}
 			else
 			{
-				this._table = new Node[_tableSizes[0]];
+				this._table = new Node[Seven.Hash.TableSizes[0]];
 			}
 			this._equate = equate;
 			this._hash = hash;
@@ -179,7 +170,7 @@ namespace Seven.Structures
 		public void Remove(T key)
 		{
 			Remove_private(key);
-			if (this._count > _tableSizes[0] && _count < this._table.Length * _minLoadFactor)
+			if (this._count > Seven.Hash.TableSizes[0] && _count < this._table.Length * _minLoadFactor)
 				Resize(GetSmallerSize());
 		}
 		#endregion
@@ -221,7 +212,7 @@ namespace Seven.Structures
 		#region public void Clear()
 		public void Clear()
 		{
-			_table = new Node[_tableSizes[0]];
+			_table = new Node[Seven.Hash.TableSizes[0]];
 			_count = 0;
 		}
 		#endregion
@@ -307,19 +298,19 @@ namespace Seven.Structures
 		#region internal int GetLargerSize()
 		internal int GetLargerSize()
 		{
-			for (int i = 0; i < _tableSizes.Length; i++)
-				if (this._table.Length < _tableSizes[i])
-					return _tableSizes[i];
-			return _tableSizes[_tableSizes[_tableSizes.Length - 1]];
+			for (int i = 0; i < Seven.Hash.TableSizes.Length; i++)
+				if (this._table.Length < Seven.Hash.TableSizes[i])
+					return Seven.Hash.TableSizes[i];
+			return Seven.Hash.TableSizes[Seven.Hash.TableSizes[Seven.Hash.TableSizes.Length - 1]];
 		}
 		#endregion
 		#region internal int GetSmallerSize()
 		internal int GetSmallerSize()
 		{
-			for (int i = _tableSizes.Length - 1; i > -1; i--)
-				if (this._table.Length > _tableSizes[i])
-					return _tableSizes[i];
-			return _tableSizes[0];
+			for (int i = Seven.Hash.TableSizes.Length - 1; i > -1; i--)
+				if (this._table.Length > Seven.Hash.TableSizes[i])
+					return Seven.Hash.TableSizes[i];
+			return Seven.Hash.TableSizes[0];
 		}
 		#endregion
 		#region internal void Remove_private(T key)
@@ -376,15 +367,6 @@ namespace Seven.Structures
 		Structure.Hashing<T>
 	{
 		// fields
-		internal static readonly int[] _tableSizes = {
-			2, 3, 7, 11, 17, 23, 29, 37, 47, 59, 71, 89, 107, 131, 163, 197, 239, 293, 353, 431, 521, 631, 761, 919, 
-			1103, 1327, 1597, 1931, 2333, 2801, 3371, 4049, 4861, 5839, 7013, 8419, 10103, 12143, 14591, 17519,
-			21023, 25229, 30293, 36353, 43627, 52361, 62851, 75431, 90523, 108631, 130363, 156437, 187751, 225307,
-			270371, 324449, 389357, 467237, 560689, 672827, 807403, 968897, 1162687, 1395263, 1674319, 2009191,
-			2411033, 2893249, 3471899, 4166287, 4999559, 5999471, 7199369, 8639243, 10367097, 12440522, 14928634,
-			17914370, 21497255, 25796719, 30956079, 37147314, 44576800, 53492188, 64190659, 77028831, 92434645,
-			110921632, 133106028, 159727317, 191672881, 230007578, 276009239, 331211261, 397453722, 476944718,
-			572333963, 686801118, 824161776, 988994653, 1186794210, 1424153803, 1708985465, 2050783640, int.MaxValue };
 		private Equate<T> _equate;
 		private Hash<T> _hash;
 		private int[] _table;
@@ -425,8 +407,8 @@ namespace Seven.Structures
 		/// <remarks>Runtime: O(1).</remarks>
 		public SetHashArray(Equate<T> equate, Hash<T> hash)
 		{
-			this._nodes = new Node[_tableSizes[0]];
-			this._table = new int[_tableSizes[0]];
+			this._nodes = new Node[Seven.Hash.TableSizes[0]];
+			this._table = new int[Seven.Hash.TableSizes[0]];
 			this._equate = equate;
 			this._hash = hash;
 			this._lastIndex = 0;
@@ -497,8 +479,8 @@ namespace Seven.Structures
 		{
 			if (this._lastIndex > 0)
 			{
-				this._nodes = new Node[_tableSizes[0]];
-				this._table = new int[_tableSizes[0]];
+				this._nodes = new Node[Seven.Hash.TableSizes[0]];
+				this._table = new int[Seven.Hash.TableSizes[0]];
 				this._lastIndex = 0;
 				this._count = 0;
 				this._freeList = -1;
@@ -652,19 +634,19 @@ namespace Seven.Structures
 		#region private int GetLargerSize()
 		private int GetLargerSize()
 		{
-			for (int i = 0; i < _tableSizes.Length; i++)
-				if (this._table.Length < _tableSizes[i])
-					return _tableSizes[i];
-			return _tableSizes[_tableSizes[_tableSizes.Length - 1]];
+			for (int i = 0; i < Seven.Hash.TableSizes.Length; i++)
+				if (this._table.Length < Seven.Hash.TableSizes[i])
+					return Seven.Hash.TableSizes[i];
+			return Seven.Hash.TableSizes[Seven.Hash.TableSizes[Seven.Hash.TableSizes.Length - 1]];
 		}
 		#endregion
 		#region private int GetSmallerSize()
 		private int GetSmallerSize()
 		{
-			for (int i = _tableSizes.Length - 1; i > -1; i--)
-				if (this._table.Length > _tableSizes[i])
-					return _tableSizes[i];
-			return _tableSizes[0];
+			for (int i = Seven.Hash.TableSizes.Length - 1; i > -1; i--)
+				if (this._table.Length > Seven.Hash.TableSizes[i])
+					return Seven.Hash.TableSizes[i];
+			return Seven.Hash.TableSizes[0];
 		}
 		#endregion
 		#region private void GrowTableSize(int newSize)
@@ -755,15 +737,6 @@ namespace Seven.Structures
 		Structure.Hashing<T>
 		where STRUCTURE : class, Structure<T>, Structure.Addable<T>, Structure.Removable<T>, Structure.Auditable<T>
 	{
-		internal static readonly int[] _tableSizes = {
-			3, 7, 11, 17, 23, 29, 37, 47, 59, 71, 89, 107, 131, 163, 197, 239, 293, 353, 431, 521, 631, 761, 919, 
-			1103, 1327, 1597, 1931, 2333, 2801, 3371, 4049, 4861, 5839, 7013, 8419, 10103, 12143, 14591, 17519,
-			21023, 25229, 30293, 36353, 43627, 52361, 62851, 75431, 90523, 108631, 130363, 156437, 187751, 225307,
-			270371, 324449, 389357, 467237, 560689, 672827, 807403, 968897, 1162687, 1395263, 1674319, 2009191,
-			2411033, 2893249, 3471899, 4166287, 4999559, 5999471, 7199369, 8639243, 10367097, 12440522, 14928634,
-			17914370, 21497255, 25796719, 30956079, 37147314, 44576800, 53492188, 64190659, 77028831, 92434645,
-			110921632, 133106028, 159727317, 191672881, 230007578, 276009239, 331211261, 397453722, 476944718,
-			572333963, 686801118, 824161776, 988994653, 1186794210, 1424153803, 1708985465, 2050783640, int.MaxValue };
 		private const float _maxLoadFactor = .7f;
 		private const float _minLoadFactor = .3f;
 		private Construct<T> _constructor;
@@ -801,7 +774,7 @@ namespace Seven.Structures
 			}
 			else
 			{
-				this._table = new STRUCTURE[_tableSizes[0]];
+				this._table = new STRUCTURE[Seven.Hash.TableSizes[0]];
 			}
 			this._equate = equate;
 			this._hash = hash;
@@ -884,7 +857,7 @@ namespace Seven.Structures
 		public void Remove(T key)
 		{
 			Remove_private(key);
-			if (this._count > _tableSizes[0] && _count < this._table.Length * _minLoadFactor)
+			if (this._count > Seven.Hash.TableSizes[0] && _count < this._table.Length * _minLoadFactor)
 				Resize(GetSmallerSize());
 		}
 		#endregion
@@ -925,7 +898,7 @@ namespace Seven.Structures
 		#region public void Clear()
 		public void Clear()
 		{
-			_table = new STRUCTURE[_tableSizes[0]];
+			_table = new STRUCTURE[Seven.Hash.TableSizes[0]];
 			_count = 0;
 		}
 		#endregion
@@ -990,19 +963,19 @@ namespace Seven.Structures
 		#region private int GetLargerSize()
 		private int GetLargerSize()
 		{
-			for (int i = 0; i < _tableSizes.Length; i++)
-				if (this._table.Length < _tableSizes[i])
-					return _tableSizes[i];
-			return _tableSizes[_tableSizes[_tableSizes.Length - 1]];
+			for (int i = 0; i < Seven.Hash.TableSizes.Length; i++)
+				if (this._table.Length < Seven.Hash.TableSizes[i])
+					return Seven.Hash.TableSizes[i];
+			return Seven.Hash.TableSizes[Seven.Hash.TableSizes[Seven.Hash.TableSizes.Length - 1]];
 		}
 		#endregion
 		#region private int GetSmallerSize()
 		private int GetSmallerSize()
 		{
-			for (int i = _tableSizes.Length - 1; i > -1; i--)
-				if (this._table.Length > _tableSizes[i])
-					return _tableSizes[i];
-			return _tableSizes[0];
+			for (int i = Seven.Hash.TableSizes.Length - 1; i > -1; i--)
+				if (this._table.Length > Seven.Hash.TableSizes[i])
+					return Seven.Hash.TableSizes[i];
+			return Seven.Hash.TableSizes[0];
 		}
 		#endregion
 		#region private void Remove_private(T key)

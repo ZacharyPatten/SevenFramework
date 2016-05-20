@@ -107,14 +107,12 @@ namespace Seven.Structures
 		System.Collections.IEnumerator
 			System.Collections.IEnumerable.GetEnumerator()
 		{
-			for (int i = 0; i < _array.Length; i++)
-				yield return _array[i];
+			return this.GetEnumerator();
 		}
 		#endregion
-		#region System.Collections.Generic.IEnumerator<T> System.Collections.Generic.IEnumerable<T>.GetEnumerator()
+		#region public System.Collections.Generic.IEnumerator<T> GetEnumerator()
 		/// <summary>FOR COMPATIBILITY ONLY. AVOID IF POSSIBLE.</summary>
-		System.Collections.Generic.IEnumerator<T>
-			System.Collections.Generic.IEnumerable<T>.GetEnumerator()
+		public System.Collections.Generic.IEnumerator<T> GetEnumerator()
 		{
 			for (int i = 0; i < _array.Length; i++)
 				yield return _array[i];
@@ -174,5 +172,14 @@ namespace Seven.Structures
 			return array;
 		}
 		#endregion
+
+		public string Serialize(Serialize<T> serialize)
+		{
+			throw new System.NotImplementedException();
+			//string[] contents = new string[this._array.Length];
+			//for (int i = 0; i < this._array.Length; i++)
+			//	contents[i] = string.serialize()
+			//this.Stepper
+		}
 	}
 }

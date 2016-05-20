@@ -402,11 +402,15 @@ namespace Testing
 			Console.Write("    Traversal [ALL]: ");
 			omnitree_linked.Stepper((int current) => { Console.Write(current); });
 			Console.WriteLine();
-			// Look Up
-			Console.Write("    Traversal [" + (test / 2) + "-" + test + "]: ");
+			// Look Up 1
+			Console.Write("    Traversal [(" + (test / 2) + ", " + (test / 2) + ", " + (test / 2) + ")->(" + test + ", " + test + ", " + test + ")]: ");
 			omnitree_linked.Stepper((int current) => { Console.Write(current); },
 				new double[] { test / 2, test / 2, test / 2 },
 				new double[] { test, test, test });
+			Console.WriteLine();
+			// Look Up 2
+			Console.Write("    Look Up [" + (test / 3) + ", " + (test / 3) + ", " + (test / 3) + "]: ");
+			omnitree_linked[(test / 3), (test / 3), (test / 3)]((int current) => { Console.Write(current); });
 			Console.WriteLine();
 			// Removal
 			Console.Write("    Remove 0-" + test / 3 + ": ");

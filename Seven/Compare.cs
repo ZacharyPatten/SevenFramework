@@ -37,6 +37,41 @@ namespace Seven
 	/// <summary>Static wrapper for "CompareTo" methods on IComparables.</summary>
 	public static class Compare
 	{
+		internal class DefaultWrapper<T>
+		{
+			internal static Compare<T> Compare = (T a, T b) =>
+				{
+					FromComparer(System.Collections.Generic.Comparer<T>.Default);
+					System.Collections.Generic.Comparer<T> comparer = null;
+					try { comparer = System.Collections.Generic.Comparer<T>.Default; }
+					catch { }
+					if (object.ReferenceEquals(null, comparer))
+						throw new System.InvalidOperationException("no default comparer exists for " + typeof(T).ToCsharpSource());
+					DefaultWrapper<T>.Compare = (T _a, T _b) =>
+						{
+							int comparison = comparer.Compare(_a, _b);
+							if (comparison < 0)
+								return Comparison.Less;
+							else if (comparison > 0)
+								return Comparison.Greater;
+							else
+								return Comparison.Equal;
+						};
+					return DefaultWrapper<T>.Compare(a, b);
+				};
+
+		}
+
+		/// <summary>Gets the default comparer or throws an exception if non exists.</summary>
+		/// <typeparam name="T">The generic type of the comparison.</typeparam>
+		/// <param name="a">Left operand of the comparison.</param>
+		/// <param name="b">Right operand of the comparison.</param>
+		/// <returns>The result of the comparison.</returns>
+		public static Comparison Default<T>(T a, T b)
+		{
+			return DefaultWrapper<T>.Compare(a, b);
+		}
+
 		/// <summary>Inverts a comparison delegate.</summary>
 		/// <returns>The invert of the compare delegate.</returns>
 		public static Compare<L, R> Invert<L, R>(Compare<L, R> comparison)
@@ -72,19 +107,6 @@ namespace Seven
 				default:
 					throw new Error("Not Implemented");
 			}
-		}
-
-		/// <summary>Static wrapper for "CompareTo" methods on IComparables.</summary>
-		public static Comparison Default<T>(T left, T right)
-			where T : System.IComparable<T>
-		{
-			int comparison = left.CompareTo(right);
-			if (comparison < 0)
-				return Comparison.Less;
-			else if (comparison > 0)
-				return Comparison.Greater;
-			else
-				return Comparison.Equal;
 		}
 
 		public static Compare<T> FromComparer<T>(System.Collections.Generic.Comparer<T> comparer)

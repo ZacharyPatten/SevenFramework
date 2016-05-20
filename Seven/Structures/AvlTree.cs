@@ -200,7 +200,7 @@ namespace Seven.Structures
 		private int _count;
 		private Compare<T> _compare;
 		// nested types
-		#region Node
+		#region private class Node
 		/// <summary>This class just holds the data for each individual node of the tree.</summary>
 		[System.Serializable]
 		private class Node
@@ -226,20 +226,7 @@ namespace Seven.Structures
 		#endregion
 		//constructors
 		#region public AvlTree_Linked()
-		public AvlTreeLinked()
-			: this(Seven.Compare.FromComparer<T>(System.Collections.Generic.Comparer<T>.Default))
-		{
-			try
-			{
-				// test comparison method
-				System.Collections.Generic.Comparer<T> comparer = System.Collections.Generic.Comparer<T>.Default;
-				comparer.Compare(default(T), default(T));
-			}
-			catch (System.Exception e)
-			{
-				throw e;
-			}
-		}
+		public AvlTreeLinked() : this(Seven.Compare.Default) { }
 		#endregion
 		#region public AvlTree_Linked(Compare<T> compare)
 		/// <summary>Constructs an AVL Tree.</summary>
@@ -289,6 +276,332 @@ namespace Seven.Structures
 		public int Count { get { return _count; } }
 		#endregion
 		// methods (public)
+		#region public AvlTree_Linked<T> Clone()
+		public AvlTreeLinked<T> Clone()
+		{
+			AvlTreeLinked<T> clone = new AvlTreeLinked<T>(this._compare);
+			foreach (T current in this)
+				clone.Add(current);
+			return clone;
+		}
+		#endregion
+		#region public bool Contains(T value)
+		public bool Contains(T value)
+		{
+			return this.Contains(value, this._root);
+		}
+		#endregion
+		#region System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+		/// <summary>FOR COMPATIBILITY ONLY. AVOID IF POSSIBLE.</summary>
+		System.Collections.IEnumerator
+			System.Collections.IEnumerable.GetEnumerator()
+		{
+			return this.GetEnumerator();
+		}
+		#endregion
+		#region public System.Collections.Generic.IEnumerator<T> GetEnumerator()
+		/// <summary>FOR COMPATIBILITY ONLY. AVOID IF POSSIBLE.</summary>
+		public System.Collections.Generic.IEnumerator<T> GetEnumerator()
+		{
+			Stack<Node> forks = new StackLinked<Node>();
+			Node current = _root;
+			while (current != null || forks.Count > 0)
+			{
+				if (current != null)
+				{
+					forks.Push(current);
+					current = current.LeftChild;
+				}
+				else if (forks.Count > 0)
+				{
+					current = forks.Pop();
+					yield return current.Value;
+					current = current.RightChild;
+				}
+			}
+		}
+		#endregion
+		#region public bool Contains<Key>(Key key, Compare<T, Key> comparison)
+		/// <summary>Determines if this structure contains an item by a given key.</summary>
+		/// <typeparam name="Key">The type of the key.</typeparam>
+		/// <param name="key">The key.</param>
+		/// <param name="comparison">The sorting technique (must synchronize with this structure's sorting).</param>
+		/// <returns>True of contained, False if not.</returns>
+		/// <runtime>O(ln(n)), Omega(1)</runtime>
+		public bool Contains<Key>(Key key, Compare<T, Key> comparison)
+		{
+			// THIS THIS THE ITERATIVE VERSION OF THIS FUNCTION. THERE IS A RECURSIVE
+			// VERSION IN THE "RECURSIVE" REGION SHOULD YOU WISH TO SEE IT.
+			Node _current = _root;
+			while (_current != null)
+			{
+				Comparison compareResult = comparison(_current.Value, key);
+				if (compareResult == Comparison.Equal)
+					return true;
+				else if (compareResult == Comparison.Greater)
+					_current = _current.LeftChild;
+				else // (compareResult == Copmarison.Less)
+					_current = _current.RightChild;
+			}
+			return false;
+		}
+		#endregion
+		#region public T Get<Key>(Key key, Compare<T, Key> compare)
+		/// <summary>Gets the item with the designated by the string.</summary>
+		/// <param name="key">The string ID to look for.</param>
+		/// <param name="compare">The sorting technique (must synchronize with this structure's sorting).</param>
+		/// <returns>The object with the desired string ID if it exists.</returns>
+		/// <runtime>O(ln(n)), Omega(1)</runtime>
+		public T Get<Key>(Key key, Compare<T, Key> compare)
+		{
+			// THIS THIS THE ITERATIVE VERSION OF THIS FUNCTION. THERE IS A RECURSIVE
+			// VERSION IN THE "RECURSIVE" REGION SHOULD YOU WISH TO SEE IT.
+			Node _current = _root;
+			while (_current != null)
+			{
+				Comparison compareResult = compare(_current.Value, key);
+				if (compareResult == Comparison.Equal)
+					return _current.Value;
+				else if (compareResult == Comparison.Greater)
+					_current = _current.LeftChild;
+				else // (compareResult == Copmarison.Less)
+					_current = _current.RightChild;
+			}
+			throw new Error("Attempting to get a non-existing value: " + key.ToString() + ".");
+		}
+		#endregion
+		#region public void Add(T addition)
+		/// <summary>Adds an object to the AVL Tree.</summary>
+		/// <param name="addition">The object to add.</param>
+		/// <runtime>Theta(ln(n))</runtime>
+		public void Add(T addition)
+		{
+			this._root = Add(addition, this._root);
+			this._count++;
+		}
+		#endregion
+		#region public void Remove(T removal)
+		/// <summary>Removes an item from this structure.</summary>
+		/// <param name="removal">The item to remove.</param>
+		/// <runtime>Theta(ln(n))</runtime>
+		public void Remove(T removal)
+		{
+			this._root = Remove(removal, _root);
+			this._count--;
+		}
+		#endregion
+		#region public void Remove<Key>(Key removal, Compare<T, Key> comparison)
+		/// <summary>Removes an item from this structure by a given key.</summary>
+		/// <typeparam name="Key">The type of the key.</typeparam>
+		/// <param name="removal">The key.</param>
+		/// <param name="comparison">The sorting technique (must synchronize with the structure's sorting).</param>
+		/// <runtime>Theta(ln(n))</runtime>
+		public void Remove<Key>(Key removal, Compare<T, Key> comparison)
+		{
+			this._root = Remove(removal, comparison, _root);
+			this._count--;
+		}
+		#endregion
+		#region public void Clear()
+		/// <summary>Returns the tree to an iterative state.</summary>
+		public void Clear()
+		{
+			this._root = null;
+			this._count = 0;
+		}
+		#endregion
+		#region public void StepperReverse(Step<T> step_function)
+		/// <summary>Invokes a delegate for each entry in the data structure.</summary>
+		/// <param name="step_function">The delegate to invoke on each item in the structure.</param>
+		/// <remarks>Runtime: O(n * traversalFunction).</remarks>
+		public void StepperReverse(Step<T> step_function)
+		{
+			this.StepperReverse(step_function);
+		}
+		#endregion
+		#region public void StepperReverse(StepRef<T> step_function)
+		/// <summary>Invokes a delegate for each entry in the data structure.</summary>
+		/// <param name="step_function">The delegate to invoke on each item in the structure.</param>
+		/// <remarks>Runtime: O(n * traversalFunction).</remarks>
+		public void StepperReverse(StepRef<T> step_function)
+		{
+			this.StepperReverse(step_function);
+		}
+		#endregion
+		#region public StepStatus StepperReverse(StepBreak<T> step_function)
+		/// <summary>Invokes a delegate for each entry in the data structure.</summary>
+		/// <param name="step_function">The delegate to invoke on each item in the structure.</param>
+		/// <returns>The resulting status of the iteration.</returns>
+		/// <remarks>Runtime: O(n * traversalFunction).</remarks>
+		public StepStatus StepperReverse(StepBreak<T> step_function)
+		{
+			return this.StepperReverse(step_function);
+		}
+		#endregion
+		#region public StepStatus StepperReverse(StepRefBreak<T> step_function)
+		/// <summary>Invokes a delegate for each entry in the data structure.</summary>
+		/// <param name="step_function">The delegate to invoke on each item in the structure.</param>
+		/// <returns>The resulting status of the iteration.</returns>
+		/// <remarks>Runtime: O(n * traversalFunction).</remarks>
+		public StepStatus StepperReverse(StepRefBreak<T> step_function)
+		{
+			return this.StepperReverse(step_function);
+		}
+		#endregion
+		#region public virtual void Stepper(Step<T> step_function, T minimum, T maximum)
+		/// <summary>Invokes a delegate for each entry in the data structure.</summary>
+		/// <param name="step_function">The delegate to invoke on each item in the structure.</param>
+		/// <param name="minimum">The minimum value of the optimized stepper function.</param>
+		/// <param name="maximum">The maximum value of the optimized stepper function.</param>
+		/// <remarks>Runtime: O(n * traversalFunction).</remarks>
+		public virtual void Stepper(Step<T> step_function, T minimum, T maximum)
+		{
+			if (this._compare(minimum, maximum) == Comparison.Greater)
+				throw new Error("invalid minimum and maximum values on Avl traversal.");
+			AvlTreeLinked<T>.Stepper(step_function, _root);
+		}
+		#endregion
+		#region public virtual void Stepper(StepRef<T> step_function, T minimum, T maximum)
+		/// <summary>Invokes a delegate for each entry in the data structure.</summary>
+		/// <param name="step_function">The delegate to invoke on each item in the structure.</param>
+		/// <param name="minimum">The minimum value of the optimized stepper function.</param>
+		/// <param name="maximum">The maximum value of the optimized stepper function.</param>
+		/// <remarks>Runtime: O(n * traversalFunction).</remarks>
+		public virtual void Stepper(StepRef<T> step_function, T minimum, T maximum)
+		{
+			if (this._compare(minimum, maximum) == Comparison.Greater)
+				throw new Error("invalid minimum and maximum values on Avl traversal.");
+			this.Stepper(step_function, _root, minimum, maximum);
+		}
+		#endregion
+		#region public virtual StepStatus Stepper(StepBreak<T> step_function, T minimum, T maximum)
+		/// <summary>Invokes a delegate for each entry in the data structure.</summary>
+		/// <param name="step_function">The delegate to invoke on each item in the structure.</param>
+		/// <param name="minimum">The minimum value of the optimized stepper function.</param>
+		/// <param name="maximum">The maximum value of the optimized stepper function.</param>
+		/// <remarks>Runtime: O(n * traversalFunction).</remarks>
+		public virtual StepStatus Stepper(StepBreak<T> step_function, T minimum, T maximum)
+		{
+			if (this._compare(minimum, maximum) == Comparison.Greater)
+				throw new Error("invalid minimum and maximum values on Avl traversal.");
+			return this.Stepper(step_function, _root, minimum, maximum);
+		}
+		#endregion
+		#region public virtual StepStatus Stepper(StepRefBreak<T> step_function, T minimum, T maximum)
+		/// <summary>Invokes a delegate for each entry in the data structure.</summary>
+		/// <param name="step_function">The delegate to invoke on each item in the structure.</param>
+		/// <param name="minimum">The minimum value of the optimized stepper function.</param>
+		/// <param name="maximum">The maximum value of the optimized stepper function.</param>
+		/// <remarks>Runtime: O(n * step_function).</remarks>
+		public virtual StepStatus Stepper(StepRefBreak<T> step_function, T minimum, T maximum)
+		{
+			if (this._compare(minimum, maximum) == Comparison.Greater)
+				throw new Error("invalid minimum and maximum values on Avl traversal.");
+			return this.Stepper(step_function, _root, minimum, maximum);
+		}
+		#endregion
+		#region public virtual void StepperReverse(Step<T> step_function, T minimum, T maximum)
+		/// <summary>Invokes a delegate for each entry in the data structure.</summary>
+		/// <param name="step_function">The delegate to invoke on each item in the structure.</param>
+		/// <param name="minimum">The minimum value of the optimized stepper function.</param>
+		/// <param name="maximum">The maximum value of the optimized stepper function.</param>
+		/// <remarks>Runtime: O(n * traversalFunction).</remarks>
+		public virtual void StepperReverse(Step<T> step_function, T minimum, T maximum)
+		{
+			if (this._compare(minimum, maximum) == Comparison.Greater)
+				throw new Error("invalid minimum and maximum values on Avl traversal.");
+			AvlTreeLinked<T>.StepperReverse(step_function, _root);
+		}
+		#endregion
+		#region public virtual void StepperReverse(StepRef<T> step_function, T minimum, T maximum)
+		/// <summary>Invokes a delegate for each entry in the data structure.</summary>
+		/// <param name="step_function">The delegate to invoke on each item in the structure.</param>
+		/// <param name="minimum">The minimum value of the optimized stepper function.</param>
+		/// <param name="maximum">The maximum value of the optimized stepper function.</param>
+		/// <remarks>Runtime: O(n * traversalFunction).</remarks>
+		public virtual void StepperReverse(StepRef<T> step_function, T minimum, T maximum)
+		{
+			if (this._compare(minimum, maximum) == Comparison.Greater)
+				throw new Error("invalid minimum and maximum values on Avl traversal.");
+			this.StepperReverse(step_function, _root, minimum, maximum);
+		}
+		#endregion
+		#region public virtual StepStatus StepperReverse(StepBreak<T> step_function, T minimum, T maximum)
+		/// <summary>Invokes a delegate for each entry in the data structure.</summary>
+		/// <param name="step_function">The delegate to invoke on each item in the structure.</param>
+		/// <param name="minimum">The minimum value of the optimized stepper function.</param>
+		/// <param name="maximum">The maximum value of the optimized stepper function.</param>
+		/// <remarks>Runtime: O(n * traversalFunction).</remarks>
+		public virtual StepStatus StepperReverse(StepBreak<T> step_function, T minimum, T maximum)
+		{
+			if (this._compare(minimum, maximum) == Comparison.Greater)
+				throw new Error("invalid minimum and maximum values on Avl traversal.");
+			return this.StepperReverse(step_function, _root, minimum, maximum);
+		}
+		#endregion
+		#region public virtual StepStatus StepperReverse(StepRefBreak<T> step_function, T minimum, T maximum)
+		/// <summary>Invokes a delegate for each entry in the data structure.</summary>
+		/// <param name="step_function">The delegate to invoke on each item in the structure.</param>
+		/// <param name="minimum">The minimum value of the optimized stepper function.</param>
+		/// <param name="maximum">The maximum value of the optimized stepper function.</param>
+		/// <remarks>Runtime: O(n * step_function).</remarks>
+		public virtual StepStatus StepperReverse(StepRefBreak<T> step_function, T minimum, T maximum)
+		{
+			if (this._compare(minimum, maximum) == Comparison.Greater)
+				throw new Error("invalid minimum and maximum values on Avl traversal.");
+			return this.StepperReverse(step_function, _root, minimum, maximum);
+		}
+		#endregion
+		#region public void Stepper(Step<T> function)
+		/// <summary>Invokes a delegate for each entry in the data structure.</summary>
+		/// <param name="function">The delegate to invoke on each item in the structure.</param>
+		/// <remarks>Runtime: O(n * traversalFunction).</remarks>
+		public void Stepper(Step<T> function)
+		{
+			AvlTreeLinked<T>.Stepper(function, this._root);
+		}
+		#endregion
+		#region public void Stepper(StepRef<T> function)
+		/// <summary>Invokes a delegate for each entry in the data structure.</summary>
+		/// <param name="function">The delegate to invoke on each item in the structure.</param>
+		/// <remarks>Runtime: O(n * traversalFunction).</remarks>
+		public void Stepper(StepRef<T> function)
+		{
+			AvlTreeLinked<T>.Stepper(function, this._root);
+		}
+		private static void Stepper(StepRef<T> step_function, Node node)
+		{
+			if (node != null)
+			{
+				AvlTreeLinked<T>.Stepper(step_function, node.LeftChild);
+				T value = node.Value;
+				step_function(ref value);
+				node.Value = value;
+				AvlTreeLinked<T>.Stepper(step_function, node.RightChild);
+			}
+		}
+		#endregion
+		#region public StepStatus Stepper(StepBreak<T> function)
+		/// <summary>Invokes a delegate for each entry in the data structure.</summary>
+		/// <param name="function">The delegate to invoke on each item in the structure.</param>
+		/// <returns>The resulting status of the iteration.</returns>
+		/// <remarks>Runtime: O(n * traversalFunction).</remarks>
+		public StepStatus Stepper(StepBreak<T> function)
+		{
+			return AvlTreeLinked<T>.Stepper(function, this._root);
+		}
+		#endregion
+		#region public StepStatus Stepper(StepRefBreak<T> function)
+		/// <summary>Invokes a delegate for each entry in the data structure.</summary>
+		/// <param name="function">The delegate to invoke on each item in the structure.</param>
+		/// <returns>The resulting status of the iteration.</returns>
+		/// <remarks>Runtime: O(n * traversalFunction).</remarks>
+		public StepStatus Stepper(StepRefBreak<T> function)
+		{
+			return AvlTreeLinked<T>.Stepper(function, this._root);
+		}
+		#endregion
+		// methods (private)
 		#region private Node Add(T addition, Node avlTree)
 		private Node Add(T addition, Node avlTree)
 		{
@@ -326,21 +639,6 @@ namespace Seven.Structures
 			return avlTree;
 		}
 		#endregion
-		#region public AvlTree_Linked<T> Clone()
-		public AvlTreeLinked<T> Clone()
-		{
-			AvlTreeLinked<T> clone = new AvlTreeLinked<T>(this._compare);
-			foreach (T current in this)
-				clone.Add(current);
-			return clone;
-		}
-		#endregion
-		#region public bool Contains(T value)
-		public bool Contains(T value)
-		{
-			return this.Contains(value, this._root);
-		}
-		#endregion
 		#region private bool Contains(T value, AvlTree_Linked<T>.Node node)
 		private bool Contains(T value, AvlTreeLinked<T>.Node node)
 		{
@@ -354,52 +652,6 @@ namespace Seven.Structures
 			else if (comparison == Comparison.Greater)
 				return this.Contains(value, node.RightChild);
 			throw new System.NotImplementedException("Unexpected Comparison value: " + comparison);
-		}
-		#endregion
-		#region System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
-		/// <summary>FOR COMPATIBILITY ONLY. AVOID IF POSSIBLE.</summary>
-		System.Collections.IEnumerator
-			System.Collections.IEnumerable.GetEnumerator()
-		{
-			Stack<Node> forks = new StackLinked<Node>();
-			Node current = _root;
-			while (current != null || forks.Count > 0)
-			{
-				if (current != null)
-				{
-					forks.Push(current);
-					current = current.LeftChild;
-				}
-				else if (forks.Count > 0)
-				{
-					current = forks.Pop();
-					yield return current.Value;
-					current = current.RightChild;
-				}
-			}
-		}
-		#endregion
-		#region System.Collections.Generic.IEnumerator<T> System.Collections.Generic.IEnumerable<T>.GetEnumerator()
-		/// <summary>FOR COMPATIBILITY ONLY. AVOID IF POSSIBLE.</summary>
-		System.Collections.Generic.IEnumerator<T>
-			System.Collections.Generic.IEnumerable<T>.GetEnumerator()
-		{
-			Stack<Node> forks = new StackLinked<Node>();
-			Node current = _root;
-			while (current != null || forks.Count > 0)
-			{
-				if (current != null)
-				{
-					forks.Push(current);
-					current = current.LeftChild;
-				}
-				else if (forks.Count > 0)
-				{
-					current = forks.Pop();
-					yield return current.Value;
-					current = current.RightChild;
-				}
-			}
 		}
 		#endregion
 		#region private int Height(Node avlTree)
@@ -844,286 +1096,22 @@ namespace Seven.Structures
 			return StepStatus.Continue;
 		}
 		#endregion
-		#region public bool Contains<Key>(Key key, Compare<T, Key> comparison)
-		/// <summary>Determines if this structure contains an item by a given key.</summary>
-		/// <typeparam name="Key">The type of the key.</typeparam>
-		/// <param name="key">The key.</param>
-		/// <param name="comparison">The sorting technique (must synchronize with this structure's sorting).</param>
-		/// <returns>True of contained, False if not.</returns>
-		/// <runtime>O(ln(n)), Omega(1)</runtime>
-		public bool Contains<Key>(Key key, Compare<T, Key> comparison)
-		{
-			// THIS THIS THE ITERATIVE VERSION OF THIS FUNCTION. THERE IS A RECURSIVE
-			// VERSION IN THE "RECURSIVE" REGION SHOULD YOU WISH TO SEE IT.
-			Node _current = _root;
-			while (_current != null)
-			{
-				Comparison compareResult = comparison(_current.Value, key);
-				if (compareResult == Comparison.Equal)
-					return true;
-				else if (compareResult == Comparison.Greater)
-					_current = _current.LeftChild;
-				else // (compareResult == Copmarison.Less)
-					_current = _current.RightChild;
-			}
-			return false;
-		}
-		#endregion
-		#region public T Get<Key>(Key key, Compare<T, Key> compare)
-		/// <summary>Gets the item with the designated by the string.</summary>
-		/// <param name="key">The string ID to look for.</param>
-		/// <param name="compare">The sorting technique (must synchronize with this structure's sorting).</param>
-		/// <returns>The object with the desired string ID if it exists.</returns>
-		/// <runtime>O(ln(n)), Omega(1)</runtime>
-		public T Get<Key>(Key key, Compare<T, Key> compare)
-		{
-			// THIS THIS THE ITERATIVE VERSION OF THIS FUNCTION. THERE IS A RECURSIVE
-			// VERSION IN THE "RECURSIVE" REGION SHOULD YOU WISH TO SEE IT.
-			Node _current = _root;
-			while (_current != null)
-			{
-				Comparison compareResult = compare(_current.Value, key);
-				if (compareResult == Comparison.Equal)
-					return _current.Value;
-				else if (compareResult == Comparison.Greater)
-					_current = _current.LeftChild;
-				else // (compareResult == Copmarison.Less)
-					_current = _current.RightChild;
-			}
-			throw new Error("Attempting to get a non-existing value: " + key.ToString() + ".");
-		}
-		#endregion
-		#region public void Add(T addition)
-		/// <summary>Adds an object to the AVL Tree.</summary>
-		/// <param name="addition">The object to add.</param>
-		/// <runtime>Theta(ln(n))</runtime>
-		public void Add(T addition)
-		{
-			this._root = Add(addition, this._root);
-			this._count++;
-		}
-		#endregion
-		#region public void Remove(T removal)
-		/// <summary>Removes an item from this structure.</summary>
-		/// <param name="removal">The item to remove.</param>
-		/// <runtime>Theta(ln(n))</runtime>
-		public void Remove(T removal)
-		{
-			this._root = Remove(removal, _root);
-			this._count--;
-		}
-		#endregion
-		#region public void Remove<Key>(Key removal, Compare<T, Key> comparison)
-		/// <summary>Removes an item from this structure by a given key.</summary>
-		/// <typeparam name="Key">The type of the key.</typeparam>
-		/// <param name="removal">The key.</param>
-		/// <param name="comparison">The sorting technique (must synchronize with the structure's sorting).</param>
-		/// <runtime>Theta(ln(n))</runtime>
-		public void Remove<Key>(Key removal, Compare<T, Key> comparison)
-		{
-			this._root = Remove(removal, comparison, _root);
-			this._count--;
-		}
-		#endregion
-		#region public void Clear()
-		/// <summary>Returns the tree to an iterative state.</summary>
-		public void Clear()
-		{
-			this._root = null;
-			this._count = 0;
-		}
-		#endregion
-		#region public void StepperReverse(Step<T> step_function)
-		/// <summary>Invokes a delegate for each entry in the data structure.</summary>
-		/// <param name="step_function">The delegate to invoke on each item in the structure.</param>
-		/// <remarks>Runtime: O(n * traversalFunction).</remarks>
-		public void StepperReverse(Step<T> step_function)
-		{
-			this.StepperReverse(step_function);
-		}
-		#endregion
-		#region public void StepperReverse(StepRef<T> step_function)
-		/// <summary>Invokes a delegate for each entry in the data structure.</summary>
-		/// <param name="step_function">The delegate to invoke on each item in the structure.</param>
-		/// <remarks>Runtime: O(n * traversalFunction).</remarks>
-		public void StepperReverse(StepRef<T> step_function)
-		{
-			this.StepperReverse(step_function);
-		}
-		#endregion
-		#region public StepStatus StepperReverse(StepBreak<T> step_function)
-		/// <summary>Invokes a delegate for each entry in the data structure.</summary>
-		/// <param name="step_function">The delegate to invoke on each item in the structure.</param>
-		/// <returns>The resulting status of the iteration.</returns>
-		/// <remarks>Runtime: O(n * traversalFunction).</remarks>
-		public StepStatus StepperReverse(StepBreak<T> step_function)
-		{
-			return this.StepperReverse(step_function);
-		}
-		#endregion
-		#region public StepStatus StepperReverse(StepRefBreak<T> step_function)
-		/// <summary>Invokes a delegate for each entry in the data structure.</summary>
-		/// <param name="step_function">The delegate to invoke on each item in the structure.</param>
-		/// <returns>The resulting status of the iteration.</returns>
-		/// <remarks>Runtime: O(n * traversalFunction).</remarks>
-		public StepStatus StepperReverse(StepRefBreak<T> step_function)
-		{
-			return this.StepperReverse(step_function);
-		}
-		#endregion
-		#region public virtual void Stepper(Step<T> step_function, T minimum, T maximum)
-		/// <summary>Invokes a delegate for each entry in the data structure.</summary>
-		/// <param name="step_function">The delegate to invoke on each item in the structure.</param>
-		/// <param name="minimum">The minimum value of the optimized stepper function.</param>
-		/// <param name="maximum">The maximum value of the optimized stepper function.</param>
-		/// <remarks>Runtime: O(n * traversalFunction).</remarks>
-		public virtual void Stepper(Step<T> step_function, T minimum, T maximum)
-		{
-			if (this._compare(minimum, maximum) == Comparison.Greater)
-				throw new Error("invalid minimum and maximum values on Avl traversal.");
-			AvlTreeLinked<T>.Stepper(step_function, _root);
-		}
-		#endregion
-		#region public virtual void Stepper(StepRef<T> step_function, T minimum, T maximum)
-		/// <summary>Invokes a delegate for each entry in the data structure.</summary>
-		/// <param name="step_function">The delegate to invoke on each item in the structure.</param>
-		/// <param name="minimum">The minimum value of the optimized stepper function.</param>
-		/// <param name="maximum">The maximum value of the optimized stepper function.</param>
-		/// <remarks>Runtime: O(n * traversalFunction).</remarks>
-		public virtual void Stepper(StepRef<T> step_function, T minimum, T maximum)
-		{
-			if (this._compare(minimum, maximum) == Comparison.Greater)
-				throw new Error("invalid minimum and maximum values on Avl traversal.");
-			this.Stepper(step_function, _root, minimum, maximum);
-		}
-		#endregion
-		#region public virtual StepStatus Stepper(StepBreak<T> step_function, T minimum, T maximum)
-		/// <summary>Invokes a delegate for each entry in the data structure.</summary>
-		/// <param name="step_function">The delegate to invoke on each item in the structure.</param>
-		/// <param name="minimum">The minimum value of the optimized stepper function.</param>
-		/// <param name="maximum">The maximum value of the optimized stepper function.</param>
-		/// <remarks>Runtime: O(n * traversalFunction).</remarks>
-		public virtual StepStatus Stepper(StepBreak<T> step_function, T minimum, T maximum)
-		{
-			if (this._compare(minimum, maximum) == Comparison.Greater)
-				throw new Error("invalid minimum and maximum values on Avl traversal.");
-			return this.Stepper(step_function, _root, minimum, maximum);
-		}
-		#endregion
-		#region public virtual StepStatus Stepper(StepRefBreak<T> step_function, T minimum, T maximum)
-		/// <summary>Invokes a delegate for each entry in the data structure.</summary>
-		/// <param name="step_function">The delegate to invoke on each item in the structure.</param>
-		/// <param name="minimum">The minimum value of the optimized stepper function.</param>
-		/// <param name="maximum">The maximum value of the optimized stepper function.</param>
-		/// <remarks>Runtime: O(n * step_function).</remarks>
-		public virtual StepStatus Stepper(StepRefBreak<T> step_function, T minimum, T maximum)
-		{
-			if (this._compare(minimum, maximum) == Comparison.Greater)
-				throw new Error("invalid minimum and maximum values on Avl traversal.");
-			return this.Stepper(step_function, _root, minimum, maximum);
-		}
-		#endregion
-		#region public virtual void StepperReverse(Step<T> step_function, T minimum, T maximum)
-		/// <summary>Invokes a delegate for each entry in the data structure.</summary>
-		/// <param name="step_function">The delegate to invoke on each item in the structure.</param>
-		/// <param name="minimum">The minimum value of the optimized stepper function.</param>
-		/// <param name="maximum">The maximum value of the optimized stepper function.</param>
-		/// <remarks>Runtime: O(n * traversalFunction).</remarks>
-		public virtual void StepperReverse(Step<T> step_function, T minimum, T maximum)
-		{
-			if (this._compare(minimum, maximum) == Comparison.Greater)
-				throw new Error("invalid minimum and maximum values on Avl traversal.");
-			AvlTreeLinked<T>.StepperReverse(step_function, _root);
-		}
-		#endregion
-		#region public virtual void StepperReverse(StepRef<T> step_function, T minimum, T maximum)
-		/// <summary>Invokes a delegate for each entry in the data structure.</summary>
-		/// <param name="step_function">The delegate to invoke on each item in the structure.</param>
-		/// <param name="minimum">The minimum value of the optimized stepper function.</param>
-		/// <param name="maximum">The maximum value of the optimized stepper function.</param>
-		/// <remarks>Runtime: O(n * traversalFunction).</remarks>
-		public virtual void StepperReverse(StepRef<T> step_function, T minimum, T maximum)
-		{
-			if (this._compare(minimum, maximum) == Comparison.Greater)
-				throw new Error("invalid minimum and maximum values on Avl traversal.");
-			this.StepperReverse(step_function, _root, minimum, maximum);
-		}
-		#endregion
-		#region public virtual StepStatus StepperReverse(StepBreak<T> step_function, T minimum, T maximum)
-		/// <summary>Invokes a delegate for each entry in the data structure.</summary>
-		/// <param name="step_function">The delegate to invoke on each item in the structure.</param>
-		/// <param name="minimum">The minimum value of the optimized stepper function.</param>
-		/// <param name="maximum">The maximum value of the optimized stepper function.</param>
-		/// <remarks>Runtime: O(n * traversalFunction).</remarks>
-		public virtual StepStatus StepperReverse(StepBreak<T> step_function, T minimum, T maximum)
-		{
-			if (this._compare(minimum, maximum) == Comparison.Greater)
-				throw new Error("invalid minimum and maximum values on Avl traversal.");
-			return this.StepperReverse(step_function, _root, minimum, maximum);
-		}
-		#endregion
-		#region public virtual StepStatus StepperReverse(StepRefBreak<T> step_function, T minimum, T maximum)
-		/// <summary>Invokes a delegate for each entry in the data structure.</summary>
-		/// <param name="step_function">The delegate to invoke on each item in the structure.</param>
-		/// <param name="minimum">The minimum value of the optimized stepper function.</param>
-		/// <param name="maximum">The maximum value of the optimized stepper function.</param>
-		/// <remarks>Runtime: O(n * step_function).</remarks>
-		public virtual StepStatus StepperReverse(StepRefBreak<T> step_function, T minimum, T maximum)
-		{
-			if (this._compare(minimum, maximum) == Comparison.Greater)
-				throw new Error("invalid minimum and maximum values on Avl traversal.");
-			return this.StepperReverse(step_function, _root, minimum, maximum);
-		}
-		#endregion
-		#region public void Stepper(Step<T> function)
-		/// <summary>Invokes a delegate for each entry in the data structure.</summary>
-		/// <param name="function">The delegate to invoke on each item in the structure.</param>
-		/// <remarks>Runtime: O(n * traversalFunction).</remarks>
-		public void Stepper(Step<T> function)
-		{
-			AvlTreeLinked<T>.Stepper(function, this._root);
-		}
-		#endregion
-		#region private static bool Stepper(Step<T> step_function, Node node)
-		private static bool Stepper(Step<T> step_function, Node node)
+		#region private static StepStatus Stepper(StepRefBreak<T> function, Node node)
+		private static StepStatus Stepper(StepRefBreak<T> function, Node node)
 		{
 			if (node != null)
 			{
-				AvlTreeLinked<T>.Stepper(step_function, node.LeftChild);
-				step_function(node.Value);
-				AvlTreeLinked<T>.Stepper(step_function, node.RightChild);
-			}
-			return true;
-		}
-		#endregion
-		#region public void Stepper(StepRef<T> function)
-		/// <summary>Invokes a delegate for each entry in the data structure.</summary>
-		/// <param name="function">The delegate to invoke on each item in the structure.</param>
-		/// <remarks>Runtime: O(n * traversalFunction).</remarks>
-		public void Stepper(StepRef<T> function)
-		{
-			AvlTreeLinked<T>.Stepper(function, this._root);
-		}
-		private static void Stepper(StepRef<T> step_function, Node node)
-		{
-			if (node != null)
-			{
-				AvlTreeLinked<T>.Stepper(step_function, node.LeftChild);
+				if (AvlTreeLinked<T>.Stepper(function, node.LeftChild) == StepStatus.Break)
+					return StepStatus.Break;
 				T value = node.Value;
-				step_function(ref value);
+				StepStatus status = function(ref value);
 				node.Value = value;
-				AvlTreeLinked<T>.Stepper(step_function, node.RightChild);
+				if (status == StepStatus.Break)
+					return StepStatus.Break;
+				if (AvlTreeLinked<T>.Stepper(function, node.RightChild) == StepStatus.Break)
+					return StepStatus.Break;
 			}
-		}
-		#endregion
-		#region public StepStatus Stepper(StepBreak<T> function)
-		/// <summary>Invokes a delegate for each entry in the data structure.</summary>
-		/// <param name="function">The delegate to invoke on each item in the structure.</param>
-		/// <returns>The resulting status of the iteration.</returns>
-		/// <remarks>Runtime: O(n * traversalFunction).</remarks>
-		public StepStatus Stepper(StepBreak<T> function)
-		{
-			return AvlTreeLinked<T>.Stepper(function, this._root);
+			return StepStatus.Continue;
 		}
 		#endregion
 		#region private static StepStatus Stepper(StepBreak<T> function, Node avltreeNode)
@@ -1144,35 +1132,18 @@ namespace Seven.Structures
 			return StepStatus.Continue;
 		}
 		#endregion
-		#region public StepStatus Stepper(StepRefBreak<T> function)
-		/// <summary>Invokes a delegate for each entry in the data structure.</summary>
-		/// <param name="function">The delegate to invoke on each item in the structure.</param>
-		/// <returns>The resulting status of the iteration.</returns>
-		/// <remarks>Runtime: O(n * traversalFunction).</remarks>
-		public StepStatus Stepper(StepRefBreak<T> function)
-		{
-			return AvlTreeLinked<T>.Stepper(function, this._root);
-		}
-		#endregion
-		#region private static StepStatus Stepper(StepRefBreak<T> function, Node node)
-		private static StepStatus Stepper(StepRefBreak<T> function, Node node)
+		#region private static bool Stepper(Step<T> step_function, Node node)
+		private static bool Stepper(Step<T> step_function, Node node)
 		{
 			if (node != null)
 			{
-				if (AvlTreeLinked<T>.Stepper(function, node.LeftChild) == StepStatus.Break)
-					return StepStatus.Break;
-				T value = node.Value;
-				StepStatus status = function(ref value);
-				node.Value = value;
-				if (status == StepStatus.Break)
-					return StepStatus.Break;
-				if (AvlTreeLinked<T>.Stepper(function, node.RightChild) == StepStatus.Break)
-					return StepStatus.Break;
+				AvlTreeLinked<T>.Stepper(step_function, node.LeftChild);
+				step_function(node.Value);
+				AvlTreeLinked<T>.Stepper(step_function, node.RightChild);
 			}
-			return StepStatus.Continue;
+			return true;
 		}
 		#endregion
-		// methods (private)
 	}
 
 	#region In Development

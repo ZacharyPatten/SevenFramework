@@ -19,6 +19,9 @@ namespace Seven.Structures
 		Structure.Equating<T>
 	{
 		// properties
+		#region public Stepper<T> this[params M[] coordinates];
+		Stepper<T> this[params M[] coordinates] { get; }
+		#endregion
 		#region Get<M> Origin
 		/// <summary>Gets the dimensions of the center point of the Omnitree.</summary>
 		Get<M> Origin { get; }
@@ -493,7 +496,7 @@ namespace Seven.Structures
 			this._previousAdditionDepth = 0;
 		}
 		#endregion
-		#region public Omnitree_LinkedArrayLists(M[] min, M[] max, Omnitree.Locate<T, M> locate, Compare<M> compare, Omnitree.Average<M> average)
+		#region public Omnitree_LinkedArrayLists(M[] min, M[] max, Omnitree.Locate<T, M> locate, Equate<T> equate, Compare<M> compare, Omnitree.Average<M> average)
 		/// <summary>Constructor for an Omnitree_Linked.</summary>
 		/// <param name="min">The minimum values of the tree.</param>
 		/// <param name="max">The maximum values of the tree.</param>
@@ -541,6 +544,16 @@ namespace Seven.Structures
 		}
 		#endregion
 		// properties
+		#region public Stepper<T> this[params M[] coordinates]
+		public Stepper<T> this[params M[] coordinates]
+		{
+			get
+			{
+				Get<M> get = Accessor.Get(coordinates);
+				return (Step<T> step) => { this.Stepper(step, get, get); };
+			}
+		}
+		#endregion
 		#region public Get<M> Origin
 		/// <summary>Gets the dimensions of the center point of the Omnitree.</summary>
 		public Get<M> Origin { get { return this._origin; } }
@@ -578,6 +591,331 @@ namespace Seven.Structures
 		public Equate<T> Equate { get { return this._equate; } }
 		#endregion
 		// methods
+		#region public void Remove(Predicate<T> where)
+		/// <summary>Removes all the items qualified by the delegate.</summary>
+		/// <param name="where">The predicate to qualify removals.</param>
+		public void Remove(Predicate<T> where)
+		{
+			this._count -= this.Remove(this._top, where);
+
+			// dynamic tree sizes
+			while (this._loadPowered > this._count && this._load > _defaultLoad)
+			{
+				this._load--;
+				this._loadPlusOnePowered =
+					OmnitreeLinkedArrayLists<T, M>.Int_Power(_load + 1, _dimensions);
+				this._loadPowered =
+					OmnitreeLinkedArrayLists<T, M>.Int_Power(_load, _dimensions);
+			}
+
+			this._previousAddition = this._top;
+			this._previousAdditionDepth = 0;
+		}
+		#endregion
+		#region public StepStatus Stepper(StepRefBreak<T> function)
+		/// <summary>Traverses every item in the tree and performs the delegate in them.</summary>
+		/// <param name="function">The delegate to perform on every item in the tree.</param>
+		public StepStatus Stepper(StepRefBreak<T> function)
+		{
+			return Stepper(function, this._top);
+		}
+		private StepStatus Stepper(StepRefBreak<T> function, Node node)
+		{
+			if (node is Leaf)
+			{
+				Leaf leaf = node as Leaf;
+				for (int i = 0; i < leaf.Count; i++)
+					if (function(ref leaf.Contents[i]) == StepStatus.Break)
+						return StepStatus.Break;
+			}
+			else
+			{
+				Branch branch = node as Branch;
+				if (branch.Children.Length == this._children)
+				{
+					foreach (Node child in branch.Children)
+						if (child != null)
+							if (this.Stepper(function, child) == StepStatus.Break)
+								return StepStatus.Break;
+				}
+				else
+					for (int i = 0; i < branch.ChildCount; i++)
+						if (this.Stepper(function, branch.Children[i]) == StepStatus.Break)
+							return StepStatus.Break;
+			}
+			return StepStatus.Continue;
+		}
+		#endregion
+		#region public void Stepper(StepRef<T> function, Get<M> min, Get<M> max)
+		/// <summary>Performs and specialized traversal of the structure and performs a delegate on every node within the provided dimensions.</summary>
+		/// <param name="function">The delegate to perform on all items in the tree within the given bounds.</param>
+		/// <param name="min">The minimum dimensions of the traversal.</param>
+		/// <param name="max">The maximum dimensions of the traversal.</param>
+		public void Stepper(StepRef<T> function, Get<M> min, Get<M> max)
+		{
+			Stepper(function, _top, min, max);
+		}
+		#endregion
+		#region public Omnitree_LinkedArrayLists<T, M> Clone()
+		/// <summary>Creates a shallow clone of this data structure.</summary>
+		/// <returns>A shallow clone of this data structure.</returns>
+		public OmnitreeLinkedArrayLists<T, M> Clone()
+		{
+			// OPTIMIZATION NEEDED
+			OmnitreeLinkedArrayLists<T, M> clone = new OmnitreeLinkedArrayLists<T, M>(
+				this._dimensions,
+				this._top.Min,this._top.Max,
+				this._locate, this._equate, this._compare, this._average);
+			this.Stepper(new Step<T>(clone.Add));
+			return clone;
+		}
+		#endregion
+		#region public void Add(T addition)
+		/// <summary>Adds an item to the tree.</summary>
+		/// <param name="addition">The item to be added.</param>
+		public void Add(T addition)
+		{
+			if (this._count == int.MaxValue)
+				throw new Error("(Count == int.MaxValue) max Omnitree size reached (change ints to longs if you need to).");
+
+			// dynamic tree sizes
+			if (this._loadPlusOnePowered < this._count)
+			{
+				this._load++;
+				this._loadPlusOnePowered =
+					OmnitreeLinkedArrayLists<T, M>.Int_Power(this._load + 1, this._dimensions);
+				this._loadPowered =
+					OmnitreeLinkedArrayLists<T, M>.Int_Power(this._load, this._dimensions);
+			}
+
+			Get<M> ms = this._locate(addition);
+
+			if (ms == null)
+				throw new Error("the location function for omnitree is invalid.");
+
+			if (!EncapsulationCheck(this._top.Min, this._top.Max, ms))
+				throw new Error("out of bounds during addition");
+
+			if (this._top is Leaf && (this._top as Leaf).Count >= this._load)
+			{
+				Leaf leaf = this._top as Leaf;
+				this._top = new Branch(this._top.Min, this._top.Max, null, -1, _defaultLoad);
+
+				for (int i = 0; i < leaf.Count; i++)
+				{
+					Get<M> child_ms = this._locate(leaf.Contents[i]);
+
+					if (child_ms == null)
+						throw new Error("the location function for omnitree is invalid.");
+
+					if (!EncapsulationCheck(this._top.Min, this._top.Max, child_ms))
+					{
+						this._count--;
+						throw new Error("a node was updated to be out of bounds (found in an addition)");
+					}
+					else
+						Add(leaf.Contents[i], this._top, child_ms, 0);
+				}
+			}
+
+			if (this.EncapsulationCheck(this._previousAddition.Min, this._previousAddition.Max, ms))
+				this.Add(addition, this._previousAddition, ms, this._previousAdditionDepth);
+			else
+				this.Add(addition, _top, ms, 0);
+			this._count++;
+		}
+		#endregion
+		#region public void Update()
+		/// <summary>Iterates through the entire tree and ensures each item is in the proper leaf.</summary>
+		public void Update()
+		{
+			this.Update(this._top, 0);
+
+			this._previousAddition = this._top;
+			this._previousAdditionDepth = 0;
+		}
+		#endregion
+		#region public void Update(Get<M> min, Get<M> max)
+		/// <summary>Iterates through the provided dimensions and ensures each item is in the proper leaf.</summary>
+		/// <param name="min">The minimum dimensions of the space to update.</param>
+		/// <param name="max">The maximum dimensions of the space to update.</param>
+		public void Update(Get<M> min, Get<M> max)
+		{
+			this.Update(min, max, this._top, 0);
+
+			this._previousAddition = this._top;
+			this._previousAdditionDepth = 0;
+		}
+		#endregion
+		#region public void Remove(Get<M> min, Get<M> max)
+		/// <summary>Removes all the items in a given space.</summary>
+		/// <param name="min">The minimum values of the space.</param>
+		/// <param name="max">The maximum values of the space.</param>
+		/// <returns>The number of items that were removed.</returns>
+		public void Remove(Get<M> min, Get<M> max)
+		{
+			this._count -= this.Remove(this._top, min, max);
+
+			// dynamic tree sizes
+			while (this._loadPowered > this._count && this._load > _defaultLoad)
+			{
+				this._load--;
+				this._loadPlusOnePowered =
+					OmnitreeLinkedArrayLists<T, M>.Int_Power(_load + 1, _dimensions);
+				this._loadPowered =
+					OmnitreeLinkedArrayLists<T, M>.Int_Power(_load, _dimensions);
+			}
+
+			this._previousAddition = this._top;
+			this._previousAdditionDepth = 0;
+		}
+		#endregion
+		#region public void Remove(Get<M> min, Get<M> max, Predicate<T> where)
+		/// <summary>Removes all the items in a given space validated by a predicate.</summary>
+		/// <param name="min">The minimum values of the space.</param>
+		/// <param name="max">The maximum values of the space.</param>
+		/// <param name="where">The equality constraint of the removal.</param>
+		public void Remove(Get<M> min, Get<M> max, Predicate<T> where)
+		{
+			this._count -= this.Remove(this._top, min, max, where);
+
+			// dynamic tree sizes
+			while (this._loadPowered > this._count && this._load > _defaultLoad)
+			{
+				this._load--;
+				this._loadPlusOnePowered =
+					OmnitreeLinkedArrayLists<T, M>.Int_Power(_load + 1, _dimensions);
+				this._loadPowered =
+					OmnitreeLinkedArrayLists<T, M>.Int_Power(_load, _dimensions);
+			}
+
+			this._previousAddition = this._top;
+			this._previousAdditionDepth = 0;
+		}
+		#endregion
+		#region public void Remove(T removal)
+		/// <summary>Removes all the items in a given space validated by a predicate.</summary>
+		public void Remove(T removal)
+		{
+			Get<M> location = this.Locate(removal);
+			this.Remove(location, location, (T item) => { return this._equate(item, removal); });
+		}
+		#endregion
+		#region public void Stepper(Step<T> function, Get<M> min, Get<M> max)
+		/// <summary>Performs and specialized traversal of the structure and performs a delegate on every node within the provided dimensions.</summary>
+		/// <param name="function">The delegate to perform on all items in the tree within the given bounds.</param>
+		/// <param name="min">The minimum dimensions of the traversal.</param>
+		/// <param name="max">The maximum dimensions of the traversal.</param>
+		public void Stepper(Step<T> function, Get<M> min, Get<M> max)
+		{
+			Stepper(function, _top, min, max);
+		}
+		#endregion
+		#region public void Stepper(StepRef<T> function)
+		/// <summary>Traverses every item in the tree and performs the delegate in them.</summary>
+		/// <param name="function">The delegate to perform on every item in the tree.</param>
+		public void Stepper(StepRef<T> function)
+		{
+			Stepper(function, this._top);
+		}
+		#endregion
+		#region public StepStatus Stepper(StepBreak<T> function, Get<M> min, Get<M> max)
+		/// <summary>Performs and specialized traversal of the structure and performs a delegate on every node within the provided dimensions.</summary>
+		/// <param name="function">The delegate to perform on all items in the tree within the given bounds.</param>
+		/// <param name="min">The minimum dimensions of the traversal.</param>
+		/// <param name="max">The maximum dimensions of the traversal.</param>
+		public StepStatus Stepper(StepBreak<T> function, Get<M> min, Get<M> max)
+		{
+			return Stepper(function, _top, min, max);
+		}
+		#endregion
+		#region public StepStatus Stepper(StepRefBreak<T> function, Get<M> min, Get<M> max)
+		/// <summary>Performs and specialized traversal of the structure and performs a delegate on every node within the provided dimensions.</summary>
+		/// <param name="function">The delegate to perform on all items in the tree within the given bounds.</param>
+		/// <param name="min">The minimum dimensions of the traversal.</param>
+		/// <param name="max">The maximum dimensions of the traversal.</param>
+		public StepStatus Stepper(StepRefBreak<T> function, Get<M> min, Get<M> max)
+		{
+			return Stepper(function, _top, min, max);
+		}
+		#endregion
+		#region public void Clear()
+		/// <summary>Returns the tree to an empty state.</summary>
+		public void Clear()
+		{
+			this._top = new Leaf(this._top.Min, this._top.Max, null, -1);
+			this._count = 0;
+
+			this._load = _defaultLoad;
+			this._loadPlusOnePowered =
+				OmnitreeLinkedArrayLists<T, M>.Int_Power(this._load + 1, this._dimensions);
+			this._loadPowered =
+				OmnitreeLinkedArrayLists<T, M>.Int_Power(_load, _dimensions);
+		}
+		#endregion
+		#region public void Stepper(Step<T> function)
+		/// <summary>Traverses every item in the tree and performs the delegate in them.</summary>
+		/// <param name="function">The delegate to perform on every item in the tree.</param>
+		public void Stepper(Step<T> function)
+		{
+			this.Stepper(function, this._top);
+		}
+		#endregion
+		#region public StepStatus Stepper(StepBreak<T> function)
+		/// <summary>Traverses every item in the tree and performs the delegate in them.</summary>
+		/// <param name="function">The delegate to perform on every item in the tree.</param>
+		public StepStatus Stepper(StepBreak<T> function)
+		{
+			return Stepper(function, this._top);
+		}
+		#endregion
+		#region private StepStatus Stepper(StepBreak<T> function, Node node)
+		private StepStatus Stepper(StepBreak<T> function, Node node)
+		{
+			if (node is Leaf)
+			{
+				Leaf leaf = node as Leaf;
+				for (int i = 0; i < leaf.Count; i++)
+					if (function(leaf.Contents[i]) == StepStatus.Break)
+						return StepStatus.Break;
+			}
+			else
+			{
+				Branch branch = node as Branch;
+				if (branch.ChildCount == this._children)
+				{
+					foreach (Node child in branch.Children)
+						if (child != null)
+							if (this.Stepper(function, child) == StepStatus.Break)
+								return StepStatus.Break;
+				}
+				else
+					for (int i = 0; i < branch.ChildCount; i++)
+						if (this.Stepper(function, branch.Children[i]) == StepStatus.Break)
+							return StepStatus.Break;
+			}
+			return StepStatus.Continue;
+		}
+		#endregion
+		#region System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+		/// <summary>FOR COMPATIBILITY ONLY. AVOID IF POSSIBLE.</summary>
+		System.Collections.IEnumerator
+			System.Collections.IEnumerable.GetEnumerator()
+		{
+			T[] array = this.ToArray();
+			return array.GetEnumerator();
+		}
+		#endregion
+		#region System.Collections.Generic.IEnumerator<T> System.Collections.Generic.IEnumerable<T>.GetEnumerator()
+		/// <summary>FOR COMPATIBILITY ONLY. AVOID IF POSSIBLE.</summary>
+		System.Collections.Generic.IEnumerator<T>
+			System.Collections.Generic.IEnumerable<T>.GetEnumerator()
+		{
+			T[] array = this.ToArray();
+			return ((System.Collections.Generic.IEnumerable<T>)array).GetEnumerator();
+		}
+		#endregion
+		// methods (private)
 		#region private void Add(T addition, Node node, Get<M> ms, int depth)
 		/// <summary>Recursive version of the add function.</summary>
 		/// <param name="addition">The item to be added.</param>
@@ -765,27 +1103,6 @@ namespace Seven.Structures
 				_base *= _base;
 			}
 			return result;
-		}
-		#endregion
-		#region public void Remove(Predicate<T> where)
-		/// <summary>Removes all the items qualified by the delegate.</summary>
-		/// <param name="where">The predicate to qualify removals.</param>
-		public void Remove(Predicate<T> where)
-		{
-			this._count -= this.Remove(this._top, where);
-
-			// dynamic tree sizes
-			while (this._loadPowered > this._count && this._load > _defaultLoad)
-			{
-				this._load--;
-				this._loadPlusOnePowered =
-					OmnitreeLinkedArrayLists<T, M>.Int_Power(_load + 1, _dimensions);
-				this._loadPowered =
-					OmnitreeLinkedArrayLists<T, M>.Int_Power(_load, _dimensions);
-			}
-
-			this._previousAddition = this._top;
-			this._previousAdditionDepth = 0;
 		}
 		#endregion
 		#region private int Remove(Node node, Predicate<T> where)
@@ -1307,40 +1624,6 @@ namespace Seven.Structures
 			}
 		}
 		#endregion
-		#region public StepStatus Stepper(StepRefBreak<T> function)
-		/// <summary>Traverses every item in the tree and performs the delegate in them.</summary>
-		/// <param name="function">The delegate to perform on every item in the tree.</param>
-		public StepStatus Stepper(StepRefBreak<T> function)
-		{
-			return Stepper(function, this._top);
-		}
-		private StepStatus Stepper(StepRefBreak<T> function, Node node)
-		{
-			if (node is Leaf)
-			{
-				Leaf leaf = node as Leaf;
-				for (int i = 0; i < leaf.Count; i++)
-					if (function(ref leaf.Contents[i]) == StepStatus.Break)
-						return StepStatus.Break;
-			}
-			else
-			{
-				Branch branch = node as Branch;
-				if (branch.Children.Length == this._children)
-				{
-					foreach (Node child in branch.Children)
-						if (child != null)
-							if (this.Stepper(function, child) == StepStatus.Break)
-								return StepStatus.Break;
-				}
-				else
-					for (int i = 0; i < branch.ChildCount; i++)
-						if (this.Stepper(function, branch.Children[i]) == StepStatus.Break)
-							return StepStatus.Break;
-			}
-			return StepStatus.Continue;
-		}
-		#endregion
 		#region private void Stepper(Step<T> function, Node node, Get<M> min, Get<M> max)
 		private void Stepper(Step<T> function, Node node, Get<M> min, Get<M> max)
 		{
@@ -1378,16 +1661,6 @@ namespace Seven.Structures
 							this.Stepper(function, branch.Children[i], min, max);
 				}
 			}
-		}
-		#endregion
-		#region public void Stepper(StepRef<T> function, Get<M> min, Get<M> max)
-		/// <summary>Performs and specialized traversal of the structure and performs a delegate on every node within the provided dimensions.</summary>
-		/// <param name="function">The delegate to perform on all items in the tree within the given bounds.</param>
-		/// <param name="min">The minimum dimensions of the traversal.</param>
-		/// <param name="max">The maximum dimensions of the traversal.</param>
-		public void Stepper(StepRef<T> function, Get<M> min, Get<M> max)
-		{
-			Stepper(function, _top, min, max);
 		}
 		#endregion
 		#region private void Stepper(StepRef<T> function, Node node, Get<M> min, Get<M> max)
@@ -1515,211 +1788,6 @@ namespace Seven.Structures
 			return StepStatus.Continue;
 		}
 		#endregion
-		#region public Omnitree_LinkedArrayLists<T, M> Clone()
-		/// <summary>Creates a shallow clone of this data structure.</summary>
-		/// <returns>A shallow clone of this data structure.</returns>
-		public OmnitreeLinkedArrayLists<T, M> Clone()
-		{
-			// OPTIMIZATION NEEDED
-			OmnitreeLinkedArrayLists<T, M> clone = new OmnitreeLinkedArrayLists<T, M>(
-				this._dimensions,
-				this._top.Min,this._top.Max,
-				this._locate, this._equate, this._compare, this._average);
-			this.Stepper(new Step<T>(clone.Add));
-			return clone;
-		}
-		#endregion
-		#region public void Add(T addition)
-		/// <summary>Adds an item to the tree.</summary>
-		/// <param name="addition">The item to be added.</param>
-		public void Add(T addition)
-		{
-			if (this._count == int.MaxValue)
-				throw new Error("(Count == int.MaxValue) max Omnitree size reached (change ints to longs if you need to).");
-
-			// dynamic tree sizes
-			if (this._loadPlusOnePowered < this._count)
-			{
-				this._load++;
-				this._loadPlusOnePowered =
-					OmnitreeLinkedArrayLists<T, M>.Int_Power(this._load + 1, this._dimensions);
-				this._loadPowered =
-					OmnitreeLinkedArrayLists<T, M>.Int_Power(this._load, this._dimensions);
-			}
-
-			Get<M> ms = this._locate(addition);
-
-			if (ms == null)
-				throw new Error("the location function for omnitree is invalid.");
-
-			if (!EncapsulationCheck(this._top.Min, this._top.Max, ms))
-				throw new Error("out of bounds during addition");
-
-			if (this._top is Leaf && (this._top as Leaf).Count >= this._load)
-			{
-				Leaf leaf = this._top as Leaf;
-				this._top = new Branch(this._top.Min, this._top.Max, null, -1, _defaultLoad);
-
-				for (int i = 0; i < leaf.Count; i++)
-				{
-					Get<M> child_ms = this._locate(leaf.Contents[i]);
-
-					if (child_ms == null)
-						throw new Error("the location function for omnitree is invalid.");
-
-					if (!EncapsulationCheck(this._top.Min, this._top.Max, child_ms))
-					{
-						this._count--;
-						throw new Error("a node was updated to be out of bounds (found in an addition)");
-					}
-					else
-						Add(leaf.Contents[i], this._top, child_ms, 0);
-				}
-			}
-
-			if (this.EncapsulationCheck(this._previousAddition.Min, this._previousAddition.Max, ms))
-				this.Add(addition, this._previousAddition, ms, this._previousAdditionDepth);
-			else
-				this.Add(addition, _top, ms, 0);
-			this._count++;
-		}
-		#endregion
-		#region public void Update()
-		/// <summary>Iterates through the entire tree and ensures each item is in the proper leaf.</summary>
-		public void Update()
-		{
-			this.Update(this._top, 0);
-
-			this._previousAddition = this._top;
-			this._previousAdditionDepth = 0;
-		}
-		#endregion
-		#region public void Update(Get<M> min, Get<M> max)
-		/// <summary>Iterates through the provided dimensions and ensures each item is in the proper leaf.</summary>
-		/// <param name="min">The minimum dimensions of the space to update.</param>
-		/// <param name="max">The maximum dimensions of the space to update.</param>
-		public void Update(Get<M> min, Get<M> max)
-		{
-			this.Update(min, max, this._top, 0);
-
-			this._previousAddition = this._top;
-			this._previousAdditionDepth = 0;
-		}
-		#endregion
-		#region public void Remove(Get<M> min, Get<M> max)
-		/// <summary>Removes all the items in a given space.</summary>
-		/// <param name="min">The minimum values of the space.</param>
-		/// <param name="max">The maximum values of the space.</param>
-		/// <returns>The number of items that were removed.</returns>
-		public void Remove(Get<M> min, Get<M> max)
-		{
-			this._count -= this.Remove(this._top, min, max);
-
-			// dynamic tree sizes
-			while (this._loadPowered > this._count && this._load > _defaultLoad)
-			{
-				this._load--;
-				this._loadPlusOnePowered =
-					OmnitreeLinkedArrayLists<T, M>.Int_Power(_load + 1, _dimensions);
-				this._loadPowered =
-					OmnitreeLinkedArrayLists<T, M>.Int_Power(_load, _dimensions);
-			}
-
-			this._previousAddition = this._top;
-			this._previousAdditionDepth = 0;
-		}
-		#endregion
-		#region public void Remove(Get<M> min, Get<M> max, Predicate<T> where)
-		/// <summary>Removes all the items in a given space validated by a predicate.</summary>
-		/// <param name="min">The minimum values of the space.</param>
-		/// <param name="max">The maximum values of the space.</param>
-		/// <param name="where">The equality constraint of the removal.</param>
-		public void Remove(Get<M> min, Get<M> max, Predicate<T> where)
-		{
-			this._count -= this.Remove(this._top, min, max, where);
-
-			// dynamic tree sizes
-			while (this._loadPowered > this._count && this._load > _defaultLoad)
-			{
-				this._load--;
-				this._loadPlusOnePowered =
-					OmnitreeLinkedArrayLists<T, M>.Int_Power(_load + 1, _dimensions);
-				this._loadPowered =
-					OmnitreeLinkedArrayLists<T, M>.Int_Power(_load, _dimensions);
-			}
-
-			this._previousAddition = this._top;
-			this._previousAdditionDepth = 0;
-		}
-		#endregion
-		#region public void Remove(T removal)
-		/// <summary>Removes all the items in a given space validated by a predicate.</summary>
-		public void Remove(T removal)
-		{
-			Get<M> location = this.Locate(removal);
-			this.Remove(location, location, (T item) => { return this._equate(item, removal); });
-		}
-		#endregion
-		#region public void Stepper(Step<T> function, Get<M> min, Get<M> max)
-		/// <summary>Performs and specialized traversal of the structure and performs a delegate on every node within the provided dimensions.</summary>
-		/// <param name="function">The delegate to perform on all items in the tree within the given bounds.</param>
-		/// <param name="min">The minimum dimensions of the traversal.</param>
-		/// <param name="max">The maximum dimensions of the traversal.</param>
-		public void Stepper(Step<T> function, Get<M> min, Get<M> max)
-		{
-			Stepper(function, _top, min, max);
-		}
-		#endregion
-		#region public void Stepper(StepRef<T> function)
-		/// <summary>Traverses every item in the tree and performs the delegate in them.</summary>
-		/// <param name="function">The delegate to perform on every item in the tree.</param>
-		public void Stepper(StepRef<T> function)
-		{
-			Stepper(function, this._top);
-		}
-		#endregion
-		#region public StepStatus Stepper(StepBreak<T> function, Get<M> min, Get<M> max)
-		/// <summary>Performs and specialized traversal of the structure and performs a delegate on every node within the provided dimensions.</summary>
-		/// <param name="function">The delegate to perform on all items in the tree within the given bounds.</param>
-		/// <param name="min">The minimum dimensions of the traversal.</param>
-		/// <param name="max">The maximum dimensions of the traversal.</param>
-		public StepStatus Stepper(StepBreak<T> function, Get<M> min, Get<M> max)
-		{
-			return Stepper(function, _top, min, max);
-		}
-		#endregion
-		#region public StepStatus Stepper(StepRefBreak<T> function, Get<M> min, Get<M> max)
-		/// <summary>Performs and specialized traversal of the structure and performs a delegate on every node within the provided dimensions.</summary>
-		/// <param name="function">The delegate to perform on all items in the tree within the given bounds.</param>
-		/// <param name="min">The minimum dimensions of the traversal.</param>
-		/// <param name="max">The maximum dimensions of the traversal.</param>
-		public StepStatus Stepper(StepRefBreak<T> function, Get<M> min, Get<M> max)
-		{
-			return Stepper(function, _top, min, max);
-		}
-		#endregion
-		#region public void Clear()
-		/// <summary>Returns the tree to an empty state.</summary>
-		public void Clear()
-		{
-			this._top = new Leaf(this._top.Min, this._top.Max, null, -1);
-			this._count = 0;
-
-			this._load = _defaultLoad;
-			this._loadPlusOnePowered =
-				OmnitreeLinkedArrayLists<T, M>.Int_Power(this._load + 1, this._dimensions);
-			this._loadPowered =
-				OmnitreeLinkedArrayLists<T, M>.Int_Power(_load, _dimensions);
-		}
-		#endregion
-		#region public void Stepper(Step<T> function)
-		/// <summary>Traverses every item in the tree and performs the delegate in them.</summary>
-		/// <param name="function">The delegate to perform on every item in the tree.</param>
-		public void Stepper(Step<T> function)
-		{
-			this.Stepper(function, this._top);
-		}
-		#endregion
 		#region private void Stepper(Step<T> function, Node node)
 		private void Stepper(Step<T> function, Node node)
 		{
@@ -1742,60 +1810,6 @@ namespace Seven.Structures
 					for (int i = 0; i < branch.ChildCount; i++)
 						this.Stepper(function, branch.Children[i]);
 			}
-		}
-		#endregion
-		#region public StepStatus Stepper(StepBreak<T> function)
-		/// <summary>Traverses every item in the tree and performs the delegate in them.</summary>
-		/// <param name="function">The delegate to perform on every item in the tree.</param>
-		public StepStatus Stepper(StepBreak<T> function)
-		{
-			return Stepper(function, this._top);
-		}
-		#endregion
-		#region private StepStatus Stepper(StepBreak<T> function, Node node)
-		private StepStatus Stepper(StepBreak<T> function, Node node)
-		{
-			if (node is Leaf)
-			{
-				Leaf leaf = node as Leaf;
-				for (int i = 0; i < leaf.Count; i++)
-					if (function(leaf.Contents[i]) == StepStatus.Break)
-						return StepStatus.Break;
-			}
-			else
-			{
-				Branch branch = node as Branch;
-				if (branch.ChildCount == this._children)
-				{
-					foreach (Node child in branch.Children)
-						if (child != null)
-							if (this.Stepper(function, child) == StepStatus.Break)
-								return StepStatus.Break;
-				}
-				else
-					for (int i = 0; i < branch.ChildCount; i++)
-						if (this.Stepper(function, branch.Children[i]) == StepStatus.Break)
-							return StepStatus.Break;
-			}
-			return StepStatus.Continue;
-		}
-		#endregion
-		#region System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
-		/// <summary>FOR COMPATIBILITY ONLY. AVOID IF POSSIBLE.</summary>
-		System.Collections.IEnumerator
-			System.Collections.IEnumerable.GetEnumerator()
-		{
-			T[] array = this.ToArray();
-			return array.GetEnumerator();
-		}
-		#endregion
-		#region System.Collections.Generic.IEnumerator<T> System.Collections.Generic.IEnumerable<T>.GetEnumerator()
-		/// <summary>FOR COMPATIBILITY ONLY. AVOID IF POSSIBLE.</summary>
-		System.Collections.Generic.IEnumerator<T>
-			System.Collections.Generic.IEnumerable<T>.GetEnumerator()
-		{
-			T[] array = this.ToArray();
-			return ((System.Collections.Generic.IEnumerable<T>)array).GetEnumerator();
 		}
 		#endregion
 	}
@@ -2084,6 +2098,16 @@ namespace Seven.Structures
 		}
 		#endregion
 		// properties
+		#region public Stepper<T> this[params M[] coordinates]
+		public Stepper<T> this[params M[] coordinates]
+		{
+			get
+			{
+				Get<M> get = Accessor.Get(coordinates);
+				return (Step<T> step) => { this.Stepper(step, get, get); };
+			}
+		}
+		#endregion
 		#region public Get<M> Origin
 		/// <summary>Gets the dimensions of the center point of the Omnitree.</summary>
 		public Get<M> Origin { get { return this._origin; } }

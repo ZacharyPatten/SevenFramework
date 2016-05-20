@@ -31,6 +31,11 @@ namespace Seven.Structures
 		/// <param name="predicate">The function to determine equality.</param>
 		void RemoveAll(Predicate<T> predicate);
 		#endregion
+		#region void RemoveAll(T value);
+		/// <summary>Removes all occurences of an item in the list.</summary>
+		/// <param name="value">The value to remove all occurences of.</param>
+		void RemoveAll(T value);
+		#endregion
 	}
 
 	/// <summary>Implements a growing, singularly-linked list data structure that inherits InterfaceTraversable.</summary>
@@ -234,6 +239,33 @@ namespace Seven.Structures
 			}
 		}
 		#endregion
+		#region public void RemoveAll(T value)
+		/// <summary>Removes the first equality by object reference.</summary>
+		/// <param name="value">The item to remove.</param>
+		public void RemoveAll(T value)
+		{
+			if (_head == null)
+				return;
+			if (this._equate(value, _head.Value))
+			{
+				_head = _head.Next;
+				_count--;
+			}
+			Node listNode = _head;
+			while (listNode != null)
+			{
+				if (listNode.Next == null)
+					break;
+				else if (this._equate(value, _head.Value))
+				{
+					if (listNode.Next.Equals(_tail))
+						_tail = listNode;
+					listNode.Next = listNode.Next.Next;
+				}
+				listNode = listNode.Next;
+			}
+		}
+		#endregion
 		#region public void Stepper(Step<T> function)
 		/// <summary>Invokes a delegate for each entry in the data structure.</summary>
 		/// <param name="function">The delegate to invoke on each item in the structure.</param>
@@ -426,7 +458,7 @@ namespace Seven.Structures
 		#region public Equate<T> Equate
 		public Equate<T> Equate { get { return this._equate; } }
 		#endregion
-		// methods
+		// methods (public)
 		#region public void Add(T addition)
 		/// <summary>Adds an item to the end of the list.</summary>
 		/// <param name="addition">The item to be added.</param>
@@ -504,8 +536,7 @@ namespace Seven.Structures
 		/// <remarks>Runtime: Theta(n - index).</remarks>
 		public void Remove(int index)
 		{
-			if (index < 0 || index > this._count)
-				throw new Error("Attempting to remove an index outside the ListArray's current size.");
+			this.Remove_private(index);
 			if (_count < this._list.Length / 2)
 			{
 				T[] newList = new T[this._list.Length / 2];
@@ -513,9 +544,15 @@ namespace Seven.Structures
 					newList[i] = this._list[i];
 				this._list = newList;
 			}
-			for (int i = index; i < this._count; i++)
-				this._list[i] = this._list[i + 1];
-			_count--;
+		}
+		#endregion public void RemoveWithoutShrink(int index)
+		#region public void RemoveWithoutShrink(int index)
+		/// <summary>Removes the item at a specific index.</summary>
+		/// <param name="index">The index of the item to be removed.</param>
+		/// <remarks>Runtime: Theta(n - index).</remarks>
+		public void RemoveWithoutShrink(int index)
+		{
+			this.Remove_private(index);
 		}
 		#endregion
 		#region public void RemoveAll(Predicate<T> predicate)
@@ -542,7 +579,48 @@ namespace Seven.Structures
 			}
 		}
 		#endregion
-		#region public void Remove(Predicate<T> predicate)
+		#region public void RemoveAll(T value)
+		/// <summary>Removes all occurences of a given item.</summary>
+		/// <param name="item">The itme to genocide.</param>
+		/// <remarks>Runtime: Theta(n).</remarks>
+		public void RemoveAll(T value)
+		{
+			if (this._count == 0)
+				return;
+			int removed = 0;
+			for (int i = 0; i < this._count; i++)
+				if (this._equate(value, this._list[i]))
+					removed++;
+				else
+					this._list[i - removed] = this._list[i];
+			this._count -= removed;
+			if (_count < _list.Length / 2)
+			{
+				T[] newList = new T[_list.Length / 2];
+				for (int i = 0; i < this._count; i++)
+					newList[i] = this._list[i];
+				this._list = newList;
+			}
+		}
+		#endregion
+		#region public void RemoveAllWithoutShrink(Predicate<T> predicate)
+		/// <summary>Removes all occurences of a given item.</summary>
+		/// <param name="item">The itme to genocide.</param>
+		/// <remarks>Runtime: Theta(n).</remarks>
+		public void RemoveAllWithoutShrink(Predicate<T> predicate)
+		{
+			if (this._count == 0)
+				return;
+			int removed = 0;
+			for (int i = 0; i < this._count; i++)
+				if (predicate(this._list[i]))
+					removed++;
+				else
+					this._list[i - removed] = this._list[i];
+			this._count -= removed;
+		}
+		#endregion
+		#region public void Remove(T removal)
 		/// <summary>Removes the item at a specific index.</summary>
 		/// <param name="compare">The technique of determining equality.</param>
 		/// <remarks>Runtime: Theta(n).</remarks>
@@ -555,6 +633,21 @@ namespace Seven.Structures
 			if (i == this._count)
 				throw new Error("Attempting to remove a non-existing item from this list.");
 			this.Remove(i);
+		}
+		#endregion
+		#region public void RemoveWithoutShrink(T removal)
+		/// <summary>Removes the item at a specific index.</summary>
+		/// <param name="compare">The technique of determining equality.</param>
+		/// <remarks>Runtime: Theta(n).</remarks>
+		public void RemoveWithoutShrink(T removal)
+		{
+			int i;
+			for (i = 0; i < this._count; i++)
+				if (this._equate(removal, this._list[i]))
+					break;
+			if (i == this._count)
+				throw new Error("Attempting to remove a non-existing item from this list.");
+			this.RemoveWithoutShrink(i);
 		}
 		#endregion
 		#region public void Remove(Predicate<T> predicate)
@@ -570,6 +663,21 @@ namespace Seven.Structures
 			if (i == this._count)
 				throw new Error("Attempting to remove a non-existing item from this list.");
 			this.Remove(i);
+		}
+		#endregion
+		#region public void RemoveWithoutShrink(Predicate<T> predicate)
+		/// <summary>Removes the item at a specific index.</summary>
+		/// <param name="compare">The technique of determining equality.</param>
+		/// <remarks>Runtime: Theta(n).</remarks>
+		public void RemoveWithoutShrink(Predicate<T> predicate)
+		{
+			int i;
+			for (i = 0; i < this._count; i++)
+				if (predicate(this._list[i]))
+					break;
+			if (i == this._count)
+				throw new Error("Attempting to remove a non-existing item from this list.");
+			this.RemoveWithoutShrink(i);
 		}
 		#endregion
 		#region public void Stepper(Step<T> step_function)
@@ -651,5 +759,26 @@ namespace Seven.Structures
 			return true;
 		}
 		#endregion
+		// methods (private)
+		#region public void Remove_private(int index)
+		/// <summary>Removes the item at a specific index.</summary>
+		/// <param name="index">The index of the item to be removed.</param>
+		/// <remarks>Runtime: Theta(n - index).</remarks>
+		public void Remove_private(int index)
+		{
+			if (index < 0 || index > this._count)
+				throw new Error("Attempting to remove an index outside the ListArray's current size.");
+			if (_count < this._list.Length / 2)
+			{
+				T[] newList = new T[this._list.Length / 2];
+				for (int i = 0; i < this._count; i++)
+					newList[i] = this._list[i];
+				this._list = newList;
+			}
+			for (int i = index; i < this._count; i++)
+				this._list[i] = this._list[i + 1];
+			_count--;
+		}
+		#endregion 
 	}
 }
