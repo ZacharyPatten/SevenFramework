@@ -17,7 +17,7 @@ namespace Seven
 	/// <summary>
 	/// Infinitely long integer (capped only by memory).
 	/// </summary>
-	/// /// <citation>
+	/// <citation>
 	/// This Integer imlpementation was originally developed by 
 	/// Chew Keong TAN and posted as an open source project on 
 	/// CodeProject.com. However, it has been modified since its

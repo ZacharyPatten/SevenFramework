@@ -25,9 +25,6 @@ namespace Seven
 		internal static T Compile<T>(
 			string code, string method, string _class, string _namespace, bool _unsafe, string[] name_spaces, string[] references)
 		{
-#if no_error_shecking
-			// nothing
-#else
 			if (code == null)
 				throw new Error("code == null");
 			if (method == null)
@@ -36,7 +33,6 @@ namespace Seven
 				throw new Error("_class == null");
 			if (_namespace == null)
 				throw new Error("_namespace == null");
-#endif
 
 			string full_code = string.Empty;
 
@@ -85,12 +81,8 @@ namespace Seven
 		/// <returns>The generated object.</returns>
 		internal static T Compile<T>(string code)
 		{
-#if no_error_shecking
-			// nothing
-#else
 			if (code == null)
 				throw new Error("code == null");
-#endif
 
 			string type_string = Meta.ConvertTypeToCsharpSource(typeof(T));
 

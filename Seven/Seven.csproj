@@ -88,9 +88,7 @@
     <Compile Include="Algorithms\GraphSearch\Greedy.cs" />
     <Compile Include="Algorithms\Arbitrary.cs" />
     <Compile Include="Algorithms\Search.cs" />
-    <Compile Include="char_Extensions.cs" />
     <Compile Include="Construct.cs" />
-    <Compile Include="Delegate.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="Integer.cs" />
     <Compile Include="Logic\Logic.cs" />
@@ -116,9 +114,7 @@
     <Compile Include="Parallels\Parallel.cs" />
     <Compile Include="Predicate.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Random_extensions.cs" />
     <Compile Include="Serialize.cs" />
-    <Compile Include="string_extensions.cs" />
     <Compile Include="Structures\Array.cs" />
     <Compile Include="Structures\BTree.cs" />
     <Compile Include="Structures\Deque.cs" />

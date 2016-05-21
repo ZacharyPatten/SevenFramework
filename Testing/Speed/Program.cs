@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 //using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 //using System.Linq.Expressions;
 //using System.Text;
 //using System.Threading.Tasks;
@@ -78,53 +79,36 @@ namespace Speed
 
 	class Program
 	{
-
-		//internal static int GetPrime(int min) {
-		//				Debug.Assert(min >= 0, "min less than zero; handle overflow checking before calling HashHelpers"); 
- 
-		//				for (int i = 0; i < primes.Length; i++) { 
-		//						int prime = primes[i]; 
-		//						if (prime >= min) {
-		//								return prime; 
-		//						}
-		//				}
- 
-		//				// Outside of our predefined table. Compute the hard way. 
-		//				for (int i = (min | 1); i < Int32.MaxValue; i += 2) {
-		//						if (IsPrime(i)) { 
-		//								return i; 
-		//						}
-		//				} 
-		//				return min;
-		//		}
- 
-		//		internal static int GetMinPrime() { 
-		//				return primes[0];
-		//		} 
-		//} 
-
 		static void Main(string[] args)
 		{
-			//Console.WriteLine("This example is mainly for speed testing during development.");
-			//Console.WriteLine("See the other examples provided for clearer usage examples.");
-			//Console.WriteLine();
-
-			//IntegerClass[] array = new IntegerClass[] { 0, 1, 2, null, 3, null, 4 };
-			//array.
-
-			//string random = RandomString(int.MaxValue / 50);
-			//string temp1;
-			//string temp2;
-
-			//Console.WriteLine("Reverse1:      " + Seven.Diagnostics.Performance.Time(() => { temp1 = Reverse1(random); }));
-			//Console.WriteLine("Reverse2:      " + Seven.Diagnostics.Performance.Time(() => { temp2 = Reverse2(random); }));
-
-			Console.WriteLine(new int[0]);
-
-			Console.WriteLine(@"1
-2
-3".PadLinesLeft("        ", 2, 4));
-
+			int iterationsperrandom = 3;
+			Action<Random> testrandom = (Random random) =>
+				{
+					for (int i = 0; i < iterationsperrandom; i++)
+						Console.WriteLine(i + ": " + random.Next());
+					Console.WriteLine();
+				};
+			Arbitrary mcg_2pow59_13pow13 = Arbitrary.MultiplicativeCongruentGenerator_Modulus2power59_Multiplier13power13();
+			Console.WriteLine("mcg_2pow59_13pow13 randoms:");
+			testrandom(mcg_2pow59_13pow13);
+			Arbitrary mcg_2pow31m1_1132489760 = Arbitrary.MultiplicativeCongruentGenerator_Modulus2power31minus1_Multiplier1132489760();
+			Console.WriteLine("mcg_2pow31m1_1132489760 randoms:");
+			testrandom(mcg_2pow31m1_1132489760);
+			Arbitrary mersenneTwister = Arbitrary.MersenneTwister();
+			Console.WriteLine("mersenneTwister randoms:");
+			testrandom(mersenneTwister);
+			Arbitrary cmr32_c2_o3 = Arbitrary.CombinedMultipleRecursiveGenerator32bit_components2_order3();
+			Console.WriteLine("mersenneTwister randoms:");
+			testrandom(cmr32_c2_o3);
+			Arbitrary wh1982cmcg = Arbitrary.WichmannHills1982_CombinedMultiplicativeCongruentialGenerator();
+			Console.WriteLine("mersenneTwister randoms:");
+			testrandom(wh1982cmcg);
+			Arbitrary wh2006cmcg = Arbitrary.WichmannHills2006_CombinedMultiplicativeCongruentialGenerator();
+			Console.WriteLine("mersenneTwister randoms:");
+			testrandom(wh2006cmcg);
+			Arbitrary mwcxorsg = Arbitrary.MultiplyWithCarryXorshiftGenerator();
+			Console.WriteLine("mwcxorsg randoms:");
+			testrandom(mwcxorsg);
 
 			#region Set Tests
 			//{

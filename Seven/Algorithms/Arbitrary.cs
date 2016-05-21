@@ -5,6 +5,40 @@
 
 namespace Seven.Algorithms
 {
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <citation>
+	/// This code has been adapted from the Math.Net Numerics project. Here is their license and plugs:
+	/// 
+	/// Math.NET Numerics, part of the Math.NET Project
+	/// http://numerics.mathdotnet.com
+	/// http://github.com/mathnet/mathnet-numerics
+	/// http://mathnetnumerics.codeplex.com
+	///
+	/// Copyright (c) 2009-2014 Math.NET
+	///
+	/// Permission is hereby granted, free of charge, to any person
+	/// obtaining a copy of this software and associated documentation
+	/// files (the "Software"), to deal in the Software without
+	/// restriction, including without limitation the rights to use,
+	/// copy, modify, merge, publish, distribute, sublicense, and/or sell
+	/// copies of the Software, and to permit persons to whom the
+	/// Software is furnished to do so, subject to the following
+	/// conditions:
+	///
+	/// The above copyright notice and this permission notice shall be
+	/// included in all copies or substantial portions of the Software.
+	///
+	/// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+	/// EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+	/// OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+	/// NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+	/// HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+	/// WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+	/// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+	/// OTHER DEALINGS IN THE SOFTWARE.
+	/// </citation>
 	public class Arbitrary : System.Random
 	{
 		// fields
@@ -23,11 +57,10 @@ namespace Seven.Algorithms
 		public delegate double ArbitraryDoubleGenerator_0to1();
 		// algorithms
 		#region MultiplicativeCongruentGenerator
-
 		public static ArbitraryDoubleGenerator_0to1 MultiplicativeCongruentGenerator(int seed, ulong modulus, ulong multiplier)
 		{
 			double reciprocal = 1.0d / modulus;
-			ulong xn = (uint)seed % modulus;
+			ulong xn = (uint) seed % modulus;
 
 			return () =>
 			{
@@ -36,41 +69,32 @@ namespace Seven.Algorithms
 				return ret;
 			};
 		}
-
+		#endregion
+		#region MultiplicativeCongruentGenerator_Modulus2power31minus1_Multiplier1132489760
+		public static ArbitraryDoubleGenerator_0to1 MultiplicativeCongruentGenerator_Modulus2power31minus1_Multiplier1132489760()
+		{
+			return MultiplicativeCongruentGenerator_Modulus2power31minus1_Multiplier1132489760(System.Environment.TickCount);
+		}
+		public static ArbitraryDoubleGenerator_0to1 MultiplicativeCongruentGenerator_Modulus2power31minus1_Multiplier1132489760(int seed)
+		{
+			return MultiplicativeCongruentGenerator(seed, 2147483647, 1132489760);
+		}
 		#endregion
 		#region MultiplicativeCongruentGenerator_Modulus2power59_Multiplier13power13
-
 		public static ArbitraryDoubleGenerator_0to1 MultiplicativeCongruentGenerator_Modulus2power59_Multiplier13power13()
 		{
 			return MultiplicativeCongruentGenerator_Modulus2power59_Multiplier13power13(System.Environment.TickCount);
 		}
-
 		public static ArbitraryDoubleGenerator_0to1 MultiplicativeCongruentGenerator_Modulus2power59_Multiplier13power13(int seed)
 		{
 			return MultiplicativeCongruentGenerator(seed, 576460752303423488, 302875106592253);
 		}
-
-		#endregion
-		#region MultiplicativeCongruentGenerator_Modulus2power31minus1_Multiplier1132489760
-
-		public static ArbitraryDoubleGenerator_0to1 MultiplicativeCongruentGenerator_Modulus2power31minus1_Multiplier1132489760()
-		{
-			return MultiplicativeCongruentGenerator_Modulus2pow59_Multiplier13pow13(System.Environment.TickCount);
-		}
-
-		public static ArbitraryDoubleGenerator_0to1 MultiplicativeCongruentGenerator_Modulus2pow59_Multiplier13pow13(int seed)
-		{
-			return MultiplicativeCongruentGenerator(seed, 2147483647, 1132489760);
-		}
-
 		#endregion
 		#region MersenneTwister
-
 		public static ArbitraryIntegerGenerator MersenneTwister()
 		{
 			return MersenneTwister(System.Environment.TickCount);
 		}
-
 		public static ArbitraryIntegerGenerator MersenneTwister(int seed)
 		{
 			// algorithm constants
@@ -124,15 +148,12 @@ namespace Seven.Algorithms
 					return integer;
 				};
 		}
-
 		#endregion
 		#region CombinedMultipleRecursiveGenerator32bit_components2_order3
-
 		public static ArbitraryDoubleGenerator_0to1 CombinedMultipleRecursiveGenerator32bit_components2_order3()
 		{
 			return CombinedMultipleRecursiveGenerator32bit_components2_order3(System.Environment.TickCount);
 		}
-
 		public static ArbitraryDoubleGenerator_0to1 CombinedMultipleRecursiveGenerator32bit_components2_order3(int seed)
 		{
 			const double A12 = 1403580;
@@ -171,15 +192,12 @@ namespace Seven.Algorithms
 					return (xn - yn) * Reciprocal;
 				};
 		}
-
 		#endregion
 		#region WichmannHills1982_CombinedMultiplicativeCongruentialGenerator
-
 		public static ArbitraryDoubleGenerator_0to1 WichmannHills1982_CombinedMultiplicativeCongruentialGenerator()
 		{
 			return WichmannHills1982_CombinedMultiplicativeCongruentialGenerator(System.Environment.TickCount);
 		}
-
 		public static ArbitraryDoubleGenerator_0to1 WichmannHills1982_CombinedMultiplicativeCongruentialGenerator(int seed)
 		{
 			const uint Modx = 30269;
@@ -201,15 +219,12 @@ namespace Seven.Algorithms
 					return w;
 				};
 		}
-
 		#endregion
 		#region WichmannHills2006_CombinedMultiplicativeCongruentialGenerator
-
 		public static ArbitraryDoubleGenerator_0to1 WichmannHills2006_CombinedMultiplicativeCongruentialGenerator()
 		{
 			return WichmannHills2006_CombinedMultiplicativeCongruentialGenerator(System.Environment.TickCount);
 		}
-
 		public static ArbitraryDoubleGenerator_0to1 WichmannHills2006_CombinedMultiplicativeCongruentialGenerator(int seed)
 		{
 			const uint Modw = 2147483123;
@@ -236,21 +251,17 @@ namespace Seven.Algorithms
 					return u;
 				};
 		}
-
 		#endregion
 		#region MultiplyWithCarryXorshiftGenerator
-
-		public ArbitraryIntegerGenerator MultiplyWithCarryXorshiftGenerator()
+		public static ArbitraryIntegerGenerator MultiplyWithCarryXorshiftGenerator()
 		{
 			return MultiplyWithCarryXorshiftGenerator(System.Environment.TickCount);
 		}
-
-		public ArbitraryIntegerGenerator MultiplyWithCarryXorshiftGenerator(int seed)
+		public static ArbitraryIntegerGenerator MultiplyWithCarryXorshiftGenerator(int seed)
 		{
 			return MultiplyWithCarryXorshiftGenerator(seed, 916905990, 13579, 362436069, 77465321);
 		}
-
-		public ArbitraryIntegerGenerator MultiplyWithCarryXorshiftGenerator(int seed, long a, long c, long x1, long x2)
+		public static ArbitraryIntegerGenerator MultiplyWithCarryXorshiftGenerator(int seed, long a, long c, long x1, long x2)
 		{
 			ulong _x; // Seed or last but three unsigned random number
 			ulong _y; // Last but two unsigned random number
@@ -303,11 +314,21 @@ namespace Seven.Algorithms
 			this._nextDouble = new System.Func<double>(doubleGenerator_0to1);
 			this._sample = new System.Func<double>(doubleGenerator_0to1);
 		}
+		// methods
 		public override int Next() { return this._next(); }
 		public override int Next(int maxValue) { return this._nextMax(maxValue); }
 		public override int Next(int minValue, int maxValue) { return this._nextMinMax(minValue, maxValue); }
 		public override void NextBytes(byte[] buffer) { this._nextBytes(buffer); }
 		public override double NextDouble() { return this._nextDouble(); }
 		protected override double Sample() { return this._sample(); }
+		// operators
+		public static implicit operator Arbitrary(ArbitraryIntegerGenerator arbitraryIntegerGenerator)
+		{
+			return new Arbitrary(arbitraryIntegerGenerator);
+		}
+		public static implicit operator Arbitrary(ArbitraryDoubleGenerator_0to1 arbitraryDoubleGenerator_0to1)
+		{
+			return new Arbitrary(arbitraryDoubleGenerator_0to1);
+		}
 	}
 }

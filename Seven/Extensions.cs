@@ -1,13 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿// Seven
+// https://github.com/53V3N1X/SevenFramework
+// LISCENSE: See "LISCENSE.md" in th root project directory.
+// SUPPORT: See "SUPPORT.md" in the root project directory.
 
 namespace Seven
 {
-	public static class char_Extensions
+	public static class Extensions
 	{
+		#region char
+
 		/// <summary>Creates a string of a repreated character a provided number of times.</summary>
 		/// <param name="character">The character to repeat.</param>
 		/// <param name="count">The number of repetitions of the charater (aka resulting string length).</param>
@@ -21,10 +22,11 @@ namespace Seven
 				sets[i] = character;
 			return new string(sets);
 		}
-	}
 
-	public static class string_extensions
-	{
+		#endregion
+
+		#region string
+
 		internal static string RemoveCarriageReturns(this string str)
 		{
 			return str.Replace("\r", string.Empty);
@@ -248,10 +250,11 @@ namespace Seven
 			System.Array.Reverse(characters);
 			return new string(characters);
 		}
-	}
+	
+		#endregion
 
-	public static class Random_extensions
-	{
+		#region Random
+
 		/// <summary>Generates a random string of a given length using the System.Random generator.</summary>
 		/// <param name="length">The length of the randomized string to generate.</param>
 		/// <returns>The generated randomized string.</returns>
@@ -298,5 +301,56 @@ namespace Seven
 		{
 			return RandomString(random, length, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ".ToCharArray());
 		}
+
+		#endregion
+
+		#region Delegate
+
+		/// <summary>Compares delgates for equality (see source code for criteria).</summary>
+		/// <param name="a">One of the delegates to compare.</param>
+		/// <param name="b">One of the delegates to compare.</param>
+		/// <returns>True if deemed equal, False if not.</returns>
+		public static bool Equate(this System.Delegate a, System.Delegate b)
+		{
+			// remove delegate assignment overhead
+			while (a.Target is System.Delegate)
+				a = a.Target as System.Delegate;
+			while (b.Target is System.Delegate)
+				b = b.Target as System.Delegate;
+
+			// (1) method and target match
+			if (a == b)
+				return true;
+
+			// null
+			if (a == null || b == null)
+				return false;
+
+			// (2) compiled method bodies match
+			if (a.Target != b.Target)
+				return false;
+			byte[] a_body = a.Method.GetMethodBody().GetILAsByteArray();
+			byte[] b_body = b.Method.GetMethodBody().GetILAsByteArray();
+			if (a_body.Length != b_body.Length)
+				return false;
+			for (int i = 0; i < a_body.Length; i++)
+			{
+				if (a_body[i] != b_body[i])
+					return false;
+			}
+			return true;
+		}
+
+		/// <summary>Removes the overhead caused by delegate assignment.</summary>
+		/// <param name="del">The delegate to truncate.</param>
+		/// <returns>The truncated delegate.</returns>
+		public static System.Delegate Truncate(this System.Delegate del)
+		{
+			while (del.Target is System.Delegate)
+				del = del.Target as System.Delegate;
+			return del;
+		}
+
+		#endregion
 	}
 }

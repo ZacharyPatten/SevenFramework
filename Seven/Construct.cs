@@ -5,5 +5,8 @@
 
 namespace Seven
 {
+	/// <summary>A delegate type for constructing an instance of a type.</summary>
+	/// <typeparam name="T">The generic type to construct an instance of.</typeparam>
+	/// <returns>The constructed instance of the generic type.</returns>
 	public delegate T Construct<T>();
 }
