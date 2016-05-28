@@ -190,14 +190,14 @@ namespace Seven.Structures
 		public void Add(T addition)
 		{
 			if (addition == null)
-				throw new Error("attempting to add a null key to the structure.");
+				throw new System.ArgumentNullException("addition");
 			int location = ComputeHash(addition);
 			if (Find(addition, location) == null)
 			{
 				if (++_count > _table.Length * _maxLoadFactor)
 				{
 					if (Count == int.MaxValue)
-						throw new Error("maximum size of hash table reached.");
+						throw new System.InvalidOperationException("maximum size of hash table reached.");
 
 					Resize(GetLargerSize());
 					location = ComputeHash(addition);
@@ -206,7 +206,7 @@ namespace Seven.Structures
 				Add(p, location);
 			}
 			else
-				throw new Error("\nMember: \"Add(TKey key, TValue value)\"\nThe key is already in the table.");
+				throw new System.InvalidOperationException("\nMember: \"Add(TKey key, TValue value)\"\nThe key is already in the table.");
 		}
 		#endregion
 		#region public void Clear()
@@ -320,14 +320,14 @@ namespace Seven.Structures
 		internal void Remove_private(T key)
 		{
 			if (key == null)
-				throw new Error("attempting to remove \"null\" from the structure.");
+				throw new System.ArgumentNullException("key", "attempting to remove \"null\" from the structure.");
 			int location = ComputeHash(key);
 			if (this._equate(this._table[location].Value, key))
 				_table[location] = _table[location].Next;
 			for (Node bucket = _table[location]; bucket != null; bucket = bucket.Next)
 			{
 				if (bucket.Next == null)
-					throw new Error("attempting to remove a non-existing value.");
+					throw new System.InvalidOperationException("attempting to remove a non-existing value.");
 				else if (this._equate(bucket.Next.Value, key))
 					bucket.Next = bucket.Next.Next;
 			}
@@ -877,14 +877,14 @@ namespace Seven.Structures
 		public void Add(T addition)
 		{
 			if (addition == null)
-				throw new Error("attempting to add a null key to the structure.");
+				throw new System.ArgumentNullException("addition");
 			int location = ComputeHash(addition);
 			if (this._table[location].Contains(addition))
 			{
 				if (++_count > _table.Length * _maxLoadFactor)
 				{
 					if (Count == int.MaxValue)
-						throw new Error("maximum size of hash table reached.");
+						throw new System.InvalidOperationException("maximum size of hash table reached.");
 
 					Resize(GetLargerSize());
 					location = ComputeHash(addition);
@@ -892,7 +892,7 @@ namespace Seven.Structures
 				this._table[location].Add(addition);
 			}
 			else
-				throw new Error("\nMember: \"Add(TKey key, TValue value)\"\nThe key is already in the table.");
+				throw new System.InvalidOperationException("\nMember: \"Add(TKey key, TValue value)\"\nThe key is already in the table.");
 		}
 		#endregion
 		#region public void Clear()
@@ -985,7 +985,7 @@ namespace Seven.Structures
 		private void Remove_private(T removal)
 		{
 			if (object.ReferenceEquals(null, removal))
-				throw new Error("attempting to remove \"null\" from the structure.");
+				throw new System.ArgumentNullException("removal");
 			int location = ComputeHash(removal);
 			this._table[ComputeHash(removal)].Remove(removal);
 			_count--;

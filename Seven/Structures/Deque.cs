@@ -72,7 +72,7 @@ namespace Seven.Structures
 		public T DequeueFront()
 		{
 			if (_head == null)
-				throw new Error("Attempting to remove a non-existing id value.");
+				throw new System.InvalidOperationException("Attempting to remove a non-existing id value.");
 			T value = _head.Value;
 			if (_head == _tail)
 				_tail = null;
@@ -87,7 +87,7 @@ namespace Seven.Structures
 		public T PeekFront()
 		{
 			if (_head == null)
-				throw new Error("Attempting to remove a non-existing id value.");
+				throw new System.InvalidOperationException("Attempting to remove a non-existing id value.");
 			T returnValue = _head.Value;
 			return returnValue;
 		}

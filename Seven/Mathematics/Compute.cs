@@ -1297,7 +1297,7 @@ namespace Seven.Mathematics
 	_stepper((", T_source, @" n) =>
 	{
 		if (n % (", T_source, @")1 != 0)
-			throw new Error(", "\"Attempting to find the Greatest Common Factor of a non-integer value.\"", @");
+			throw new System.Exception(", "\"Attempting to find the Greatest Common Factor of a non-integer value.\"", @");
 		if (!assigned)
 		{
 			gcf = Compute<", T_source, @">.AbsoluteValue(n);
@@ -1320,7 +1320,7 @@ namespace Seven.Mathematics
 		}
 	});
 	if (!assigned)
-		throw new Error(", "\"No parameters provided in GCF function.\"", @");
+		throw new System.Exception(", "\"No parameters provided in GCF function.\"", @");
 	return gcf;
 }"));
 
@@ -1337,7 +1337,7 @@ namespace Seven.Mathematics
 					string.Concat(
 @"(Stepper<", T_source, @"> _stepper) =>
 {
-	if (_stepper == null) { throw new Error(", "\"Null reference: stepper\"", @"); }
+	if (_stepper == null) { throw new System.Exception(", "\"Null reference: stepper\"", @"); }
 	bool assigned = false;
 	", T_source, " lcm = (", T_source, @")0;
 	_stepper((", T_source, @" n) =>
@@ -1348,7 +1348,7 @@ namespace Seven.Mathematics
 			return;
 		}
 		if (n % (", T_source, @")1 != 0)
-			throw new Error(", "\"Attempting to find the Greatest Common Factor of a non-integer value.\"", @");
+			throw new System.Exception(", "\"Attempting to find the Greatest Common Factor of a non-integer value.\"", @");
 		if (!assigned)
 		{
 			lcm = Compute<", T_source, @">.AbsoluteValue(n);
@@ -1363,7 +1363,7 @@ namespace Seven.Mathematics
 		}
 	});
 	if (!assigned)
-		throw new Error(", "\"No parameters provided in LCM function.\"", @");
+		throw new System.Exception(", "\"No parameters provided in LCM function.\"", @");
 	return lcm;
 }"));
 
@@ -1382,7 +1382,7 @@ namespace Seven.Mathematics
 {
 	", T_source, @" __value = _value;
 	if (__value % (", T_source, ")1 != (", T_source, @")0)
-		throw new Error(", "\"Attempting to get the pime factors of a non integer\"", @");
+		throw new System.Exception(", "\"Attempting to get the pime factors of a non integer\"", @");
 	if (__value < 0)
 	{
 		__value = -__value;
@@ -1427,7 +1427,7 @@ namespace Seven.Mathematics
 		{
 			Compute<T>.NaturalLogarithm =
 				Meta.Compile<Compute<T>.Delegates.NaturalLogarithm>(
-					string.Concat("(", T_source, " _value) => { throw new Error(\"not yet implemented\"); }"));
+					string.Concat("(", T_source, " _value) => { throw new System.Exception(\"not yet implemented\"); }"));
 
 			return Compute<T>.NaturalLogarithm(value);
 		};
@@ -1484,14 +1484,14 @@ namespace Seven.Mathematics
 @"(", T_source, " _x, ", T_source, " _x0, ", T_source, " _x1, ", T_source, " _y0, ", T_source, @" _y1) =>
 {
 	if (_x0 > _x1)
-		throw new Error(", "\"invalid arguments: x0 > x1\"", @");
+		throw new System.Exception(", "\"invalid arguments: x0 > x1\"", @");
 	else if (_x < _x0)
-		throw new Error(", "\"invalid arguments: x < x0\"", @");
+		throw new System.Exception(", "\"invalid arguments: x < x0\"", @");
 	else if (_x > _x1)
-		throw new Error(", "\"invalid arguments: x > x1\"", @");
+		throw new System.Exception(", "\"invalid arguments: x > x1\"", @");
 	else if (_x0 == _x1)
 		if (_y0 != _y1)
-			throw new Error(", "\"invalid arguments: _x0 == _x1 && _y0 != _y1\"", @");
+			throw new System.Exception(", "\"invalid arguments: _x0 == _x1 && _y0 != _y1\"", @");
 		else
 			return _y0;
 	else
@@ -1512,9 +1512,9 @@ namespace Seven.Mathematics
 @"(", T_source, @" N) =>
 {
 	if (N % 1 != 0)
-		throw new Error(", "\"invalid factorial: N must be a whole number.\"", @");
+		throw new System.Exception(", "\"invalid factorial: N must be a whole number.\"", @");
 	if (N < 0)
-		throw new Error(", "\"invalid factorial: [ N < 0 ] (N = \\\" + N + \\\").\"", @");
+		throw new System.Exception(", "\"invalid factorial: [ N < 0 ] (N = \\\" + N + \\\").\"", @");
 	", T_source, @" result = 1;
 	for (; N > 1; N--)
 		result *= N;
@@ -1531,9 +1531,9 @@ namespace Seven.Mathematics
 		//		(T N) =>
 		//		{
 		//			if (N % 1 != 0)
-		//				throw new Error("invalid factorial: N must be a whole number.");
+		//				throw new System.Exception("invalid factorial: N must be a whole number.");
 		//			if (N < 0)
-		//				throw new Error("invalid factorial: [ N < 0 ] (N = \\\" + N + \\\").");
+		//				throw new System.Exception("invalid factorial: [ N < 0 ] (N = \\\" + N + \\\").");
 		//			T result = 1;
 		//			for (; N > 1; N--)
 		//				result *= N;
@@ -1554,10 +1554,10 @@ namespace Seven.Mathematics
 @"(", T_source, " _N, ", T_source, @"[] _n) =>
 {
 	if (_N % 1 != 0)
-		throw new Error(", "\"invalid combination: N must be a whole number.\"", @");
+		throw new System.Exception(", "\"invalid combination: N must be a whole number.\"", @");
 	for (int i = 0; i < _n.Length; i++)
 		if (_n[i] % 1 != 0)
-			throw new Error(", "\"invalid combination: n[\\\" + i + \\\"] must be a whole number.\"", @");
+			throw new System.Exception(", "\"invalid combination: n[\\\" + i + \\\"] must be a whole number.\"", @");
 	", T_source, " result = Compute<", T_source, @">.Factorial(_N);
 	", T_source, @" sum = 0;
 	for (int i = 0; i < _n.Length; i++)
@@ -1566,7 +1566,7 @@ namespace Seven.Mathematics
 		sum += _n[i];
 	}
 	if (sum > _N)
-		throw new Error(", "\"invalid combination: [ N < Sum(n) ].\"", @");
+		throw new System.Exception(", "\"invalid combination: [ N < Sum(n) ].\"", @");
 	return result;
 }"));
 
@@ -1584,11 +1584,11 @@ namespace Seven.Mathematics
 @"(", T_source, " _N, ", T_source, @" _n) =>
 {
 	if (_N % 1 != 0)
-		throw new Error(", "\"invalid chose: N must be a whole number.\"", @");
+		throw new System.Exception(", "\"invalid chose: N must be a whole number.\"", @");
 	if (_n % 1 != 0)
-		throw new Error(", "\"invalid combination: n must be a whole number.\"", @");
+		throw new System.Exception(", "\"invalid combination: n must be a whole number.\"", @");
 	if (!(_N <= _n || _N >= 0))
-		throw new Error(", "\"invalid choose: [ !(N <= n || N >= 0) ].\"", @");
+		throw new System.Exception(", "\"invalid choose: [ !(N <= n || N >= 0) ].\"", @");
 	", T_source, " factorial_N = Compute<", T_source, @">.Factorial(_N);
 	return Compute<", T_source, ">.Factorial(_N) / (Compute<", T_source, ">.Factorial(_n) * Compute<", T_source, @">.Factorial(_N - _n));
 }"));
@@ -1738,7 +1738,7 @@ namespace Seven.Mathematics
 					"(Stepper<" + T_source + "> _stepper) =>" +
 					"{" +
  "	if (_stepper == null)" +
-					"		throw new Error(\"null reference: _stepper\");" +
+					"		throw new System.Exception(\"null reference: _stepper\");" +
  "	" + T_source + " mean = Compute<" + T_source + ">.Mean(_stepper);" +
 					"	" + T_source + " variance = 0;" +
 					"	int count = 0;" +
@@ -1765,7 +1765,7 @@ namespace Seven.Mathematics
 @"(Stepper<", T_source, @"> _stepper) =>
 {",
 @"	if (_stepper == null)
-		throw new Error(", "\"null reference: _stepper\");",
+		throw new System.Exception(", "\"null reference: _stepper\");",
 @"	return Compute<", T_source, ">.SquareRoot(Compute<", T_source, @">.Variance(_stepper));
 }"));
 
@@ -1842,9 +1842,9 @@ namespace Seven.Mathematics
 @"(int _quantiles, Stepper<", T_source, @"> _stepper) =>
 {",
 @"	if (_stepper == null)
-		throw new Error(", "\"null reference: _stepper\"", @");
+		throw new System.Exception(", "\"null reference: _stepper\"", @");
 	if (_quantiles < 1)
-		throw new Error(", "\"invalid numer of dimensions on Quantile division\");",
+		throw new System.Exception(", "\"invalid numer of dimensions on Quantile division\");",
 @"	int count = 0;
 	_stepper((", T_source, @" i) => { count++; });
 	", T_source, "[] ordered = new ", T_source, @"[count];
@@ -1873,7 +1873,7 @@ namespace Seven.Mathematics
 		/// <summary>Computes the median of a set of values.</summary>
 		public static Compute<T>.Delegates.Correlation Correlation = (Stepper<T> a, Stepper<T> b) =>
 		{
-			throw new Error("I introduced an error here when I removed the stepref off of structure. will fix soon - seven");
+			throw new System.NotImplementedException("I introduced an error here when I removed the stepref off of structure. will fix soon - seven");
 
 			Compute<T>.Correlation =
 				Meta.Compile<Compute<T>.Delegates.Correlation>(
@@ -2123,7 +2123,7 @@ QuandrantSkip:
 			else if (typeof(T) == typeof(float))
 				Compute<float>.InverseSine = (float _ratio) => { return Angle<float>.Factory_Radians((float)System.Math.Asin(_ratio)); };
 			else
-				throw new Error("unsupported parameter type for Cot function");
+				throw new System.NotImplementedException("unsupported parameter type for Cot function");
 
 			return Compute<T>.InverseSine(ratio);
 		};
@@ -2137,7 +2137,7 @@ QuandrantSkip:
 			else if (typeof(T) == typeof(float))
 				Compute<float>.InverseCosine = (float _ratio) => { return Angle<float>.Factory_Radians((float)System.Math.Acos(_ratio)); };
 			else
-				throw new Error("unsupported parameter type for Cot function");
+				throw new System.NotImplementedException("unsupported parameter type for Cot function");
 
 			return Compute<T>.InverseCosine(ratio);
 		};
@@ -2151,7 +2151,7 @@ QuandrantSkip:
 			else if (typeof(T) == typeof(float))
 				Compute<float>.InverseTangent = (float _ratio) => { return Angle<float>.Factory_Radians((float)System.Math.Atan(_ratio)); };
 			else
-				throw new Error("unsupported parameter type for Cot function");
+				throw new System.NotImplementedException("unsupported parameter type for Cot function");
 
 			return Compute<T>.InverseTangent(ratio);
 		};
@@ -2165,7 +2165,7 @@ QuandrantSkip:
 			else if (typeof(T) == typeof(float))
 				Compute<float>.InverseCosecant = (float _ratio) => { return Angle<float>.Factory_Radians((float)System.Math.Asin(1f / _ratio)); };
 			else
-				throw new Error("unsupported parameter type for Cot function");
+				throw new System.NotImplementedException("unsupported parameter type for Cot function");
 
 			return Compute<T>.InverseCosecant(ratio);
 		};
@@ -2179,7 +2179,7 @@ QuandrantSkip:
 			else if (typeof(T) == typeof(float))
 				Compute<float>.InverseSecant = (float _ratio) => { return Angle<float>.Factory_Radians((float)System.Math.Acos(1f / _ratio)); };
 			else
-				throw new Error("unsupported parameter type for Cot function");
+				throw new System.NotImplementedException("unsupported parameter type for Cot function");
 
 			return Compute<T>.InverseSecant(ratio);
 		};
@@ -2193,7 +2193,7 @@ QuandrantSkip:
 			else if (typeof(T) == typeof(float))
 				Compute<float>.InverseCotangent = (float _ratio) => { return Angle<float>.Factory_Radians((float)System.Math.Atan(1f / _ratio)); };
 			else
-				throw new Error("unsupported parameter type for Cot function");
+				throw new System.NotImplementedException("unsupported parameter type for Cot function");
 
 			return Compute<T>.InverseCotangent(ratio);
 		};
@@ -2207,7 +2207,7 @@ QuandrantSkip:
 			else if (typeof(T) == typeof(float))
 				Compute<float>.HyperbolicSine = (Angle<float> _angle) => { return (float)System.Math.Sinh(_angle.Radians); };
 			else
-				throw new Error("unsupported parameter type for Cot function");
+				throw new System.NotImplementedException("unsupported parameter type for Cot function");
 
 			return Compute<T>.HyperbolicSine(angle);
 		};
@@ -2221,7 +2221,7 @@ QuandrantSkip:
 			else if (typeof(T) == typeof(float))
 				Compute<float>.HyperbolicCosine = (Angle<float> _angle) => { return (float)System.Math.Cosh(_angle.Radians); };
 			else
-				throw new Error("unsupported parameter type for Cot function");
+				throw new System.NotImplementedException("unsupported parameter type for Cot function");
 
 			return Compute<T>.HyperbolicCosine(angle);
 		};
@@ -2235,7 +2235,7 @@ QuandrantSkip:
 			else if (typeof(T) == typeof(float))
 				Compute<float>.HyperbolicTangent = (Angle<float> _angle) => { return (float)System.Math.Tanh(_angle.Radians); };
 			else
-				throw new Error("unsupported parameter type for Cot function");
+				throw new System.NotImplementedException("unsupported parameter type for Cot function");
 
 			return Compute<T>.HyperbolicTangent(angle);
 		};
@@ -2249,7 +2249,7 @@ QuandrantSkip:
 			else if (typeof(T) == typeof(float))
 				Compute<float>.HyperbolicSecant = (Angle<float> _angle) => { return 1f / (float)System.Math.Cosh(_angle.Radians); };
 			else
-				throw new Error("unsupported parameter type for Cot function");
+				throw new System.NotImplementedException("unsupported parameter type for Cot function");
 
 			return Compute<T>.HyperbolicSecant(angle);
 		};
@@ -2263,7 +2263,7 @@ QuandrantSkip:
 			else if (typeof(T) == typeof(float))
 				Compute<float>.HyperbolicCosecant = (Angle<float> _angle) => { return 1f / (float)System.Math.Sinh(_angle.Radians); };
 			else
-				throw new Error("unsupported parameter type for Cot function");
+				throw new System.NotImplementedException("unsupported parameter type for Cot function");
 
 			return Compute<T>.HyperbolicCosecant(angle);
 		};
@@ -2277,7 +2277,7 @@ QuandrantSkip:
 			else if (typeof(T) == typeof(float))
 				Compute<float>.HyperbolicCotangent = (Angle<float> _angle) => { return 1f / (float)System.Math.Tanh(_angle.Radians); };
 			else
-				throw new Error("unsupported parameter type for Cot function");
+				throw new System.NotImplementedException("unsupported parameter type for Cot function");
 
 			return Compute<T>.HyperbolicCotangent(angle);
 		};
@@ -2286,42 +2286,42 @@ QuandrantSkip:
 		#region InverseHyperbolicSine
 		public static Compute<T>.Delegates.InverseHyperbolicSine InverseHyperbolicSine = (T ratio) =>
 		{
-			throw new Error("not implemented");
+			throw new System.NotImplementedException();
 		};
 		#endregion
 
 		#region InverseHyperbolicCosine
 		public static Compute<T>.Delegates.InverseHyperbolicCosine InverseHyperbolicCosine = (T ratio) =>
 		{
-			throw new Error("not implemented");
+			throw new System.NotImplementedException();
 		};
 		#endregion
 
 		#region InverseHyperbolicTangent
 		public static Compute<T>.Delegates.InverseHyperbolicTangent InverseHyperbolicTangent = (T ratio) =>
 		{
-			throw new Error("not implemented");
+			throw new System.NotImplementedException();
 		};
 		#endregion
 
 		#region InverseHyperbolicCosecant
 		public static Compute<T>.Delegates.InverseHyperbolicCosecant InverseHyperbolicCosecant = (T ratio) =>
 		{
-			throw new Error("not implemented");
+			throw new System.NotImplementedException();
 		};
 		#endregion
 
 		#region InverseHyperbolicSecant
 		public static Compute<T>.Delegates.InverseHyperbolicSecant InverseHyperbolicSecant = (T ratio) =>
 		{
-			throw new Error("not implemented");
+			throw new System.NotImplementedException();
 		};
 		#endregion
 
 		#region InverseHyperbolicCotangent
 		public static Compute<T>.Delegates.InverseHyperbolicCotangent InverseHyperbolicCotangent = (T ratio) =>
 		{
-			throw new Error("not implemented");
+			throw new System.NotImplementedException();
 		};
 		#endregion
 	}

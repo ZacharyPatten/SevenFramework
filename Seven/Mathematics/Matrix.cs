@@ -169,17 +169,17 @@ namespace Seven.Mathematics
 			get
 			{
 				if (row < 0 || row > this._rows)
-					throw new Error("index out of bounds: row");
+					throw new System.ArgumentOutOfRangeException("index out of bounds: row");
 				if (column < 0 || column > this._columns)
-					throw new Error("index out of bounds: column");
+					throw new System.ArgumentOutOfRangeException("index out of bounds: column");
 				return (this._matrix)[row * this._columns + column];
 			}
 			set
 			{
 				if (row < 0 || row > this._rows)
-					throw new Error("index out of bounds: row");
+					throw new System.ArgumentOutOfRangeException("index out of bounds: row");
 				if (column < 0 || column > this._columns)
-					throw new Error("index out of bounds: column");
+					throw new System.ArgumentOutOfRangeException("index out of bounds: column");
 				(this._matrix)[row * this._columns + column] = value;
 			}
 		}
@@ -194,9 +194,9 @@ namespace Seven.Mathematics
 		public Matrix(int rows, int columns)
 		{
 			if (rows < 1)
-				throw new Error("Invalid rows on matrix contruction");
+				throw new System.ArgumentException("Invalid rows on matrix contruction");
 			if (columns < 1)
-				throw new Error("Invalid columns on matrix contruction");
+				throw new System.ArgumentException("Invalid columns on matrix contruction");
 
 			this._matrix = new T[rows * columns];
 			this._rows = rows;
@@ -268,8 +268,11 @@ namespace Seven.Mathematics
 		public static Matrix<T> FactoryUniform(int rows, int columns, T uniform)
 		{
 			Matrix<T> matrix;
-			try { matrix = new Matrix<T>(rows, columns); }
-			catch { throw new Error("invalid dimensions."); }
+			if (!(rows > 0))
+				throw new System.ArgumentOutOfRangeException("rows");
+			if (!(columns > 0))
+				throw new System.ArgumentOutOfRangeException("columns");
+			matrix = new Matrix<T>(rows, columns);
 			for (int i = 0; i < rows; i++)
 				for (int j = 0; j < columns; j++)
 					matrix[i, j] = uniform;
@@ -790,7 +793,7 @@ namespace Seven.Mathematics
 //{
 //	Matrix<", T_Source, @"> matrix;
 //	try { matrix = new Matrix<", T_Source, @">(_rows, _columns); }
-//	catch { throw new Error(", "\"invalid dimensions.\"", @"); }
+			//	catch { throw new System.Exception(", "\"invalid dimensions.\"", @"); }
 //	", T_Source, @"[] array = matrix._matrix;
 //	for (int i = 0; i < array.Length; i++)
 //			array[0] = 0;
@@ -1055,11 +1058,11 @@ namespace Seven.Mathematics
 
 			#region Alternate Version
 			//if (_left == null)
-			//	throw new Error("null reference: _left");
+			//	throw new System.Exception("null reference: _left");
 			//if (_right == null)
-			//	throw new Error("null reference: _right");
+			//	throw new System.Exception("null reference: _right");
 			//if (_left.Columns != _right.Rows)
-			//	throw new Error("invalid multiplication (size miss-match).");
+			//	throw new System.Exception("invalid multiplication (size miss-match).");
 			//Matrix<T> result =
 			//	new Matrix<T>(left.Rows, right.Columns);
 			//for (int i = 0; i < left.Rows; i++)
@@ -1120,9 +1123,9 @@ namespace Seven.Mathematics
 "(Matrix<", T_Source, "> _left, ", T_Source, @" _right) =>
 {
 	if (_left == null)
-		throw new Error(", "\"null reference: _left\"", @");
+		throw new System.Exception(", "\"null reference: _left\"", @");
 	if (_right == null)
-		throw new Error(", "\"null reference: _right\"", @");
+		throw new System.Exception(", "\"null reference: _right\"", @");
 	int rows = _left.Rows;
 	int columns = _left.Columns;
 	Matrix<", T_Source, "> result = new Matrix<", T_Source, @">(rows, columns);
@@ -1155,9 +1158,9 @@ namespace Seven.Mathematics
 "(Matrix<", T_Source, "> _left, ", T_Source, @" _right) =>
 {
 	if (_left == null)
-		throw new Error(", "\"null reference: matrix\"", @");
+		throw new System.Exception(", "\"null reference: matrix\"", @");
 	if (_right == null)
-			throw new Error(", "\"null reference: matrix\"", @");
+			throw new System.Exception(", "\"null reference: matrix\"", @");
 	int matrix_row = _left.Rows;
 	int matrix_col = _left.Columns;
 	Matrix<", T_Source, @"> result =
@@ -1194,9 +1197,9 @@ namespace Seven.Mathematics
 "(Matrix<", T_Source, @"> _matrix, int _power) =>
 {
 	if (!(_matrix.Rows == _matrix.Columns))
-		throw new Error(", "\"invalid _power (!_matrix.IsSquare).\"", @");
+		throw new System.Exception(", "\"invalid _power (!_matrix.IsSquare).\"", @");
 	if (!(_power >= 0))
-		throw new Error(", "\"invalid _power !(_power > -1)\"", @");
+		throw new System.Exception(", "\"invalid _power !(_power > -1)\"", @");
 	if (_power == 0)
 		return Matrix<" + T_Source, @">.FactoryIdentity(_matrix.Rows, _matrix.Columns);
 	Matrix<", T_Source, @"> result = _matrix.Clone();
@@ -1226,13 +1229,13 @@ namespace Seven.Mathematics
 "(Matrix<", T_Source, @"> _matrix, int _row, int _column) =>
 {
 	if (object.ReferenceEquals(_matrix, null))
-		throw new Error(", "\"null reference: _matrix\"", @");
+		throw new System.Exception(", "\"null reference: _matrix\"", @");
 	if (_matrix.Rows < 2 || _matrix.Columns < 2)
-		throw new Error(", "\"invalid _matrix minor: (_matrix.Rows < 2 || _matrix.Columns < 2)\"", @");
+		throw new System.Exception(", "\"invalid _matrix minor: (_matrix.Rows < 2 || _matrix.Columns < 2)\"", @");
 	if (_row < 0 || _row >= _matrix.Rows)
-		throw new Error(", "\"invalid _row on _matrix minor: !(0 <= _row < _matrix.Rows)\"", @");
+		throw new System.Exception(", "\"invalid _row on _matrix minor: !(0 <= _row < _matrix.Rows)\"", @");
 	if (_column < 0 || _row >= _matrix.Columns)
-		throw new Error(", "\"invalid _column on _matrix minor: !(0 <= _column < _matrix.Columns)\"", @");
+		throw new System.Exception(", "\"invalid _column on _matrix minor: !(0 <= _column < _matrix.Columns)\"", @");
 	Matrix<", T_Source, @"> minor =
 		new Matrix<", T_Source, @">(_matrix.Rows - 1, _matrix.Columns - 1);
 	int _matrix__rows = _matrix.Rows;
@@ -1286,11 +1289,11 @@ namespace Seven.Mathematics
 "(Matrix<", T_Source, "> _left, Matrix<", T_Source, @"> _right) =>
 {
 	if (object.ReferenceEquals(_left, null))
-			throw new Error(", "\"null reference: _left\"", @");
+			throw new System.Exception(", "\"null reference: _left\"", @");
 	if (object.ReferenceEquals(_right, null))
-			throw new Error(", "\"null reference: _right\"", @");
+			throw new System.Exception(", "\"null reference: _right\"", @");
 	if (_left.Rows != _right.Rows)
-			throw new Error(", "\"invalid row-wise concatenation !(_left.Rows == _right.Rows).\"", @");
+			throw new System.Exception(", "\"invalid row-wise concatenation !(_left.Rows == _right.Rows).\"", @");
 	Matrix<", T_Source, @"> result =
 		new Matrix<", T_Source, @">(_left.Rows, _left.Columns + _right.Columns);
 	int result_rows = result.Rows;
@@ -1399,7 +1402,7 @@ namespace Seven.Mathematics
 "(Matrix<", T_Source, @"> _matrix) =>
 {
 	if (object.ReferenceEquals(_matrix, null))
-		throw new Error(", "\"null reference: _matrix\"", @");
+		throw new System.Exception(", "\"null reference: _matrix\"", @");
 	Matrix<", T_Source, @"> result = _matrix.Clone();
 	for (int i = 0; i < _matrix.Rows; i++)
 	{
@@ -1457,7 +1460,7 @@ namespace Seven.Mathematics
 "(Matrix<", T_Source, @"> _matrix) =>
 		{
 	if (_matrix == null)
-		throw new Error(", "\"null reference: _matrix\"", @");
+		throw new System.Exception(", "\"null reference: _matrix\"", @");
 	Matrix<", T_Source, @"> result = _matrix.Clone();
 	for (int i = 0; i < _matrix.Rows; i++)
 	{
@@ -1652,9 +1655,9 @@ namespace Seven.Mathematics
 "(Matrix<", T_Source, "> _matrix, out Matrix<", T_Source, "> _Lower, out Matrix<", T_Source, @"> _Upper) =>
 {
 	if (object.ReferenceEquals(_matrix, null))
-		throw new Error(", "\"null reference: _matrix\"", @");
+		throw new System.Exception(", "\"null reference: _matrix\"", @");
 	if (_matrix.Rows != _matrix.Columns)
-		throw new Error(", "\"non-square _matrix during DecomposeLU function\"", @");
+		throw new System.Exception(", "\"non-square _matrix during DecomposeLU function\"", @");
 	_Lower = Matrix<", T_Source, @">.FactoryIdentity(_matrix.Rows, _matrix.Columns);
 	_Upper = _matrix.Clone();
 	int[] permutation = new int[_matrix.Rows];
@@ -1671,7 +1674,7 @@ namespace Seven.Mathematics
 						k0 = i;
 				}
 		if (p == 0)
-				throw new Error(", "\"The _matrix is singular!\"", @");
+				throw new System.Exception(", "\"The _matrix is singular!\"", @");
 		pom1 = permutation[k];
 		permutation[k] = permutation[k0];
 		permutation[k0] = pom1;
@@ -1717,7 +1720,7 @@ namespace Seven.Mathematics
 			//			k0 = i;
 			//		}
 			//	if (p == 0)
-			//		throw new Error("The matrix is singular!");
+			//		throw new System.Exception("The matrix is singular!");
 			//	pom1 = permutation[k];
 			//	permutation[k] = permutation[k0];
 			//	permutation[k0] = pom1;
@@ -1847,7 +1850,7 @@ namespace Seven.Mathematics
 		//					// nothing
 		//#else
 		//			if (object.ReferenceEquals(matrix, null))
-		//				throw new Error("null reference: matirx");
+		//				throw new System.Exception("null reference: matirx");
 		//#endif
 
 		//			#endregion
@@ -1914,11 +1917,11 @@ namespace Seven.Mathematics
 		//			// nothing
 		//#else
 		//						if (object.ReferenceEquals(left, null))
-		//								throw new Error("null reference: left");
+		//								throw new System.Exception("null reference: left");
 		//						if (object.ReferenceEquals(right, null))
-		//								throw new Error("null reference: right");
+		//								throw new System.Exception("null reference: right");
 		//						if (left.Rows != right.Rows || left.Columns != right.Columns)
-		//								throw new Error("invalid matrix addition (dimension miss-match).");
+		//								throw new System.Exception("invalid matrix addition (dimension miss-match).");
 		//#endif
 
 		//						#endregion
@@ -1987,11 +1990,11 @@ namespace Seven.Mathematics
 		//			// nothing
 		//#else
 		//						if (object.ReferenceEquals(left, null))
-		//								throw new Error("null reference: left");
+		//								throw new System.Exception("null reference: left");
 		//						if (object.ReferenceEquals(right, null))
-		//								throw new Error("null reference: right");
+		//								throw new System.Exception("null reference: right");
 		//						if (left.Rows != right.Rows || left.Columns != right.Columns)
-		//								throw new Error("invalid matrix subtraction (dimension miss-match).");
+		//								throw new System.Exception("invalid matrix subtraction (dimension miss-match).");
 		//#endif
 
 		//						#endregion
@@ -2060,11 +2063,11 @@ namespace Seven.Mathematics
 		//			// nothing
 		//#else
 		//						if (left == null)
-		//								throw new Error("null reference: left");
+		//								throw new System.Exception("null reference: left");
 		//						if (right == null)
-		//								throw new Error("null reference: right");
+		//								throw new System.Exception("null reference: right");
 		//						if (left.Columns != right.Rows)
-		//								throw new Error("invalid multiplication (dimension miss-match).");
+		//								throw new System.Exception("invalid multiplication (dimension miss-match).");
 		//#endif
 
 		//						#endregion

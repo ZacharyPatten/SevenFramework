@@ -1,7 +1,6 @@
 ﻿using Seven;
 using Seven.Structures;
 using Seven.Mathematics;
-using Seven.Algorithms.GraphSearch;
 using System;
 using Seven.Algorithms;
 
@@ -149,7 +148,7 @@ namespace Algorithms
 			Graph<int> graph = new GraphSetOmnitree<int>(
 				Compute<int>.Compare, 
 				Hash.Default, 
-				0, 3, 
+				0, 3,
 				(int l, int r) => { return (l + r) / 2; });
 
 			// add nodes
@@ -229,19 +228,19 @@ namespace Algorithms
 					};
 
 			// run A* the algorithm
-			Stepper<int> aStar_path = AStar<int, int>.Run(
+			Stepper<int> aStar_path = Search<int>.Graph<int>.Astar(
 				0,
-				new AStar<int, int>.Neighbors(neighbors),
-				new AStar<int, int>.Heuristic(heuristic),
-				new AStar<int, int>.Cost(cost),
-				new AStar<int, int>.Goal(goal));
+				graph,
+				new Search<int>.Graph<int>.Heuristic(heuristic),
+				new Search<int>.Graph<int>.Cost(cost),
+				new Search<int>.Graph<int>.Goal(goal));
 
 			// run the Greedy algorithm
-			Stepper<int> greedy_path = Greedy<int, int>.Run(
+			Stepper<int> greedy_path = Search<int>.Graph<int>.Greedy(
 				0,
-				new Greedy<int, int>.Neighbors(neighbors),
-				new Greedy<int, int>.Heuristic(heuristic),
-				new Greedy<int, int>.Goal(goal));
+				graph,
+				new Search<int>.Graph<int>.Heuristic(heuristic),
+				new Search<int>.Graph<int>.Goal(goal));
 
 			Console.Write("A* Path: ");
 			if (aStar_path != null)

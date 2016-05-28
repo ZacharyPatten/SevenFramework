@@ -105,7 +105,7 @@ namespace Seven
 				case Comparison.Equal:
 					return Comparison.Equal;
 				default:
-					throw new Error("Not Implemented");
+					throw new System.NotImplementedException();
 			}
 		}
 

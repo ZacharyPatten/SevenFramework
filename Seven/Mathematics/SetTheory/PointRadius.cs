@@ -5,6 +5,8 @@
 
 namespace Seven.Mathematics.SetTheory
 {
+	/// <summary>Represents a point in N-D space and a radius.</summary>
+	/// <typeparam name="T">The generic numeric type for computations.</typeparam>
 	public class PointRadius<T>
 	{
 		#region fields
@@ -88,8 +90,16 @@ namespace Seven.Mathematics.SetTheory
 
 		#region operators
 
+		/// <summary>Checks for equality.</summary>
+		/// <param name="a">First operand.</param>
+		/// <param name="b">Second operand.</param>
+		/// <returns>True if equal; False if not.</returns>
 		public static bool operator ==(PointRadius<T> a, PointRadius<T> b)
 		{ return Equals(a, b); }
+		/// <summary>Checks for inequality.</summary>
+		/// <param name="a">First operand.</param>
+		/// <param name="b">Second operand.</param>
+		/// <returns>False if equal; True if not.</returns>
 		public static bool operator !=(PointRadius<T> a, PointRadius<T> b)
 		{ return !Equals(a, b); }
 		/// <summary>Complement</summary>
@@ -103,5 +113,27 @@ namespace Seven.Mathematics.SetTheory
 		{ return PointRadius<T>.Intersect(a, b); }
 
 		#endregion
+
+		/// <summary>Checks for equality.</summary>
+		/// <param name="obj">The other operand to check for equality.</param>
+		/// <returns>True if equal; False if not.</returns>
+		public override bool Equals(object obj)
+		{
+			if (object.ReferenceEquals(this, obj))
+				return true;
+			else if (object.ReferenceEquals(null, obj))
+				return false;
+			else if (obj is PointRadius<T>)
+				return this == (obj as PointRadius<T>);
+			else
+				return false;
+		}
+
+		/// <summary>Gets the hash code for this instance.</summary>
+		/// <returns>The hash code for this instance.</returns>
+		public override int GetHashCode()
+		{
+			return _center.GetHashCode() ^ _radius.GetHashCode();
+		}
 	}
 }

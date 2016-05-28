@@ -196,13 +196,13 @@ namespace Seven
 						}
 					}
 				}
-				catch (System.OverflowException)
+				catch (System.OverflowException ex)
 				{
-					throw new Error("Conversion not possible due to overflow");
+					throw new System.OverflowException("Conversion not possible due to overflow", ex);
 				}
-				catch (System.Exception)
+				catch (System.Exception ex)
 				{
-					throw new Error("Conversion not possible");
+					throw new System.Exception("Conversion not possible", ex);
 				}
 			}
 			else
@@ -377,7 +377,7 @@ namespace Seven
 			}
 			catch
 			{
-				// throw new Error("Overflow occurred while performing arithemetic operation");
+				// throw new System.Exception("Overflow occurred while performing arithemetic operation");
 				return new Fraction32(frac1.ToDouble() + frac2.ToDouble());
 			}
 		}
@@ -399,7 +399,7 @@ namespace Seven
 			}
 			catch
 			{
-				// throw new Error("Overflow occurred while performing arithemetic operation");
+				// throw new System.Exception("Overflow occurred while performing arithemetic operation");
 				return new Fraction32(frac1.ToDouble() * frac2.ToDouble());
 			}
 		}
@@ -462,7 +462,7 @@ namespace Seven
 		public static Fraction32 Inverse(Fraction32 frac1)
 		{
 			if (frac1.Numerator == 0)
-				throw new Error("Operation not possible (Denominator cannot be assigned a ZERO Value)");
+				throw new System.ArgumentOutOfRangeException("Operation not possible (Denominator cannot be assigned a ZERO Value)");
 
 			short iNumerator = frac1.Denominator;
 			short iDenominator = frac1.Numerator;
@@ -496,7 +496,7 @@ namespace Seven
 			} // end try
 			catch (System.Exception exp)
 			{
-				throw new Error("Cannot reduce Fraction: " + exp.Message);
+				throw new System.Exception("Cannot reduce Fraction: " + exp.Message);
 			}
 		}
 
@@ -548,7 +548,7 @@ namespace Seven
 				if (value != 0)
 					_denominator = value;
 				else
-					throw new Error("Denominator cannot be assigned a ZERO Value");
+					throw new System.ArgumentOutOfRangeException("Denominator cannot be assigned a ZERO Value");
 			}
 		}
 
@@ -576,9 +576,8 @@ namespace Seven
 		public Fraction64(double rational)
 		{
 		Rounded:
-
 			if (rational > int.MaxValue)
-				throw new Error("Fraction64 construction invalid (rational > int.MaxValue)");
+				throw new System.ArgumentOutOfRangeException("Fraction64 construction invalid (rational > int.MaxValue)");
 			else if (rational % 1 == 0)
 			{
 				this._numerator = (int)rational;
@@ -696,13 +695,13 @@ namespace Seven
 						}
 					}
 				}
-				catch (System.OverflowException)
+				catch (System.OverflowException ex)
 				{
-					throw new Error("Conversion not possible due to overflow");
+					throw new System.OverflowException("Conversion not possible due to overflow", ex);
 				}
-				catch (System.Exception)
+				catch (System.Exception ex)
 				{
-					throw new Error("Conversion not possible");
+					throw new System.Exception("Conversion not possible", ex);
 				}
 			}
 			else
@@ -877,7 +876,7 @@ namespace Seven
 			}
 			catch
 			{
-				// throw new Error("Overflow occurred while performing arithemetic operation");
+				// throw new System.Exception("Overflow occurred while performing arithemetic operation");
 				return new Fraction64(frac1.ToDouble() + frac2.ToDouble());
 			}
 		}
@@ -899,7 +898,7 @@ namespace Seven
 			}
 			catch
 			{
-				// throw new Error("Overflow occurred while performing arithemetic operation");
+				// throw new System.Exception("Overflow occurred while performing arithemetic operation");
 				return new Fraction64(frac1.ToDouble() * frac2.ToDouble());
 			}
 		}
@@ -962,7 +961,7 @@ namespace Seven
 		public static Fraction64 Inverse(Fraction64 frac1)
 		{
 			if (frac1.Numerator == 0)
-				throw new Error("Operation not possible (Denominator cannot be assigned a ZERO Value)");
+				throw new System.ArgumentOutOfRangeException("Operation not possible (Denominator cannot be assigned a ZERO Value)");
 
 			int iNumerator = frac1.Denominator;
 			int iDenominator = frac1.Numerator;
@@ -996,7 +995,7 @@ namespace Seven
 			} // end try
 			catch (System.Exception exp)
 			{
-				throw new Error("Cannot reduce Fraction: " + exp.Message);
+				throw new System.Exception("Cannot reduce Fraction", exp);
 			}
 		}
 
@@ -1047,7 +1046,7 @@ namespace Seven
 				if (value != 0)
 					_denominator = value;
 				else
-					throw new Error("Denominator cannot be assigned a ZERO Value");
+					throw new System.ArgumentOutOfRangeException("Denominator cannot be assigned a ZERO Value");
 			}
 		}
 
@@ -1072,9 +1071,9 @@ namespace Seven
 		Rounded:
 
 			if (rational > long.MaxValue)
-				throw new Error("Fraction128 construction invalid (rational > long.MaxValue)");
+				throw new System.ArgumentOutOfRangeException("Fraction128 construction invalid (rational > long.MaxValue)");
 			else if (rational < long.MinValue)
-				throw new Error("Fraction128 construction invalid (rational < long.MinValue)");
+				throw new System.ArgumentOutOfRangeException("Fraction128 construction invalid (rational < long.MinValue)");
 			else if (rational % 1 == 0)	// if whole number
 			{
 				this._numerator = (long)rational;
@@ -1173,13 +1172,13 @@ namespace Seven
 						}
 					}
 				}
-				catch (System.OverflowException)
+				catch (System.OverflowException ex)
 				{
-					throw new Error("Conversion not possible due to overflow");
+					throw new System.OverflowException("Conversion not possible due to overflow", ex);
 				}
-				catch (System.Exception)
+				catch (System.Exception ex)
 				{
-					throw new Error("Conversion not possible");
+					throw new System.Exception("Conversion not possible", ex);
 				}
 			}
 			else
@@ -1346,7 +1345,7 @@ namespace Seven
 			}
 			catch
 			{
-				// throw new Error("Overflow occurred while performing arithemetic operation");
+				// throw new System.Exception("Overflow occurred while performing arithemetic operation");
 				return new Fraction128(frac1.ToDouble() + frac2.ToDouble());
 			}
 		}
@@ -1364,7 +1363,7 @@ namespace Seven
 			}
 			catch
 			{
-				// throw new Error("Overflow occurred while performing arithemetic operation");
+				// throw new System.Exception("Overflow occurred while performing arithemetic operation");
 				return new Fraction128(frac1.ToDouble() * frac2.ToDouble());
 			}
 		}
@@ -1425,7 +1424,7 @@ namespace Seven
 		public static Fraction128 Inverse(Fraction128 frac1)
 		{
 			if (frac1.Numerator == 0)
-				throw new Error("Operation not possible (Denominator cannot be assigned a ZERO Value)");
+				throw new System.ArgumentOutOfRangeException("Operation not possible (Denominator cannot be assigned a ZERO Value)");
 
 			long iNumerator = frac1.Denominator;
 			long iDenominator = frac1.Numerator;
@@ -1457,9 +1456,9 @@ namespace Seven
 					frac.Denominator *= -1;
 				}
 			} // end try
-			catch (System.Exception exp)
+			catch (System.Exception ex)
 			{
-				throw new Error("Cannot reduce Fraction: " + exp.Message);
+				throw new System.Exception("Cannot reduce Fraction: ", ex);
 			}
 		}
 
@@ -1513,7 +1512,7 @@ namespace Seven
 				if (value != 0)
 					_denominator = value;
 				else
-					throw new Error("Denominator cannot be assigned a ZERO Value");
+					throw new System.ArgumentOutOfRangeException("Denominator cannot be assigned a ZERO Value");
 			}
 		}
 
@@ -1538,9 +1537,9 @@ namespace Seven
 		Rounded:
 
 			if (rational > long.MaxValue)
-				throw new Error("Fraction construction invalid (rational > long.MaxValue)");
+				throw new System.ArgumentOutOfRangeException("Fraction construction invalid (rational > long.MaxValue)");
 			else if (rational < long.MinValue)
-				throw new Error("Fraction construction invalid (rational < long.MinValue)");
+				throw new System.ArgumentOutOfRangeException("Fraction construction invalid (rational < long.MinValue)");
 			else if (rational % 1 == 0)	// if whole number
 			{
 				this._numerator = new Integer(((long)rational).ToString());
@@ -1639,13 +1638,13 @@ namespace Seven
 						}
 					}
 				}
-				catch (System.OverflowException)
+				catch (System.OverflowException ex)
 				{
-					throw new Error("Conversion not possible due to overflow");
+					throw new System.OverflowException("Conversion not possible due to overflow", ex);
 				}
-				catch (System.Exception)
+				catch (System.Exception ex)
 				{
-					throw new Error("Conversion not possible");
+					throw new System.Exception("Conversion not possible", ex);
 				}
 			}
 			else
@@ -1871,7 +1870,7 @@ namespace Seven
 		public static Fraction Inverse(Fraction frac1)
 		{
 			if (frac1.Numerator == 0)
-				throw new Error("Operation not possible (Denominator cannot be assigned a ZERO Value)");
+				throw new System.ArgumentOutOfRangeException("Operation not possible (Denominator cannot be assigned a ZERO Value)");
 
 			Integer iNumerator = frac1.Denominator;
 			Integer iDenominator = frac1.Numerator;
@@ -1903,9 +1902,9 @@ namespace Seven
 					frac.Denominator *= -1;
 				}
 			} // end try
-			catch (System.Exception exp)
+			catch (System.Exception ex)
 			{
-				throw new Error("Cannot reduce Fraction: " + exp.Message);
+				throw new System.Exception("Cannot reduce Fraction: ", ex);
 			}
 		}
 

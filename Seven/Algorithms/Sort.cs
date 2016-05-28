@@ -493,70 +493,70 @@ namespace Seven.Algorithms
 
 		#endregion
 
-		#region Counting
+		#region Counting (In Development)
 
-		/// <summary>Method specifically for computing object keys in the Counting Sort algorithm.</summary>
-		/// <typeparam name="T">The type of instances in the array to be sorted.</typeparam>
-		/// <param name="instance">The instance to compute a counting key for.</param>
-		/// <returns>The counting key computed from the provided instance.</returns>
-		public delegate int ComputeCountingKey(T instance);
+		///// <summary>Method specifically for computing object keys in the Counting Sort algorithm.</summary>
+		///// <typeparam name="T">The type of instances in the array to be sorted.</typeparam>
+		///// <param name="instance">The instance to compute a counting key for.</param>
+		///// <returns>The counting key computed from the provided instance.</returns>
+		//public delegate int ComputeCountingKey(T instance);
 
-		/// <summary>Sorts an entire array in non-decreasing order using the heap sort algorithm.</summary>
-		/// <typeparam name="T">The type of objects stored within the array.</typeparam>
-		/// <param name="computeCountingKey">Method specifically for computing object keys in the Counting Sort algorithm.</param>
-		/// <param name="array">The array to be sorted</param>
-		/// <remarks>Runtime: Theta(Max(key)). Memory: Max(key). Stablity: yes.</remarks>
-		public static void Counting(ComputeCountingKey computeCountingKey, T[] array)
-		{
-			throw new Error("Not Yet Implemented");
+		///// <summary>Sorts an entire array in non-decreasing order using the heap sort algorithm.</summary>
+		///// <typeparam name="T">The type of objects stored within the array.</typeparam>
+		///// <param name="computeCountingKey">Method specifically for computing object keys in the Counting Sort algorithm.</param>
+		///// <param name="array">The array to be sorted</param>
+		///// <remarks>Runtime: Theta(Max(key)). Memory: Max(key). Stablity: yes.</remarks>
+		//public static void Counting(ComputeCountingKey computeCountingKey, T[] array)
+		//{
+		//	throw new System.NotImplementedException();
 
-			// This code needs revision and conversion
-			int[] count = new int[array.Length];
-			int maxKey = 0;
-			for (int i = 0; i < array.Length; i++)
-			{
-				int key = computeCountingKey(array[i]) / array.Length;
-				count[key] += 1;
-				if (key > maxKey)
-					maxKey = key;
-			}
+		//	// This code needs revision and conversion
+		//	int[] count = new int[array.Length];
+		//	int maxKey = 0;
+		//	for (int i = 0; i < array.Length; i++)
+		//	{
+		//		int key = computeCountingKey(array[i]) / array.Length;
+		//		count[key] += 1;
+		//		if (key > maxKey)
+		//			maxKey = key;
+		//	}
 
-			int total = 0;
-			for (int i = 0; i < maxKey; i++)
-			{
-				int oldCount = count[i];
-				count[i] = total;
-				total += oldCount;
-			}
+		//	int total = 0;
+		//	for (int i = 0; i < maxKey; i++)
+		//	{
+		//		int oldCount = count[i];
+		//		count[i] = total;
+		//		total += oldCount;
+		//	}
 
-			T[] output = new T[maxKey];
-			for (int i = 0; i < array.Length; i++)
-			{
-				int key = computeCountingKey(array[i]);
-				output[count[key]] = array[i];
-				count[computeCountingKey(array[i])] += 1;
-			}
-		}
+		//	T[] output = new T[maxKey];
+		//	for (int i = 0; i < array.Length; i++)
+		//	{
+		//		int key = computeCountingKey(array[i]);
+		//		output[count[key]] = array[i];
+		//		count[computeCountingKey(array[i])] += 1;
+		//	}
+		//}
 
-		/// <summary>Sorts an entire array in non-decreasing order using the heap sort algorithm.</summary>
-		/// <typeparam name="T">The type of objects stored within the array.</typeparam>
-		/// <param name="computeCountingKey">Method specifically for computing object keys in the Counting Sort algorithm.</param>
-		/// <param name="array">The array to be sorted</param>
-		/// <remarks>Runtime: Theta(Max(key)). Memory: Max(key). Stablity: yes.</remarks>
-		public static void Counting(ComputeCountingKey computeCountingKey, T[] array, int start, int end)
-		{
-			throw new Error("Not Yet Implemented");
-		}
+		///// <summary>Sorts an entire array in non-decreasing order using the heap sort algorithm.</summary>
+		///// <typeparam name="T">The type of objects stored within the array.</typeparam>
+		///// <param name="computeCountingKey">Method specifically for computing object keys in the Counting Sort algorithm.</param>
+		///// <param name="array">The array to be sorted</param>
+		///// <remarks>Runtime: Theta(Max(key)). Memory: Max(key). Stablity: yes.</remarks>
+		//public static void Counting(ComputeCountingKey computeCountingKey, T[] array, int start, int end)
+		//{
+		//	throw new System.NotImplementedException();
+		//}
 
-		/// <summary>Sorts an entire array in non-decreasing order using the heap sort algorithm.</summary>
-		/// <typeparam name="T">The type of objects stored within the array.</typeparam>
-		/// <param name="computeCountingKey">Method specifically for computing object keys in the Counting Sort algorithm.</param>
-		/// <param name="array">The array to be sorted</param>
-		/// <remarks>Runtime: Theta(Max(key)). Memory: Max(key). Stablity: yes.</remarks>
-		public static void Counting(ComputeCountingKey computeCountingKey, Get<T> get, Assign<T> set, int start, int end)
-		{
-			throw new Error("Not Yet Implemented");
-		}
+		///// <summary>Sorts an entire array in non-decreasing order using the heap sort algorithm.</summary>
+		///// <typeparam name="T">The type of objects stored within the array.</typeparam>
+		///// <param name="computeCountingKey">Method specifically for computing object keys in the Counting Sort algorithm.</param>
+		///// <param name="array">The array to be sorted</param>
+		///// <remarks>Runtime: Theta(Max(key)). Memory: Max(key). Stablity: yes.</remarks>
+		//public static void Counting(ComputeCountingKey computeCountingKey, Get<T> get, Assign<T> set, int start, int end)
+		//{
+		//	throw new System.NotImplementedException();
+		//}
 
 		#endregion
 
@@ -694,7 +694,7 @@ namespace Seven.Algorithms
 		/// <remarks>Runtime: Omega(n), average(n*n!), O(n*n!). Memory: in place. Stablity: N/A (not yet analyzed).</remarks>
 		public static void Slow(Compare<T> compare, Get<T> get, Assign<T> set, int start, int end)
 		{
-			throw new Error("Not Implemented Exception");
+			throw new System.NotImplementedException();
 
 			Sort<T>.Slow_Recursive(compare, get, set, start, end);
 		}

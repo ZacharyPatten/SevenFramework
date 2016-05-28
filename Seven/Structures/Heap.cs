@@ -131,7 +131,7 @@ namespace Seven.Structures
 			if (!(_count + 1 < _heap.Length))
 			{
 				if (_heap.Length * 2 > int.MaxValue)
-					throw new Error("this heap has become too large");
+					throw new System.InvalidOperationException("this heap has become too large");
 				T[] _newHeap = new T[_heap.Length * 2];
 				for (int i = 1; i <= _count; i++)
 					_newHeap[i] = this._heap[i];
@@ -156,7 +156,7 @@ namespace Seven.Structures
 				this.ShiftDown(_root);
 				return removal;
 			}
-			throw new Error("Attempting to remove from an empty priority queue.");
+			throw new System.InvalidOperationException("Attempting to remove from an empty priority queue.");
 		}
 		#endregion
 		#region public void Requeue(T item)
@@ -170,7 +170,7 @@ namespace Seven.Structures
 				if (this._compare(item, this._heap[i]) == Comparison.Equal)
 					break;
 			if (i > this._count)
-				throw new Error("Attempting to re-queue an item that is not in the heap.");
+				throw new System.InvalidOperationException("Attempting to re-queue an item that is not in the heap.");
 			ShiftUp(i);
 			ShiftDown(i);
 		}
@@ -182,7 +182,7 @@ namespace Seven.Structures
 		{
 			if (this._count > 0)
 				return this._heap[_root];
-			throw new Error("Attempting to peek at an empty priority queue.");
+			throw new System.InvalidOperationException("Attempting to peek at an empty priority queue.");
 		}
 		#endregion
 		#region private void ShiftUp(int index)
@@ -950,7 +950,7 @@ namespace Seven.Structures
 	//	#endregion
 
 	//	/// <summary>This is used for throwing imutable priority queue exceptions only to make debugging faster.</summary>
-	//	private class HeapArrayStaticException : Error
+	//	private class HeapArrayStaticException : System.Exception
 	//	{
 	//		public HeapArrayStaticException(string message) : base(message) { }
 	//	}
@@ -1316,7 +1316,7 @@ namespace Seven.Structures
 	//	#endregion
 
 	//	/// <summary>This is used for throwing mutable priority queue exceptions only to make debugging faster.</summary>
-	//	private class HeapArrayDynamicException : Error
+	//	private class HeapArrayDynamicException : System.Exception
 	//	{
 	//		public HeapArrayDynamicException(string message) : base(message) { }
 	//	}

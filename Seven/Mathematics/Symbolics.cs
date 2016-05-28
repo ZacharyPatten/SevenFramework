@@ -584,11 +584,11 @@ namespace Seven.Mathematics
 			//					else if (tree[i] == '.' && !comma)
 			//						comma = true;
 			//					else
-			//						throw new Error("mathematics parsing error");
+			//						throw new System.Exception("mathematics parsing error");
 			//#endif
 			//				#endregion
 
-			//				throw new Error("mathematics parsing error");
+			//				throw new System.Exception("mathematics parsing error");
 			//			}
 			//			// variable node: "[variable]"
 			//			else if (tree[0] == '[')
@@ -599,7 +599,7 @@ namespace Seven.Mathematics
 			//					//nothing
 			//#else
 			//				if (tree[tree.Length - 1] != ']')
-			//					throw new Error("mathematics parsing error");
+			//					throw new System.Exception("mathematics parsing error");
 			//#endif
 			//				#endregion
 
@@ -615,7 +615,7 @@ namespace Seven.Mathematics
 			//					//nothing
 			//#else
 			//				if (tree[tree.Length - 1] != ')')
-			//					throw new Error("mathematics parsing error");
+			//					throw new System.Exception("mathematics parsing error");
 			//#endif
 			//				#endregion
 
@@ -684,7 +684,7 @@ namespace Seven.Mathematics
 			//					//nothing
 			//#else
 			//						if (nodes.Length != 2)
-			//							throw new Error("mathematics parsing error");
+			//							throw new System.Exception("mathematics parsing error");
 			//#endif
 			//						#endregion
 			//						return new Node.operations.binary.add(nodes[0], nodes[1]);
@@ -695,7 +695,7 @@ namespace Seven.Mathematics
 			//					//nothing
 			//#else
 			//						if (nodes.Length != 2)
-			//							throw new Error("mathematics parsing error");
+			//							throw new System.Exception("mathematics parsing error");
 			//#endif
 			//						#endregion
 			//						return new Node.operations.binary.subtract(nodes[0], nodes[1]);
@@ -706,7 +706,7 @@ namespace Seven.Mathematics
 			//					//nothing
 			//#else
 			//						if (nodes.Length != 2)
-			//							throw new Error("mathematics parsing error");
+			//							throw new System.Exception("mathematics parsing error");
 			//#endif
 			//						#endregion
 			//						return new Node.operations.binary.multiply(nodes[0], nodes[1]);
@@ -717,7 +717,7 @@ namespace Seven.Mathematics
 			//					//nothing
 			//#else
 			//						if (nodes.Length != 2)
-			//							throw new Error("mathematics parsing error");
+			//							throw new System.Exception("mathematics parsing error");
 			//#endif
 			//						#endregion
 			//						return new Node.operations.binary.divide(nodes[0], nodes[1]);
@@ -728,7 +728,7 @@ namespace Seven.Mathematics
 			//					//nothing
 			//#else
 			//						if (nodes.Length != 2)
-			//							throw new Error("mathematics parsing error");
+			//							throw new System.Exception("mathematics parsing error");
 			//#endif
 			//						#endregion
 			//						return new Node.operations.binary.power(nodes[0], nodes[1]);
@@ -739,7 +739,7 @@ namespace Seven.Mathematics
 			//					//nothing
 			//#else
 			//						if (nodes.Length != 1)
-			//							throw new Error("mathematics parsing error");
+			//							throw new System.Exception("mathematics parsing error");
 			//#endif
 			//						#endregion
 			//						return new Node.operations.unary.negate(nodes[0]);
@@ -750,7 +750,7 @@ namespace Seven.Mathematics
 			//					//nothing
 			//#else
 			//						if (nodes.Length != 1)
-			//							throw new Error("mathematics parsing error");
+			//							throw new System.Exception("mathematics parsing error");
 			//#endif
 			//						#endregion
 			//						return new Node.operations.unary.sin(nodes[0]);
@@ -761,7 +761,7 @@ namespace Seven.Mathematics
 			//					//nothing
 			//#else
 			//						if (nodes.Length != 1)
-			//							throw new Error("mathematics parsing error");
+			//							throw new System.Exception("mathematics parsing error");
 			//#endif
 			//						#endregion
 			//						return new Node.operations.unary.cos(nodes[0]);
@@ -772,7 +772,7 @@ namespace Seven.Mathematics
 			//					//nothing
 			//#else
 			//						if (nodes.Length != 1)
-			//							throw new Error("mathematics parsing error");
+			//							throw new System.Exception("mathematics parsing error");
 			//#endif
 			//						#endregion
 			//						return new Node.operations.unary.tan(nodes[0]);
@@ -783,7 +783,7 @@ namespace Seven.Mathematics
 			//					//nothing
 			//#else
 			//						if (nodes.Length != 1)
-			//							throw new Error("mathematics parsing error");
+			//							throw new System.Exception("mathematics parsing error");
 			//#endif
 			//						#endregion
 			//						return new Node.operations.unary.csc(nodes[0]);
@@ -794,7 +794,7 @@ namespace Seven.Mathematics
 			//					//nothing
 			//#else
 			//						if (nodes.Length != 1)
-			//							throw new Error("mathematics parsing error");
+			//							throw new System.Exception("mathematics parsing error");
 			//#endif
 			//						#endregion
 			//						return new Node.operations.unary.sec(nodes[0]);
@@ -805,7 +805,7 @@ namespace Seven.Mathematics
 			//					//nothing
 			//#else
 			//						if (nodes.Length != 1)
-			//							throw new Error("mathematics parsing error");
+			//							throw new System.Exception("mathematics parsing error");
 			//#endif
 			//						#endregion
 			//						return new Node.operations.unary.cot(nodes[0]);
@@ -816,7 +816,7 @@ namespace Seven.Mathematics
 			//					//nothing
 			//#else
 			//						if (nodes.Length != 1)
-			//							throw new Error("mathematics parsing error");
+			//							throw new System.Exception("mathematics parsing error");
 			//#endif
 			//						#endregion
 			//						return new Node.operations.unary.arcsin(nodes[0]);
@@ -827,7 +827,7 @@ namespace Seven.Mathematics
 			//					//nothing
 			//#else
 			//						if (nodes.Length != 1)
-			//							throw new Error("mathematics parsing error");
+			//							throw new System.Exception("mathematics parsing error");
 			//#endif
 			//						#endregion
 			//						return new Node.operations.unary.arccos(nodes[0]);
@@ -838,7 +838,7 @@ namespace Seven.Mathematics
 			//					//nothing
 			//#else
 			//						if (nodes.Length != 1)
-			//							throw new Error("mathematics parsing error");
+			//							throw new System.Exception("mathematics parsing error");
 			//#endif
 			//						#endregion
 			//						return new Node.operations.unary.arctan(nodes[0]);
@@ -849,7 +849,7 @@ namespace Seven.Mathematics
 			//					//nothing
 			//#else
 			//						if (nodes.Length != 1)
-			//							throw new Error("mathematics parsing error");
+			//							throw new System.Exception("mathematics parsing error");
 			//#endif
 			//						#endregion
 			//						return new Node.operations.unary.arccsc(nodes[0]);
@@ -860,7 +860,7 @@ namespace Seven.Mathematics
 			//					//nothing
 			//#else
 			//						if (nodes.Length != 1)
-			//							throw new Error("mathematics parsing error");
+			//							throw new System.Exception("mathematics parsing error");
 			//#endif
 			//						#endregion
 			//						return new Node.operations.unary.arcsec(nodes[0]);
@@ -871,7 +871,7 @@ namespace Seven.Mathematics
 			//					//nothing
 			//#else
 			//						if (nodes.Length != 1)
-			//							throw new Error("mathematics parsing error");
+			//							throw new System.Exception("mathematics parsing error");
 			//#endif
 			//						#endregion
 			//						return new Node.operations.unary.arccot(nodes[0]);
@@ -890,7 +890,7 @@ namespace Seven.Mathematics
 			//					//	return;
 
 			//					default:
-			//						throw new Error("mathematics parsing error");
+			//						throw new System.Exception("mathematics parsing error");
 
 			//				}
 			//			}

@@ -19,11 +19,11 @@ namespace Seven.Source.Mathematics
 
 		//	pivot = tableau[row, col];
 		//	if (!(pivot > 0))
-		//		throw new Error("possible invalid tableau values (IDK)");
+	//		throw new System.Exception("possible invalid tableau values (IDK)");
 		//	for (j = 0; j < tableau.GetLength(1); j++)
 		//		tableau[row, j] /= pivot;
 		//	if (!(Logic.Equate(tableau[row, col], 1, epsilon)))
-		//		throw new Error("possible invalid tableau values (IDK)");
+	//		throw new System.Exception("possible invalid tableau values (IDK)");
 
 		//	for (i = 0; i < tableau.GetLength(0); i++)
 		//	{ // foreach remaining row i do
@@ -106,7 +106,7 @@ namespace Seven.Source.Mathematics
 		//	int i;
 		//	for (i = 1; i < tableau.GetLength(0); i++)
 		//		if (!(tableau[i, 0] >= 0))
-		//			throw new Error("possible invalid tableau values (IDK)");
+	//			throw new System.Exception("possible invalid tableau values (IDK)");
 		//}
 
 		//// Given a column of identity matrix, find the row containing 1.
@@ -162,14 +162,14 @@ namespace Seven.Source.Mathematics
 
 		//		pivot_row = find_pivot_row(ref tableau, pivot_col);
 		//		if (pivot_row < 0)
-		//			throw new Error("unbounded (no pivot_row)");
+	//			throw new System.Exception("unbounded (no pivot_row)");
 		//		//printf("Leaving variable x%d, so pivot_row=%d\n", pivot_row, pivot_row);
 
 		//		pivot_on(ref tableau, pivot_row, pivot_col);
 		//		//print_tableau(tableau, "After pivoting");
 		//		//return print_optimal_vector(ref tableau);
 		//	}
-		//	throw new Error("Simplex has a glitch");
+	//	throw new System.Exception("Simplex has a glitch");
 		//}
 
 		#endregion

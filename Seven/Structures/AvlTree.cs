@@ -40,7 +40,6 @@ namespace Seven.Structures
 		/// <param name="get">The key of the item to get.</param>
 		/// <param name="comparison">Comparison technique (must match the sorting technique of the structure).</param>
 		/// <returns>The found item.</returns>
-		/// <exception cref="Seven.Error">Thrown when getting a non-existing item to the structure.</exception>
 		T Get<Key>(Key get, Compare<T, Key> comparison);
 		#endregion
 		#region void Remove<Key>(Key removal, Compare<T, Key> comparison);
@@ -48,7 +47,6 @@ namespace Seven.Structures
 		/// <typeparam name="Key">The type of the key.</typeparam>
 		/// <param name="removal">The key of the item to be removed.</param>
 		/// <param name="comparison">Comparison technique (must match the sorting technique of the structure).</param>
-		/// <exception cref="Seven.Error">Thrown when removing a non-existing item to the structure.</exception>
 		void Remove<Key>(Key removal, Compare<T, Key> comparison);
 		#endregion
 		#region void StepperReverse(Step<T> step_delegate);
@@ -367,7 +365,7 @@ namespace Seven.Structures
 				else // (compareResult == Copmarison.Less)
 					_current = _current.RightChild;
 			}
-			throw new Error("Attempting to get a non-existing value: " + key.ToString() + ".");
+			throw new System.InvalidOperationException("Attempting to get a non-existing value: " + key.ToString() + ".");
 		}
 		#endregion
 		#region public void Add(T addition)
@@ -457,7 +455,7 @@ namespace Seven.Structures
 		public virtual void Stepper(Step<T> step_function, T minimum, T maximum)
 		{
 			if (this._compare(minimum, maximum) == Comparison.Greater)
-				throw new Error("invalid minimum and maximum values on Avl traversal.");
+				throw new System.InvalidOperationException("invalid minimum and maximum values on Avl traversal.");
 			AvlTreeLinked<T>.Stepper(step_function, _root);
 		}
 		#endregion
@@ -470,7 +468,7 @@ namespace Seven.Structures
 		public virtual void Stepper(StepRef<T> step_function, T minimum, T maximum)
 		{
 			if (this._compare(minimum, maximum) == Comparison.Greater)
-				throw new Error("invalid minimum and maximum values on Avl traversal.");
+				throw new System.InvalidOperationException("invalid minimum and maximum values on Avl traversal.");
 			this.Stepper(step_function, _root, minimum, maximum);
 		}
 		#endregion
@@ -483,7 +481,7 @@ namespace Seven.Structures
 		public virtual StepStatus Stepper(StepBreak<T> step_function, T minimum, T maximum)
 		{
 			if (this._compare(minimum, maximum) == Comparison.Greater)
-				throw new Error("invalid minimum and maximum values on Avl traversal.");
+				throw new System.ArgumentException("invalid minimum and maximum values on Avl traversal.");
 			return this.Stepper(step_function, _root, minimum, maximum);
 		}
 		#endregion
@@ -496,7 +494,7 @@ namespace Seven.Structures
 		public virtual StepStatus Stepper(StepRefBreak<T> step_function, T minimum, T maximum)
 		{
 			if (this._compare(minimum, maximum) == Comparison.Greater)
-				throw new Error("invalid minimum and maximum values on Avl traversal.");
+				throw new System.ArgumentException("invalid minimum and maximum values on Avl traversal.");
 			return this.Stepper(step_function, _root, minimum, maximum);
 		}
 		#endregion
@@ -509,7 +507,7 @@ namespace Seven.Structures
 		public virtual void StepperReverse(Step<T> step_function, T minimum, T maximum)
 		{
 			if (this._compare(minimum, maximum) == Comparison.Greater)
-				throw new Error("invalid minimum and maximum values on Avl traversal.");
+				throw new System.ArgumentException("invalid minimum and maximum values on Avl traversal.");
 			AvlTreeLinked<T>.StepperReverse(step_function, _root);
 		}
 		#endregion
@@ -522,7 +520,7 @@ namespace Seven.Structures
 		public virtual void StepperReverse(StepRef<T> step_function, T minimum, T maximum)
 		{
 			if (this._compare(minimum, maximum) == Comparison.Greater)
-				throw new Error("invalid minimum and maximum values on Avl traversal.");
+				throw new System.ArgumentException("invalid minimum and maximum values on Avl traversal.");
 			this.StepperReverse(step_function, _root, minimum, maximum);
 		}
 		#endregion
@@ -535,7 +533,7 @@ namespace Seven.Structures
 		public virtual StepStatus StepperReverse(StepBreak<T> step_function, T minimum, T maximum)
 		{
 			if (this._compare(minimum, maximum) == Comparison.Greater)
-				throw new Error("invalid minimum and maximum values on Avl traversal.");
+				throw new System.ArgumentNullException("invalid minimum and maximum values on Avl traversal.");
 			return this.StepperReverse(step_function, _root, minimum, maximum);
 		}
 		#endregion
@@ -548,7 +546,7 @@ namespace Seven.Structures
 		public virtual StepStatus StepperReverse(StepRefBreak<T> step_function, T minimum, T maximum)
 		{
 			if (this._compare(minimum, maximum) == Comparison.Greater)
-				throw new Error("invalid minimum and maximum values on Avl traversal.");
+				throw new System.ArgumentException("invalid minimum and maximum values on Avl traversal.");
 			return this.StepperReverse(step_function, _root, minimum, maximum);
 		}
 		#endregion
@@ -608,7 +606,7 @@ namespace Seven.Structures
 			if (avlTree == null) return new Node(addition);
 			Comparison compareResult = this._compare(avlTree.Value, addition);
 			if (compareResult == Comparison.Equal)
-				throw new Error("Attempting to add an already existing id exists.");
+				throw new System.InvalidOperationException("Attempting to add an already existing id exists.");
 			else if (compareResult == Comparison.Greater)
 				avlTree.LeftChild = Add(addition, avlTree.LeftChild);
 			else // (compareResult == Comparison.Less)
@@ -706,7 +704,7 @@ namespace Seven.Structures
 				SetHeight(avlTree);
 				return Balance(avlTree);
 			}
-			throw new Error("Attempting to remove a non-existing entry.");
+			throw new System.InvalidOperationException("Attempting to remove a non-existing entry.");
 		}
 		#endregion
 		#region private Node Remove<Key>(Key removal, Compare<T, Key> comparison, Node avlTree)
@@ -749,7 +747,7 @@ namespace Seven.Structures
 				SetHeight(avlTree);
 				return Balance(avlTree);
 			}
-			throw new Error("Attempting to remove a non-existing entry.");
+			throw new System.InvalidOperationException("Attempting to remove a non-existing entry.");
 		}
 		#endregion
 		#region private Node RemoveLeftMost(Node avlTree, out Node leftMost)
@@ -1169,10 +1167,10 @@ namespace Seven.Structures
 	//	/// <remarks>Runtime: O(1).</remarks>
 	//	internal AvlTree_Array(Compare<T> compare, int maximumSize)
 	//	{
-	//		throw new Error("still in development");
+	//		throw new System.Exception("still in development");
 
 	//		if (maximumSize < 1)
-	//			throw new Error("");
+	//			throw new System.Exception("");
 	//		this._avlTree = new Link<bool, T>[maximumSize + 1];
 	//		this._count = 0;
 	//		this._compare = compare;

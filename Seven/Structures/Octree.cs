@@ -290,30 +290,30 @@ namespace Seven.Structures
 
 			// check the locate and compare delegates
 			if (locate == null)
-				throw new Error("null reference on location delegate during Octree construction");
+				throw new System.ArgumentNullException("locate", "null reference on location delegate during Octree construction");
 			if (compare == null)
-				throw new Error("null reference on compare delegate during Octree construction");
+				throw new System.ArgumentNullException("compare", "null reference on compare delegate during Octree construction");
 
 			// Check the min/max values
 			if (min == null)
-				throw new Error("null reference on min dimensions during Octree construction");
+				throw new System.ArgumentNullException("min", "null reference on min dimensions during Octree construction");
 			if (max == null)
-				throw new Error("null reference on max dimensions during Octree construction");
+				throw new System.ArgumentNullException("max", "null reference on max dimensions during Octree construction");
 			if (min.Length != max.Length)
-				throw new Error("min/max values for omnitree mismatch dimensions");
+				throw new System.ArgumentException("min/max values for omnitree mismatch dimensions");
 			for (int i = 0; i < min.Length; i++)
 				if (compare(min[i], max[i]) != Comparison.Less)
-					throw new Error("invalid min/max values. not all min values are less than the max values");
+					throw new System.ArgumentException("invalid min/max values. not all min values are less than the max values");
 
 			// Check the average delegate
 			if (average == null)
-				throw new Error("null reference on average delegate during Octree construction");
+				throw new System.ArgumentNullException("average");
 			M[] origin_test = new M[min.Length];
 			for (int i = 0; i < min.Length; i++)
 				origin_test[i] = average(min[i], max[i]);
 			for (int i = 0; i < min.Length; i++)
 				if (compare(min[i], origin_test[i]) != Comparison.Less || compare(origin_test[i], max[i]) != Comparison.Less)
-					throw new Error("invalid average function. not all average values were computed to be between the min/max values.");
+					throw new System.ArgumentException("invalid average function. not all average values were computed to be between the min/max values.");
 
 			M[] origin = new M[min.Length];
 			for (int i = 0; i < min.Length; i++)
@@ -349,7 +349,7 @@ namespace Seven.Structures
 		public void Add(T addition)
 		{
 			if (this._count == int.MaxValue)
-				throw new Error("(Count == int.MaxValue) max Octree size reached (change ints to longs if you need to).");
+				throw new System.InvalidOperationException("(Count == int.MaxValue) max Octree size reached (change ints to longs if you need to).");
 
 			// dynamic tree sizes
 			if (this._loadPlusOnePowered < this._count)
@@ -366,7 +366,7 @@ namespace Seven.Structures
 			M[] ms = new M[3] { x, y, z };
 
 			if (!EncapsulationCheck(this._top.Min, this._top.Max, ms))
-				throw new Error("a node was updated to be out of bounds (found in an addition)");
+				throw new System.InvalidOperationException("a node was updated to be out of bounds (found in an addition)");
 
 			if (this._top is Leaf && (this._top as Leaf).Count >= this._load)
 			{
@@ -382,7 +382,7 @@ namespace Seven.Structures
 					if (!EncapsulationCheck(this._top.Min, this._top.Max, child_ms))
 					{
 						this._count--;
-						throw new Error("a node was updated to be out of bounds (found in an addition)");
+						throw new System.InvalidOperationException("a node was updated to be out of bounds (found in an addition)");
 					}
 					else
 						Add(list.Value, this._top, child_ms, 0);
@@ -430,7 +430,7 @@ namespace Seven.Structures
 						M[] child_ms = new M[3] { x, y, z };
 
 						if (child_ms == null || child_ms.Length != this._dimensions)
-							throw new Error("the location function for omnitree is invalid.");
+							throw new System.InvalidOperationException("the location function for omnitree is invalid.");
 
 						if (EncapsulationCheck(growth.Min, growth.Max, child_ms))
 							Add(list.Value, growth, child_ms, depth);
@@ -439,7 +439,7 @@ namespace Seven.Structures
 							if (EncapsulationCheck(this._top.Min, this._top.Max, child_ms))
 							{
 								this._count--;
-								throw new Error("a node was updated to be out of bounds (found in an addition)");
+								throw new System.InvalidOperationException("a node was updated to be out of bounds (found in an addition)");
 							}
 							else
 								Add(list.Value, this._top, child_ms, depth);
@@ -1007,7 +1007,7 @@ namespace Seven.Structures
 						if (temp == null)
 						{
 							this._count--;
-							throw new Error("a node was updated to be out of bounds (found in an update)");
+							throw new System.InvalidOperationException("a node was updated to be out of bounds (found in an update)");
 						}
 						else
 							this.Add(item, temp, ms, depth);
@@ -1042,7 +1042,7 @@ namespace Seven.Structures
 							if (temp == null)
 							{
 								this._count--;
-								throw new Error("a node was updated to be out of bounds (found in an update)");
+								throw new System.InvalidOperationException("a node was updated to be out of bounds (found in an update)");
 							}
 							else
 								this.Add(item, temp, ms, depth);
@@ -1115,7 +1115,7 @@ namespace Seven.Structures
 						if (temp == null)
 						{
 							this._count--;
-							throw new Error("a node was updated to be out of bounds (found in an update)");
+							throw new System.InvalidOperationException("a node was updated to be out of bounds (found in an update)");
 						}
 						else
 							this.Add(item, temp, ms, depth);
@@ -1150,7 +1150,7 @@ namespace Seven.Structures
 							if (temp == null)
 							{
 								this._count--;
-								throw new Error("a node was updated to be out of bounds (found in an update)");
+								throw new System.InvalidOperationException("a node was updated to be out of bounds (found in an update)");
 							}
 							else
 								this.Add(item, temp, ms, depth);
@@ -1322,7 +1322,7 @@ namespace Seven.Structures
 					M[] ms = new M[3] { x, y, z };
 
 					if (ms == null || ms.Length != this._dimensions)
-						throw new Error("the location function for omnitree is invalid.");
+						throw new System.ArgumentNullException("the location function for omnitree is invalid.");
 
 					if (EncapsulationCheck(min, max, ms))
 						function(list.Value);
@@ -1364,7 +1364,7 @@ namespace Seven.Structures
 					M[] ms = new M[3] { x, y, z };
 
 					if (ms == null || ms.Length != this._dimensions)
-						throw new Error("the location function for omnitree is invalid.");
+						throw new System.ArgumentNullException("the location function for omnitree is invalid.");
 
 					if (EncapsulationCheck(min, max, ms))
 						function(ref list._value);
@@ -1405,7 +1405,7 @@ namespace Seven.Structures
 					M[] ms = new M[3] { x, y, z };
 
 					if (ms == null || ms.Length != this._dimensions)
-						throw new Error("the location function for omnitree is invalid.");
+						throw new System.ArgumentNullException("the location function for omnitree is invalid.");
 
 					if (EncapsulationCheck(min, max, ms))
 						if (function(list.Value) == StepStatus.Break)
@@ -1442,7 +1442,7 @@ namespace Seven.Structures
 					M[] ms = new M[3] { x, y, z };
 
 					if (ms == null || ms.Length != this._dimensions)
-						throw new Error("the location function for omnitree is invalid.");
+						throw new System.ArgumentNullException("the location function for omnitree is invalid.");
 
 					if (EncapsulationCheck(min, max, ms))
 						if (function(ref list._value) == StepStatus.Break)
@@ -1655,30 +1655,30 @@ namespace Seven.Structures
 
 			// check the locate and compare delegates
 			if (locate == null)
-				throw new Error("null reference on location delegate during Octree construction");
+				throw new System.ArgumentNullException("locate");
 			if (compare == null)
-				throw new Error("null reference on compare delegate during Octree construction");
+				throw new System.ArgumentNullException("compare");
 
 			// Check the min/max values
 			if (min == null)
-				throw new Error("null reference on min dimensions during Octree construction");
+				throw new System.ArgumentNullException("min");
 			if (max == null)
-				throw new Error("null reference on max dimensions during Octree construction");
+				throw new System.ArgumentNullException("max");
 			if (min.Length != max.Length)
-				throw new Error("min/max values for omnitree mismatch dimensions");
+				throw new System.ArgumentException("min/max values for omnitree mismatch dimensions");
 			for (int i = 0; i < min.Length; i++)
 				if (compare(min[i], max[i]) != Comparison.Less)
-					throw new Error("invalid min/max values. not all min values are less than the max values");
+					throw new System.ArgumentException("invalid min/max values. not all min values are less than the max values");
 
 			// Check the average delegate
 			if (average == null)
-				throw new Error("null reference on average delegate during Octree construction");
+				throw new System.ArgumentNullException("average");
 			M[] origin = new M[min.Length];
 			for (int i = 0; i < min.Length; i++)
 				origin[i] = average(min[i], max[i]);
 			for (int i = 0; i < min.Length; i++)
 				if (compare(min[i], origin[i]) != Comparison.Less || compare(origin[i], max[i]) != Comparison.Less)
-					throw new Error("invalid average function. not all average values were computed to be between the min/max values.");
+					throw new System.ArgumentException("invalid average function. not all average values were computed to be between the min/max values.");
 
 			this._locate = locate;
 			this._average = average;
@@ -1710,7 +1710,7 @@ namespace Seven.Structures
 		public void Add(T addition)
 		{
 			if (this._count == int.MaxValue)
-				throw new Error("(Count == int.MaxValue) max Octree size reached (change ints to longs if you need to).");
+				throw new System.InvalidOperationException("(Count == int.MaxValue) max Octree size reached (change ints to longs if you need to).");
 
 			// dynamic tree sizes
 			if (this._loadPlusOnePowered < this._count)
@@ -1727,10 +1727,10 @@ namespace Seven.Structures
 			M[] ms = new M[3] { x, y, z };
 
 			if (ms == null || ms.Length != this._dimensions)
-				throw new Error("the location function for omnitree is invalid.");
+				throw new System.ArgumentException("the location function for omnitree is invalid.");
 
 			if (!EncapsulationCheck(this._top.Min, this._top.Max, ms))
-				throw new Error("out of bounds during addition");
+				throw new System.ArgumentException("out of bounds during addition");
 
 			if (this._top is Leaf && (this._top as Leaf).Count >= this._load)
 			{
@@ -1744,12 +1744,12 @@ namespace Seven.Structures
 					M[] child_ms = new M[3] { x_2, y_2, z_2 };
 
 					if (child_ms == null || child_ms.Length != this._dimensions)
-						throw new Error("the location function for omnitree is invalid.");
+						throw new System.ArgumentException("the location function for omnitree is invalid.");
 
 					if (!EncapsulationCheck(this._top.Min, this._top.Max, child_ms))
 					{
 						this._count--;
-						throw new Error("a node was updated to be out of bounds (found in an addition)");
+						throw new System.InvalidOperationException("a node was updated to be out of bounds (found in an addition)");
 					}
 					else
 						Add(leaf.Contents[i], this._top, child_ms, 0);
@@ -1794,7 +1794,7 @@ namespace Seven.Structures
 						M[] child_ms = new M[3] { x_2, y_2, z_2 };
 
 						if (child_ms == null || child_ms.Length != this._dimensions)
-							throw new Error("the location function for omnitree is invalid.");
+							throw new System.ArgumentException("the location function for omnitree is invalid.");
 
 						if (EncapsulationCheck(growth.Min, growth.Max, child_ms))
 							Add(leaf.Contents[i], growth, child_ms, depth);
@@ -1803,7 +1803,7 @@ namespace Seven.Structures
 							if (EncapsulationCheck(this._top.Min, this._top.Max, child_ms))
 							{
 								this._count--;
-								throw new Error("a node was updated to be out of bounds (found in an addition)");
+								throw new System.InvalidOperationException("a node was updated to be out of bounds (found in an addition)");
 							}
 							else
 								Add(leaf.Contents[i], this._top, child_ms, depth);
@@ -2060,7 +2060,7 @@ namespace Seven.Structures
 					M[] ms = new M[3] { x, y, z };
 
 					if (ms == null || ms.Length != this._dimensions)
-						throw new Error("the location function for omnitree is invalid.");
+						throw new System.ArgumentException("the location function for omnitree is invalid.");
 
 					if (this.EncapsulationCheck(min, max, ms))
 						removals++;
@@ -2192,7 +2192,7 @@ namespace Seven.Structures
 					M[] ms = new M[3] { x, y, z };
 
 					if (ms == null || ms.Length != this._dimensions)
-						throw new Error("the location function for omnitree is invalid.");
+						throw new System.ArgumentException("the location function for omnitree is invalid.");
 
 					if (this.EncapsulationCheck(min, max, ms) && where(leaf.Contents[i]))
 						removals++;
@@ -2389,7 +2389,7 @@ namespace Seven.Structures
 					M[] ms = new M[3] { x, y, z };
 
 					if (ms == null || ms.Length != this._dimensions)
-						throw new Error("the location function for omnitree is invalid.");
+						throw new System.ArgumentException("the location function for omnitree is invalid.");
 
 					if (!EncapsulationCheck(leaf.Min, leaf.Max, ms))
 					{
@@ -2407,7 +2407,7 @@ namespace Seven.Structures
 						if (temp == null)
 						{
 							this._count--;
-							throw new Error("a node was updated to be out of bounds (found in an update)");
+							throw new System.InvalidOperationException("a node was updated to be out of bounds (found in an update)");
 						}
 						else
 							this.Add(item, temp, ms, depth);
@@ -2468,7 +2468,7 @@ namespace Seven.Structures
 					M[] ms = new M[3] { x, y, z };
 
 					if (ms == null || ms.Length != this._dimensions)
-						throw new Error("the location function for omnitree is invalid.");
+						throw new System.ArgumentException("the location function for omnitree is invalid.");
 
 
 					if (!EncapsulationCheck(leaf.Min, leaf.Max, ms))
@@ -2487,7 +2487,7 @@ namespace Seven.Structures
 						if (temp == null)
 						{
 							this._count--;
-							throw new Error("a node was updated to be out of bounds (found in an update)");
+							throw new System.InvalidOperationException("a node was updated to be out of bounds (found in an update)");
 						}
 						else
 							this.Add(item, temp, ms, depth);
@@ -2664,7 +2664,7 @@ namespace Seven.Structures
 					M[] ms = new M[3] { x, y, z };
 
 					if (ms == null || ms.Length != this._dimensions)
-						throw new Error("the location function for omnitree is invalid.");
+						throw new System.ArgumentException("the location function for omnitree is invalid.");
 
 					if (EncapsulationCheck(min, max, ms))
 						function(leaf.Contents[i]);
@@ -2708,7 +2708,7 @@ namespace Seven.Structures
 					M[] ms = new M[3] { x, y, z };
 
 					if (ms == null || ms.Length != this._dimensions)
-						throw new Error("the location function for omnitree is invalid.");
+						throw new System.ArgumentException("the location function for omnitree is invalid.");
 
 					if (EncapsulationCheck(min, max, ms))
 						function(ref leaf.Contents[i]);
@@ -2752,7 +2752,7 @@ namespace Seven.Structures
 					M[] ms = new M[3] { x, y, z };
 
 					if (ms == null || ms.Length != this._dimensions)
-						throw new Error("the location function for omnitree is invalid.");
+						throw new System.ArgumentException("the location function for omnitree is invalid.");
 
 					if (EncapsulationCheck(min, max, ms))
 						if (function(leaf.Contents[i]) == StepStatus.Break)
@@ -2800,7 +2800,7 @@ namespace Seven.Structures
 					M[] ms = new M[3] { x, y, z };
 
 					if (ms == null || ms.Length != this._dimensions)
-						throw new Error("the location function for omnitree is invalid.");
+						throw new System.ArgumentException("the location function for omnitree is invalid.");
 
 					if (EncapsulationCheck(min, max, ms))
 						if (function(ref leaf.Contents[i]) == StepStatus.Break)

@@ -81,7 +81,7 @@ namespace Seven.Structures
 				if (this._count > 0)
 					return this._tail.Value;
 				else
-					throw new Error("attempting to get the newest item in an empty queue");
+					throw new System.InvalidOperationException("attempting to get the newest item in an empty queue");
 			}
 		}
 		#endregion
@@ -94,7 +94,7 @@ namespace Seven.Structures
 				if (this._count > 0)
 					return this._head.Value;
 				else
-					throw new Error("attempting to get the oldet item in an empty queue");
+					throw new System.InvalidOperationException("attempting to get the oldet item in an empty queue");
 			}
 		}
 		#endregion
@@ -163,7 +163,7 @@ namespace Seven.Structures
 		public T Dequeue()
 		{
 			if (_head == null)
-				throw new Error("deque from an empty queue");
+				throw new System.InvalidOperationException("deque from an empty queue");
 			T value = _head.Value;
 			if (_head == _tail)
 				_tail = null;
@@ -178,7 +178,7 @@ namespace Seven.Structures
 		public T Peek()
 		{
 			if (_head == null)
-				throw new Error("peek from an empty queue");
+				throw new System.InvalidOperationException("peek from an empty queue");
 			T returnValue = _head.Value;
 			return returnValue;
 		}
@@ -239,7 +239,7 @@ namespace Seven.Structures
 						continue;
 					default:
 						current = current.Next;
-						throw new Error("not implemented");
+						throw new System.NotImplementedException();
 				}
 			}
 			return StepStatus.Continue;
@@ -268,7 +268,7 @@ namespace Seven.Structures
 					default:
 						current.Value = temp;
 						current = current.Next;
-						throw new Error("not implemented");
+						throw new System.NotImplementedException();
 				}
 			}
 			return StepStatus.Continue;
@@ -359,7 +359,7 @@ namespace Seven.Structures
 			set
 			{
 				if (value < 1)
-					throw new Error("Attempting to set a minimum capacity to a negative or zero value.");
+					throw new System.InvalidOperationException("Attempting to set a minimum capacity to a negative or zero value.");
 				else if (value > _queue.Length)
 				{
 					T[] newList = new T[value];
@@ -380,7 +380,7 @@ namespace Seven.Structures
 				if (this._count > 0)
 					return this._queue[(this._start + this._count) % this._queue.Length];
 				else
-					throw new Error("attempting to get the newest item in an empty queue");
+					throw new System.InvalidOperationException("attempting to get the newest item in an empty queue");
 			}
 		}
 		#endregion
@@ -393,7 +393,7 @@ namespace Seven.Structures
 				if (this._count > 0)
 					return this._queue[this._start];
 				else
-					throw new Error("attempting to get the oldet item in an empty queue");
+					throw new System.InvalidOperationException("attempting to get the oldet item in an empty queue");
 			}
 		}
 		#endregion
@@ -434,7 +434,7 @@ namespace Seven.Structures
 			{
 				if (_queue.Length > int.MaxValue / 2)
 				{
-					throw new Error("your queue is so large that it can no longer double itself (Int32.MaxValue barrier reached).");
+					throw new System.InvalidOperationException("your queue is so large that it can no longer double itself (Int32.MaxValue barrier reached).");
 				}
 				T[] newQueue = new T[_queue.Length * 2];
 				for (int i = 0; i < _count; i++)
@@ -451,7 +451,7 @@ namespace Seven.Structures
 		public T Dequeue()
 		{
 			if (_count == 0)
-				throw new Error("attempting to dequeue from an empty queue.");
+				throw new System.InvalidOperationException("attempting to dequeue from an empty queue.");
 			if (_count < _queue.Length / 4 && _queue.Length / 2 > _minimumCapacity)
 			{
 				T[] newQueue = new T[_queue.Length / 2];
@@ -515,7 +515,7 @@ namespace Seven.Structures
 					case StepStatus.Continue:
 						continue;
 					default:
-						throw new Error("not implemented");
+						throw new System.NotImplementedException();
 				}
 			return StepStatus.Continue;
 		}
@@ -534,7 +534,7 @@ namespace Seven.Structures
 					case StepStatus.Continue:
 						continue;
 					default:
-						throw new Error("not implemented");
+						throw new System.NotImplementedException();
 				}
 			return StepStatus.Continue;
 		}

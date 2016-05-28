@@ -42,7 +42,7 @@ namespace Seven.Parallels
 			Operation run)
 		{
 			if (run == null)
-				throw new Error("null reference: run");
+				throw new System.ArgumentNullException("run");
 
 			return run.BeginInvoke(
 				(IAsyncResult ar) => { },
@@ -57,9 +57,9 @@ namespace Seven.Parallels
 			Resolve resolve)
 		{
 			if (run == null)
-				throw new Error("null reference: run");
+				throw new System.ArgumentNullException("run");
 			if (resolve == null)
-				throw new Error("null reference: resolve");
+				throw new System.ArgumentNullException("resolve");
 
 			SynchronizationContext context = SynchronizationContext.Current;
 
@@ -76,9 +76,9 @@ namespace Seven.Parallels
 			Callback report)
 		{
 			if (run == null)
-				throw new Error("null reference: run");
+				throw new System.ArgumentNullException("run");
 			if (report == null)
-				throw new Error("null reference: report");
+				throw new System.ArgumentNullException("report");
 
 			SynchronizationContext context = SynchronizationContext.Current;
 
@@ -101,11 +101,11 @@ namespace Seven.Parallels
 			Resolve resolve)
 		{
 			if (run == null)
-				throw new Error("null reference: run");
+				throw new System.ArgumentNullException("run");
 			if (report == null)
-				throw new Error("null reference: report");
+				throw new System.ArgumentNullException("report");
 			if (resolve == null)
-				throw new Error("null reference: resolve");
+				throw new System.ArgumentNullException("resolve");
 
 			SynchronizationContext context = SynchronizationContext.Current;
 

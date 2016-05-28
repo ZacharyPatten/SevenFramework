@@ -150,7 +150,7 @@ namespace Seven
 				return StepStatus.Continue;
 			});
 			if (contains == false)
-				throw new Error("item not found in structure");
+				throw new System.InvalidOperationException("item not found in structure");
 			return item;
 		}
 

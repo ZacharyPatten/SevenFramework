@@ -3,7 +3,7 @@
 // LISCENSE: See "LISCENSE.md" in th root project directory.
 // SUPPORT: See "SUPPORT.md" in the root project directory.
 
-using Seven.Structures; // needed for the reflection extension methods
+using Seven.Structures;
 using System;
 using System.Linq.Expressions;
 
@@ -26,13 +26,13 @@ namespace Seven
 			string code, string method, string _class, string _namespace, bool _unsafe, string[] name_spaces, string[] references)
 		{
 			if (code == null)
-				throw new Error("code == null");
+				throw new System.ArgumentNullException("code");
 			if (method == null)
-				throw new Error("method == null");
+				throw new System.ArgumentNullException("method");
 			if (_class == null)
-				throw new Error("_class == null");
+				throw new System.ArgumentNullException("_class");
 			if (_namespace == null)
-				throw new Error("_namespace == null");
+				throw new System.ArgumentNullException("_namespace");
 
 			string full_code = string.Empty;
 
@@ -66,7 +66,7 @@ namespace Seven
 				foreach (System.CodeDom.Compiler.CompilerError compiler_error in results.Errors)
 					error += compiler_error.ErrorText.ToString() + "\n";
 
-				throw new Error(error);
+				throw new System.FormatException(error);
 			}
 
 			System.Reflection.MethodInfo generate =
@@ -82,7 +82,7 @@ namespace Seven
 		internal static T Compile<T>(string code)
 		{
 			if (code == null)
-				throw new Error("code == null");
+				throw new System.ArgumentNullException("code == null");
 
 			string type_string = Meta.ConvertTypeToCsharpSource(typeof(T));
 
@@ -126,7 +126,7 @@ namespace Seven.Generated
 				foreach (System.CodeDom.Compiler.CompilerError compiler_error in results.Errors)
 					error += compiler_error.ErrorText.ToString() + "\n";
 
-				throw new Error(error);
+				throw new System.FormatException(error);
 			}
 
 			System.Reflection.MethodInfo generate =
@@ -141,7 +141,7 @@ namespace Seven.Generated
 		public static string ConvertTypeToCsharpSource(System.Type type)
 		{
 			if (type == null)
-				throw new Error("type == null");
+				throw new System.ArgumentNullException("type");
 			// no generics
 			if (!type.IsGenericType)
 				return type.ToString();
@@ -222,12 +222,31 @@ namespace Seven.Generated
 			}
 		}
 
-		/// <summary>Converts a "System.Type" into a string as it would appear in C# source code.</summary>
-		/// <param name="type">The "System.Type" to convert to a string.</param>
-		/// <returns>The string as the "System.Type" would appear in C# source code.</returns>
-		public static string ToCsharpSource(this System.Type type)
+		/// <summary>Takes a C# source code string representation fo a type and converts it to its runtime string name.</summary>
+		/// <param name="name">The name to format.</param>
+		/// <returns>The type name formatted as it exists during runtime.</returns>
+		internal static string FormatTypeNameFromCsharpSource(string name)
 		{
-			return ConvertTypeToCsharpSource(type);
+			throw new System.NotImplementedException();
+			//name = name.Trim();
+			//if (name.Contains("<") || name.Contains(">") || name.Contains(","))
+			//{
+			//	if (!name.Contains("<"))
+			//		throw new System.FormatException();
+			//	if (!name.Contains(">"))
+			//		throw new System.FormatException();
+			//	string[] type_split = name.Split('<', '>');
+			//	if (type_split.L)
+			//	for (int i = 0; i < type_split.Length; i++)
+			//		type_split[i] = type_split[i].Trim();
+				
+
+			//	if (type_split.Length != 3 || string.IsNullOrWhiteSpace
+
+
+			//}
+			//else
+			//	return name;
 		}
 
 		internal delegate Expression UnaryOperationHelperDelegate(Expression operand, LabelTarget returnLabel);

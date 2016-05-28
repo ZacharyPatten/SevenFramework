@@ -4,7 +4,6 @@ using System.Linq.Expressions;
 using Seven;
 using Seven.Structures;
 using Seven.Mathematics;
-using System.Reflection;
 
 namespace Tutorial_Mathematics
 {

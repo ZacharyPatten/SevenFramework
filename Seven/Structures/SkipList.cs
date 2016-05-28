@@ -137,7 +137,7 @@ namespace Seven.Structures
 					if (_current == _skiplist.header)
 					{
 						//string msg = list.resManager.GetString("BadEnumAccess");
-						throw new Error("BadEnumAccess");
+						throw new System.Exception("BadEnumAccess");
 					}
 					// Finally, all checks have passed. Get the current entry.
 					else
@@ -255,7 +255,7 @@ namespace Seven.Structures
 			else
 			{
 				//string msg = resManager.GetString("KeyExistsAdd");
-				throw new Error("KeyExistsAdd");
+				throw new System.InvalidOperationException("KeyExistsAdd");
 			}
 		}
 		#endregion
@@ -525,7 +525,7 @@ namespace Seven.Structures
 			if (key == null)
 			{
 				//string msg = resManager.GetString("NullKey");
-				throw new Error("null key");
+				throw new System.ArgumentNullException("key");
 			}
 
 			bool result;
@@ -639,7 +639,7 @@ namespace Seven.Structures
 			// Make sure key is comparable.
 			if (!(key is System.IComparable))
 			{
-				throw new Error("Comparable");
+				throw new System.Exception("Comparable");
 			}
 
 			bool found = false;

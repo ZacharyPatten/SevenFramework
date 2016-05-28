@@ -102,7 +102,6 @@ namespace Seven.Algorithms
 			const int M = 397;
 			const uint MatrixA = 0x9908b0df;
 			const int N = 624;
-			const double Reciprocal = 1.0 / (uint.MaxValue + 1.0); // 1.0 / 4294967296.0
 			const uint UpperMask = 0x80000000;
 			uint[] Mag01 = { 0x0U, MatrixA };
 			uint[] _mt = new uint[N];

@@ -112,7 +112,7 @@ namespace Seven.Structures
 			if (this._tree.TryGet(parent, out nodeData))
 				return nodeData.Children.Contains(node);
 			else
-				throw new Error("Attempting to get the children of a non-existing node");
+				throw new System.InvalidOperationException("Attempting to get the children of a non-existing node");
 		}
 		#endregion
 		#region public T Parent(T child)
@@ -125,7 +125,7 @@ namespace Seven.Structures
 			if (this._tree.TryGet(child, out nodeData))
 				return nodeData.Parent;
 			else
-				throw new Error("Attempting to get the parent of a non-existing node");
+				throw new System.InvalidOperationException("Attempting to get the parent of a non-existing node");
 		}
 		#endregion
 		#region public void Children(T parent, Step<T> step_function)
@@ -138,7 +138,7 @@ namespace Seven.Structures
 			if (this._tree.TryGet(parent, out nodeData))
 				nodeData.Children.Stepper(step_function);
 			else
-				throw new Error("Attempting to get the children of a non-existing node");
+				throw new System.InvalidOperationException("Attempting to get the children of a non-existing node");
 		}
 		#endregion
 		#region public void Add(T addition, T parent)
@@ -154,7 +154,7 @@ namespace Seven.Structures
 				nodeData.Children.Add(addition);
 			}
 			else
-				throw new Error("Attempting to add a node to a non-existing parent");
+				throw new System.InvalidOperationException("Attempting to add a node to a non-existing parent");
 		}
 		#endregion
 		#region public void Remove(T removal)
@@ -169,7 +169,7 @@ namespace Seven.Structures
 				RemoveRecursive(removal);
 			}
 			else
-				throw new Error("Attempting to remove a non-existing node");
+				throw new System.InvalidOperationException("Attempting to remove a non-existing node");
 		}
 		#endregion
 		#region public void Stepper(Step<T> step_function)

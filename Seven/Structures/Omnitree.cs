@@ -22,6 +22,9 @@ namespace Seven.Structures
 		#region public Stepper<T> this[params M[] coordinates];
 		Stepper<T> this[params M[] coordinates] { get; }
 		#endregion
+		#region public Stepper<T> this[params M[] coordinates];
+		Stepper<T> this[Get<M> coordinates] { get; }
+		#endregion
 		#region Get<M> Origin
 		/// <summary>Gets the dimensions of the center point of the Omnitree.</summary>
 		Get<M> Origin { get; }
@@ -51,6 +54,15 @@ namespace Seven.Structures
 		int Dimensions { get; }
 		#endregion
 		// methods
+		#region int CountSubSpace(Get<M> min, Get<M> max)
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="min"></param>
+		/// <param name="max"></param>
+		/// <returns></returns>
+		int CountSubSpace(Get<M> min, Get<M> max);
+		#endregion
 		#region void Update();
 		/// <summary>Iterates through the entire tree and ensures each item is in the proper leaf.</summary>
 		void Update();
@@ -162,9 +174,9 @@ namespace Seven.Structures
 		public static void Update<T, M>(this Omnitree<T, M> omniTree, M[] min, M[] max)
 		{
 			if (min.Length != omniTree.Dimensions)
-				throw new Error("Invalid argument (Omnitree<T, M>.Dimensions != min.Count)");
+				throw new System.ArgumentOutOfRangeException("min", "Invalid argument (Omnitree<T, M>.Dimensions != min.Count)");
 			if (max.Length != omniTree.Dimensions)
-				throw new Error("Invalid argument (Omnitree<T, M>.Dimensions != max.Count)");
+				throw new System.ArgumentOutOfRangeException("max", "Invalid argument (Omnitree<T, M>.Dimensions != max.Count)");
 			omniTree.Update(
 				Accessor.Get(min),
 				Accessor.Get(max));
@@ -177,9 +189,9 @@ namespace Seven.Structures
 		public static void Remove<T, M>(this Omnitree<T, M> omniTree, M[] min, M[] max)
 		{
 			if (min.Length != omniTree.Dimensions)
-				throw new Error("Invalid argument (Omnitree<T, M>.Dimensions != min.Count)");
+				throw new System.ArgumentOutOfRangeException("min", "Invalid argument (Omnitree<T, M>.Dimensions != min.Count)");
 			if (max.Length != omniTree.Dimensions)
-				throw new Error("Invalid argument (Omnitree<T, M>.Dimensions != max.Count)");
+				throw new System.ArgumentOutOfRangeException("max", "Invalid argument (Omnitree<T, M>.Dimensions != max.Count)");
 			omniTree.Remove(
 				Accessor.Get(min),
 				Accessor.Get(max));
@@ -193,9 +205,9 @@ namespace Seven.Structures
 		public static void Remove<T, M>(this Omnitree<T, M> omniTree, M[] min, M[] max, Predicate<T> where)
 		{
 			if (min.Length != omniTree.Dimensions)
-				throw new Error("Invalid argument (Omnitree<T, M>.Dimensions != min.Count)");
+				throw new System.ArgumentException("Invalid argument (Omnitree<T, M>.Dimensions != min.Count)");
 			if (max.Length != omniTree.Dimensions)
-				throw new Error("Invalid argument (Omnitree<T, M>.Dimensions != max.Count)");
+				throw new System.ArgumentException("Invalid argument (Omnitree<T, M>.Dimensions != max.Count)");
 			omniTree.Remove(
 				Accessor.Get(min),
 				Accessor.Get(max),
@@ -210,9 +222,9 @@ namespace Seven.Structures
 		public static void Stepper<T, M>(this Omnitree<T, M> omniTree, Step<T> function, M[] min, M[] max)
 		{
 			if (min.Length != omniTree.Dimensions)
-				throw new Error("Invalid argument (Omnitree<T, M>.Dimensions != min.Count)");
+				throw new System.ArgumentException("Invalid argument (Omnitree<T, M>.Dimensions != min.Count)");
 			if (max.Length != omniTree.Dimensions)
-				throw new Error("Invalid argument (Omnitree<T, M>.Dimensions != max.Count)");
+				throw new System.ArgumentException("Invalid argument (Omnitree<T, M>.Dimensions != max.Count)");
 			omniTree.Stepper(
 				function,
 				Accessor.Get(min),
@@ -227,9 +239,9 @@ namespace Seven.Structures
 		public static void Stepper<T, M>(this Omnitree<T, M> omniTree, StepRef<T> function, M[] min, M[] max)
 		{
 			if (min.Length != omniTree.Dimensions)
-				throw new Error("Invalid argument (Omnitree<T, M>.Dimensions != min.Count)");
+				throw new System.ArgumentException("Invalid argument (Omnitree<T, M>.Dimensions != min.Count)");
 			if (max.Length != omniTree.Dimensions)
-				throw new Error("Invalid argument (Omnitree<T, M>.Dimensions != max.Count)");
+				throw new System.ArgumentException("Invalid argument (Omnitree<T, M>.Dimensions != max.Count)");
 			omniTree.Stepper(
 				function,
 				Accessor.Get(min),
@@ -244,9 +256,9 @@ namespace Seven.Structures
 		public static StepStatus Stepper<T, M>(this Omnitree<T, M> omniTree, StepBreak<T> function, M[] min, M[] max)
 		{
 			if (min.Length != omniTree.Dimensions)
-				throw new Error("Invalid argument (Omnitree<T, M>.Dimensions != min.Count)");
+				throw new System.ArgumentException("Invalid argument (Omnitree<T, M>.Dimensions != min.Count)");
 			if (max.Length != omniTree.Dimensions)
-				throw new Error("Invalid argument (Omnitree<T, M>.Dimensions != max.Count)");
+				throw new System.ArgumentException("Invalid argument (Omnitree<T, M>.Dimensions != max.Count)");
 			return omniTree.Stepper(
 				function,
 				Accessor.Get(min),
@@ -261,9 +273,9 @@ namespace Seven.Structures
 		public static StepStatus Stepper<T, M>(this Omnitree<T, M> omniTree, StepRefBreak<T> function, M[] min, M[] max)
 		{
 			if (min.Length != omniTree.Dimensions)
-				throw new Error("Invalid argument (Omnitree<T, M>.Dimensions != min.Count)");
+				throw new System.ArgumentException("Invalid argument (Omnitree<T, M>.Dimensions != min.Count)");
 			if (max.Length != omniTree.Dimensions)
-				throw new Error("Invalid argument (Omnitree<T, M>.Dimensions != max.Count)");
+				throw new System.ArgumentException("Invalid argument (Omnitree<T, M>.Dimensions != max.Count)");
 			return omniTree.Stepper(
 				function,
 				Accessor.Get(min),
@@ -286,8 +298,9 @@ namespace Seven.Structures
 	/// <summary>Sorts items along N dimensions. The one data structure to rule them all. Made by Zachary Patten.</summary>
 	/// <typeparam name="T">The generice type of items to be stored in this octree.</typeparam>
 	/// <typeparam name="M">The type of the axis dimensions to sort the "T" values upon.</typeparam>
+	[System.Obsolete("Please use OmnitreeLinkedLinked instead of OmnitreeLinkedArray. I need to revalidate OmnitreeLinkedArray.", true)]
 	[System.Serializable]
-	public class OmnitreeLinkedArrayLists<T, M> : Omnitree<T, M>
+	public class OmnitreeLinkedArray<T, M> : Omnitree<T, M>
 	{
 		#region README NOTES
 		// 1 Dimensional:
@@ -439,7 +452,7 @@ namespace Seven.Structures
 		/// <param name="locate">A function for locating an item along the provided dimensions.</param>
 		/// <param name="compare">A function for comparing two items of the types of the axis.</param>
 		/// <param name="average">A function for computing the average between two items of the axis types.</param>
-		public OmnitreeLinkedArrayLists(
+		public OmnitreeLinkedArray(
 			int dimensions,
 			Get<M> min, Get<M> max,
 			Omnitree.Locate<T, M> locate,
@@ -449,30 +462,30 @@ namespace Seven.Structures
 		{
 			// check the locate and compare delegates
 			if (locate == null)
-				throw new Error("null reference on location delegate during Omnitree construction");
+				throw new System.ArgumentNullException("locate");
 			if (compare == null)
-				throw new Error("null reference on compare delegate during Omnitree construction");
+				throw new System.ArgumentNullException("compare");
 			if (equate == null)
-				throw new Error("null reference on equate delegate during Omnitree construction");
+				throw new System.ArgumentNullException("equate");
 
 			// Check the min/max values
 			if (min == null)
-				throw new Error("null reference on min dimensions during Omnitree construction");
+				throw new System.ArgumentNullException("min");
 			if (max == null)
-				throw new Error("null reference on max dimensions during Omnitree construction");
+				throw new System.ArgumentNullException("max");
 			for (int i = 0; i < dimensions; i++)
 				if (compare(min(i), max(i)) != Comparison.Less)
-					throw new Error("invalid min/max values. not all min values are less than the max values");
+					throw new System.ArgumentException("invalid min/max values. not all min values are less than the max values");
 
 			// Check the average delegate
 			if (average == null)
-				throw new Error("null reference on average delegate during Omnitree construction");
+				throw new System.ArgumentNullException("average");
 			M[] origin = new M[dimensions];
 			for (int i = 0; i < dimensions; i++)
 				origin[i] = average(min(i), max(i));
 			for (int i = 0; i < dimensions; i++)
 				if (compare(min(i), origin[i]) != Comparison.Less || compare(origin[i], max(i)) != Comparison.Less)
-					throw new Error("invalid average function. not all average values were computed to be between the min/max values.");
+					throw new System.ArgumentException("invalid average function. not all average values were computed to be between the min/max values.");
 
 			this._locate = locate;
 			this._average = average;
@@ -486,9 +499,9 @@ namespace Seven.Structures
 
 			this._load = _defaultLoad;
 			this._loadPlusOnePowered =
-				OmnitreeLinkedArrayLists<T, M>.Int_Power(this._load + 1, this._dimensions);
+				OmnitreeLinkedArray<T, M>.Int_Power(this._load + 1, this._dimensions);
 			this._loadPowered =
-				OmnitreeLinkedArrayLists<T, M>.Int_Power(_load, _dimensions);
+				OmnitreeLinkedArray<T, M>.Int_Power(_load, _dimensions);
 
 			this._origin = Accessor.Get(origin);
 
@@ -503,7 +516,7 @@ namespace Seven.Structures
 		/// <param name="locate">A function for locating an item along the provided dimensions.</param>
 		/// <param name="compare">A function for comparing two items of the types of the axis.</param>
 		/// <param name="average">A function for computing the average between two items of the axis types.</param>
-		public OmnitreeLinkedArrayLists(M[] min, M[] max,
+		public OmnitreeLinkedArray(M[] min, M[] max,
 			Omnitree.Locate<T, M> locate,
 			Equate<T> equate,
 			Compare<M> compare,
@@ -517,7 +530,7 @@ namespace Seven.Structures
 			average)
 		{
 			if (min.Length != max.Length)
-				throw new Error("invalid min/max dimensions when constructing an Omnitree_Array");
+				throw new System.ArgumentException("invalid min/max dimensions when constructing an Omnitree_Array");
 		}
 		#endregion
 		#region public Omnitree_LinkedArrayLists(M[] min, M[] max, Omnitree.Locate<T, M> locate, Compare<M> compare, Omnitree.Average<M> average)
@@ -527,7 +540,7 @@ namespace Seven.Structures
 		/// <param name="locate">A function for locating an item along the provided dimensions.</param>
 		/// <param name="compare">A function for comparing two items of the types of the axis.</param>
 		/// <param name="average">A function for computing the average between two items of the axis types.</param>
-		public OmnitreeLinkedArrayLists(M[] min, M[] max,
+		public OmnitreeLinkedArray(M[] min, M[] max,
 			Omnitree.Locate<T, M> locate,
 			Compare<M> compare,
 			Omnitree.Average<M> average) :
@@ -540,7 +553,7 @@ namespace Seven.Structures
 			average)
 		{
 			if (min.Length != max.Length)
-				throw new Error("invalid min/max dimensions when constructing an Omnitree_Array");
+				throw new System.ArgumentNullException("invalid min/max dimensions when constructing an Omnitree_Array");
 		}
 		#endregion
 		// properties
@@ -551,6 +564,15 @@ namespace Seven.Structures
 			{
 				Get<M> get = Accessor.Get(coordinates);
 				return (Step<T> step) => { this.Stepper(step, get, get); };
+			}
+		}
+		#endregion
+		#region public Stepper<T> this[Get<M> coordinates]
+		public Stepper<T> this[Get<M> coordinates]
+		{
+			get
+			{
+				return (Step<T> step) => { this.Stepper(step, coordinates, coordinates); };
 			}
 		}
 		#endregion
@@ -590,7 +612,7 @@ namespace Seven.Structures
 		/// <summary>The function for equating keys in this table.</summary>
 		public Equate<T> Equate { get { return this._equate; } }
 		#endregion
-		// methods
+		// methods (public)
 		#region public void Remove(Predicate<T> where)
 		/// <summary>Removes all the items qualified by the delegate.</summary>
 		/// <param name="where">The predicate to qualify removals.</param>
@@ -603,13 +625,19 @@ namespace Seven.Structures
 			{
 				this._load--;
 				this._loadPlusOnePowered =
-					OmnitreeLinkedArrayLists<T, M>.Int_Power(_load + 1, _dimensions);
+					OmnitreeLinkedArray<T, M>.Int_Power(_load + 1, _dimensions);
 				this._loadPowered =
-					OmnitreeLinkedArrayLists<T, M>.Int_Power(_load, _dimensions);
+					OmnitreeLinkedArray<T, M>.Int_Power(_load, _dimensions);
 			}
 
 			this._previousAddition = this._top;
 			this._previousAdditionDepth = 0;
+		}
+		#endregion
+		#region public int CountSubSpace(Get<M> min, Get<M> max)
+		public int CountSubSpace(Get<M> min, Get<M> max)
+		{
+			return CountSubSpace(_top, min, max);
 		}
 		#endregion
 		#region public StepStatus Stepper(StepRefBreak<T> function)
@@ -659,10 +687,10 @@ namespace Seven.Structures
 		#region public Omnitree_LinkedArrayLists<T, M> Clone()
 		/// <summary>Creates a shallow clone of this data structure.</summary>
 		/// <returns>A shallow clone of this data structure.</returns>
-		public OmnitreeLinkedArrayLists<T, M> Clone()
+		public OmnitreeLinkedArray<T, M> Clone()
 		{
 			// OPTIMIZATION NEEDED
-			OmnitreeLinkedArrayLists<T, M> clone = new OmnitreeLinkedArrayLists<T, M>(
+			OmnitreeLinkedArray<T, M> clone = new OmnitreeLinkedArray<T, M>(
 				this._dimensions,
 				this._top.Min,this._top.Max,
 				this._locate, this._equate, this._compare, this._average);
@@ -676,25 +704,25 @@ namespace Seven.Structures
 		public void Add(T addition)
 		{
 			if (this._count == int.MaxValue)
-				throw new Error("(Count == int.MaxValue) max Omnitree size reached (change ints to longs if you need to).");
+				throw new System.InvalidOperationException("(Count == int.MaxValue) max Omnitree size reached (change ints to longs if you need to).");
 
 			// dynamic tree sizes
 			if (this._loadPlusOnePowered < this._count)
 			{
 				this._load++;
 				this._loadPlusOnePowered =
-					OmnitreeLinkedArrayLists<T, M>.Int_Power(this._load + 1, this._dimensions);
+					OmnitreeLinkedArray<T, M>.Int_Power(this._load + 1, this._dimensions);
 				this._loadPowered =
-					OmnitreeLinkedArrayLists<T, M>.Int_Power(this._load, this._dimensions);
+					OmnitreeLinkedArray<T, M>.Int_Power(this._load, this._dimensions);
 			}
 
 			Get<M> ms = this._locate(addition);
 
 			if (ms == null)
-				throw new Error("the location function for omnitree is invalid.");
+				throw new System.ArgumentNullException("the location function for omnitree is invalid.");
 
 			if (!EncapsulationCheck(this._top.Min, this._top.Max, ms))
-				throw new Error("out of bounds during addition");
+				throw new System.ArgumentNullException("out of bounds during addition");
 
 			if (this._top is Leaf && (this._top as Leaf).Count >= this._load)
 			{
@@ -706,12 +734,12 @@ namespace Seven.Structures
 					Get<M> child_ms = this._locate(leaf.Contents[i]);
 
 					if (child_ms == null)
-						throw new Error("the location function for omnitree is invalid.");
+						throw new System.ArgumentNullException("the location function for omnitree is invalid.");
 
 					if (!EncapsulationCheck(this._top.Min, this._top.Max, child_ms))
 					{
 						this._count--;
-						throw new Error("a node was updated to be out of bounds (found in an addition)");
+						throw new System.ArgumentNullException("a node was updated to be out of bounds (found in an addition)");
 					}
 					else
 						Add(leaf.Contents[i], this._top, child_ms, 0);
@@ -761,9 +789,9 @@ namespace Seven.Structures
 			{
 				this._load--;
 				this._loadPlusOnePowered =
-					OmnitreeLinkedArrayLists<T, M>.Int_Power(_load + 1, _dimensions);
+					OmnitreeLinkedArray<T, M>.Int_Power(_load + 1, _dimensions);
 				this._loadPowered =
-					OmnitreeLinkedArrayLists<T, M>.Int_Power(_load, _dimensions);
+					OmnitreeLinkedArray<T, M>.Int_Power(_load, _dimensions);
 			}
 
 			this._previousAddition = this._top;
@@ -784,9 +812,9 @@ namespace Seven.Structures
 			{
 				this._load--;
 				this._loadPlusOnePowered =
-					OmnitreeLinkedArrayLists<T, M>.Int_Power(_load + 1, _dimensions);
+					OmnitreeLinkedArray<T, M>.Int_Power(_load + 1, _dimensions);
 				this._loadPowered =
-					OmnitreeLinkedArrayLists<T, M>.Int_Power(_load, _dimensions);
+					OmnitreeLinkedArray<T, M>.Int_Power(_load, _dimensions);
 			}
 
 			this._previousAddition = this._top;
@@ -848,9 +876,9 @@ namespace Seven.Structures
 
 			this._load = _defaultLoad;
 			this._loadPlusOnePowered =
-				OmnitreeLinkedArrayLists<T, M>.Int_Power(this._load + 1, this._dimensions);
+				OmnitreeLinkedArray<T, M>.Int_Power(this._load + 1, this._dimensions);
 			this._loadPowered =
-				OmnitreeLinkedArrayLists<T, M>.Int_Power(_load, _dimensions);
+				OmnitreeLinkedArray<T, M>.Int_Power(_load, _dimensions);
 		}
 		#endregion
 		#region public void Stepper(Step<T> function)
@@ -929,7 +957,7 @@ namespace Seven.Structures
 				Leaf leaf = node as Leaf;
 				if (depth >= this._load || !(leaf.Count >= this._load))
 				{
-					OmnitreeLinkedArrayLists<T, M>.Leaf_Add(leaf, addition);
+					OmnitreeLinkedArray<T, M>.Leaf_Add(leaf, addition);
 
 					this._previousAddition = leaf;
 					this._previousAdditionDepth = depth;
@@ -946,7 +974,7 @@ namespace Seven.Structures
 						Get<M> child_ms = this._locate(leaf.Contents[i]);
 
 						if (child_ms == null)
-							throw new Error("the location function for omnitree is invalid.");
+							throw new System.ArgumentNullException("the location function for omnitree is invalid.");
 
 						if (EncapsulationCheck(growth.Min, growth.Max, child_ms))
 							Add(leaf.Contents[i], growth, child_ms, depth);
@@ -955,7 +983,7 @@ namespace Seven.Structures
 							if (EncapsulationCheck(this._top.Min, this._top.Max, child_ms))
 							{
 								this._count--;
-								throw new Error("a node was updated to be out of bounds (found in an addition)");
+								throw new System.ArgumentNullException("a node was updated to be out of bounds (found in an addition)");
 							}
 							else
 								Add(leaf.Contents[i], this._top, child_ms, depth);
@@ -976,7 +1004,7 @@ namespace Seven.Structures
 				if (child_node == null)
 				{
 					Leaf leaf = GrowLeaf(branch, child);
-					OmnitreeLinkedArrayLists<T, M>.Leaf_Add(leaf, addition);
+					OmnitreeLinkedArray<T, M>.Leaf_Add(leaf, addition);
 
 					this._previousAddition = leaf;
 					this._previousAdditionDepth = depth + 1;
@@ -989,6 +1017,54 @@ namespace Seven.Structures
 				branch.Count++;
 				return;
 			}
+		}
+		#endregion
+		#region private int CountSubSpace(Node node, Get<M> min, Get<M> max)
+		/// <summary>Counts the number of items in a sub space.</summary>
+		/// <param name="node">The current traversal node.</param>
+		/// <param name="min">The minimum of the space to count the items of.</param>
+		/// <param name="max">The maximum of the space to count the items of.</param>
+		/// <returns>The number of items in the provided sub space.</returns>
+		private int CountSubSpace(Node node, Get<M> min, Get<M> max)
+		{
+			int count = 0;
+			if (EncapsulationCheck(min, max, node.Min, node.Max))
+				count += node.Count;
+			else if (node is Leaf)
+			{
+				Leaf leaf = node as Leaf;
+				for (int i = 0; i < leaf.Count; i++)
+				{
+					Get<M> ms = this._locate(leaf.Contents[i]);
+
+					if (ms == null)
+						throw new System.ArgumentException("the location function for omnitree is invalid.");
+
+					if (EncapsulationCheck(min, max, ms))
+						count++;
+				}
+			}
+			else
+			{
+				Branch branch = node as Branch;
+				// if the length of the child array is equal to its maximum capacity,
+				// use real indeces and skip null children
+				if (branch.Children.Length == this._children)
+				{
+					for (int i = 0; i < branch.Children.Length; i++)
+						if (branch.Children[i] != null && InclusionCheck(branch.Children[i].Min, branch.Children[i].Max, min, max))
+							count += CountSubSpace(branch.Children[i], min, max);
+				}
+				// if the length of the child array is less than its maximum capacity,
+				// iterate through the artificially index children where there will be no null values
+				else
+				{
+					for (int i = 0; i < branch.ChildCount; i++)
+						if (InclusionCheck(branch.Children[i].Min, branch.Children[i].Max, min, max))
+							count += CountSubSpace(branch.Children[i], min, max);
+				}
+			}
+			return count;
 		}
 		#endregion
 		#region private static void Leaf_Add(Leaf leaf, T addition)
@@ -1174,7 +1250,7 @@ namespace Seven.Structures
 					Get<M> ms = this._locate(leaf.Contents[i]);
 
 					if (ms == null)
-						throw new Error("the location function for omnitree is invalid.");
+						throw new System.ArgumentException("the location function for omnitree is invalid.");
 
 					if (this.EncapsulationCheck(min, max, ms))
 						removals++;
@@ -1284,7 +1360,7 @@ namespace Seven.Structures
 					Get<M> ms = this._locate(leaf.Contents[i]);
 
 					if (ms == null)
-						throw new Error("the location function for omnitree is invalid.");
+						throw new System.ArgumentException("the location function for omnitree is invalid.");
 
 					if (this.EncapsulationCheck(min, max, ms) && where(leaf.Contents[i]))
 						removals++;
@@ -1481,7 +1557,7 @@ namespace Seven.Structures
 					Get<M> ms = this._locate(leaf.Contents[i]);
 
 					if (ms == null)
-						throw new Error("the location function for omnitree is invalid.");
+						throw new System.ArgumentException("the location function for omnitree is invalid.");
 
 					if (!EncapsulationCheck(leaf.Min, leaf.Max, ms))
 					{
@@ -1499,7 +1575,7 @@ namespace Seven.Structures
 						if (temp == null)
 						{
 							this._count--;
-							throw new Error("a node was updated to be out of bounds (found in an update)");
+							throw new System.InvalidOperationException("a node was updated to be out of bounds (found in an update)");
 						}
 						else
 							this.Add(item, temp, ms, depth);
@@ -1548,7 +1624,7 @@ namespace Seven.Structures
 					Get<M> ms = this._locate(leaf.Contents[i]);
 
 					if (ms == null)
-						throw new Error("the location function for omnitree is invalid.");
+						throw new System.ArgumentException("the location function for omnitree is invalid.");
 
 
 					if (!EncapsulationCheck(leaf.Min, leaf.Max, ms))
@@ -1567,7 +1643,7 @@ namespace Seven.Structures
 						if (temp == null)
 						{
 							this._count--;
-							throw new Error("a node was updated to be out of bounds (found in an update)");
+							throw new System.InvalidOperationException("a node was updated to be out of bounds (found in an update)");
 						}
 						else
 							this.Add(item, temp, ms, depth);
@@ -1635,7 +1711,7 @@ namespace Seven.Structures
 					Get<M> ms = this._locate(leaf.Contents[i]);
 
 					if (ms == null)
-						throw new Error("the location function for omnitree is invalid.");
+						throw new System.ArgumentException("the location function for omnitree is invalid.");
 
 					if (EncapsulationCheck(min, max, ms))
 						function(leaf.Contents[i]);
@@ -1674,7 +1750,7 @@ namespace Seven.Structures
 					Get<M> ms = this._locate(leaf.Contents[i]);
 
 					if (ms == null)
-						throw new Error("the location function for omnitree is invalid.");
+						throw new System.ArgumentException("the location function for omnitree is invalid.");
 
 					if (EncapsulationCheck(min, max, ms))
 						function(ref leaf.Contents[i]);
@@ -1713,7 +1789,7 @@ namespace Seven.Structures
 					Get<M> ms = this._locate(leaf.Contents[i]);
 
 					if (ms == null)
-						throw new Error("the location function for omnitree is invalid.");
+						throw new System.ArgumentException("the location function for omnitree is invalid.");
 
 					if (EncapsulationCheck(min, max, ms))
 						if (function(leaf.Contents[i]) == StepStatus.Break)
@@ -1756,7 +1832,7 @@ namespace Seven.Structures
 					Get<M> ms = this._locate(leaf.Contents[i]);
 
 					if (ms == null)
-						throw new Error("the location function for omnitree is invalid.");
+						throw new System.ArgumentException("the location function for omnitree is invalid.");
 
 					if (EncapsulationCheck(min, max, ms))
 						if (function(ref leaf.Contents[i]) == StepStatus.Break)
@@ -1818,7 +1894,7 @@ namespace Seven.Structures
 	/// <typeparam name="T">The generice type of items to be stored in this octree.</typeparam>
 	/// <typeparam name="M">The type of the axis dimensions to sort the "T" values upon.</typeparam>
 	[System.Serializable]
-	public class OmnitreeLinkedLinkedLists<T, M> : Omnitree<T, M>
+	public class OmnitreeLinkedLinked<T, M> : Omnitree<T, M>
 	{
 		#region README NOTES
 		// 1 Dimensional:
@@ -1892,19 +1968,17 @@ namespace Seven.Structures
 		private int _dimensions;
 		private int _children;
 		private Get<M> _origin;
-		private Node _top;
+		public Node _top;
 		private int _count;
 		private int _load; // count ^ (1 / dimensions)
 		private int _loadPowered; // load ^ dimensions
 		private int _loadPlusOnePowered; // (load + 1) ^ dimensions
-		private Node _previousAddition; // leaf depth of previous addition (sequencial addition optimization)
-		private int _previousAdditionDepth; // tree depth of previous addition (sequencial addition optimization)
 		private const int _defaultLoad = 2;
 		// nested types
 		#region private abstract class Node
 		/// <summary>Can be a leaf or a branch.</summary>
 		[System.Serializable]
-		private abstract class Node
+		public abstract class Node
 		{
 			private Get<M> _min;
 			private Get<M> _max;
@@ -1912,13 +1986,13 @@ namespace Seven.Structures
 			private int _index;
 			private int _count;
 
-			internal Get<M> Min { get { return this._min; } }
-			internal Get<M> Max { get { return this._max; } }
-			internal Branch Parent { get { return this._parent; } }
-			internal int Index { get { return this._index; } }
-			internal int Count { get { return this._count; } set { this._count = value; } }
+			public Get<M> Min { get { return this._min; } }
+			public Get<M> Max { get { return this._max; } }
+			public Branch Parent { get { return this._parent; } }
+			public int Index { get { return this._index; } }
+			public int Count { get { return this._count; } set { this._count = value; } }
 
-			internal Node(Get<M> min, Get<M> max, Branch parent, int index)
+			public Node(Get<M> min, Get<M> max, Branch parent, int index)
 			{
 				this._min = min;
 				this._max = max;
@@ -1930,10 +2004,10 @@ namespace Seven.Structures
 		#region private class Leaf : Node
 		/// <summary>A branch in the tree. Only contains items.</summary>
 		[System.Serializable]
-		private class Leaf : Node
+		public class Leaf : Node
 		{
 			[System.Serializable]
-			internal class Node
+			public class Node
 			{
 				internal T _value;
 				internal Node _next;
@@ -1959,18 +2033,18 @@ namespace Seven.Structures
 		#region private class Branch : Node
 		/// <summary>A branch in the tree. Only contains nodes.</summary>
 		[System.Serializable]
-		private class Branch : Node
+		public class Branch : Node
 		{
 			[System.Serializable]
-			internal class Node
+			public class Node
 			{
-				private OmnitreeLinkedLinkedLists<T, M>.Node _value;
+				private OmnitreeLinkedLinked<T, M>.Node _value;
 				private Branch.Node _next;
 
-				public OmnitreeLinkedLinkedLists<T, M>.Node Value { get { return this._value; } }
+				public OmnitreeLinkedLinked<T, M>.Node Value { get { return this._value; } }
 				public Branch.Node Next { get { return this._next; } set { this._next = value; } }
 
-				public Node(OmnitreeLinkedLinkedLists<T, M>.Node value, Branch.Node next)
+				public Node(OmnitreeLinkedLinked<T, M>.Node value, Branch.Node next)
 				{
 					this._value = value;
 					this._next = next;
@@ -1993,7 +2067,7 @@ namespace Seven.Structures
 		/// <param name="locate">A function for locating an item along the provided dimensions.</param>
 		/// <param name="compare">A function for comparing two items of the types of the axis.</param>
 		/// <param name="average">A function for computing the average between two items of the axis types.</param>
-		public OmnitreeLinkedLinkedLists(
+		public OmnitreeLinkedLinked(
 			int dimensions,
 			Get<M> min, Get<M> max,
 			Omnitree.Locate<T, M> locate,
@@ -2003,28 +2077,30 @@ namespace Seven.Structures
 		{
 			// check the locate and compare delegates
 			if (locate == null)
-				throw new Error("null reference on location delegate during Omnitree construction");
+				throw new System.ArgumentNullException("locate");
 			if (compare == null)
-				throw new Error("null reference on compare delegate during Omnitree construction");
+				throw new System.ArgumentNullException("compare");
 			if (equate == null)
-				throw new Error("null reference on equate delegate during Omnitree construction");
+				throw new System.ArgumentNullException("equate");
 
 			// Check the min/max values
 			if (min == null)
-				throw new Error("null reference on min dimensions during Omnitree construction");
+				throw new System.ArgumentNullException("min");
 			if (max == null)
-				throw new Error("null reference on max dimensions during Omnitree construction");
+				throw new System.ArgumentNullException("max");
 			for (int i = 0; i < dimensions; i++)
 				if (compare(min(i), max(i)) != Comparison.Less)
-					throw new Error("invalid min/max values. not all min values are less than the max values");
+					throw new System.ArgumentException("invalid min/max values. not all min values are less than the max values");
 
 			// Check the average delegate
 			if (average == null)
-				throw new Error("null reference on average delegate during Omnitree construction");
-
+				throw new System.ArgumentNullException("average");
 			M[] origin = new M[dimensions];
 			for (int i = 0; i < dimensions; i++)
 				origin[i] = average(min(i), max(i));
+			for (int i = 0; i < dimensions; i++)
+				if (compare(min(i), origin[i]) != Comparison.Less || compare(origin[i], max(i)) != Comparison.Less)
+					throw new System.ArgumentException("invalid average function. not all average values were computed to be between the min/max values.");
 
 			this._locate = locate;
 			this._average = average;
@@ -2038,14 +2114,11 @@ namespace Seven.Structures
 
 			this._load = _defaultLoad;
 			this._loadPlusOnePowered =
-				OmnitreeLinkedLinkedLists<T, M>.Int_Power(this._load + 1, this._dimensions);
+				OmnitreeLinkedLinked<T, M>.Int_Power(this._load + 1, this._dimensions);
 			this._loadPowered =
-				OmnitreeLinkedLinkedLists<T, M>.Int_Power(_load, _dimensions);
+				OmnitreeLinkedLinked<T, M>.Int_Power(_load, _dimensions);
 
 			this._origin = Accessor.Get(origin);
-
-			this._previousAddition = this._top;
-			this._previousAdditionDepth = 0;
 		}
 		#endregion
 		#region public OmnitreeLinkedLinkedLists(M[] min, M[] max, Omnitree.Locate<T, M> locate, Equate<T> equate, Compare<M> compare, Omnitree.Average<M> average)
@@ -2055,7 +2128,7 @@ namespace Seven.Structures
 		/// <param name="locate">A function for locating an item along the provided dimensions.</param>
 		/// <param name="compare">A function for comparing two items of the types of the axis.</param>
 		/// <param name="average">A function for computing the average between two items of the axis types.</param>
-		public OmnitreeLinkedLinkedLists(M[] min, M[] max,
+		public OmnitreeLinkedLinked(M[] min, M[] max,
 			Omnitree.Locate<T, M> locate,
 			Equate<T> equate,
 			Compare<M> compare,
@@ -2070,7 +2143,7 @@ namespace Seven.Structures
 				average)
 		{
 			if (min.Length != max.Length)
-				throw new Error("invalid min/max dimensions when constructing an Omnitree_Linked");
+				throw new System.ArgumentException("invalid min/max dimensions when constructing an Omnitree_Linked");
 		}
 		#endregion
 		#region public Omnitree_LinkedLinkedLists(M[] min, M[] max, Omnitree.Locate<T, M> locate, Compare<M> compare, Omnitree.Average<M> average)
@@ -2080,7 +2153,7 @@ namespace Seven.Structures
 		/// <param name="locate">A function for locating an item along the provided dimensions.</param>
 		/// <param name="compare">A function for comparing two items of the types of the axis.</param>
 		/// <param name="average">A function for computing the average between two items of the axis types.</param>
-		public OmnitreeLinkedLinkedLists(M[] min, M[] max,
+		public OmnitreeLinkedLinked(M[] min, M[] max,
 			Omnitree.Locate<T, M> locate,
 			Compare<M> compare,
 			Omnitree.Average<M> average) :
@@ -2094,7 +2167,7 @@ namespace Seven.Structures
 				average)
 		{
 			if (min.Length != max.Length)
-				throw new Error("invalid min/max dimensions when constructing an Omnitree_Linked");
+				throw new System.ArgumentException("invalid min/max dimensions when constructing an Omnitree_Linked");
 		}
 		#endregion
 		// properties
@@ -2105,6 +2178,15 @@ namespace Seven.Structures
 			{
 				Get<M> get = Accessor.Get(coordinates);
 				return (Step<T> step) => { this.Stepper(step, get, get); };
+			}
+		}
+		#endregion
+		#region public Stepper<T> this[Get<M> coordinates]
+		public Stepper<T> this[Get<M> coordinates]
+		{
+			get
+			{
+				return (Step<T> step) => { this.Stepper(step, coordinates, coordinates); };
 			}
 		}
 		#endregion
@@ -2158,10 +2240,7 @@ namespace Seven.Structures
 				Leaf leaf = node as Leaf;
 				if (depth >= this._load || !(leaf.Count >= this._load))
 				{
-					OmnitreeLinkedLinkedLists<T, M>.Leaf_Add(leaf, addition);
-
-					this._previousAddition = leaf;
-					this._previousAdditionDepth = depth;
+					OmnitreeLinkedLinked<T, M>.Leaf_Add(leaf, addition);
 
 					return;
 				}
@@ -2175,7 +2254,7 @@ namespace Seven.Structures
 						Get<M> child_ms = this._locate(list.Value);
 
 						if (child_ms == null)
-							throw new Error("the location function for omnitree is invalid.");
+							throw new System.ArgumentException("the location function for omnitree is invalid.");
 
 						if (EncapsulationCheck(growth.Min, growth.Max, child_ms))
 							Add(list.Value, growth, child_ms, depth);
@@ -2185,7 +2264,7 @@ namespace Seven.Structures
 							{
 								this._count--;
 
-								throw new Error("a node was updated to be out of bounds (found in an addition)");
+								throw new System.InvalidOperationException("a node was updated to be out of bounds (found in an addition)");
 							}
 							else
 								Add(list.Value, this._top, child_ms, depth);
@@ -2193,6 +2272,7 @@ namespace Seven.Structures
 					}
 
 					Add(addition, growth, ms, depth);
+
 					return;
 				}
 			}
@@ -2206,19 +2286,60 @@ namespace Seven.Structures
 				if (child_node == null)
 				{
 					Leaf leaf = GrowLeaf(branch, child);
-					OmnitreeLinkedLinkedLists<T, M>.Leaf_Add(leaf, addition);
+					OmnitreeLinkedLinked<T, M>.Leaf_Add(leaf, addition);
 
-					this._previousAddition = leaf;
-					this._previousAdditionDepth = depth + 1;
+					branch.Count++;
 
 					return;
 				}
 
 				Add(addition, child_node, ms, depth + 1);
 				branch.Count++;
+
 				return;
 			}
 			node.Count++;
+		}
+		#endregion
+		#region public int Count(Get<M> min, Get<M> max)
+		public int CountSubSpace(Get<M> min, Get<M> max)
+		{
+			return CountSubSpace(_top, min, max);
+		}
+		#endregion
+		#region private int Count(Node node, Get<M> min, Get<M> max)
+		/// <summary>Counts the number of items in a sub space.</summary>
+		/// <param name="node">The current traversal node.</param>
+		/// <param name="min">The minimum of the space to count the items of.</param>
+		/// <param name="max">The maximum of the space to count the items of.</param>
+		/// <returns>The number of items in the provided sub space.</returns>
+		private int CountSubSpace(Node node, Get<M> min, Get<M> max)
+		{
+			int count = 0;
+			if (EncapsulationCheck(min, max, node.Min, node.Max))
+				count += node.Count; 
+			else if (node is Leaf)
+			{
+				Leaf.Node list = (node as Leaf).Head;
+				for (; list != null; list = list.Next)
+				{
+					Get<M> ms = this._locate(list.Value);
+
+					if (ms == null)
+						throw new System.ArgumentException("the location function for omnitree is invalid.");
+
+					if (EncapsulationCheck(min, max, ms))
+						count++;
+				}
+			}
+			else
+			{
+				Branch.Node list = (node as Branch).Head;
+				for (; list != null; list = list.Next)
+					if (InclusionCheck(list.Value.Min, list.Value.Max, min, max))
+						count += this.CountSubSpace(list.Value, min, max);
+			}
+			return count;
 		}
 		#endregion
 		#region private static void Leaf_Add(Leaf leaf, T addition)
@@ -2302,13 +2423,11 @@ namespace Seven.Structures
 			{
 				this._load--;
 				this._loadPlusOnePowered =
-					OmnitreeLinkedLinkedLists<T, M>.Int_Power(_load + 1, _dimensions);
+					OmnitreeLinkedLinked<T, M>.Int_Power(_load + 1, _dimensions);
 				this._loadPowered =
-					OmnitreeLinkedLinkedLists<T, M>.Int_Power(_load, _dimensions);
+					OmnitreeLinkedLinked<T, M>.Int_Power(_load, _dimensions);
 			}
 
-			this._previousAddition = this._top;
-			this._previousAdditionDepth = 0;
 		}
 		#endregion
 		#region private int Remove(Node node, Predicate<T> where)
@@ -2378,13 +2497,11 @@ namespace Seven.Structures
 			{
 				this._load--;
 				this._loadPlusOnePowered =
-					OmnitreeLinkedLinkedLists<T, M>.Int_Power(_load + 1, _dimensions);
+					OmnitreeLinkedLinked<T, M>.Int_Power(_load + 1, _dimensions);
 				this._loadPowered =
-					OmnitreeLinkedLinkedLists<T, M>.Int_Power(_load, _dimensions);
+					OmnitreeLinkedLinked<T, M>.Int_Power(_load, _dimensions);
 			}
 
-			this._previousAddition = this._top;
-			this._previousAdditionDepth = 0;
 		}
 		#endregion
 		#region private int Remove(Node node, Get<M> min, Get<M> max)
@@ -2408,7 +2525,7 @@ namespace Seven.Structures
 						Get<M> coordinates = this._locate(current_node.Value);
 
 						if (coordinates == null)
-							throw new Error("the location function for omnitree is invalid.");
+							throw new System.ArgumentException("the location function for omnitree is invalid.");
 
 						if (EncapsulationCheck(min, max, coordinates))
 						{
@@ -2482,13 +2599,27 @@ namespace Seven.Structures
 			{
 				Node oldChild = this._top;
 				this._top = new Leaf(oldChild.Min, oldChild.Max, parent, oldChild.Index);
-				this.Stepper(new Step<T>(this.Add), oldChild);
+				this.Stepper(new Step<T>((T step) => { this.Add(step, this._top, this._locate(step), 0); }), oldChild);
 			}
 			else
 			{
 				Branch.Node list = parent.Head;
 				if (list.Value.Index == child)
+				{
+					Branch.Node temp = parent.Head;
 					parent.Head = parent.Head.Next;
+
+					// adjust the counts before the additions
+					int temp_removals = temp.Value.Count;
+					Node looper = parent;
+					while (looper != null)
+					{
+						looper.Count -= temp_removals;
+						looper = looper.Parent;
+					}
+
+					this.Stepper((T step) => { this.Add(step, this._top, this._locate(step), 0); }, temp.Value);
+				}
 				else
 				{
 					while (list != null)
@@ -2497,7 +2628,17 @@ namespace Seven.Structures
 						{
 							Branch.Node shrinking = list.Next;
 							list.Next = new Branch.Node(new Leaf(shrinking.Value.Min, shrinking.Value.Max, parent, shrinking.Value.Index), list.Next.Next);
-							this.Stepper(new Step<T>(this.Add), shrinking.Value);
+
+							// adjust the counts before the additions
+							int temp_removals = shrinking.Value.Count;
+							Node looper = parent;
+							while (looper != null)
+							{
+								looper.Count -= temp_removals;
+								looper = looper.Parent;
+							}
+
+							this.Stepper((T step) => { this.Add(step, this._top, this._locate(step), 0); }, shrinking.Value);
 							break;
 						}
 						list = list.Next;
@@ -2520,13 +2661,11 @@ namespace Seven.Structures
 			{
 				this._load--;
 				this._loadPlusOnePowered =
-					OmnitreeLinkedLinkedLists<T, M>.Int_Power(_load + 1, _dimensions);
+					OmnitreeLinkedLinked<T, M>.Int_Power(_load + 1, _dimensions);
 				this._loadPowered =
-					OmnitreeLinkedLinkedLists<T, M>.Int_Power(_load, _dimensions);
+					OmnitreeLinkedLinked<T, M>.Int_Power(_load, _dimensions);
 			}
 
-			this._previousAddition = this._top;
-			this._previousAdditionDepth = 0;
 		}
 		#endregion
 		#region private int Remove(Node node, Get<M> min, Get<M> max, Predicate<T> where)
@@ -2537,43 +2676,38 @@ namespace Seven.Structures
 		/// <param name="where">The equality constraint of the removal.</param>
 		private int Remove(Node node, Get<M> min, Get<M> max, Predicate<T> where)
 		{
+			if (!InclusionCheck(node.Min, node.Max, min, max))
+				return 0;
 			int removals = 0;
 			if (node is Leaf)
 			{
 				Leaf leaf = node as Leaf;
-				while (leaf.Head != null)
+				Leaf.Node current = leaf.Head;
+				Leaf.Node previous = null;
+				while (current != null)
 				{
-					Get<M> ms = this._locate(leaf.Head.Value);
+					Get<M> ms = this._locate(current.Value);
 
 					if (ms == null)
-						throw new Error("the location function for omnitree is invalid.");
+						throw new System.ArgumentException("the location function for omnitree is invalid.");
 
-					if (this.EncapsulationCheck(min, max, ms) && where(leaf.Head.Value))
+					if (this.EncapsulationCheck(min, max, ms) && where(current.Value))
 					{
-						leaf.Head = leaf.Head.Next;
 						removals++;
-					}
-					else
-						break;
-				}
-				if (leaf != null)
-				{
-					Leaf.Node list = (node as Leaf).Head;
-					while (list.Next != null)
-					{
-						Get<M> ms = this._locate(list.Next.Value);
-
-						if (this.EncapsulationCheck(min, max, ms) && where(list.Next.Value))
+						if (previous == null)
 						{
-							list.Next = list.Next.Next;
-							removals++;
+							leaf.Head = current.Next;
+							goto HeadRemoved;
 						}
+						else
+							previous.Next = current.Next;
 					}
+					previous = current;
+				HeadRemoved:
+					current = current.Next;
 				}
 
 				leaf.Count -= removals;
-				this._count -= removals;
-
 				return removals;
 			}
 			else
@@ -2581,9 +2715,10 @@ namespace Seven.Structures
 				Branch.Node list = (node as Branch).Head;
 				while (list != null)
 				{
-					this.Remove(list.Value, min, max, where);
+					removals += this.Remove(list.Value, min, max, where);
 					if (list.Value.Count == 0)
 						this.ChopChild(list.Value.Parent, list.Value.Index);
+					list = list.Next;
 				}
 
 				node.Count -= removals;
@@ -2735,7 +2870,7 @@ namespace Seven.Structures
 			else
 			{
 				Branch.Node list = branch.Head;
-				while (list.Next != null)
+				while (true)
 				{
 					if (list.Next.Value.Index == child)
 					{
@@ -2758,74 +2893,46 @@ namespace Seven.Structures
 			if (node is Leaf)
 			{
 				Leaf leaf = node as Leaf;
-				while (leaf.Head != null)
+				Leaf.Node current = leaf.Head;
+				Leaf.Node previous = null;
+				while (current != null)
 				{
-					Get<M> ms = this._locate(leaf.Head.Value);
+					Get<M> ms = this._locate(current.Value);
 
 					if (ms == null)
-						throw new Error("the location function for omnitree is invalid.");
+						throw new System.ArgumentException("the location function for omnitree is invalid.");
 
-					if (!EncapsulationCheck(leaf.Min, leaf.Max, ms))
+					if (!this.EncapsulationCheck(node.Min, node.Max, ms))
 					{
-						T item = leaf.Head.Value;
-						leaf.Head = leaf.Head.Next;
-						Node temp = leaf.Parent;
-						while (temp != null)
+						removals++;
+						T updated = current.Value;
+						if (previous == null)
 						{
-							if (EncapsulationCheck(temp.Min, temp.Max, ms))
-								break;
-							removals++;
-							temp = temp.Parent;
-						}
-
-						if (temp == null)
-						{
-							this._count--;
-
-							throw new Error("a node was updated to be out of bounds (found in an update)");
+							leaf.Head = current.Next;
+							goto HeadRemoved;
 						}
 						else
-							this.Add(item, temp, ms, depth);
-					}
-					else
-						break;
+							previous.Next = current.Next;
 
-					leaf.Count -= removals;
-				}
-				if (leaf.Head != null)
-				{
-					Leaf.Node list = leaf.Head;
-					while (list.Next != null)
-					{
-						Get<M> ms = this._locate(list.Next.Value);
-
-						if (ms == null)
-							throw new Error("the location function for omnitree is invalid.");
-
-						if (!EncapsulationCheck(leaf.Min, leaf.Max, ms))
+						Node whereToAdd = node.Parent;
+						while (!EncapsulationCheck(whereToAdd.Min, whereToAdd.Max, ms))
 						{
-							T item = list.Next.Value;
-							list.Next = list.Next.Next;
-							Node temp = leaf.Parent;
-							while (temp != null)
-							{
-								if (EncapsulationCheck(temp.Min, temp.Max, ms))
-									break;
-								temp.Count--;
-								temp = temp.Parent;
-							}
-
-							if (temp == null)
-							{
-								this._count--;
-
-								throw new Error("a node was updated to be out of bounds (found in an update)");
-							}
-							else
-								this.Add(item, temp, ms, depth);
+							if (whereToAdd.Parent == null)
+								throw new System.Exception("an item was updates outside the range of the omnitree");
+							whereToAdd = whereToAdd.Parent;
 						}
+						int whereToAddDepth = 0;
+						Node depthCounter = whereToAdd;
+						while (!depthCounter.Equals(this._top))
+							whereToAddDepth++;
+						this.Add(updated, whereToAdd, ms, whereToAddDepth);
 					}
+					previous = current;
+				HeadRemoved:
+					current = current.Next;
 				}
+				leaf.Count -= removals;
+				return removals;
 			}
 			else
 			{
@@ -2836,6 +2943,7 @@ namespace Seven.Structures
 					removals += this.Update(list.Value, depth + 1);
 					if (list.Value.Count == 0)
 						ChopChild(branch, list.Value.Index);
+					list = list.Next;
 				}
 
 				branch.Count -= removals;
@@ -2854,9 +2962,6 @@ namespace Seven.Structures
 		public void Update(Get<M> min, Get<M> max)
 		{
 			this.Update(min, max, this._top, 0);
-
-			this._previousAddition = this._top;
-			this._previousAdditionDepth = 0;
 		}
 		#endregion
 		#region private int Update(Get<M> min, Get<M> max, Node node, int depth)
@@ -2867,79 +2972,54 @@ namespace Seven.Structures
 		/// <param name="depth">The current depth in the tree.</param>
 		private int Update(Get<M> min, Get<M> max, Node node, int depth)
 		{
+			if (!InclusionCheck(min, max, node.Min, node.Max))
+				return 0;
+
 			int removals = 0;
 
 			if (node is Leaf)
 			{
 				Leaf leaf = node as Leaf;
-				while (leaf.Head != null)
+				Leaf.Node current = leaf.Head;
+				Leaf.Node previous = null;
+				while (current != null)
 				{
-					Get<M> ms = this._locate(leaf.Head.Value);
+					Get<M> ms = this._locate(current.Value);
 
 					if (ms == null)
-						throw new Error("the location function for omnitree is invalid.");
+						throw new System.ArgumentException("the location function for omnitree is invalid.");
 
-					if (!EncapsulationCheck(leaf.Min, leaf.Max, ms))
+					if (!this.EncapsulationCheck(node.Min, node.Max, ms))
 					{
-						T item = leaf.Head.Value;
-						leaf.Head = leaf.Head.Next;
-						Node temp = leaf.Parent;
-						while (temp != null)
+						removals++;
+						T updated = current.Value;
+						if (previous == null)
 						{
-							if (EncapsulationCheck(temp.Min, temp.Max, ms))
-								break;
-							removals++;
-							temp = temp.Parent;
-						}
-
-						if (temp == null)
-						{
-							this._count--;
-
-							throw new Error("a node was updated to be out of bounds (found in an update)");
+							leaf.Head = current.Next;
+							goto HeadRemoved;
 						}
 						else
-							this.Add(item, temp, ms, depth);
-					}
-					else
-						break;
+							previous.Next = current.Next;
 
-					leaf.Count -= removals;
-				}
-				if (leaf.Head != null)
-				{
-					Leaf.Node list = leaf.Head;
-					while (list.Next != null)
-					{
-						Get<M> ms = this._locate(list.Next.Value);
-
-						if (ms == null)
-							throw new Error("the location function for omnitree is invalid.");
-
-						if (!EncapsulationCheck(leaf.Min, leaf.Max, ms))
+						Node whereToAdd = node.Parent;
+						while (!EncapsulationCheck(whereToAdd.Min, whereToAdd.Max, ms))
 						{
-							T item = list.Next.Value;
-							list.Next = list.Next.Next;
-							Node temp = leaf.Parent;
-							while (temp != null)
-							{
-								if (EncapsulationCheck(temp.Min, temp.Max, ms))
-									break;
-								temp.Count--;
-								temp = temp.Parent;
-							}
-
-							if (temp == null)
-							{
-								this._count--;
-
-								throw new Error("a node was updated to be out of bounds (found in an update)");
-							}
-							else
-								this.Add(item, temp, ms, depth);
+							if (whereToAdd.Parent == null)
+								throw new System.Exception("an item was updates outside the range of the omnitree");
+							whereToAdd = whereToAdd.Parent;
 						}
+						int whereToAddDepth = 0;
+						Node depthCounter = whereToAdd;
+						while (!depthCounter.Equals(this._top))
+							whereToAddDepth++;
+						this.Add(updated, whereToAdd, ms, whereToAddDepth);
 					}
+					previous = current;
+				HeadRemoved:
+					current = current.Next;
 				}
+				leaf.Count -= removals;
+				return removals;
 			}
 			else
 			{
@@ -2947,12 +3027,10 @@ namespace Seven.Structures
 				Branch.Node list = branch.Head;
 				while (list != null)
 				{
-					if (this.InclusionCheck(list.Value.Min, list.Value.Max, min, max))
-					{
-						removals += this.Update(min, max, list.Value, depth + 1);
-						if (list.Value.Count == 0)
-							ChopChild(branch, list.Value.Index);
-					}
+					removals += this.Update(list.Value, depth + 1);
+					if (list.Value.Count == 0)
+						ChopChild(branch, list.Value.Index);
+					list = list.Next;
 				}
 
 				branch.Count -= removals;
@@ -3049,7 +3127,7 @@ namespace Seven.Structures
 					Get<M> ms = this._locate(list.Value);
 
 					if (ms == null)
-						throw new Error("the location function for omnitree is invalid.");
+						throw new System.ArgumentException("the location function for omnitree is invalid.");
 
 					if (EncapsulationCheck(min, max, ms))
 						function(list.Value);
@@ -3085,7 +3163,7 @@ namespace Seven.Structures
 					Get<M> ms = this._locate(list.Value);
 
 					if (ms == null)
-						throw new Error("the location function for omnitree is invalid.");
+						throw new System.ArgumentException("the location function for omnitree is invalid.");
 
 					if (EncapsulationCheck(min, max, ms))
 						function(ref list._value);
@@ -3125,7 +3203,7 @@ namespace Seven.Structures
 					Get<M> ms = this._locate(list.Value);
 
 					if (ms == null)
-						throw new Error("the location function for omnitree is invalid.");
+						throw new System.ArgumentException("the location function for omnitree is invalid.");
 
 					if (EncapsulationCheck(min, max, ms))
 						if (function(list.Value) == StepStatus.Break)
@@ -3160,7 +3238,7 @@ namespace Seven.Structures
 					Get<M> ms = this._locate(list.Value);
 
 					if (ms == null)
-						throw new Error("the location function for omnitree is invalid.");
+						throw new System.ArgumentException("the location function for omnitree is invalid.");
 
 					if (EncapsulationCheck(min, max, ms))
 						if (function(ref list._value) == StepStatus.Break)
@@ -3180,10 +3258,10 @@ namespace Seven.Structures
 		#region public Omnitree_LinkedLinkedLists<T, M> Clone()
 		/// <summary>Creates a shallow clone of this data structure.</summary>
 		/// <returns>A shallow clone of this data structure.</returns>
-		public OmnitreeLinkedLinkedLists<T, M> Clone()
+		public OmnitreeLinkedLinked<T, M> Clone()
 		{
 			// OPTIMIZATION NEEDED
-			OmnitreeLinkedLinkedLists<T, M> clone = new OmnitreeLinkedLinkedLists<T, M>(
+			OmnitreeLinkedLinked<T, M> clone = new OmnitreeLinkedLinked<T, M>(
 				this._dimensions,
 				this._top.Min, this._top.Max,
 				this._locate,
@@ -3203,9 +3281,9 @@ namespace Seven.Structures
 
 			this._load = _defaultLoad;
 			this._loadPlusOnePowered =
-				OmnitreeLinkedLinkedLists<T, M>.Int_Power(this._load + 1, this._dimensions);
+				OmnitreeLinkedLinked<T, M>.Int_Power(this._load + 1, this._dimensions);
 			this._loadPowered =
-				OmnitreeLinkedLinkedLists<T, M>.Int_Power(_load, _dimensions);
+				OmnitreeLinkedLinked<T, M>.Int_Power(_load, _dimensions);
 		}
 		#endregion
 		#region public void Add(T addition)
@@ -3214,26 +3292,27 @@ namespace Seven.Structures
 		public void Add(T addition)
 		{
 			if (this._count == int.MaxValue)
-				throw new Error("(Count == int.MaxValue) max Omnitree size reached (change ints to longs if you need to).");
+				throw new System.InvalidOperationException("(Count == int.MaxValue) max Omnitree size reached (change ints to longs if you need to).");
 
 			// dynamic tree sizes
 			if (this._loadPlusOnePowered < this._count)
 			{
 				this._load++;
 				this._loadPlusOnePowered =
-					OmnitreeLinkedLinkedLists<T, M>.Int_Power(this._load + 1, this._dimensions);
+					OmnitreeLinkedLinked<T, M>.Int_Power(this._load + 1, this._dimensions);
 				this._loadPowered =
-					OmnitreeLinkedLinkedLists<T, M>.Int_Power(this._load, this._dimensions);
+					OmnitreeLinkedLinked<T, M>.Int_Power(this._load, this._dimensions);
 			}
 
 			Get<M> ms = this._locate(addition);
 
 			if (ms == null)
-				throw new Error("the location function for omnitree is invalid.");
+				throw new System.ArgumentException("the location function for omnitree is invalid.");
 
 			if (!EncapsulationCheck(this._top.Min, this._top.Max, ms))
-				throw new Error("a node was updated to be out of bounds (found in an addition)");
+				throw new System.InvalidOperationException("a node was updated to be out of bounds (found in an addition)");
 
+			// grow the first branch of the tree
 			if (this._top is Leaf && (this._top as Leaf).Count >= this._load)
 			{
 				Leaf leaf = this._top as Leaf;
@@ -3244,26 +3323,24 @@ namespace Seven.Structures
 					Get<M> child_ms = this._locate(list.Value);
 
 					if (child_ms == null)
-						throw new Error("the location function for omnitree is invalid.");
+						throw new System.ArgumentException("the location function for omnitree is invalid.");
 
 					if (!EncapsulationCheck(this._top.Min, this._top.Max, child_ms))
 					{
 						this._count--;
 
-						throw new Error("a node was updated to be out of bounds (found in an addition)");
+						throw new System.InvalidOperationException("a node was updated to be out of bounds (found in an addition)");
 					}
 					else
 						Add(list.Value, this._top, child_ms, 0);
 				}
-
-				this._previousAddition = this._top;
-				this._previousAdditionDepth = 0;
 			}
 
-			if (this.EncapsulationCheck(this._previousAddition.Min, this._previousAddition.Max, ms))
-				this.Add(addition, this._previousAddition, ms, this._previousAdditionDepth);
-			else
-				this.Add(addition, _top, ms, 0);
+			// NOTE: possible optimization
+			// track the location of the previous addition and see if the new addition goes there
+
+			this.Add(addition, this._top, ms, 0);
+
 			this._count++;
 		}
 		#endregion
@@ -3272,9 +3349,6 @@ namespace Seven.Structures
 		public void Update()
 		{
 			this.Update(this._top, 0);
-
-			this._previousAddition = this._top;
-			this._previousAdditionDepth = 0;
 		}
 		#endregion
 		#region public void Stepper(Step<T> function)
@@ -3352,17 +3426,6 @@ namespace Seven.Structures
 			T[] array = this.ToArray();
 			return ((System.Collections.Generic.IEnumerable<T>)array).GetEnumerator();
 		}
-		#endregion
-
-		#region wtf was this?
-		//void Update(Get<M> min, Get<M> max);
-		//void Remove(Get<M> min, Get<M> max);
-		//void Remove(Get<M> min, Get<M> max, Predicate<T> where);
-		//void Stepper(Step<T> function, Get<M> min, Get<M> max);
-		//void Stepper(StepRef<T> function, Get<M> min, Get<M> max);
-		//StepStatus Stepper(StepBreak<T> function, Get<M> min, Get<M> max);
-		//StepStatus Stepper(StepRefBreak<T> function, Get<M> min, Get<M> max);
-		//void Clear();
 		#endregion
 	}
 }

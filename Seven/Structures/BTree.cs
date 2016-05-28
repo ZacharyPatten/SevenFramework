@@ -176,7 +176,7 @@ namespace Seven.Structures
 		public BTreeLinkedArray(Compare<T> compare, int node_size)
 		{
 			if (node_size < 2)
-				throw new Error("invalid node size");
+				throw new System.ArgumentOutOfRangeException("node_size");
 
 			this._node_size = node_size;
 			this._root = new Node(this._node_size);
@@ -265,7 +265,7 @@ namespace Seven.Structures
 			if (this._root.ItemCount == 0 && !(this._root.ChildCount == 0))
 			{
 				if (this._root.ChildCount != 1)
-					throw new Error("this._root.ChildCount != 1");
+					throw new System.InvalidOperationException("this._root.ChildCount != 1");
 				this._root = this._root.Children[0];
 				this._height--;
 			}
@@ -314,7 +314,7 @@ namespace Seven.Structures
 		/// <param name="maximum">The maximum step value.</param>
 		public void Stepper(Step<T> step_function, T minimum, T maximum)
 		{
-			throw new Error("not implemented");
+			throw new System.NotImplementedException();
 		}
 		#endregion
 		#region public void Stepper(StepRef<T> step_function, T minimum, T maximum)
@@ -324,7 +324,7 @@ namespace Seven.Structures
 		/// <param name="maximum">The maximum step value.</param>
 		public void Stepper(StepRef<T> step_function, T minimum, T maximum)
 		{
-			throw new Error("not implemented");
+			throw new System.NotImplementedException();
 		}
 		#endregion
 		#region public StepStatus Stepper(StepBreak<T> step_function, T minimum, T maximum)
@@ -335,7 +335,7 @@ namespace Seven.Structures
 		/// <returns>The result status of the stepper function.</returns>
 		public StepStatus Stepper(StepBreak<T> step_function, T minimum, T maximum)
 		{
-			throw new Error("not implemented");
+			throw new System.NotImplementedException();
 		}
 		#endregion
 		#region public StepStatus Stepper(StepRefBreak<T> step_function, T minimum, T maximum)
@@ -346,7 +346,7 @@ namespace Seven.Structures
 		/// <returns>The result status of the stepper function.</returns>
 		public StepStatus Stepper(StepRefBreak<T> step_function, T minimum, T maximum)
 		{
-			throw new Error("not implemented");
+			throw new System.NotImplementedException();
 		}
 		#endregion
 		#region public void StepperReverse(Step<T> step_function, T minimum, T maximum)
@@ -356,7 +356,7 @@ namespace Seven.Structures
 		/// <param name="maximum">The maximum step value.</param>
 		public void StepperReverse(Step<T> step_function, T minimum, T maximum)
 		{
-			throw new Error("not implemented");
+			throw new System.NotImplementedException();
 		}
 		#endregion
 		#region public void StepperReverse(StepRef<T> step_function, T minimum, T maximum)
@@ -366,7 +366,7 @@ namespace Seven.Structures
 		/// <param name="maximum">The maximum step value.</param>
 		public void StepperReverse(StepRef<T> step_function, T minimum, T maximum)
 		{
-			throw new Error("not implemented");
+			throw new System.NotImplementedException();
 		}
 		#endregion
 		#region public StepStatus StepperReverse(StepBreak<T> step_function, T minimum, T maximum)
@@ -377,7 +377,7 @@ namespace Seven.Structures
 		/// <returns>The result status of the stepper function.</returns>
 		public StepStatus StepperReverse(StepBreak<T> step_function, T minimum, T maximum)
 		{
-			throw new Error("not implemented");
+			throw new System.NotImplementedException();
 		}
 		#endregion
 		#region public StepStatus StepperReverse(StepRefBreak<T> step_function, T minimum, T maximum)
@@ -388,7 +388,7 @@ namespace Seven.Structures
 		/// <returns>The result status of the stepper function.</returns>
 		public StepStatus StepperReverse(StepRefBreak<T> step_function, T minimum, T maximum)
 		{
-			throw new Error("not implemented");
+			throw new System.NotImplementedException();
 		}
 		#endregion
 		#region public void Clear()
@@ -485,7 +485,7 @@ namespace Seven.Structures
 					case Comparison.Greater:
 						goto break_for;
 					default:
-						throw new Error("not implemented");
+						throw new System.NotImplementedException();
 				}
 		break_for:
 			if (loc < node.ItemCount && compare(node.Items[loc], key) == Comparison.Equal)
@@ -510,13 +510,13 @@ namespace Seven.Structures
 					case Comparison.Greater:
 						goto break_for;
 					default:
-						throw new Error("not implemented");
+						throw new System.NotImplementedException();
 				}
 		break_for:
 			if (loc < node.ItemCount && compare(node.Items[loc], key) == Comparison.Equal)
 				return node.Items[loc];
 			if (node.ChildCount == 0)
-				throw new Error("getting a non-existing item");
+				throw new System.InvalidOperationException("getting a non-existing item");
 			return this.Get(node.Children[loc], key, compare);
 		}
 		#endregion
@@ -535,7 +535,7 @@ namespace Seven.Structures
 					case Comparison.Greater:
 						goto break_for;
 					default:
-						throw new Error("not implemented");
+						throw new System.NotImplementedException();
 				}
 		break_for:
 			if (loc < node.ItemCount && compare(node.Items[loc], key) == Comparison.Equal)
@@ -784,7 +784,7 @@ namespace Seven.Structures
 						positionToInsert++;
 						continue;
 					default:
-						throw new Error("not implemented");
+						throw new System.NotImplementedException();
 				}
 		break_for:
 			if (node.ChildCount == 0) // leaf node
@@ -847,7 +847,7 @@ namespace Seven.Structures
 				case StepStatus.Continue:
 					break;
 				default:
-					throw new Error("not implemented");
+					throw new System.NotImplementedException();
 			}
 			for (int i = node.ItemCount - 1; i > -1; i--)
 			{
@@ -858,7 +858,7 @@ namespace Seven.Structures
 					case StepStatus.Continue:
 						break;
 					default:
-						throw new Error("not implemented");
+						throw new System.NotImplementedException();
 				}
 				switch (Stepper(step_delegate, node.Children[i]))
 				{
@@ -867,7 +867,7 @@ namespace Seven.Structures
 					case StepStatus.Continue:
 						break;
 					default:
-						throw new Error("not implemented");
+						throw new System.NotImplementedException();
 				}
 			}
 			return StepStatus.Continue;
@@ -885,7 +885,7 @@ namespace Seven.Structures
 				case StepStatus.Continue:
 					break;
 				default:
-					throw new Error("not implemented");
+					throw new System.NotImplementedException();
 			}
 			for (int i = node.ItemCount - 1; i > -1; i--)
 			{
@@ -896,7 +896,7 @@ namespace Seven.Structures
 					case StepStatus.Continue:
 						break;
 					default:
-						throw new Error("not implemented");
+						throw new System.NotImplementedException();
 				}
 				switch (Stepper(step_delegate, node.Children[i]))
 				{
@@ -905,7 +905,7 @@ namespace Seven.Structures
 					case StepStatus.Continue:
 						break;
 					default:
-						throw new Error("not implemented");
+						throw new System.NotImplementedException();
 				}
 			}
 			return StepStatus.Continue;
@@ -951,7 +951,7 @@ namespace Seven.Structures
 					case StepStatus.Continue:
 						break;
 					default:
-						throw new Error("not implemented");
+						throw new System.NotImplementedException();
 				}
 				switch (step_delegate(node.Items[i]))
 				{
@@ -960,7 +960,7 @@ namespace Seven.Structures
 					case StepStatus.Break:
 						return StepStatus.Break;
 					default:
-						throw new Error("not implemented");
+						throw new System.NotImplementedException();
 				}
 			}
 			return Stepper(step_delegate, node.Children[node.ItemCount]);
@@ -980,7 +980,7 @@ namespace Seven.Structures
 					case StepStatus.Continue:
 						break;
 					default:
-						throw new Error("not implemented");
+						throw new System.NotImplementedException();
 				}
 				switch (step_delegate(ref node.Items[i]))
 				{
@@ -989,7 +989,7 @@ namespace Seven.Structures
 					case StepStatus.Break:
 						return StepStatus.Break;
 					default:
-						throw new Error("not implemented");
+						throw new System.NotImplementedException();
 				}
 			}
 			return Stepper(step_delegate, node.Children[node.ItemCount]);
@@ -1114,7 +1114,7 @@ namespace Seven.Structures
 	//					low = median + 1;
 	//					break;
 	//				default:
-	//					throw new Error("not implemented");
+	//					throw new System.NotImplementedException();
 	//			}
 	//		}
 	//		return ~low;
@@ -1297,7 +1297,7 @@ namespace Seven.Structures
 	//	/// <param name="removal">The item to be removed.</param>
 	//	public void Remove(T removal)
 	//	{
-	//		throw new Error("not implemented");
+	//		throw new System.NotImplementedException();
 	//	}
 
 	//	/// <summary>Determines if the structure contains an item based on a given key.</summary>
@@ -1307,7 +1307,7 @@ namespace Seven.Structures
 	//	/// <returns>True if contained, False if not.</returns>
 	//	public bool Contains<Key>(Key key, Compare<T, Key> comparison)
 	//	{
-	//		throw new Error("not implemented");
+	//		throw new System.NotImplementedException();
 	//	}
 
 	//	/// <summary>Gets an item based on a given key.</summary>
@@ -1322,7 +1322,7 @@ namespace Seven.Structures
 	//	private T Get<K>(K key, Compare<T, K> compare, Node node)
 	//	{
 	//		if (node == null)
-	//			throw new Error("getting a non-existing value from BTree");
+	//			throw new System.Exception("getting a non-existing value from BTree");
 	//		for (int i = 0; i < node.Items.Length; i++)
 	//		{
 	//			switch (compare(node.Items[i], key))
@@ -1334,7 +1334,7 @@ namespace Seven.Structures
 	//				case Comparison.Less:
 	//					break;
 	//				default:
-	//					throw new Error("not implemented");
+	//					throw new System.NotImplementedException();
 	//			}
 	//		}
 	//		return Get<K>(key, compare, node.Children[node.Items.Length]);
@@ -1346,7 +1346,7 @@ namespace Seven.Structures
 	//	/// <param name="compare">The comparison technique (must synchronize with the sorting of this data structure).</param>
 	//	public void Remove<Key>(Key removal, Compare<T, Key> compare)
 	//	{
-	//		throw new Error("not implemented");
+	//		throw new System.NotImplementedException();
 	//	}
 
 	//	/// <summary>Invokes a delegate for each entry in the data structure (right to left).</summary>
@@ -1403,7 +1403,7 @@ namespace Seven.Structures
 	//			case StepStatus.Continue:
 	//				break;
 	//			default:
-	//				throw new Error("not implemented");
+	//				throw new System.NotImplementedException();
 	//		}
 	//		for (int i = node.Count - 1; i > -1; i--)
 	//		{
@@ -1414,7 +1414,7 @@ namespace Seven.Structures
 	//				case StepStatus.Continue:
 	//					break;
 	//				default:
-	//					throw new Error("not implemented");
+	//					throw new System.NotImplementedException();
 	//			}
 	//			switch (Stepper(step_delegate, node.Children[i]))
 	//			{
@@ -1423,7 +1423,7 @@ namespace Seven.Structures
 	//				case StepStatus.Continue:
 	//					break;
 	//				default:
-	//					throw new Error("not implemented");
+	//					throw new System.NotImplementedException();
 	//			}
 	//		}
 	//		return StepStatus.Continue;
@@ -1447,7 +1447,7 @@ namespace Seven.Structures
 	//			case StepStatus.Continue:
 	//				break;
 	//			default:
-	//				throw new Error("not implemented");
+	//				throw new System.NotImplementedException();
 	//		}
 	//		for (int i = node.Count - 1; i > -1; i--)
 	//		{
@@ -1458,7 +1458,7 @@ namespace Seven.Structures
 	//				case StepStatus.Continue:
 	//					break;
 	//				default:
-	//					throw new Error("not implemented");
+	//					throw new System.NotImplementedException();
 	//			}
 	//			switch (Stepper(step_delegate, node.Children[i]))
 	//			{
@@ -1467,7 +1467,7 @@ namespace Seven.Structures
 	//				case StepStatus.Continue:
 	//					break;
 	//				default:
-	//					throw new Error("not implemented");
+	//					throw new System.NotImplementedException();
 	//			}
 	//		}
 	//		return StepStatus.Continue;
@@ -1479,7 +1479,7 @@ namespace Seven.Structures
 	//	/// <param name="maximum">The maximum step value.</param>
 	//	public void Stepper(Step<T> step_function, T minimum, T maximum)
 	//	{
-	//		throw new Error("not implemented");
+	//		throw new System.NotImplementedException();
 	//	}
 
 	//	/// <summary>Does an optimized step function (left to right) for sorted binary search trees.</summary>
@@ -1488,7 +1488,7 @@ namespace Seven.Structures
 	//	/// <param name="maximum">The maximum step value.</param>
 	//	public void Stepper(StepRef<T> step_function, T minimum, T maximum)
 	//	{
-	//		throw new Error("not implemented");
+	//		throw new System.NotImplementedException();
 	//	}
 
 	//	/// <summary>Does an optimized step function (left to right) for sorted binary search trees.</summary>
@@ -1498,7 +1498,7 @@ namespace Seven.Structures
 	//	/// <returns>The result status of the stepper function.</returns>
 	//	public StepStatus Stepper(StepBreak<T> step_function, T minimum, T maximum)
 	//	{
-	//		throw new Error("not implemented");
+	//		throw new System.NotImplementedException();
 	//	}
 
 	//	/// <summary>Does an optimized step function (left to right) for sorted binary search trees.</summary>
@@ -1508,7 +1508,7 @@ namespace Seven.Structures
 	//	/// <returns>The result status of the stepper function.</returns>
 	//	public StepStatus Stepper(StepRefBreak<T> step_function, T minimum, T maximum)
 	//	{
-	//		throw new Error("not implemented");
+	//		throw new System.NotImplementedException();
 	//	}
 
 	//	/// <summary>Does an optimized step function (right to left) for sorted binary search trees.</summary>
@@ -1517,7 +1517,7 @@ namespace Seven.Structures
 	//	/// <param name="maximum">The maximum step value.</param>
 	//	public void StepperReverse(Step<T> step_function, T minimum, T maximum)
 	//	{
-	//		throw new Error("not implemented");
+	//		throw new System.NotImplementedException();
 	//	}
 
 	//	/// <summary>Does an optimized step function (right to left) for sorted binary search trees.</summary>
@@ -1526,7 +1526,7 @@ namespace Seven.Structures
 	//	/// <param name="maximum">The maximum step value.</param>
 	//	public void StepperReverse(StepRef<T> step_function, T minimum, T maximum)
 	//	{
-	//		throw new Error("not implemented");
+	//		throw new System.NotImplementedException();
 	//	}
 
 	//	/// <summary>Does an optimized step function (right to left) for sorted binary search trees.</summary>
@@ -1536,7 +1536,7 @@ namespace Seven.Structures
 	//	/// <returns>The result status of the stepper function.</returns>
 	//	public StepStatus StepperReverse(StepBreak<T> step_function, T minimum, T maximum)
 	//	{
-	//		throw new Error("not implemented");
+	//		throw new System.NotImplementedException();
 	//	}
 
 	//	/// <summary>Does an optimized step function (right to left) for sorted binary search trees.</summary>
@@ -1546,7 +1546,7 @@ namespace Seven.Structures
 	//	/// <returns>The result status of the stepper function.</returns>
 	//	public StepStatus StepperReverse(StepRefBreak<T> step_function, T minimum, T maximum)
 	//	{
-	//		throw new Error("not implemented");
+	//		throw new System.NotImplementedException();
 	//	}
 
 	//	/// <summary>Returns the structure to an empty state.</summary>
@@ -1616,7 +1616,7 @@ namespace Seven.Structures
 	//				case StepStatus.Continue:
 	//					break;
 	//				default:
-	//					throw new Error("not implemented");
+	//					throw new System.NotImplementedException();
 	//			}
 	//			switch (step_delegate(node.Items[i]))
 	//			{
@@ -1625,7 +1625,7 @@ namespace Seven.Structures
 	//				case StepStatus.Break:
 	//					return StepStatus.Break;
 	//				default:
-	//					throw new Error("not implemented");
+	//					throw new System.NotImplementedException();
 	//			}
 	//		}
 	//		return Stepper(step_delegate, node.Children[node.Count]);
@@ -1651,7 +1651,7 @@ namespace Seven.Structures
 	//				case StepStatus.Continue:
 	//					break;
 	//				default:
-	//					throw new Error("not implemented");
+	//					throw new System.NotImplementedException();
 	//			}
 	//			switch (step_delegate(ref node.Items[i]))
 	//			{
@@ -1660,7 +1660,7 @@ namespace Seven.Structures
 	//				case StepStatus.Break:
 	//					return StepStatus.Break;
 	//				default:
-	//					throw new Error("not implemented");
+	//					throw new System.NotImplementedException();
 	//			}
 	//		}
 	//		return Stepper(step_delegate, node.Children[node.Count]);

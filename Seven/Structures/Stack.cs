@@ -130,7 +130,7 @@ namespace Seven.Structures
 		public T Peek()
 		{
 			if (_top == null)
-				throw new Error("Attempting to remove from an empty queue.");
+				throw new System.InvalidOperationException("Attempting to remove from an empty queue.");
 			T peek = _top.Value;
 			return peek;
 		}
@@ -280,7 +280,7 @@ namespace Seven.Structures
 			set
 			{
 				if (value < 1)
-					throw new Error("Attempting to set a minimum capacity to a negative or zero value.");
+					throw new System.InvalidOperationException("Attempting to set a minimum capacity to a negative or zero value.");
 				else if (value > _stack.Length)
 				{
 					T[] newList = new T[value];
@@ -332,7 +332,7 @@ namespace Seven.Structures
 			if (_count == _stack.Length)
 			{
 				if (_stack.Length > int.MaxValue / 2)
-					throw new Error("your queue is so large that it can no longer double itself (Int32.MaxValue barrier reached).");
+					throw new System.InvalidOperationException("your queue is so large that it can no longer double itself (Int32.MaxValue barrier reached).");
 				T[] newStack = new T[_stack.Length * 2];
 				for (int i = 0; i < _count; i++)
 					newStack[i] = _stack[i];
@@ -347,7 +347,7 @@ namespace Seven.Structures
 		public T Pop()
 		{
 			if (_count == 0)
-				throw new Error("attempting to dequeue from an empty queue.");
+				throw new System.InvalidOperationException("attempting to dequeue from an empty queue.");
 			if (_count < _stack.Length / 4 && _stack.Length / 2 > _minimumCapacity)
 			{
 				T[] newQueue = new T[_stack.Length / 2];
@@ -410,7 +410,7 @@ namespace Seven.Structures
 					case StepStatus.Continue:
 						continue;
 					default:
-						throw new Error("not implemented");
+						throw new System.NotImplementedException();
 				}
 			return StepStatus.Continue;
 		}
@@ -429,7 +429,7 @@ namespace Seven.Structures
 					case StepStatus.Continue:
 						continue;
 					default:
-						throw new Error("not implemented");
+						throw new System.NotImplementedException();
 				}
 			return StepStatus.Continue;
 		}

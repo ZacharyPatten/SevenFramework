@@ -33,7 +33,6 @@
 		/// <param name="get">The key of the item to get.</param>
 		/// <param name="comparison">Comparison technique (must match the sorting technique of the structure).</param>
 		/// <returns>The found item.</returns>
-		/// <exception cref="Seven.Error">Thrown when getting a non-existing item to the structure.</exception>
 		T Get<Key>(Key get, Compare<T, Key> comparison);
 		#endregion
 		#region void Remove<Key>(Key removal, Compare<T, Key> comparison);
@@ -41,7 +40,6 @@
 		/// <typeparam name="Key">The type of the key.</typeparam>
 		/// <param name="removal">The key of the item to be removed.</param>
 		/// <param name="comparison">Comparison technique (must match the sorting technique of the structure).</param>
-		/// <exception cref="Seven.Error">Thrown when removing a non-existing item to the structure.</exception>
 		void Remove<Key>(Key removal, Compare<T, Key> comparison);
 		#endregion
 	}
@@ -209,10 +207,10 @@
 						treeNode = treeNode.RightChild;
 						break;
 					default:
-						throw new Error("not implemeted");
+						throw new System.NotImplementedException();
 				}
 			}
-			throw new Error("attempting to get a non-existing value.");
+			throw new System.InvalidOperationException("attempting to get a non-existing value.");
 		}
 		#endregion
 		#region public void Add(T data)
@@ -227,7 +225,7 @@
 				switch (this._compare_function(data, temp.Value))
 				{
 					case Comparison.Equal:
-						throw (new Error("A Node with the same key already exists"));
+						throw (new System.InvalidOperationException("A Node with the same key already exists"));
 					case Comparison.Greater:
 						temp = temp.RightChild;
 						break;
@@ -235,7 +233,7 @@
 						temp = temp.LeftChild;
 						break;
 					default:
-						throw new Error("not implemented");
+						throw new System.NotImplementedException();
 				}
 			}
 			addition.Value = data;
@@ -252,7 +250,7 @@
 						addition.Parent.LeftChild = addition;
 						break;
 					default:
-						throw new Error("not implemented");
+						throw new System.NotImplementedException();
 				}
 			}
 			else
@@ -289,7 +287,7 @@
 						node = node.RightChild;
 						break;
 					default:
-						throw new Error("not implemented");
+						throw new System.NotImplementedException();
 				}
 			}
 		}
@@ -317,7 +315,7 @@
 						treeNode = treeNode.RightChild;
 						break;
 					default:
-						throw new Error("not implemeted");
+						throw new System.NotImplementedException();
 				}
 			}
 			return false;
@@ -335,7 +333,7 @@
 		{
 			RedBlackTreeLinked<T>.Node treeNode = _root;
 			if (treeNode == null || treeNode == _sentinelNode)
-				throw new Error("attempting to get the minimum value from an empty tree.");
+				throw new System.InvalidOperationException("attempting to get the minimum value from an empty tree.");
 			while (treeNode.LeftChild != _sentinelNode)
 				treeNode = treeNode.LeftChild;
 			T returnValue = treeNode.Value;
@@ -348,7 +346,7 @@
 			RedBlackTreeLinked<T>.Node treeNode = _root;
 			if (treeNode == null || treeNode == _sentinelNode)
 			{
-				throw (new Error("attempting to get the maximum value from an empty tree."));
+				throw new System.InvalidOperationException("attempting to get the maximum value from an empty tree.");
 			}
 			while (treeNode.RightChild != _sentinelNode)
 				treeNode = treeNode.RightChild;

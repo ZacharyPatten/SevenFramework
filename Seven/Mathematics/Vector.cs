@@ -136,22 +136,22 @@ namespace Seven.Mathematics
 		/// <summary>Same as accessing index 1.</summary>
 		public T Y
 		{
-			get { try { return _vector[1]; } catch { throw new Error("vector does not contains a y component."); } }
-			set { try { _vector[1] = value; } catch { throw new Error("vector does not contains a y component."); } }
+			get { try { return _vector[1]; } catch { throw new System.ArgumentOutOfRangeException("vector does not contains a y component."); } }
+			set { try { _vector[1] = value; } catch { throw new System.ArgumentOutOfRangeException("vector does not contains a y component."); } }
 		}
 
 		/// <summary>Same as accessing index 2.</summary>
 		public T Z
 		{
-			get { try { return _vector[2]; } catch { throw new Error("vector does not contains a z component."); } }
-			set { try { _vector[2] = value; } catch { throw new Error("vector does not contains a z component."); } }
+			get { try { return _vector[2]; } catch { throw new System.ArgumentOutOfRangeException("vector does not contains a z component."); } }
+			set { try { _vector[2] = value; } catch { throw new System.ArgumentOutOfRangeException("vector does not contains a z component."); } }
 		}
 
 		/// <summary>Same as accessing index 3.</summary>
 		public T W
 		{
-			get { try { return _vector[3]; } catch { throw new Error("vector does not contains a w component."); } }
-			set { try { _vector[3] = value; } catch { throw new Error("vector does not contains a w component."); } }
+			get { try { return _vector[3]; } catch { throw new System.ArgumentOutOfRangeException("vector does not contains a w component."); } }
+			set { try { _vector[3] = value; } catch { throw new System.ArgumentOutOfRangeException("vector does not contains a w component."); } }
 		}
 
 		/// <summary>The number of components in this vector.</summary>
@@ -162,8 +162,8 @@ namespace Seven.Mathematics
 		/// <returns>The value of the given index.</returns>
 		public T this[int index]
 		{
-			get { try { return _vector[index]; } catch { throw new Error("index out of bounds."); } }
-			set { try { _vector[index] = value; } catch { throw new Error("index out of bounds."); } }
+			get { try { return _vector[index]; } catch { throw new System.ArgumentOutOfRangeException("index out of bounds."); } }
+			set { try { _vector[index] = value; } catch { throw new System.ArgumentOutOfRangeException("index out of bounds."); } }
 		}
 
 		#endregion
@@ -667,11 +667,11 @@ namespace Seven.Mathematics
 
 			#region Alternat Version
 			//if (object.ReferenceEquals(left, null))
-			//	throw new Error("null reference: left");
+			//	throw new System.Exception("null reference: left");
 			//if (object.ReferenceEquals(right, null))
-			//	throw new Error("null reference: right");
+			//	throw new System.Exception("null reference: right");
 			//if (left.Dimensions != right.Dimensions)
-			//	throw new Error("invalid dimensions on vector addition.");
+			//	throw new System.Exception("invalid dimensions on vector addition.");
 			//T[] _left = left._vector;
 			//T[] _right = right._vector;
 			//int dimensions = left.Dimensions;
@@ -732,7 +732,7 @@ namespace Seven.Mathematics
 @"(Vector<", T_Source, @"> _vector) =>
 {
  	if (object.ReferenceEquals(_vector, null))
-		throw new Error(", "\"null reference: vector\"", @");
+		throw new System.Exception(", "\"null reference: vector\"", @");
  	int length = _vector.Dimensions;
 	Vector<", T_Source, @"> result =
 		new Vector<", T_Source, @">(length);
@@ -747,7 +747,7 @@ namespace Seven.Mathematics
 
 			#region Alternate Version
 			//if (object.ReferenceEquals(vector, null))
-			//	throw new Error("null reference: vector");
+			//	throw new System.Exception("null reference: vector");
 			//Vector<T> result =
 			//	new Vector<T>(vector.Dimensions);
 			//for (int i = 0; i < vector.Dimensions; i++)
@@ -767,11 +767,11 @@ namespace Seven.Mathematics
 @"(Vector<", T_Source, "> _left, Vector<", T_Source, @"> _right) =>
 {
 	if (object.ReferenceEquals(_left, null))
-		throw new Error(", "\"null reference: _left\"", @");
+		throw new System.Exception(", "\"null reference: _left\"", @");
 	if (object.ReferenceEquals(_right, null))
-		throw new Error(", "\"null reference: _right\"", @");
+		throw new System.Exception(", "\"null reference: _right\"", @");
 	if (_left.Dimensions != _right.Dimensions)
-		throw new Error(", "\"invalid dimensions on vector subtraction.\"", @");
+		throw new System.Exception(", "\"invalid dimensions on vector subtraction.\"", @");
 	int length = _left.Dimensions;
 	Vector<", T_Source, @"> result =
 		new Vector<", T_Source, @">(length);
@@ -787,11 +787,11 @@ namespace Seven.Mathematics
 
 			#region Alternate Version
 			//if (object.ReferenceEquals(left, null))
-			//	throw new Error("null reference: left");
+			//	throw new System.Exception("null reference: left");
 			//if (object.ReferenceEquals(right, null))
-			//	throw new Error("null reference: right");
+			//	throw new System.Exception("null reference: right");
 			//if (left.Dimensions != right.Dimensions)
-			//	throw new Error("invalid dimensions on vector subtraction.");
+			//	throw new System.Exception("invalid dimensions on vector subtraction.");
 			//Vector<T> result =
 			//	new Vector<T>(left.Dimensions);
 			//for (int i = 0; i < left.Dimensions; i++)
@@ -811,7 +811,7 @@ namespace Seven.Mathematics
 "(Vector<", T_Source, "> _left, ", T_Source, @" _right) =>
 {
  	if (object.ReferenceEquals(_left, null))
-			throw new Error(", "\"null reference: _left\"", @");
+			throw new System.Exception(", "\"null reference: _left\"", @");
 	int length = _left.Dimensions;
 	Vector<", T_Source, @"> result =
 		new Vector<", T_Source, @">(length);
@@ -826,9 +826,9 @@ namespace Seven.Mathematics
 
 			#region Alternate Version
 			//if (left == null)
-			//	throw new Error("null reference: left");
+			//	throw new System.Exception("null reference: left");
 			//if (right == null)
-			//	throw new Error("null reference: right");
+			//	throw new System.Exception("null reference: right");
 			//Vector<T> result =
 			//	new Vector<T>(left.Dimensions);
 			//for (int i = 0; i < left.Dimensions; i++)
@@ -952,7 +952,7 @@ namespace Seven.Mathematics
 "(Vector<", T_Source + @"> _vector) =>
 {
 	if (object.ReferenceEquals(_vector, null))
-		throw new Error(", "\"null reference: _vector\"", @");
+		throw new System.Exception(", "\"null reference: _vector\"", @");
 	int length = _vector.Dimensions;
 	Vector<", T_Source, @"> result =
 		new Vector<", T_Source, @">(_vector.Dimensions);
@@ -995,7 +995,7 @@ namespace Seven.Mathematics
 "(Vector<", T_Source, @"> _vector) =>
 {
 	if (object.ReferenceEquals(_vector, null))
-		throw new Error(", "\"null reference: _vector\"", @");
+		throw new System.Exception(", "\"null reference: _vector\"", @");
 	int length = _vector.Dimensions;
 	", T_Source, @" result = 0;
 	", T_Source, @"[] _vector_flat = _vector._vector;
@@ -1025,7 +1025,7 @@ namespace Seven.Mathematics
 "(Vector<", T_Source, @"> _vector) =>
 {
 	if (object.ReferenceEquals(_vector, null))
-		throw new Error(", "\"null reference: _vector\"", @");
+		throw new System.Exception(", "\"null reference: _vector\"", @");
 	int length = _vector.Dimensions;
 	", T_Source, @" result = 0;
 	", T_Source, @"[] _vector_flat = _vector._vector;
@@ -1092,9 +1092,9 @@ namespace Seven.Mathematics
 "(Vector<", T_Source, "> _left, Vector<", T_Source, "> _right, ", T_Source, @" _blend) =>
 {
 	if (_blend < 0 || _blend > 1)
-		throw new Error(", "\"invalid vector lerp _blend value: (_blend < 0.0f || _blend > 1.0f).\"", @");
+		throw new System.Exception(", "\"invalid vector lerp _blend value: (_blend < 0.0f || _blend > 1.0f).\"", @");
 	if (_left.Dimensions != _right.Dimensions)
-		throw new Error(", "\"invalid vector lerp length: (_left.Dimensions != _right.Dimensions)\"", @");
+		throw new System.Exception(", "\"invalid vector lerp length: (_left.Dimensions != _right.Dimensions)\"", @");
 	int length = _left.Dimensions;
 	Vector<", T_Source, @"> result =
 		new Vector<", T_Source, @">(length);
@@ -1121,7 +1121,7 @@ namespace Seven.Mathematics
 		/// <summary>Sphereically interpolates between two vectors.</summary>
 		private static Vector<T>.Delegates.Vector_Slerp Vector_Slerp = (Vector<T> left, Vector<T> right, T blend) =>
 		{
-			throw new Error("not yet implemented");
+			throw new System.NotImplementedException();
 
 			//#region pre-optimization
 
@@ -1156,11 +1156,11 @@ namespace Seven.Mathematics
 "(Vector<", T_Source, "> _a, Vector<", T_Source, "> _b, Vector<", T_Source, "> _c, ", T_Source, " _u, ", T_Source, @" _v) =>
 {
 	if (object.ReferenceEquals(a, null))
-		throw new Error(", "\"null reference: _a\"", @");
+		throw new System.Exception(", "\"null reference: _a\"", @");
 	if (object.ReferenceEquals(b, null))
-		throw new Error(", "\"null reference: _b\"", @");
+		throw new System.Exception(", "\"null reference: _b\"", @");
 	if (object.ReferenceEquals(c, null))
-		throw new Error(", "\"null reference: _c\"", @");
+		throw new System.Exception(", "\"null reference: _c\"", @");
 	return
 		Vector<", T_Source, @">.Vector_Add(
 			Vector<", T_Source, @">.Vector_Add(
@@ -1284,7 +1284,7 @@ namespace Seven.Mathematics
 		///// <returns>The angle between the two vectors in radians.</returns>
 		//private static generic Angle(Vector<generic> first, Vector<generic> second)
 		//{
-		//		throw new Error("requires rational types");
+		//		throw new System.Exception("requires rational types");
 
 		//		//			#region pre-optimization
 
@@ -1299,9 +1299,9 @@ namespace Seven.Mathematics
 		//		//			// nothing
 		//		//#else
 		//		//			if (object.ReferenceEquals(first, null))
-		//		//				throw new Error("null reference: first");
+		//		//				throw new System.Exception("null reference: first");
 		//		//			if (object.ReferenceEquals(second, null))
-		//		//				throw new Error("null reference: second");
+		//		//				throw new System.Exception("null reference: second");
 		//		//#endif
 
 		//		//			return Trigonometry.arccos(
@@ -1341,9 +1341,9 @@ namespace Seven.Mathematics
 		//		//			// nothing
 		//		//#else
 		//		//			if (object.ReferenceEquals(vector, null))
-		//		//				throw new Error("null reference: vector");
+		//		//				throw new System.Exception("null reference: vector");
 		//		//			if (vector.Dimensions == 3)
-		//		//				throw new Error("my RotateBy() function is only defined for 3-component vectors.");
+		//		//				throw new System.Exception("my RotateBy() function is only defined for 3-component vectors.");
 		//		//#endif
 
 		//		//			Vector<generic> result = new Vector<generic>(3);
@@ -1400,7 +1400,7 @@ namespace Seven.Mathematics
 		///// <returns>The result of the slerp operation.</returns>
 		//private static Vector<generic> Slerp(Vector<generic> left, Vector<generic> right, generic blend)
 		//{
-		//		throw new Error("requires rational rational types");
+		//		throw new System.Exception("requires rational rational types");
 
 		//		//			#region pre-optimization
 
@@ -1417,11 +1417,11 @@ namespace Seven.Mathematics
 		//		//			// nothing
 		//		//#else
 		//		//			if (object.ReferenceEquals(left, null))
-		//		//				throw new Error("null reference: left");
+		//		//				throw new System.Exception("null reference: left");
 		//		//			if (object.ReferenceEquals(right, null))
-		//		//				throw new Error("null reference: right");
+		//		//				throw new System.Exception("null reference: right");
 		//		//			if (blend < 0 || blend > 1)
-		//		//				throw new Error("invalid slerp blend value: (blend < 0.0f || blend > 1.0f).");
+		//		//				throw new System.Exception("invalid slerp blend value: (blend < 0.0f || blend > 1.0f).");
 		//		//#endif
 
 		//		//			generic dot = Vector.DotProduct(left, right);

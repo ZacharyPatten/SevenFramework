@@ -36,7 +36,7 @@ namespace Seven.Structures
 		public ArrayArray(int size)
 		{
 			if (size < 1)
-				throw new Error("size of the array must be at least 1.");
+				throw new System.ArgumentOutOfRangeException("size of the array must be at least 1.");
 			this._array = new T[size];
 		}
 		#endregion
@@ -60,12 +60,12 @@ namespace Seven.Structures
 			get
 			{
 				try { return _array[index]; }
-				catch { throw new Error("index out of bounds."); }
+				catch { throw new System.ArgumentOutOfRangeException("index out of bounds."); }
 			}
 			set
 			{
 				try { _array[index] = value; }
-				catch { throw new Error("index out of bounds."); }
+				catch { throw new System.ArgumentOutOfRangeException("index out of bounds."); }
 			}
 		}
 		#endregion
@@ -173,13 +173,15 @@ namespace Seven.Structures
 		}
 		#endregion
 
-		public string Serialize(Serialize<T> serialize)
-		{
-			throw new System.NotImplementedException();
-			//string[] contents = new string[this._array.Length];
-			//for (int i = 0; i < this._array.Length; i++)
-			//	contents[i] = string.serialize()
-			//this.Stepper
-		}
+		#region In Development
+		//public string Serialize(Serialize<T> serialize)
+		//{
+		//	throw new System.NotImplementedException();
+		//	//string[] contents = new string[this._array.Length];
+		//	//for (int i = 0; i < this._array.Length; i++)
+		//	//	contents[i] = serialize(this._array[i]);
+		//	//this.Stepper
+		//}
+		#endregion
 	}
 }

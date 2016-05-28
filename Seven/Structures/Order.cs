@@ -77,7 +77,7 @@
 		{
 			throw new System.NotImplementedException();
 			//if (!this._list.TryRemoveFirst(removal, this._compare))
-			//	throw new Error("attempting to remove a non-existing first item from an order");
+			//	throw new System.Exception("attempting to remove a non-existing first item from an order");
 		}
 		#endregion
 		#region public bool TryRemoveFirst(T removal)
@@ -209,7 +209,7 @@
 		{
 			throw new System.NotImplementedException();
 			//if (!this._list.TryRemoveFirst(removal, this._compare))
-			//	throw new Error("attempting to remove a non-existing first item from an order");
+			//	throw new System.Exception("attempting to remove a non-existing first item from an order");
 		}
 		#endregion
 		#region public bool TryRemoveFirst(T removal)

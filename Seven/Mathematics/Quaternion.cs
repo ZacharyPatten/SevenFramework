@@ -426,7 +426,7 @@ namespace Seven.Mathematics
 				"(Quaternion<" + T_Source + "> _quaternion) =>" +
 				"{" +
 				"	if (object.ReferenceEquals(_quaternion, null))" +
-				"		throw new Error(\"null reference: _quaternion\");" +
+				"		throw new System.Exception(\"null reference: _quaternion\");" +
 				"	return Compute<" + T_Source + ">.SquareRoot(" +
 				"		(_quaternion.X * _quaternion.X +" +
 				"		_quaternion.Y * _quaternion.Y +" +
@@ -449,7 +449,7 @@ namespace Seven.Mathematics
 				"(Quaternion<" + T_Source + "> _quaternion) =>" +
 				"{" +
 				"	if (object.ReferenceEquals(_quaternion, null))" +
-				"		throw new Error(\"null reference: _quaternion\");" +
+				"		throw new System.Exception(\"null reference: _quaternion\");" +
 				"	return" +
 				"		_quaternion.X * _quaternion.X +" +
 				"		_quaternion.Y * _quaternion.Y +" +
@@ -472,7 +472,7 @@ namespace Seven.Mathematics
 				"(Quaternion<" + T_Source + "> _quaternion) =>" +
 				"{" +
 				"	if (_quaternion == null)" +
-				"		throw new Error(\"null reference: quaternion\");" +
+				"		throw new System.Exception(\"null reference: quaternion\");" +
 				"	return new Quaternion<" + T_Source + ">(" +
 				"		-_quaternion.X," +
 				"		-_quaternion.Y," +
@@ -495,9 +495,9 @@ namespace Seven.Mathematics
 				"(Quaternion<" + T_Source + "> _left, Quaternion<" + T_Source + "> _right) =>" +
 				"{" +
 				"	if (object.ReferenceEquals(_left, null))" +
-				"		throw new Error(\"null reference: _left\");" +
+				"		throw new System.Exception(\"null reference: _left\");" +
 				"	if (object.ReferenceEquals(_right, null))" +
-				"		throw new Error(\"null reference: _right\");" +
+				"		throw new System.Exception(\"null reference: _right\");" +
 				"	return new Quaternion<" + T_Source + ">(" +
 				"		_left.X + _right.X," +
 				"		_left.Y + _right.Y," +
@@ -520,9 +520,9 @@ namespace Seven.Mathematics
 				"(Quaternion<" + T_Source + "> _left, Quaternion<" + T_Source + "> _right) =>" +
 				"{" +
 				"	if (object.ReferenceEquals(_left, null))" +
-				"		throw new Error(\"null reference: _left\");" +
+				"		throw new System.Exception(\"null reference: _left\");" +
 				"	if (object.ReferenceEquals(_right, null))" +
-				"		throw new Error(\"null reference: _right\");" +
+				"		throw new System.Exception(\"null reference: _right\");" +
 				"	return new Quaternion<" + T_Source + ">(" +
 				"		_left.X - _right.X," +
 				"		_left.Y - _right.Y," +
@@ -545,9 +545,9 @@ namespace Seven.Mathematics
 				"(Quaternion<" + T_Source + "> _left, Quaternion<" + T_Source + "> _right) =>" +
 				"{" +
 				"	if (object.ReferenceEquals(_left, null))" +
-				"		throw new Error(\"null reference: _left\");" +
+				"		throw new System.Exception(\"null reference: _left\");" +
 				"	if (object.ReferenceEquals(_right, null))" +
-				"		throw new Error(\"null reference: _right\");" +
+				"		throw new System.Exception(\"null reference: _right\");" +
 				"	return new Quaternion<" + T_Source + ">(" +
 				"		_left.X * _right.W + _left.W * _right.X + _left.Y * _right.Z - _left.Z * _right.Y," +
 				"		_left.Y * _right.W + _left.W * _right.Y + _left.Z * _right.X - _left.X * _right.Z," +
@@ -570,7 +570,7 @@ namespace Seven.Mathematics
 				"(Quaternion<" + T_Source + "> _left, " + T_Source + " _right) =>" +
 				"{" +
 				"	if (object.ReferenceEquals(_left, null))" +
-				"		throw new Error(\"null reference: _left\");" +
+				"		throw new System.Exception(\"null reference: _left\");" +
 				"	return new Quaternion<" + T_Source + ">(" +
 				"		_left.X * _right," +
 				"		_left.Y * _right," +
@@ -593,11 +593,11 @@ namespace Seven.Mathematics
 				"(Quaternion<" + T_Source + "> _left, Vector<" + T_Source + "> _right) =>" +
 				"{" +
 				"	if (object.ReferenceEquals(_left, null))" +
-				"		throw new Error(\"null reference: _left\");" +
+				"		throw new System.Exception(\"null reference: _left\");" +
 				"	if (object.ReferenceEquals(_right, null))" +
-				"		throw new Error(\"null reference: _right\");" +
+				"		throw new System.Exception(\"null reference: _right\");" +
 				"	if (_right.Dimensions != 3)" +
-				"		throw new Error(\"my quaternion rotations are only defined for 3-component vectors.\");" +
+				"		throw new System.Exception(\"my quaternion rotations are only defined for 3-component vectors.\");" +
 				"	return new Quaternion<" + T_Source + ">(" +
 				"		_left.W * _right.X + _left.Y * _right.Z - _left.Z * _right.Y," +
 				"		_left.W * _right.Y + _left.Z * _right.X - _left.X * _right.Z," +
@@ -620,7 +620,7 @@ namespace Seven.Mathematics
 				"(Quaternion<" + T_Source + "> _quaternion) =>" +
 				"{" +
 				"	if (object.ReferenceEquals(_quaternion, null))" +
-				"		throw new Error(\"null reference: quaternion\");" +
+				"		throw new System.Exception(\"null reference: quaternion\");" +
 				"	" + T_Source + " normalizer = Quaternion<" + T_Source + ">.Magnitude(_quaternion);" +
 				"	if (normalizer != 0)" +
 				"		return _quaternion * (1 / normalizer);" +
@@ -643,7 +643,7 @@ namespace Seven.Mathematics
 				"(Quaternion<" + T_Source + "> _quaternion) =>" +
 				"{" +
 				"	if (object.ReferenceEquals(_quaternion, null))" +
-				"		throw new Error(\"null reference: quaternion\");" +
+				"		throw new System.Exception(\"null reference: quaternion\");" +
 				"	" + T_Source + " normalizer = Quaternion<" + T_Source + ">.MagnitudeSquared(_quaternion);" +
 				"	if (normalizer == 0)" +
 				"		return new Quaternion<" + T_Source + ">(_quaternion.X, _quaternion.Y, _quaternion.Z, _quaternion.W);" +
@@ -670,11 +670,11 @@ namespace Seven.Mathematics
 				"(Quaternion<" + T_Source + "> _left, Quaternion<" + T_Source + "> _right, " + T_Source + " _blend) =>" +
 				"{" +
 				"	if (object.ReferenceEquals(_left, null))" +
-				"		throw new Error(\"null reference: _left\");" +
+				"		throw new System.Exception(\"null reference: _left\");" +
 				"	if (object.ReferenceEquals(_right, null))" +
-				"		throw new Error(\"null reference: _right\");" +
+				"		throw new System.Exception(\"null reference: _right\");" +
 				"	if (_blend < 0 || _blend > 1)" +
-				"		throw new Error(\"invalid _blending value during lerp !(_blend < 0.0f || _blend > 1.0f).\");" +
+				"		throw new System.Exception(\"invalid _blending value during lerp !(_blend < 0.0f || _blend > 1.0f).\");" +
 				"	if (Quaternion<" + T_Source + ">.MagnitudeSquared(_left) == 0)" +
 				"	{" +
 				"		if (Quaternion<" + T_Source + ">.MagnitudeSquared(_right) == 0)" +
@@ -706,7 +706,7 @@ namespace Seven.Mathematics
 		/// <summary>Sphereically interpolates between two quaternions.</summary>
 		private static Quaternion<T>.Delegates.Quaternion_Slerp Quaternion_Slerp = (Quaternion<T> left, Quaternion<T> right, T blend) =>
 		{
-			throw new Error("not yet implemented");
+			throw new System.NotImplementedException();
 		};
 		#endregion
 
@@ -720,11 +720,11 @@ namespace Seven.Mathematics
 						"(Quaternion<" + T_Source + "> _rotation, Vector<" + T_Source + "> _vector) =>" +
 						"{" +
 						"	if (object.ReferenceEquals(_rotation, null))" +
-						"		throw new Error(\"null reference: rotation\");" +
+						"		throw new System.Exception(\"null reference: rotation\");" +
 						"	if (object.ReferenceEquals(_vector, null))" +
-						"		throw new Error(\"null reference: vector\");" +
+						"		throw new System.Exception(\"null reference: vector\");" +
 						"	if (_vector.Dimensions != 3 && _vector.Dimensions != 4)" +
-						"		throw new Error(\"my quaternion rotations are only defined for 3-component vectors.\");" +
+						"		throw new System.Exception(\"my quaternion rotations are only defined for 3-component vectors.\");" +
 						"	Quaternion<" + T_Source + "> answer =" +
 						"		Quaternion<" + T_Source + ">.Multiply(" +
 						"		Quaternion<" + T_Source + ">.Multiply(_rotation, _vector)," +
@@ -799,19 +799,19 @@ namespace Seven.Mathematics
 		///// <returns>The result of the interpolation.</returns>
 		//private static Quaternion<generic> Slerp(Quaternion<generic> left, Quaternion<generic> right, generic blend)
 		//{
-		//		throw new Error("requires rational rational types");
+		//		throw new System.Exception("requires rational rational types");
 
 		//		//#if no_error_checking
 		//		//			// nothing
 		//		//#else
 		//		//			if (object.ReferenceEquals(left, null))
-		//		//				throw new Error("null reference: left");
+		//		//				throw new System.Exception("null reference: left");
 		//		//			if (object.ReferenceEquals(right, null))
-		//		//				throw new Error("null reference: right");
+		//		//				throw new System.Exception("null reference: right");
 		//		//#endif
 
 		//		//			if (blend < 0 || blend > 1)
-		//		//				throw new Error("invalid blending value during slerp !(blend < 0.0f || blend > 1.0f).");
+		//		//				throw new System.Exception("invalid blending value during slerp !(blend < 0.0f || blend > 1.0f).");
 		//		//			if (LinearAlgebra.MagnitudeSquared(left) == 0)
 		//		//			{
 		//		//				if (LinearAlgebra.MagnitudeSquared(right) == 0)

@@ -55,7 +55,7 @@ namespace Seven.Structures
 	{
 		//fields
 		public SetHashList<T> _nodes;
-		public OmnitreeLinkedLinkedLists<Edge, T> _edges;
+		public OmnitreeLinkedLinked<Edge, T> _edges;
 		// nested types
 		#region Edge
 		/// <summary>Represents an edge in a graph.</summary>
@@ -78,7 +78,7 @@ namespace Seven.Structures
 		#region private Graph_SetOmnitree(Graph_SetOmnitree<T> graph)
 		private GraphSetOmnitree(GraphSetOmnitree<T> graph)
 		{
-			this._edges = graph._edges.Clone() as OmnitreeLinkedLinkedLists<Edge, T>;
+			this._edges = graph._edges.Clone() as OmnitreeLinkedLinked<Edge, T>;
 			this._nodes = graph._nodes.Clone() as SetHashList<T>;
 		}
 		#endregion
@@ -87,7 +87,7 @@ namespace Seven.Structures
 		{
 			this._nodes = new SetHashList<T>(equate, hash);
 			Omnitree.Locate<Edge, T> locationFunction = (Edge a) => { return Accessor.Get(new T[] { a.Start, a.End }); };
-			this._edges = new OmnitreeLinkedLinkedLists<Edge, T>(
+			this._edges = new OmnitreeLinkedLinked<Edge, T>(
 				new T[] { min, min },
 				new T[] { max, max },
 				locationFunction, compare, average);
@@ -98,7 +98,7 @@ namespace Seven.Structures
 		{
 			this._nodes = new SetHashList<T>((T a, T b) => { return compare(a, b) == Comparison.Equal; }, hash);
 			Omnitree.Locate<Edge, T> locationFunction = (Edge a) => { return Accessor.Get(new T[] { a.Start, a.End }); };
-			this._edges = new OmnitreeLinkedLinkedLists<Edge, T>(
+			this._edges = new OmnitreeLinkedLinked<Edge, T>(
 				new T[] { min, min },
 				new T[] { max, max },
 				locationFunction, compare, average);
@@ -128,7 +128,7 @@ namespace Seven.Structures
 		public void Clear()
 		{
 			this._nodes = new SetHashList<T>(this._nodes.Equate, this._nodes.Hash);
-			this._edges = new OmnitreeLinkedLinkedLists<Edge, T>(
+			this._edges = new OmnitreeLinkedLinked<Edge, T>(
 				new T[] { this._edges.Min(0), this._edges.Min(1) },
 				new T[] { this._edges.Max(0), this._edges.Max(1) },
 				this._edges.Locate, this._edges.Compare, this._edges.Average);
@@ -146,7 +146,7 @@ namespace Seven.Structures
 		public void Neighbors(T a, Step<T> function)
 		{
 			if (!this._nodes.Contains(a))
-				throw new Error("Attempting to look up the neighbors of a node that does not belong to a graph");
+				throw new System.InvalidOperationException("Attempting to look up the neighbors of a node that does not belong to a graph");
 
 			this._edges.Stepper(
 					(Edge e) => { function(e.End); },
@@ -157,11 +157,11 @@ namespace Seven.Structures
 		public void Add(T start, T end)
 		{
 			if (!this._nodes.Contains(start))
-				throw new Error("Adding an edge to a graph from a node that does not exists");
+				throw new System.InvalidOperationException("Adding an edge to a graph from a node that does not exists");
 			if (!this._nodes.Contains(end))
-				throw new Error("Adding an edge to a graph to a node that does not exists");
+				throw new System.InvalidOperationException("Adding an edge to a graph to a node that does not exists");
 			this._edges.Stepper(
-					(Edge e) => { throw new Error("Adding an edge to a graph that already exists"); },
+					(Edge e) => { throw new System.InvalidOperationException("Adding an edge to a graph that already exists"); },
 					new T[] { start, end }, new T[] { start, end });
 
 			this._edges.Add(new Edge(start, end));
@@ -171,16 +171,16 @@ namespace Seven.Structures
 		public void Remove(T start, T end)
 		{
 			if (!this._nodes.Contains(start))
-				throw new Error("Removing an edge to a graph from a node that does not exists");
+				throw new System.InvalidOperationException("Removing an edge to a graph from a node that does not exists");
 			if (!this._nodes.Contains(end))
-				throw new Error("Removing an edge to a graph to a node that does not exists");
+				throw new System.InvalidOperationException("Removing an edge to a graph to a node that does not exists");
 
 			bool exists = false;
 			this._edges.Stepper(
 					(Edge e) => { exists = true; },
 					new T[] { start, end }, new T[] { start, end });
 			if (!exists)
-				throw new Error("Removing a non-existing edge in a graph");
+				throw new System.InvalidOperationException("Removing a non-existing edge in a graph");
 
 			this._edges.Remove(new T[] { start, end }, new T[] { start, end });
 		}
@@ -189,7 +189,7 @@ namespace Seven.Structures
 		public void Add(T node)
 		{
 			if (this._nodes.Contains(node))
-				throw new Error("Adding an already-existing node to a graph");
+				throw new System.InvalidOperationException("Adding an already-existing node to a graph");
 
 			this._nodes.Add(node);
 		}
@@ -198,7 +198,7 @@ namespace Seven.Structures
 		public void Remove(T node)
 		{
 			if (this._nodes.Contains(node))
-				throw new Error("Removing non-existing node from a graph");
+				throw new System.InvalidOperationException("Removing non-existing node from a graph");
 
 			this._edges.Remove(new T[] { node, this._edges.Min(1) }, new T[] { node, this._edges.Max(1) });
 			this._edges.Remove(new T[] { this._edges.Min(1), node }, new T[] { this._edges.Max(1), node });
@@ -313,9 +313,9 @@ namespace Seven.Structures
 		public void Add(T start, T end)
 		{
 			if (!this._map.Contains(start))
-				throw new Error("Adding an edge to a non-existing starting node.");
+				throw new System.InvalidOperationException("Adding an edge to a non-existing starting node.");
 			if (!this._map[start].Contains(end))
-				throw new Error("Adding an edge to a non-existing ending node.");
+				throw new System.InvalidOperationException("Adding an edge to a non-existing ending node.");
 			if (this._map[start] == null)
 				this._map[start] = new MapHashLinked<bool, T>(this._map.Equate, this._map.Hash);
 
@@ -329,9 +329,9 @@ namespace Seven.Structures
 		public void Remove(T start, T end)
 		{
 			if (this._map[start] == null)
-				throw new Error("Removing a non-existing edge from the graph.");
+				throw new System.InvalidOperationException("Removing a non-existing edge from the graph.");
 			if (!this._map[start].Contains(end))
-				throw new Error("Removing a non-existing edge from the graph.");
+				throw new System.InvalidOperationException("Removing a non-existing edge from the graph.");
 			this._map[start].Remove(end);
 		}
 		#endregion
@@ -341,7 +341,7 @@ namespace Seven.Structures
 		public void Add(T node)
 		{
 			if (this._map.Count == int.MaxValue)
-				throw new Error("This graph has reach its node capacity.");
+				throw new System.InvalidOperationException("This graph has reach its node capacity.");
 			this._map.Add(node, new MapHashLinked<bool, T>(this._map.Equate, this._map.Hash));
 		}
 		#endregion

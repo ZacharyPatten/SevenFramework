@@ -377,9 +377,9 @@ namespace Testing
 
 			#region Omnitree
 
-			Console.WriteLine("  Testing Omnitree_LinkedLinkedLists<int, double>-------");
+			Console.WriteLine("  Testing OmnitreeLinkedLinked<int, double>-------");
 			// Construction
-			Omnitree<int, double> omnitree_linked = new OmnitreeLinkedLinkedLists<int, double>(
+			Omnitree<int, double> omnitree_linked = new OmnitreeLinkedLinked<int, double>(
 				new double[] { -test - 1, -test - 1, -test - 1 }, // minimum dimensions of the omnitree
 				new double[] { test + 1, test + 1, test + 1 }, // maximum dimensions of the omnitree
 				(int index) => { return Accessor.Get(new double[] { index, index, index }); }, // "N-D" location function
@@ -434,58 +434,58 @@ namespace Testing
 			//Console.WriteLine("    Deserialized: " + Deserialize(omnitreelinked_file, out deserialized_omnitreeLinked));
 			Console.WriteLine();
 
-			Console.WriteLine("  Testing Omnitree_LinkedArrayLists<int, double>--------");
-			// Construction
-			Omnitree<int, double> omnitree_array = new OmnitreeLinkedArrayLists<int, double>(
-				new double[] { -test - 1, -test - 1, -test - 1 }, // minimum dimensions of the omnitree
-				new double[] { test + 1, test + 1, test + 1 }, // maximum dimensions of the omnitree
-				(int index) => { return Accessor.Get(new double[] { index, index, index }); }, // "N-D" location function
-				Compute<double>.Compare, // comparison function
-				(double a, double b) => { return (a + b) / 2; }); // average function
-			// Properties
-			Console.WriteLine("      Origin: [" + omnitree_array.Origin(0) + ", " + omnitree_array.Origin(1) + ", " + omnitree_array.Origin(2) + "]");
-			Console.WriteLine("      Minimum: [" + omnitree_array.Min(0) + ", " + omnitree_array.Min(1) + ", " + omnitree_array.Min(2) + "]");
-			Console.WriteLine("      Maximum: [" + omnitree_array.Max(0) + ", " + omnitree_array.Max(1) + ", " + omnitree_array.Max(2) + "]");
-			Console.WriteLine("      Dimensions: " + omnitree_array.Dimensions);
-			Console.WriteLine("      Count: " + omnitree_array.Count);
-			// Addition
-			Console.Write("    Adding 0-" + test + ": ");
-			for (int i = 0; i < test; i++)
-				omnitree_array.Add(i);
-			omnitree_array.Stepper((int current) => { Console.Write(current); });
-			Console.WriteLine();
-			Console.WriteLine("      Count: " + omnitree_array.Count);
-			// Traversal
-			Console.Write("    Traversal [ALL]: ");
-						omnitree_array.Stepper((int current) => { Console.Write(current); });
-			Console.WriteLine();
-			// Look Up
-			Console.Write("    Traversal [" + (test / 2) + "-" + test + "]: ");
-						omnitree_array.Stepper((int current) => { Console.Write(current); },
-				new double[] { test / 2, test / 2, test / 2 },
-				new double[] { test, test, test });
-			Console.WriteLine();
-			// Removal
-			Console.Write("    Remove 0-" + test / 3 + ": ");
-			omnitree_array.Remove(
-				new double[] { 0, 0, 0 },
-				new double[] { test / 3, test / 3, test / 3 });
-			omnitree_array.Stepper((int current) => { Console.Write(current); });
-			Console.WriteLine();
-			Console.WriteLine("      Count: " + omnitree_array.Count);
-			// Clear
-			Console.Write("    Clear: ");
-			omnitree_array.Clear();
-						omnitree_array.Stepper((int current) => { Console.Write(current); });
-			Console.WriteLine();
-			Console.WriteLine("      Count: " + omnitree_array.Count);
-			// Saving to a file
-			//string omnitreearray_file = "omnitree_linkedarraylists." + ToExtension(omnitree_array.GetType());
-			//Console.WriteLine("    File: \"" + omnitreearray_file + "\"");
-			//Console.WriteLine("    Serialized: " + Serialize(omnitreearray_file, omnitree_array));
-			//OmnitreeLinkedLinkedLists<int, double> deserialized_omnitreearray;
-			//Console.WriteLine("    Deserialized: " + Deserialize(omnitreearray_file, out deserialized_omnitreearray));
-			Console.WriteLine();
+			//Console.WriteLine("  Testing Omnitree_LinkedArrayLists<int, double>--------");
+			//// Construction
+			//Omnitree<int, double> omnitree_array = new OmnitreeLinkedArray<int, double>(
+			//	new double[] { -test - 1, -test - 1, -test - 1 }, // minimum dimensions of the omnitree
+			//	new double[] { test + 1, test + 1, test + 1 }, // maximum dimensions of the omnitree
+			//	(int index) => { return Accessor.Get(new double[] { index, index, index }); }, // "N-D" location function
+			//	Compute<double>.Compare, // comparison function
+			//	(double a, double b) => { return (a + b) / 2; }); // average function
+			//// Properties
+			//Console.WriteLine("      Origin: [" + omnitree_array.Origin(0) + ", " + omnitree_array.Origin(1) + ", " + omnitree_array.Origin(2) + "]");
+			//Console.WriteLine("      Minimum: [" + omnitree_array.Min(0) + ", " + omnitree_array.Min(1) + ", " + omnitree_array.Min(2) + "]");
+			//Console.WriteLine("      Maximum: [" + omnitree_array.Max(0) + ", " + omnitree_array.Max(1) + ", " + omnitree_array.Max(2) + "]");
+			//Console.WriteLine("      Dimensions: " + omnitree_array.Dimensions);
+			//Console.WriteLine("      Count: " + omnitree_array.Count);
+			//// Addition
+			//Console.Write("    Adding 0-" + test + ": ");
+			//for (int i = 0; i < test; i++)
+			//	omnitree_array.Add(i);
+			//omnitree_array.Stepper((int current) => { Console.Write(current); });
+			//Console.WriteLine();
+			//Console.WriteLine("      Count: " + omnitree_array.Count);
+			//// Traversal
+			//Console.Write("    Traversal [ALL]: ");
+			//			omnitree_array.Stepper((int current) => { Console.Write(current); });
+			//Console.WriteLine();
+			//// Look Up
+			//Console.Write("    Traversal [" + (test / 2) + "-" + test + "]: ");
+			//			omnitree_array.Stepper((int current) => { Console.Write(current); },
+			//	new double[] { test / 2, test / 2, test / 2 },
+			//	new double[] { test, test, test });
+			//Console.WriteLine();
+			//// Removal
+			//Console.Write("    Remove 0-" + test / 3 + ": ");
+			//omnitree_array.Remove(
+			//	new double[] { 0, 0, 0 },
+			//	new double[] { test / 3, test / 3, test / 3 });
+			//omnitree_array.Stepper((int current) => { Console.Write(current); });
+			//Console.WriteLine();
+			//Console.WriteLine("      Count: " + omnitree_array.Count);
+			//// Clear
+			//Console.Write("    Clear: ");
+			//omnitree_array.Clear();
+			//			omnitree_array.Stepper((int current) => { Console.Write(current); });
+			//Console.WriteLine();
+			//Console.WriteLine("      Count: " + omnitree_array.Count);
+			//// Saving to a file
+			////string omnitreearray_file = "omnitree_linkedarraylists." + ToExtension(omnitree_array.GetType());
+			////Console.WriteLine("    File: \"" + omnitreearray_file + "\"");
+			////Console.WriteLine("    Serialized: " + Serialize(omnitreearray_file, omnitree_array));
+			////OmnitreeLinkedLinkedLists<int, double> deserialized_omnitreearray;
+			////Console.WriteLine("    Deserialized: " + Deserialize(omnitreearray_file, out deserialized_omnitreearray));
+			//Console.WriteLine();
 
 			#endregion
 

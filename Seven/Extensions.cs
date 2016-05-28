@@ -5,6 +5,7 @@
 
 namespace Seven
 {
+	/// <summary>Contains Extension methods on common .Net Framework types.</summary>
 	public static class Extensions
 	{
 		#region char
@@ -256,9 +257,10 @@ namespace Seven
 		#region Random
 
 		/// <summary>Generates a random string of a given length using the System.Random generator.</summary>
+		/// <param name="random">The random generation algorithm.</param>
 		/// <param name="length">The length of the randomized string to generate.</param>
 		/// <returns>The generated randomized string.</returns>
-		public static string RandomString(this System.Random random, int length)
+		public static string NextString(this System.Random random, int length)
 		{
 			char[] randomstring = new char[length];
 			for (int i = 0; i < randomstring.Length; i++)
@@ -267,10 +269,11 @@ namespace Seven
 		}
 
 		/// <summary>Generates a random string of a given length using the System.Random generator with a specific set of characters.</summary>
+		/// <param name="random">The random generation algorithm.</param>
 		/// <param name="length">The length of the randomized string to generate.</param>
 		/// <param name="allowableChars">The set of allowable characters.</param>
 		/// <returns>The generated randomized string.</returns>
-		public static string RandomString(this System.Random random, int length, char[] allowableChars)
+		public static string NextString(this System.Random random, int length, char[] allowableChars)
 		{
 			char[] randomstring = new char[length];
 			for (int i = 0; i < randomstring.Length; i++)
@@ -279,27 +282,166 @@ namespace Seven
 		}
 
 		/// <summary>Generates a random alphanumeric string of a given length using the System.Random generator.</summary>
+		/// <param name="random">The random generation algorithm.</param>
 		/// <param name="length">The length of the randomized alphanumeric string to generate.</param>
 		/// <returns>The generated randomized alphanumeric string.</returns>
-		public static string RandomAlphaNumericString(this System.Random random, int length)
+		public static string NextAlphaNumericString(this System.Random random, int length)
 		{
-			return RandomString(random, length, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".ToCharArray());
+			return NextString(random, length, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".ToCharArray());
 		}
 
 		/// <summary>Generates a random numeric string of a given length using the System.Random generator.</summary>
+		/// <param name="random">The random generation algorithm.</param>
 		/// <param name="length">The length of the randomized numeric string to generate.</param>
 		/// <returns>The generated randomized numeric string.</returns>
-		public static string RandomNumericString(this System.Random random, int length)
+		public static string NumericString(this System.Random random, int length)
 		{
-			return RandomString(random, length, "0123456789".ToCharArray());
+			return NextString(random, length, "0123456789".ToCharArray());
 		}
 
 		/// <summary>Generates a random alhpabetical string of a given length using the System.Random generator.</summary>
+		/// <param name="random">The random generation algorithm.</param>
 		/// <param name="length">The length of the randomized alphabetical string to generate.</param>
 		/// <returns>The generated randomized alphabetical string.</returns>
-		public static string RandomAlphabeticString(this System.Random random, int length)
+		public static string NextAlphabeticString(this System.Random random, int length)
 		{
-			return RandomString(random, length, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ".ToCharArray());
+			return NextString(random, length, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ".ToCharArray());
+		}
+
+		/// <summary>Generates a random char value.</summary>
+		/// <param name="random">The random generation algorithm.</param>
+		/// <returns>A randomly generated char value.</returns>
+		public static char NextChar(this System.Random random)
+		{
+			return NextChar(random, char.MinValue, char.MaxValue);
+		}
+
+		/// <summary>Generates a random char value.</summary>
+		/// <param name="random">The random generation algorithm.</param>
+		/// <param name="min">Minimum allowed value of the random generation.</param>
+		/// <param name="max">Maximum allowed value of the random generation.</param>
+		/// <returns>A randomly generated char value.</returns>
+		public static char NextChar(this System.Random random, char min, char max)
+		{
+			return (char)random.Next(min, max);
+		}
+
+		/// <summary>Generates a random decimal value.</summary>
+		/// <param name="random">The random generation algorithm.</param>
+		/// <returns>A randomly generated decimal value.</returns>
+		public static decimal NextDecimal(this System.Random random)
+		{
+			System.Func<int> NextInt = () =>
+				{
+					unchecked
+					{
+						int firstBits = random.Next(0, 1 << 4) << 28;
+						int lastBits = random.Next(0, 1 << 28);
+						return firstBits | lastBits;
+					}
+				};
+			byte scale = (byte)random.Next(29);
+			bool sign = random.Next(2) == 1;
+			return new decimal(NextInt(), NextInt(), NextInt(), sign, scale);
+		}
+
+		/// <summary>Generates a random decimal value.</summary>
+		/// <param name="random">The random generation algorithm.</param>
+		/// <param name="max">The maximum allowed value of the random generation.</param>
+		/// <returns>A randomly generated decimal value.</returns>
+		public static decimal NextDecimal(this System.Random random, decimal max)
+		{
+			return NextDecimal(random, decimal.MinValue, max);
+		}
+
+		/// <summary>Generates a random decimal value.</summary>
+		/// <param name="random">The random generation algorithm.</param>
+		/// <param name="min">The minimum allowed value of the random generation.</param>
+		/// <param name="max">The maximum allowed value of the random generation.</param>
+		/// <returns>A randomly generated decimal value.</returns>
+		public static decimal NextDecimal(this System.Random random, decimal min, decimal max)
+		{
+			return (NextDecimal(random) % (max - min)) + min;
+		}
+
+		/// <summary>Generates a random DateTime value.</summary>
+		/// <param name="random">The random generation algorithm.</param>
+		/// <returns>A randomly generated DateTime value.</returns>
+		public static System.DateTime DateTime(this System.Random random)
+		{
+			return DateTime(random, System.DateTime.MaxValue);
+		}
+
+		/// <summary>Generates a random DateTime value.</summary>
+		/// <param name="random">The random generation algorithm.</param>
+		/// <param name="max">The maximum allowed value of the random generation.</param>
+		/// <returns>A randomly generated DateTime value.</returns>
+		public static System.DateTime DateTime(this System.Random random, System.DateTime max)
+		{
+			return DateTime(random, System.DateTime.MinValue, max);
+		}
+
+		/// <summary>Generates a random DateTime value.</summary>
+		/// <param name="random">The random generation algorithm.</param>
+		/// <param name="min">The minimum allowed value of the random generation.</param>
+		/// <param name="max">The maximum allowed value of the random generation.</param>
+		/// <returns>A randomly generated DateTime value.</returns>
+		public static System.DateTime DateTime(this System.Random random, System.DateTime min, System.DateTime max)
+		{
+			if (random == null)
+				throw new System.ArgumentNullException("random");
+			if (min > max)
+				throw new System.ArgumentException("!(min <= max)");
+			System.TimeSpan span = max - min;
+			int day_range = span.Days;
+			span -= System.TimeSpan.FromDays(day_range);
+			int hour_range = span.Hours;
+			span -= System.TimeSpan.FromHours(hour_range);
+			int minute_range = span.Minutes;
+			span -= System.TimeSpan.FromMinutes(minute_range);
+			int second_range = span.Seconds;
+			span -= System.TimeSpan.FromSeconds(second_range);
+			int millisecond_range = span.Milliseconds;
+			span -= System.TimeSpan.FromMilliseconds(millisecond_range);
+			int tick_range = (int)span.Ticks;
+			System.DateTime result = min;
+			result.AddDays(random.Next(day_range));
+			result.AddHours(random.Next(hour_range));
+			result.AddMinutes(random.Next(minute_range));
+			result.AddSeconds(random.Next(second_range));
+			result.AddMilliseconds(random.Next(millisecond_range));
+			result.AddTicks(random.Next(tick_range));
+			return result;
+		}
+
+		/// <summary>Generates a random TimeSpan value.</summary>
+		/// <param name="random">The random generation algorithm.</param>
+		/// <returns>A randomly generated TimeSpan value.</returns>
+		public static System.TimeSpan TimeSpan(this System.Random random)
+		{
+			return TimeSpan(random, System.TimeSpan.MaxValue);
+		}
+
+		/// <summary>Generates a random TimeSpan value.</summary>
+		/// <param name="random">The random generation algorithm.</param>
+		/// <param name="max">The maximum allowed value of the random generation.</param>
+		/// <returns>A randomly generated TimeSpan value.</returns>
+		public static System.TimeSpan TimeSpan(this System.Random random, System.TimeSpan max)
+		{
+			return TimeSpan(random, System.TimeSpan.MinValue, max);
+		}
+
+		/// <summary>Generates a random TimeSpan value.</summary>
+		/// <param name="random">The random generation algorithm.</param>
+		/// <param name="min">The minimum allowed value of the random generation.</param>
+		/// <param name="max">The maximum allowed value of the random generation.</param>
+		/// <returns>A randomly generated TimeSpan value.</returns>
+		public static System.TimeSpan TimeSpan(this System.Random random, System.TimeSpan min, System.TimeSpan max)
+		{
+			System.DateTime min_dateTime = System.DateTime.MinValue + min;
+			System.DateTime max_dateTime = System.DateTime.MinValue + max;
+			System.DateTime random_dateTime = DateTime(random, min_dateTime, max_dateTime);
+			return random_dateTime - System.DateTime.MinValue;
 		}
 
 		#endregion
@@ -310,6 +452,8 @@ namespace Seven
 		/// <param name="a">One of the delegates to compare.</param>
 		/// <param name="b">One of the delegates to compare.</param>
 		/// <returns>True if deemed equal, False if not.</returns>
+		/// <remarks>FOR ADVANCED DEVELOPERS ONLY.</remarks>
+		[System.Obsolete("For advanced developers only.", true)]
 		public static bool Equate(this System.Delegate a, System.Delegate b)
 		{
 			// remove delegate assignment overhead
@@ -349,6 +493,18 @@ namespace Seven
 			while (del.Target is System.Delegate)
 				del = del.Target as System.Delegate;
 			return del;
+		}
+
+		#endregion
+
+		#region Type
+
+		/// <summary>Converts a System.Type into a string as it would appear in C# source code.</summary>
+		/// <param name="type">The "System.Type" to convert to a string.</param>
+		/// <returns>The string as the "System.Type" would appear in C# source code.</returns>
+		public static string ToCsharpSource(this System.Type type)
+		{
+			return Meta.ConvertTypeToCsharpSource(type);
 		}
 
 		#endregion

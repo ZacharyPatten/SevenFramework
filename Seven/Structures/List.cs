@@ -156,7 +156,7 @@ namespace Seven.Structures
 		public void Remove(T removal)
 		{
 			if (_head == null)
-				throw new Error("Attempting to remove a non-existing id value.");
+				throw new System.InvalidOperationException("Attempting to remove a non-existing id value.");
 			if (this._equate(removal, _head.Value))
 			{
 				_head = _head.Next;
@@ -167,7 +167,7 @@ namespace Seven.Structures
 			while (listNode != null)
 			{
 				if (listNode.Next == null)
-					throw new Error("Attempting to remove a non-existing id value.");
+					throw new System.InvalidOperationException("Attempting to remove a non-existing id value.");
 				else if (this._equate(removal, listNode.Value))
 				{
 					if (object.ReferenceEquals(listNode.Next, this._tail))
@@ -178,7 +178,7 @@ namespace Seven.Structures
 				else
 					listNode = listNode.Next;
 			}
-			throw new Error("Attempting to remove a non-existing id value.");
+			throw new System.InvalidOperationException("Attempting to remove a non-existing id value.");
 		}
 		#endregion
 		#region public void Remove(Predicate<T> predicate)
@@ -187,7 +187,7 @@ namespace Seven.Structures
 		public void Remove(Predicate<T> predicate)
 		{
 			if (_head == null)
-				throw new Error("Attempting to remove a non-existing id value.");
+				throw new System.InvalidOperationException("Attempting to remove a value from an empty list.");
 			if (predicate(_head.Value))
 			{
 				_head = _head.Next;
@@ -198,7 +198,7 @@ namespace Seven.Structures
 			while (listNode != null)
 			{
 				if (listNode.Next == null)
-					throw new Error("Attempting to remove a non-existing id value.");
+					throw new System.InvalidOperationException("Attempting to remove a non-existing id value.");
 				else if (predicate(_head.Value))
 				{
 					if (listNode.Next.Equals(_tail))
@@ -209,7 +209,7 @@ namespace Seven.Structures
 				else
 					listNode = listNode.Next;
 			}
-			throw new Error("Attempting to remove a non-existing id value.");
+			throw new System.InvalidOperationException("Attempting to remove a non-existing id value.");
 		}
 		#endregion
 		#region public void RemoveAll(Predicate<T> predicate)
@@ -430,7 +430,7 @@ namespace Seven.Structures
 			{
 				if (index < 0 || index > _count)
 				{
-					throw new Error("Attempting an index look-up outside the ListArray's current size.");
+					throw new System.InvalidOperationException("Attempting an index look-up outside the ListArray's current size.");
 				}
 				T returnValue = _list[index];
 				return returnValue;
@@ -439,7 +439,7 @@ namespace Seven.Structures
 			{
 				if (index < 0 || index > _count)
 				{
-					throw new Error("Attempting an index assignment outside the ListArray's current size.");
+					throw new System.InvalidOperationException("Attempting an index assignment outside the ListArray's current size.");
 				}
 				_list[index] = value;
 			}
@@ -468,7 +468,7 @@ namespace Seven.Structures
 			if (_count == _list.Length)
 			{
 				if (_list.Length > int.MaxValue / 2)
-					throw new Error("Your list is so large that it can no longer double itself (int.MaxValue barrier reached).");
+					throw new System.InvalidOperationException("Your list is so large that it can no longer double itself (int.MaxValue barrier reached).");
 				T[] newList = new T[_list.Length * 2];
 				this._list.CopyTo(newList, 0);
 				this._list = newList;
@@ -485,7 +485,7 @@ namespace Seven.Structures
 			if (_count == _list.Length)
 			{
 				if (_list.Length > int.MaxValue / 2)
-					throw new Error("Your list is so large that it can no longer double itself (int.MaxValue barrier reached).");
+					throw new System.InvalidOperationException("Your list is so large that it can no longer double itself (int.MaxValue barrier reached).");
 				T[] newList = new T[_list.Length * 2];
 				_list.CopyTo(newList, 0);
 				_list = newList;
@@ -631,7 +631,7 @@ namespace Seven.Structures
 				if (this._equate(removal, this._list[i]))
 					break;
 			if (i == this._count)
-				throw new Error("Attempting to remove a non-existing item from this list.");
+				throw new System.InvalidOperationException("Attempting to remove a non-existing item from this list.");
 			this.Remove(i);
 		}
 		#endregion
@@ -646,7 +646,7 @@ namespace Seven.Structures
 				if (this._equate(removal, this._list[i]))
 					break;
 			if (i == this._count)
-				throw new Error("Attempting to remove a non-existing item from this list.");
+				throw new System.InvalidOperationException("Attempting to remove a non-existing item from this list.");
 			this.RemoveWithoutShrink(i);
 		}
 		#endregion
@@ -661,7 +661,7 @@ namespace Seven.Structures
 				if (predicate(this._list[i]))
 					break;
 			if (i == this._count)
-				throw new Error("Attempting to remove a non-existing item from this list.");
+				throw new System.InvalidOperationException("Attempting to remove a non-existing item from this list.");
 			this.Remove(i);
 		}
 		#endregion
@@ -676,7 +676,7 @@ namespace Seven.Structures
 				if (predicate(this._list[i]))
 					break;
 			if (i == this._count)
-				throw new Error("Attempting to remove a non-existing item from this list.");
+				throw new System.InvalidOperationException("Attempting to remove a non-existing item from this list.");
 			this.RemoveWithoutShrink(i);
 		}
 		#endregion
@@ -767,7 +767,7 @@ namespace Seven.Structures
 		public void Remove_private(int index)
 		{
 			if (index < 0 || index > this._count)
-				throw new Error("Attempting to remove an index outside the ListArray's current size.");
+				throw new System.ArgumentOutOfRangeException("index");
 			if (_count < this._list.Length / 2)
 			{
 				T[] newList = new T[this._list.Length / 2];

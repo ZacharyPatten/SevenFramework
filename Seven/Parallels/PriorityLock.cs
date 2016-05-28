@@ -62,7 +62,7 @@ namespace Seven.Parallels
 			lock (this._lock)
 			{
 				if (this._compare(this._current, priority) != Comparison.Equal)
-					throw new Error("Invalid unlock triggered on a PriorityLock (expected [" + this._current + "] ).");
+					throw new System.InvalidOperationException("Invalid unlock triggered on a PriorityLock (expected [" + this._current + "] ).");
 				this._count--;
 				Monitor.PulseAll(this._lock);
 			}

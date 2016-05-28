@@ -183,7 +183,7 @@ namespace Seven.Structures
 								parent = parent.RightChild;
 							break;
 						default:
-							throw new Error("Not Implemented.");
+							throw new System.NotImplementedException();
 					}
 				}
 			}
@@ -310,7 +310,7 @@ namespace Seven.Structures
 							node = node.RightChild;
 						break;
 					default:
-						throw new Error("Not Implemented Exception.");
+						throw new System.NotImplementedException();
 				}
 			}
 			while (node != null);
@@ -386,7 +386,7 @@ namespace Seven.Structures
 					compareTargetPoint_as_int = 1;
 					break;
 				default:
-					throw new Error("Not Implemented Exception.");
+					throw new System.NotImplementedException();
 			}
 
 			var nearerRect = compareTargetPoint_as_int <= 0 ? leftRect : rightRect;

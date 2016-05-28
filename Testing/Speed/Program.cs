@@ -6,15 +6,14 @@ using Seven.Diagnostics;
 
 using System;
 using System.Collections.Generic;
-//using System.Diagnostics;
 using System.Linq;
 using System.Threading;
-//using System.Linq.Expressions;
-//using System.Text;
-//using System.Threading.Tasks;
+using System.Reflection;
 
 namespace Speed
 {
+	#region Reference int type (for testing)
+
 	public class IntegerClass
 	{
 		public int _int;
@@ -77,38 +76,137 @@ namespace Speed
 		}
 	}
 
+	#endregion
+
 	class Program
 	{
+		static void Test()
+		{
+			Console.WriteLine();
+		}
+
 		static void Main(string[] args)
 		{
-			int iterationsperrandom = 3;
-			Action<Random> testrandom = (Random random) =>
-				{
-					for (int i = 0; i < iterationsperrandom; i++)
-						Console.WriteLine(i + ": " + random.Next());
-					Console.WriteLine();
-				};
-			Arbitrary mcg_2pow59_13pow13 = Arbitrary.MultiplicativeCongruentGenerator_Modulus2power59_Multiplier13power13();
-			Console.WriteLine("mcg_2pow59_13pow13 randoms:");
-			testrandom(mcg_2pow59_13pow13);
-			Arbitrary mcg_2pow31m1_1132489760 = Arbitrary.MultiplicativeCongruentGenerator_Modulus2power31minus1_Multiplier1132489760();
-			Console.WriteLine("mcg_2pow31m1_1132489760 randoms:");
-			testrandom(mcg_2pow31m1_1132489760);
-			Arbitrary mersenneTwister = Arbitrary.MersenneTwister();
-			Console.WriteLine("mersenneTwister randoms:");
-			testrandom(mersenneTwister);
-			Arbitrary cmr32_c2_o3 = Arbitrary.CombinedMultipleRecursiveGenerator32bit_components2_order3();
-			Console.WriteLine("mersenneTwister randoms:");
-			testrandom(cmr32_c2_o3);
-			Arbitrary wh1982cmcg = Arbitrary.WichmannHills1982_CombinedMultiplicativeCongruentialGenerator();
-			Console.WriteLine("mersenneTwister randoms:");
-			testrandom(wh1982cmcg);
-			Arbitrary wh2006cmcg = Arbitrary.WichmannHills2006_CombinedMultiplicativeCongruentialGenerator();
-			Console.WriteLine("mersenneTwister randoms:");
-			testrandom(wh2006cmcg);
-			Arbitrary mwcxorsg = Arbitrary.MultiplyWithCarryXorshiftGenerator();
-			Console.WriteLine("mwcxorsg randoms:");
-			testrandom(mwcxorsg);
+			#region Delegate
+			//Action test1 = () => { Console.WriteLine("test 1"); };
+			//Action test2 = () => { Console.WriteLine("test 2"); };
+
+			//Action action = test1;
+
+			////foreach (byte b in test1.Method.GetMethodBody().GetILAsByteArray())
+			////	Console.WriteLine(b);
+			////
+			////foreach (System.Reflection.FieldInfo field in typeof(Action).GetFields(BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public))
+			////	Console.WriteLine(field);
+
+			//action();
+			////Console.WriteLine(typeof(Action).GetField("_target", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public).GetValue(action));
+
+			//IntPtr methodPtr = (IntPtr)typeof(Action).GetField("_methodPtr", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public).GetValue(test2);
+			//IntPtr methodPtrAux = (IntPtr)typeof(Action).GetField("_methodPtrAux", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public).GetValue(test2);
+			//object target = typeof(Action).GetField("_target", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public).GetValue(test2);
+			//object methodBase = typeof(Action).GetField("_methodBase", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public).GetValue(test2);
+
+			////typeof(Action).GetField("_methodPtr", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public).SetValue(action, methodPtr);
+			////typeof(Action).GetField("_methodPtrAux", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public).SetValue(action, methodPtrAux);
+			////typeof(Action).GetField("_target", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public).SetValue(action, target);
+			////typeof(Action).GetField("_methodBase", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public).SetValue(action, methodBase);
+
+			//byte[] array = test1.Method.GetMethodBody().GetILAsByteArray();
+			//System.Runtime.InteropServices.GCHandle pinnedArray = System.Runtime.InteropServices.GCHandle.Alloc(array, System.Runtime.InteropServices.GCHandleType.Pinned);
+			//IntPtr pointer = pinnedArray.AddrOfPinnedObject();
+
+			//typeof(Action).GetField("_methodPtrAux", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public).SetValue(action, pointer);
+
+			//pinnedArray.Free();
+
+			//action();
+			////Console.WriteLine(typeof(Action).GetField("_target", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public).GetValue(action));
+
+			//System.Action<System.String, System.Int32, System.Double>
+			//System.Action`3[System.String, System.Int32, System.Double]
+
+			int i = 0;
+			foreach (string s in "Action<int, double, decimal>".Split('<', '>'))
+				Console.WriteLine(i++ + " "+ s);
+
+			Console.WriteLine(string.IsNullOrWhiteSpace("Action<int, double, decimal>".Split('<', '>')["Action<int, double, decimal>".Split('<', '>').Length - 1]));
+
+			//Console.WriteLine(Type.GetType("System.Action`3[System.String, System.Int32, System.Double]"));
+			//Console.WriteLine(Type.GetType("Action<int>"));
+			//Console.WriteLine(typeof(Action<int>).Name);
+			//Console.WriteLine(typeof(Action<float>).Name);
+			//Console.WriteLine(typeof(Action<double>).Name);
+			//Console.WriteLine(typeof(Action<decimal>).Name);
+			//Console.WriteLine(typeof(System.Collections.Generic.List<int>).Name);
+			//Console.WriteLine(typeof(System.Collections.Generic.List<float>).Name);
+			//Console.WriteLine(typeof(System.Collections.Generic.List<double>).Name);
+			//Console.WriteLine(typeof(System.Collections.Generic.List<decimal>).Name);
+
+			//Console.WriteLine(Type.GetType("List'1"));
+
+			//Action test2 = Test;
+			
+			//Console.WriteLine(typeof(Action).GetField("_methodPtr", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public).GetValue(test2));
+			//Console.WriteLine(typeof(Action).GetField("_methodPtrAux", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public).GetValue(test2));
+			//Console.WriteLine(typeof(Action).GetField("_target", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public).GetValue(test2));
+			//Console.WriteLine(typeof(Action).GetField("_methodBase", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public).GetValue(test2));
+			//Console.WriteLine(test2.Truncate().Target);
+			//Console.WriteLine(test2.Truncate().Method.DeclaringType.Name);
+
+			//Action d = (Action)Delegate.CreateDelegate(typeof(Action), test2.Method);
+
+			//114
+			//1
+			//0
+			//0
+			//112
+			//40
+			//22
+			//0
+			//0
+			//10
+			//42
+			//System.Object _target
+			//System.Object _methodBase
+			//IntPtr _methodPtr
+			//IntPtr _methodPtrAux
+
+
+			#endregion
+
+			#region Random Generators
+
+			//int iterationsperrandom = 3;
+			//Action<Random> testrandom = (Random random) =>
+			//	{
+			//		for (int i = 0; i < iterationsperrandom; i++)
+			//			Console.WriteLine(i + ": " + random.Next());
+			//		Console.WriteLine();
+			//	};
+			//Arbitrary mcg_2pow59_13pow13 = Arbitrary.MultiplicativeCongruentGenerator_Modulus2power59_Multiplier13power13();
+			//Console.WriteLine("mcg_2pow59_13pow13 randoms:");
+			//testrandom(mcg_2pow59_13pow13);
+			//Arbitrary mcg_2pow31m1_1132489760 = Arbitrary.MultiplicativeCongruentGenerator_Modulus2power31minus1_Multiplier1132489760();
+			//Console.WriteLine("mcg_2pow31m1_1132489760 randoms:");
+			//testrandom(mcg_2pow31m1_1132489760);
+			//Arbitrary mersenneTwister = Arbitrary.MersenneTwister();
+			//Console.WriteLine("mersenneTwister randoms:");
+			//testrandom(mersenneTwister);
+			//Arbitrary cmr32_c2_o3 = Arbitrary.CombinedMultipleRecursiveGenerator32bit_components2_order3();
+			//Console.WriteLine("mersenneTwister randoms:");
+			//testrandom(cmr32_c2_o3);
+			//Arbitrary wh1982cmcg = Arbitrary.WichmannHills1982_CombinedMultiplicativeCongruentialGenerator();
+			//Console.WriteLine("mersenneTwister randoms:");
+			//testrandom(wh1982cmcg);
+			//Arbitrary wh2006cmcg = Arbitrary.WichmannHills2006_CombinedMultiplicativeCongruentialGenerator();
+			//Console.WriteLine("mersenneTwister randoms:");
+			//testrandom(wh2006cmcg);
+			//Arbitrary mwcxorsg = Arbitrary.MultiplyWithCarryXorshiftGenerator();
+			//Console.WriteLine("mwcxorsg randoms:");
+			//testrandom(mwcxorsg);
+
+			#endregion
 
 			#region Set Tests
 			//{
@@ -142,9 +240,9 @@ namespace Speed
 			//		for (int i = 0; i < iterations; i++) set1.Remove(i);
 			//		for (int i = 0; i < iterations; i++) set2.Remove(i);
 
-			//		Console.WriteLine("Adding HashSet:               " + Seven.Diagnostics.Performance.Time(() => { for (int i = 0; i < iterations; i++) set0.Add(i); }));
-			//		Console.WriteLine("Adding Set_HashLinkedList:    " + Seven.Diagnostics.Performance.Time(() => { for (int i = 0; i < iterations; i++) set1.Add(i); }));
-			//		Console.WriteLine("Adding SetHash:               " + Seven.Diagnostics.Performance.Time(() => { for (int i = 0; i < iterations; i++) set2.Add(i); }));
+			//		Console.WriteLine("Adding HashSet:               " + Seven.Diagnostics.Performance.Time_DateTimNow(() => { for (int i = 0; i < iterations; i++) set0.Add(i); }));
+			//		Console.WriteLine("Adding Set_HashLinkedList:    " + Seven.Diagnostics.Performance.Time_DateTimNow(() => { for (int i = 0; i < iterations; i++) set1.Add(i); }));
+			//		Console.WriteLine("Adding SetHash:               " + Seven.Diagnostics.Performance.Time_DateTimNow(() => { for (int i = 0; i < iterations; i++) set2.Add(i); }));
 
 			//		for (int i = 0; i < iterations; i++)
 			//			validation.Add(i);
@@ -165,17 +263,81 @@ namespace Speed
 			//		Console.WriteLine("Size Set_HashLinkedList:      " + set1.TableSize);
 			//		Console.WriteLine("Size SetHash:                 " + set2.TableSize);
 
-			//		Console.WriteLine("Constains HashSet:            " + Seven.Diagnostics.Performance.Time(() => { for (int i = 0; i < iterations; i++) set0.Contains(i); }));
-			//		Console.WriteLine("Constains Set_HashLinkedList: " + Seven.Diagnostics.Performance.Time(() => { for (int i = 0; i < iterations; i++) set1.Contains(i); }));
-			//		Console.WriteLine("Constains SetHash:            " + Seven.Diagnostics.Performance.Time(() => { for (int i = 0; i < iterations; i++) set2.Contains(i); }));
+			//		Console.WriteLine("Constains HashSet:            " + Seven.Diagnostics.Performance.Time_DateTimNow(() => { for (int i = 0; i < iterations; i++) set0.Contains(i); }));
+			//		Console.WriteLine("Constains Set_HashLinkedList: " + Seven.Diagnostics.Performance.Time_DateTimNow(() => { for (int i = 0; i < iterations; i++) set1.Contains(i); }));
+			//		Console.WriteLine("Constains SetHash:            " + Seven.Diagnostics.Performance.Time_DateTimNow(() => { for (int i = 0; i < iterations; i++) set2.Contains(i); }));
 
 			//		//Console.WriteLine("Removed HashSet:              " + Seven.Diagnostics.Performance.Time(() => { for (int i = 0; i < iterations; i++) set0.Remove(i); }));
 			//		//Console.WriteLine("Removed Set_HashLinkedList:   " + Seven.Diagnostics.Performance.Time(() => { for (int i = 0; i < iterations; i++) set1.Remove(i); }));
 			//		//Console.WriteLine("Remove SetHash:               " + Seven.Diagnostics.Performance.Time(() => { for (int i = 0; i < iterations; i++) set2.Remove(i); }));
 
-			//		Console.WriteLine("Removed HashSet:              " + Seven.Diagnostics.Performance.Time(() => { for (int i = iterations - 1; i >= 0; i--) set0.Remove(i); }));
-			//		Console.WriteLine("Removed Set_HashLinkedList:   " + Seven.Diagnostics.Performance.Time(() => { for (int i = iterations - 1; i >= 0; i--) set1.Remove(i); }));
-			//		Console.WriteLine("Remove SetHash:               " + Seven.Diagnostics.Performance.Time(() => { for (int i = iterations - 1; i >= 0; i--) set2.Remove(i); }));
+			//		Console.WriteLine("Removed HashSet:              " + Seven.Diagnostics.Performance.Time_DateTimNow(() => { for (int i = iterations - 1; i >= 0; i--) set0.Remove(i); }));
+			//		Console.WriteLine("Removed Set_HashLinkedList:   " + Seven.Diagnostics.Performance.Time_DateTimNow(() => { for (int i = iterations - 1; i >= 0; i--) set1.Remove(i); }));
+			//		Console.WriteLine("Remove SetHash:               " + Seven.Diagnostics.Performance.Time_DateTimNow(() => { for (int i = iterations - 1; i >= 0; i--) set2.Remove(i); }));
+
+			//		Console.WriteLine("Size HashSet:                 " + (typeof(HashSet<int>).GetField("m_buckets", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance).GetValue(set0) as int[]).Length);
+			//		Console.WriteLine("Size Set_HashLinkedList:      " + set1.TableSize);
+			//		Console.WriteLine("Size SetHash:                 " + set2.TableSize);
+			//	}
+			//	Console.WriteLine();
+			//	{
+			//		HashSet<int> set0 = new HashSet<int>();
+			//		SetHashList<int> set1 = new SetHashList<int>();
+			//		SetHashArray<int> set2 = new SetHashArray<int>();
+
+			//		for (int i = 0; i < iterations; i++) set0.Add(i);
+			//		for (int i = 0; i < iterations; i++) set1.Add(i);
+			//		for (int i = 0; i < iterations; i++) set2.Add(i);
+			//		for (int i = 0; i < iterations; i++)
+			//			validation.Add(i);
+			//		foreach (int i in set0) { validation.Remove(i); }
+			//		for (int i = 0; i < iterations; i++)
+			//			validation.Add(i);
+			//		set1.Stepper((int i) => { validation.Remove(i); });
+			//		for (int i = 0; i < iterations; i++)
+			//			validation.Add(i);
+			//		set2.Stepper((int i) => { validation.Remove(i); });
+			//		for (int i = 0; i < iterations; i++) set0.Contains(i);
+			//		for (int i = 0; i < iterations; i++) set1.Contains(i);
+			//		for (int i = 0; i < iterations; i++) set2.Contains(i);
+			//		for (int i = 0; i < iterations; i++) set0.Remove(i);
+			//		for (int i = 0; i < iterations; i++) set1.Remove(i);
+			//		for (int i = 0; i < iterations; i++) set2.Remove(i);
+
+			//		Console.WriteLine("Adding HashSet:               " + Seven.Diagnostics.Performance.Time_StopWatch(() => { for (int i = 0; i < iterations; i++) set0.Add(i); }));
+			//		Console.WriteLine("Adding Set_HashLinkedList:    " + Seven.Diagnostics.Performance.Time_StopWatch(() => { for (int i = 0; i < iterations; i++) set1.Add(i); }));
+			//		Console.WriteLine("Adding SetHash:               " + Seven.Diagnostics.Performance.Time_StopWatch(() => { for (int i = 0; i < iterations; i++) set2.Add(i); }));
+
+			//		for (int i = 0; i < iterations; i++)
+			//			validation.Add(i);
+			//		foreach (int i in set0) { validation.Remove(i); }
+			//		Console.WriteLine("Validate HashSet:             " + (validation.Count == 0));
+
+			//		for (int i = 0; i < iterations; i++)
+			//			validation.Add(i);
+			//		set1.Stepper((int i) => { validation.Remove(i); });
+			//		Console.WriteLine("Validate Set_HashLinkedList:  " + (validation.Count == 0));
+
+			//		for (int i = 0; i < iterations; i++)
+			//			validation.Add(i);
+			//		set2.Stepper((int i) => { validation.Remove(i); });
+			//		Console.WriteLine("Validate SetHas:              " + (validation.Count == 0));
+
+			//		Console.WriteLine("Size HashSet:                 " + (typeof(HashSet<int>).GetField("m_buckets", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance).GetValue(set0) as int[]).Length);
+			//		Console.WriteLine("Size Set_HashLinkedList:      " + set1.TableSize);
+			//		Console.WriteLine("Size SetHash:                 " + set2.TableSize);
+
+			//		Console.WriteLine("Constains HashSet:            " + Seven.Diagnostics.Performance.Time_StopWatch(() => { for (int i = 0; i < iterations; i++) set0.Contains(i); }));
+			//		Console.WriteLine("Constains Set_HashLinkedList: " + Seven.Diagnostics.Performance.Time_StopWatch(() => { for (int i = 0; i < iterations; i++) set1.Contains(i); }));
+			//		Console.WriteLine("Constains SetHash:            " + Seven.Diagnostics.Performance.Time_StopWatch(() => { for (int i = 0; i < iterations; i++) set2.Contains(i); }));
+
+			//		//Console.WriteLine("Removed HashSet:              " + Seven.Diagnostics.Performance.Time2(() => { for (int i = 0; i < iterations; i++) set0.Remove(i); }));
+			//		//Console.WriteLine("Removed Set_HashLinkedList:   " + Seven.Diagnostics.Performance.Time2(() => { for (int i = 0; i < iterations; i++) set1.Remove(i); }));
+			//		//Console.WriteLine("Remove SetHash:               " + Seven.Diagnostics.Performance.Time2(() => { for (int i = 0; i < iterations; i++) set2.Remove(i); }));
+
+			//		Console.WriteLine("Removed HashSet:              " + Seven.Diagnostics.Performance.Time_StopWatch(() => { for (int i = iterations - 1; i >= 0; i--) set0.Remove(i); }));
+			//		Console.WriteLine("Removed Set_HashLinkedList:   " + Seven.Diagnostics.Performance.Time_StopWatch(() => { for (int i = iterations - 1; i >= 0; i--) set1.Remove(i); }));
+			//		Console.WriteLine("Remove SetHash:               " + Seven.Diagnostics.Performance.Time_StopWatch(() => { for (int i = iterations - 1; i >= 0; i--) set2.Remove(i); }));
 
 			//		Console.WriteLine("Size HashSet:                 " + (typeof(HashSet<int>).GetField("m_buckets", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance).GetValue(set0) as int[]).Length);
 			//		Console.WriteLine("Size Set_HashLinkedList:      " + set1.TableSize);
@@ -324,6 +486,8 @@ namespace Speed
 			//}
 			#endregion
 
+			#region Matrix Test
+
 			//Random random = new Random();
 			//const int matrix_rows = 4;
 			//const int matrix_columns = 4;
@@ -376,6 +540,8 @@ namespace Speed
 
 			//}
 
+			#endregion
+			
 			Console.WriteLine();
 			Console.WriteLine("Done...");
 			Console.ReadLine();

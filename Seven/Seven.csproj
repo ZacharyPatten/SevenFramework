@@ -84,8 +84,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Accessor.cs" />
-    <Compile Include="Algorithms\GraphSearch\AStar.cs" />
-    <Compile Include="Algorithms\GraphSearch\Greedy.cs" />
     <Compile Include="Algorithms\Arbitrary.cs" />
     <Compile Include="Algorithms\Search.cs" />
     <Compile Include="Construct.cs" />
@@ -103,7 +101,6 @@
     <Compile Include="Equate.cs" />
     <Compile Include="Fraction.cs" />
     <Compile Include="Compare.cs" />
-    <Compile Include="Error.cs" />
     <Compile Include="Mathematics\Quaternion.cs" />
     <Compile Include="Mathematics\Range.cs" />
     <Compile Include="Mathematics\Symbolics.cs" />
