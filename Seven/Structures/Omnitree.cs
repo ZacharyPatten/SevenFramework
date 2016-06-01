@@ -20,10 +20,10 @@ namespace Seven.Structures
 		Structure.Comparing<M>
 	{
 		// properties
-		#region public Stepper<T> this[params M[] coordinates];
+		#region Stepper<T> this[params M[] coordinates]
 		Stepper<T> this[params M[] coordinates] { get; }
 		#endregion
-		#region public Stepper<T> this[params M[] coordinates];
+		#region Stepper<T> this[Get<M> coordinates]
 		Stepper<T> this[Get<M> coordinates] { get; }
 		#endregion
 

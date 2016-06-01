@@ -6,14 +6,14 @@ using Seven.Structures;
 
 namespace Validation
 {
-	public class omnitree_record
+	public class TestObject
 	{
 		public int Id { get; set; }
 		public double X { get; set; }
 		public double Y { get; set; }
 		public double Z { get; set; }
 
-		public omnitree_record(int id, double x, double y, double z)
+		public TestObject(int id, double x, double y, double z)
 		{
 			this.Id = id;
 			this.X = x;
@@ -60,7 +60,7 @@ namespace Validation
 		{
 			#region construction
 
-			Omnitree.Locate<omnitree_record, double> locate = (omnitree_record record) =>
+			Omnitree.Locate<TestObject, double> locate = (TestObject record) =>
 			{
 				return (int i) =>
 				{
@@ -79,7 +79,7 @@ namespace Validation
 			};
 
 			Compute<double>.Compare(0, 0);
-			Omnitree<omnitree_record, double> omnitree = new OmnitreeLinked<omnitree_record, double>(
+			Omnitree<TestObject, double> omnitree = new OmnitreeLinked<TestObject, double>(
 				new double[] { 0, 0, 0 },
 				new double[] { 1, 1, 1 },
 				locate,
@@ -94,9 +94,9 @@ namespace Validation
 
 			Random random = new Random(0);
 			int count = 100;
-			omnitree_record[] records = new omnitree_record[count];
+			TestObject[] records = new TestObject[count];
 			for (int i = 0; i < count; i++)
-				records[i] = new omnitree_record(i, random.NextDouble(), random.NextDouble(), random.NextDouble());
+				records[i] = new TestObject(i, random.NextDouble(), random.NextDouble(), random.NextDouble());
 
 			Console.WriteLine("Generated random data.");
 
@@ -114,24 +114,24 @@ namespace Validation
 			}
 
 			Console.WriteLine("OmniTree.Count: " + omnitree.Count);
-			Console.WriteLine("OmniTree._top.Count: " + (omnitree as OmnitreeLinked<omnitree_record, double>)._top.Count);
+			Console.WriteLine("OmniTree._top.Count: " + (omnitree as OmnitreeLinked<TestObject, double>)._top.Count);
 
 			int test_count = 0;
-			omnitree.Stepper((omnitree_record record) => { test_count++; });
+			omnitree.Stepper((TestObject record) => { test_count++; });
 			Console.WriteLine("OmniTree Stepper Count: " + test_count);
 
 			#endregion
 
 			#region validation
 
-			SetHashArray<omnitree_record> setHash = new SetHashArray<omnitree_record>(
-				(omnitree_record a, omnitree_record b) => { return a.Id == b.Id; },
-				(omnitree_record a) => { return a.Id.GetHashCode(); });
+			SetHashArray<TestObject> setHash = new SetHashArray<TestObject>(
+				(TestObject a, TestObject b) => { return a.Id == b.Id; },
+				(TestObject a) => { return a.Id.GetHashCode(); });
 			for (int i = 0; i < count; i++)
 				setHash.Add(records[i]);
 
 			bool validated = true;
-			omnitree.Stepper((omnitree_record record) => { if (!setHash.Contains(record)) validated = false; });
+			omnitree.Stepper((TestObject record) => { if (!setHash.Contains(record)) validated = false; });
 			if (validated)
 				Console.WriteLine("Values Validated.");
 			else
@@ -147,7 +147,7 @@ namespace Validation
 			for (int i = 0; i < count; i++)
 			{
 				query_test = false;
-				omnitree[locate(records[i])]((omnitree_record record) => { query_test = true; });
+				omnitree[locate(records[i])]((TestObject record) => { query_test = true; });
 				if (query_test == false)
 				{
 					Console.WriteLine("Querying INVALID on value: " + i);
@@ -167,7 +167,7 @@ namespace Validation
 
 			Console.WriteLine("Moving randomized data...");
 
-			foreach (omnitree_record record in records)
+			foreach (TestObject record in records)
 			{
 				record.X += Math.Max(0d, Math.Min(1d, (random.NextDouble() / 100D) - .5D));
 				record.Y += Math.Max(0d, Math.Min(1d, (random.NextDouble() / 100D) - .5D));
@@ -222,10 +222,10 @@ namespace Validation
 
 			Console.WriteLine("OmniTree.Count: " + omnitree.Count);
 
-			Console.WriteLine("OmniTree._top.Count: " + (omnitree as OmnitreeLinked<omnitree_record, double>)._top.Count);
+			Console.WriteLine("OmniTree._top.Count: " + (omnitree as OmnitreeLinked<TestObject, double>)._top.Count);
 
 			test_count = 0;
-			omnitree.Stepper((omnitree_record record) => { test_count++; });
+			omnitree.Stepper((TestObject record) => { test_count++; });
 			Console.WriteLine("OmniTree Stepper Count: " + test_count);
 
 			#endregion
@@ -238,7 +238,7 @@ namespace Validation
 		{
 			#region construction
 
-			Omnitree.Locate<omnitree_record, object> Locate = (omnitree_record record) =>
+			Omnitree.Locate<TestObject, object> Locate = (TestObject record) =>
 			{
 				return (int i) =>
 				{
@@ -300,7 +300,7 @@ namespace Validation
 				}
 			};
 
-			Omnitree<omnitree_record, object> omnitree = new OmnitreeLinked<omnitree_record, object>(
+			Omnitree<TestObject, object> omnitree = new OmnitreeLinked<TestObject, object>(
 				new object[] { 0d, 0d, 0d, false },
 				new object[] { 1d, 1d, 1d, true },
 				Locate,
@@ -315,9 +315,9 @@ namespace Validation
 
 			Random random = new Random(0);
 			int count = 100;
-			omnitree_record[] records = new omnitree_record[count];
+			TestObject[] records = new TestObject[count];
 			for (int i = 0; i < count; i++)
-				records[i] = new omnitree_record(i, random.NextDouble(), random.NextDouble(), random.NextDouble());
+				records[i] = new TestObject(i, random.NextDouble(), random.NextDouble(), random.NextDouble());
 
 			Console.WriteLine("Generated random data.");
 
@@ -337,24 +337,24 @@ namespace Validation
 			Console.WriteLine("Omnitree Built.");
 
 			Console.WriteLine("OmniTree.Count: " + omnitree.Count);
-			Console.WriteLine("OmniTree._top.Count: " + (omnitree as OmnitreeLinked<omnitree_record, object>)._top.Count);
+			Console.WriteLine("OmniTree._top.Count: " + (omnitree as OmnitreeLinked<TestObject, object>)._top.Count);
 
 			int test_count = 0;
-			omnitree.Stepper((omnitree_record record) => { test_count++; });
+			omnitree.Stepper((TestObject record) => { test_count++; });
 			Console.WriteLine("OmniTree Stepper Count: " + test_count);
 
 			#endregion
 
 			#region validation
 
-			SetHashArray<omnitree_record> setHash = new SetHashArray<omnitree_record>(
-				(omnitree_record a, omnitree_record b) => { return a.Id == b.Id; },
-				(omnitree_record a) => { return a.Id.GetHashCode(); });
+			SetHashArray<TestObject> setHash = new SetHashArray<TestObject>(
+				(TestObject a, TestObject b) => { return a.Id == b.Id; },
+				(TestObject a) => { return a.Id.GetHashCode(); });
 			for (int i = 0; i < count; i++)
 				setHash.Add(records[i]);
 
 			bool validated2 = true;
-			omnitree.Stepper((omnitree_record record) => { if (!setHash.Contains(record)) validated2 = false; });
+			omnitree.Stepper((TestObject record) => { if (!setHash.Contains(record)) validated2 = false; });
 			if (validated2)
 				Console.WriteLine("Values Validated.");
 			else
@@ -370,7 +370,7 @@ namespace Validation
 			for (int i = 0; i < count; i++)
 			{
 				query_test2 = false;
-				omnitree[Locate(records[i])]((omnitree_record record) => { query_test2 = true; });
+				omnitree[Locate(records[i])]((TestObject record) => { query_test2 = true; });
 				if (query_test2 == false)
 				{
 					Console.WriteLine("Querying INVALID on value: " + i);
@@ -390,7 +390,7 @@ namespace Validation
 
 			Console.WriteLine("Moving randomized data...");
 
-			foreach (omnitree_record record in records)
+			foreach (TestObject record in records)
 			{
 				record.X += Math.Max(0d, Math.Min(1d, (random.NextDouble() / 100D) - .5D));
 				record.Y += Math.Max(0d, Math.Min(1d, (random.NextDouble() / 100D) - .5D));
@@ -445,10 +445,10 @@ namespace Validation
 
 			Console.WriteLine("OmniTree.Count: " + omnitree.Count);
 
-			Console.WriteLine("OmniTree._top.Count: " + (omnitree as OmnitreeLinked<omnitree_record, object>)._top.Count);
+			Console.WriteLine("OmniTree._top.Count: " + (omnitree as OmnitreeLinked<TestObject, object>)._top.Count);
 
 			test_count = 0;
-			omnitree.Stepper((omnitree_record record) => { test_count++; });
+			omnitree.Stepper((TestObject record) => { test_count++; });
 			Console.WriteLine("OmniTree Stepper Count: " + test_count);
 
 			#endregion
