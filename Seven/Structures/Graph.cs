@@ -55,7 +55,7 @@ namespace Seven.Structures
 	{
 		//fields
 		public SetHashList<T> _nodes;
-		public OmnitreeLinkedLinked<Edge, T> _edges;
+		public OmnitreeLinked<Edge, T> _edges;
 		// nested types
 		#region Edge
 		/// <summary>Represents an edge in a graph.</summary>
@@ -78,7 +78,7 @@ namespace Seven.Structures
 		#region private Graph_SetOmnitree(Graph_SetOmnitree<T> graph)
 		private GraphSetOmnitree(GraphSetOmnitree<T> graph)
 		{
-			this._edges = graph._edges.Clone() as OmnitreeLinkedLinked<Edge, T>;
+			this._edges = graph._edges.Clone() as OmnitreeLinked<Edge, T>;
 			this._nodes = graph._nodes.Clone() as SetHashList<T>;
 		}
 		#endregion
@@ -87,7 +87,7 @@ namespace Seven.Structures
 		{
 			this._nodes = new SetHashList<T>(equate, hash);
 			Omnitree.Locate<Edge, T> locationFunction = (Edge a) => { return Accessor.Get(new T[] { a.Start, a.End }); };
-			this._edges = new OmnitreeLinkedLinked<Edge, T>(
+			this._edges = new OmnitreeLinked<Edge, T>(
 				new T[] { min, min },
 				new T[] { max, max },
 				locationFunction, compare, average);
@@ -98,7 +98,7 @@ namespace Seven.Structures
 		{
 			this._nodes = new SetHashList<T>((T a, T b) => { return compare(a, b) == Comparison.Equal; }, hash);
 			Omnitree.Locate<Edge, T> locationFunction = (Edge a) => { return Accessor.Get(new T[] { a.Start, a.End }); };
-			this._edges = new OmnitreeLinkedLinked<Edge, T>(
+			this._edges = new OmnitreeLinked<Edge, T>(
 				new T[] { min, min },
 				new T[] { max, max },
 				locationFunction, compare, average);
@@ -128,7 +128,7 @@ namespace Seven.Structures
 		public void Clear()
 		{
 			this._nodes = new SetHashList<T>(this._nodes.Equate, this._nodes.Hash);
-			this._edges = new OmnitreeLinkedLinked<Edge, T>(
+			this._edges = new OmnitreeLinked<Edge, T>(
 				new T[] { this._edges.Min(0), this._edges.Min(1) },
 				new T[] { this._edges.Max(0), this._edges.Max(1) },
 				this._edges.Locate, this._edges.Compare, this._edges.Average);

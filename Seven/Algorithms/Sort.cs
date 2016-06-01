@@ -588,7 +588,15 @@ namespace Seven.Algorithms
 		/// <remarks>Runtime: O(n). Memory: in place. Stable: N/A (not a comparative sort).</remarks>
 		public static void Shuffle(Get<T> get, Assign<T> set, int start, int end)
 		{
-			System.Random random = new System.Random();
+			Shuffle(new System.Random(), get, set, start, end);
+		}
+
+		/// <summary>Sorts an entire array in a randomized order.</summary>
+		/// <typeparam name="T">The type of objects stored within the array.</typeparam>
+		/// <param name="array">The aray to shuffle.</param>
+		/// <remarks>Runtime: O(n). Memory: in place. Stable: N/A (not a comparative sort).</remarks>
+		public static void Shuffle(System.Random random, Get<T> get, Assign<T> set, int start, int end)
+		{
 			for (int i = start; i < end; i++)
 			{
 				int randomIndex = random.Next(start, end);

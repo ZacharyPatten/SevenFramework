@@ -379,7 +379,7 @@ namespace Testing
 
 			Console.WriteLine("  Testing OmnitreeLinkedLinked<int, double>-------");
 			// Construction
-			Omnitree<int, double> omnitree_linked = new OmnitreeLinkedLinked<int, double>(
+			Omnitree<int, double> omnitree_linked = new OmnitreeLinked<int, double>(
 				new double[] { -test - 1, -test - 1, -test - 1 }, // minimum dimensions of the omnitree
 				new double[] { test + 1, test + 1, test + 1 }, // maximum dimensions of the omnitree
 				(int index) => { return Accessor.Get(new double[] { index, index, index }); }, // "N-D" location function

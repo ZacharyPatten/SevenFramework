@@ -15,13 +15,13 @@ namespace Seven.Diagnostics
 			return b - a;
 		}
 
-		public static long Time_StopWatch(System.Action action)
+		public static System.TimeSpan Time_StopWatch(System.Action action)
 		{
 			System.Diagnostics.Stopwatch watch = new System.Diagnostics.Stopwatch();
 			watch.Restart();
 			action();
 			watch.Stop();
-			return watch.ElapsedTicks;
+			return watch.Elapsed;
 		}
 	}
 }

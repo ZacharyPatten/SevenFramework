@@ -12,7 +12,7 @@ using System.Reflection;
 
 namespace Speed
 {
-	#region Reference int type (for testing)
+	#region IntegerClass
 
 	public class IntegerClass
 	{
@@ -78,6 +78,24 @@ namespace Speed
 
 	#endregion
 
+	#region omnitree_record
+	public class omnitree_record
+	{
+		public int Id { get; set; }
+		public double X { get; set; }
+		public double Y { get; set; }
+		public double Z { get; set; }
+
+		public omnitree_record(int id, double x, double y, double z)
+		{
+			this.Id = id;
+			this.X = x;
+			this.Y = y;
+			this.Z = z;
+		}
+	}
+	#endregion
+
 	class Program
 	{
 		static void Test()
@@ -126,11 +144,11 @@ namespace Speed
 			//System.Action<System.String, System.Int32, System.Double>
 			//System.Action`3[System.String, System.Int32, System.Double]
 
-			int i = 0;
-			foreach (string s in "Action<int, double, decimal>".Split('<', '>'))
-				Console.WriteLine(i++ + " "+ s);
+			//int i = 0;
+			//foreach (string s in "Action<int, double, decimal>".Split('<', '>'))
+			//	Console.WriteLine(i++ + " "+ s);
 
-			Console.WriteLine(string.IsNullOrWhiteSpace("Action<int, double, decimal>".Split('<', '>')["Action<int, double, decimal>".Split('<', '>').Length - 1]));
+			//Console.WriteLine(string.IsNullOrWhiteSpace("Action<int, double, decimal>".Split('<', '>')["Action<int, double, decimal>".Split('<', '>').Length - 1]));
 
 			//Console.WriteLine(Type.GetType("System.Action`3[System.String, System.Int32, System.Double]"));
 			//Console.WriteLine(Type.GetType("Action<int>"));
@@ -541,7 +559,258 @@ namespace Speed
 			//}
 
 			#endregion
-			
+
+			#region Omnitree
+
+			Omnitree.Locate<omnitree_record, double> locate = (omnitree_record record) =>
+			{
+				return (int i) =>
+				{
+					switch (i)
+					{
+						case 0:
+							return record.X;
+						case 1:
+							return record.Y;
+						case 2:
+							return record.Z;
+						default:
+							throw new System.Exception();
+					}
+				};
+			};
+
+			Compute<double>.Compare(0, 0);
+			Omnitree<omnitree_record, double> omnitree = new OmnitreeLinked<omnitree_record, double>(
+				3,
+				Accessor.Get(new double[] { 0, 0, 0 }),
+				Accessor.Get(new double[] { 1, 1, 1 }),
+				locate,
+				(double a, double b) => { return a == b; },
+				Equate.Default,
+				Compute<double>.Compare,
+				(double a, double b) => { return (a + b) / 2; });
+
+			System.Collections.Generic.List<omnitree_record> list = new System.Collections.Generic.List<omnitree_record>();
+
+			System.Collections.Generic.LinkedList<omnitree_record> linkedlist = new LinkedList<omnitree_record>();
+
+			Random random = new Random(0);
+			int count = 1000;
+			omnitree_record[] records = new omnitree_record[count];
+			for (int i = 0; i < count; i++)
+				records[i] = new omnitree_record(i, random.NextDouble(), random.NextDouble(), random.NextDouble());
+
+			Console.WriteLine("Testing with " + count + " records...");
+			Console.WriteLine();
+
+			Console.WriteLine("Adding (Omnitree):          " + Seven.Diagnostics.Performance.Time_StopWatch(() =>
+				{
+					for (int i = 0; i < count; i++)
+						omnitree.Add(records[i]);
+				}));
+
+			Console.WriteLine("Adding (List):              " + Seven.Diagnostics.Performance.Time_StopWatch(() =>
+			{
+				for (int i = 0; i < count; i++)
+					list.Add(records[i]);
+			}));
+
+			Console.WriteLine("Adding (L-List):            " + Seven.Diagnostics.Performance.Time_StopWatch(() =>
+			{
+				for (int i = 0; i < count; i++)
+					linkedlist.AddLast(records[i]);
+			}));
+
+			Console.WriteLine();
+
+			Sort<omnitree_record>.Shuffle(random, Accessor.Get(records), Accessor.Assign(records), 0, records.Length);
+
+			Console.WriteLine("Querying Single (Omnitree): " + Seven.Diagnostics.Performance.Time_StopWatch(() =>
+				{
+					bool query_test;
+					for (int i = 0; i < count; i++)
+					{
+						query_test = false;
+						omnitree[locate(records[i])]((omnitree_record record) => { query_test = true; });
+						if (query_test == false)
+							throw new System.Exception();
+					}
+				}));
+
+			Console.WriteLine("Querying Single (List):     " + Seven.Diagnostics.Performance.Time_StopWatch(() =>
+			{
+				bool query_test = false;
+				for (int i = 0; i < count; i++)
+				{
+					foreach (omnitree_record record in list)
+					{
+						if (record.X == records[i].X && record.Y == records[i].Y && record.Z == records[i].Z)
+						{
+							query_test = true;
+							break;
+						}
+					}
+					if (query_test == false)
+						throw new System.Exception();
+				}
+			}));
+
+			Console.WriteLine("Querying Single (L-List):   " + Seven.Diagnostics.Performance.Time_StopWatch(() =>
+			{
+				bool query_test = false;
+				for (int i = 0; i < count; i++)
+				{
+					foreach (omnitree_record record in linkedlist)
+					{
+						if (record.X == records[i].X && record.Y == records[i].Y && record.Z == records[i].Z)
+						{
+							query_test = true;
+							break;
+						}
+					}
+					if (query_test == false)
+						throw new System.Exception();
+				}
+			}));
+
+			Console.WriteLine();
+
+			int random_query_count = 100;
+			double[][] random_mins = new double[random_query_count][];
+			for (int i = 0; i < random_query_count; i++)
+				random_mins[i] = new double[] { random.NextDouble(), random.NextDouble(), random.NextDouble(), };
+			double[][] random_maxes = new double[random_query_count][];
+			for (int i = 0; i < random_query_count; i++)
+				random_maxes[i] = new double[] { 
+					random.NextDouble() * ((1 - random_mins[i][1]) + random_mins[i][1]), 
+					random.NextDouble() * ((1 - random_mins[i][1]) + random_mins[i][1]),
+					random.NextDouble() * ((1 - random_mins[i][1]) + random_mins[i][1]) };
+
+			//Console.WriteLine("Querying Single (Omnitree): " + Seven.Diagnostics.Performance.Time_StopWatch(() =>
+			//{
+			//	bool query_test;
+			//	for (int i = 0; i < count; i++)
+			//	{
+			//		query_test = false;
+			//		omnitree.Stepper()
+			//		if (query_test == false)
+			//			throw new System.Exception();
+			//	}
+			//}));
+
+			//Console.WriteLine("Querying Single (List):     " + Seven.Diagnostics.Performance.Time_StopWatch(() =>
+			//{
+			//	bool query_test = false;
+			//	for (int i = 0; i < count; i++)
+			//	{
+			//		foreach (omnitree_record record in list)
+			//		{
+			//			if (record.X == records[i].X && record.Y == records[i].Y && record.Z == records[i].Z)
+			//			{
+			//				query_test = true;
+			//				break;
+			//			}
+			//		}
+			//		if (query_test == false)
+			//			throw new System.Exception();
+			//	}
+			//}));
+
+			//Console.WriteLine("Querying Single (L-List):   " + Seven.Diagnostics.Performance.Time_StopWatch(() =>
+			//{
+			//	bool query_test = false;
+			//	for (int i = 0; i < count; i++)
+			//	{
+			//		foreach (omnitree_record record in linkedlist)
+			//		{
+			//			if (record.X == records[i].X && record.Y == records[i].Y && record.Z == records[i].Z)
+			//			{
+			//				query_test = true;
+			//				break;
+			//			}
+			//		}
+			//		if (query_test == false)
+			//			throw new System.Exception();
+			//	}
+			//}));
+
+			Console.WriteLine();
+
+			foreach (omnitree_record record in records)
+			{
+				record.X += Math.Max(0d, Math.Min(1d, (random.NextDouble() / 100D) - .5D));
+				record.Y += Math.Max(0d, Math.Min(1d, (random.NextDouble() / 100D) - .5D));
+				record.Z += Math.Max(0d, Math.Min(1d, (random.NextDouble() / 100D) - .5D));
+			}
+
+			Console.WriteLine("Updating (Omnitree):        " + Seven.Diagnostics.Performance.Time_StopWatch(() =>
+			{
+				omnitree.Update();
+			}));
+
+			Console.WriteLine();
+
+			Console.WriteLine("Removing (Omnitree):        " + Seven.Diagnostics.Performance.Time_StopWatch(() =>
+			{
+				for (int i = 0; i < count; i++)
+				{
+					//// Removal Method #1
+					omnitree.Remove(records[i]);
+
+					//// Removal Method #2
+					//omnitree.Remove(locate(records[i]), locate(records[i]));
+
+					//// Removal Method #3
+					//omnitree.Remove(locate(records[i]), locate(records[i]), (omnitree_record step) => { return records[i].Id == step.Id; });
+
+					//// Removal Method #4
+					//double[] location = new double[] { locate(records[i])(0), locate(records[i])(1), locate(records[i])(2) };
+					//omnitree.Remove(location, location);
+
+					//// Removal Method #5
+					//double[] location = new double[] { locate(records[i])(0), locate(records[i])(1), locate(records[i])(2) };
+					//omnitree.Remove(location, location, (omnitree_record step) => { return records[i].Id == step.Id; });
+				}
+			}));
+
+			Console.WriteLine("Removing (List):            " + Seven.Diagnostics.Performance.Time_StopWatch(() =>
+			{
+				for (int i = 0; i < count; i++)
+				{
+					//list.Remove(records[i]);
+
+					for (int j = 0; j < list.Count; j++)
+					{
+						if (list[j].X == records[i].X && list[j].Y == records[i].Y && list[j].Z == records[i].Z)
+						{
+							list.RemoveAt(j);
+							break;
+						}
+					}
+				}
+			}));
+
+			Console.WriteLine("Removing (L-List):          " + Seven.Diagnostics.Performance.Time_StopWatch(() =>
+			{
+				for (int i = 0; i < count; i++)
+				{
+					//linkedlist.Remove(records[i]);
+
+					LinkedList<omnitree_record> temp = new LinkedList<omnitree_record>();
+					foreach (omnitree_record record in linkedlist)
+						if (record.X == records[i].X && record.Y == records[i].Y && record.Z == records[i].Z)
+						{
+							temp.AddLast(record);
+							break;
+						}
+					foreach (omnitree_record record in temp)
+						linkedlist.Remove(record);
+				}
+			}));
+
+			#endregion
+
 			Console.WriteLine();
 			Console.WriteLine("Done...");
 			Console.ReadLine();
