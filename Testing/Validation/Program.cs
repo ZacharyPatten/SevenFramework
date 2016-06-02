@@ -114,7 +114,7 @@ namespace Validation
 			}
 
 			Console.WriteLine("OmniTree.Count: " + omnitree.Count);
-			Console.WriteLine("OmniTree._top.Count: " + (omnitree as OmnitreeLinked<TestObject, double>)._top.Count);
+			//Console.WriteLine("OmniTree._top.Count: " + (omnitree as OmnitreeLinked<TestObject, double>)._top.Count);
 
 			int test_count = 0;
 			omnitree.Stepper((TestObject record) => { test_count++; });
@@ -222,7 +222,7 @@ namespace Validation
 
 			Console.WriteLine("OmniTree.Count: " + omnitree.Count);
 
-			Console.WriteLine("OmniTree._top.Count: " + (omnitree as OmnitreeLinked<TestObject, double>)._top.Count);
+			//Console.WriteLine("OmniTree._top.Count: " + (omnitree as OmnitreeLinked<TestObject, double>)._top.Count);
 
 			test_count = 0;
 			omnitree.Stepper((TestObject record) => { test_count++; });
@@ -337,7 +337,7 @@ namespace Validation
 			Console.WriteLine("Omnitree Built.");
 
 			Console.WriteLine("OmniTree.Count: " + omnitree.Count);
-			Console.WriteLine("OmniTree._top.Count: " + (omnitree as OmnitreeLinked<TestObject, object>)._top.Count);
+			//Console.WriteLine("OmniTree._top.Count: " + (omnitree as OmnitreeLinked<TestObject, object>)._top.Count);
 
 			int test_count = 0;
 			omnitree.Stepper((TestObject record) => { test_count++; });
@@ -445,7 +445,7 @@ namespace Validation
 
 			Console.WriteLine("OmniTree.Count: " + omnitree.Count);
 
-			Console.WriteLine("OmniTree._top.Count: " + (omnitree as OmnitreeLinked<TestObject, object>)._top.Count);
+			//Console.WriteLine("OmniTree._top.Count: " + (omnitree as OmnitreeLinked<TestObject, object>)._top.Count);
 
 			test_count = 0;
 			omnitree.Stepper((TestObject record) => { test_count++; });
